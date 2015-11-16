@@ -16,6 +16,11 @@ if ( ! defined( 'WPINC' ) ) {
 
 define("PATREON_PLUGIN_URL", plugin_dir_url( __FILE__ ) );
 
+require_once("patreon-php/src/patreon.php");
+
+use Patreon\API;
+use Patreon\OAuth;
+
 include 'admin/patreon-options-page.php';
 include 'classes/patreon_wordpress.php';
 

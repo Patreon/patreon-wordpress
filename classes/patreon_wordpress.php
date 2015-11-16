@@ -22,8 +22,6 @@ class Patreon_Wordpress {
 
 	function __construct() {
 
-		include 'patreon_oauth.php';
-		include 'patreon_api.php';
 		include 'patreon_login.php';
 		include 'patreon_routing.php';
 		include 'patreon_frontend.php';
@@ -42,7 +40,7 @@ class Patreon_Wordpress {
 		/* get user meta data and query patreon api */
 		$user_meta = get_user_meta($user->ID);
 		if(isset($user_meta['patreon_access_token'][0])) {
-			$api_client = new Patreon_API($user_meta['patreon_access_token'][0]);
+			$api_client = new Patreon\API($user_meta['patreon_access_token'][0]);
 			$user = $api_client->fetch_user();
 			return $user;
 		}
@@ -77,6 +75,24 @@ class Patreon_Wordpress {
 
 		/* get current users meta data */
 		$user_meta = get_user_meta($user->ID);
+
+		$user_response = self::getPatreonUser($user);
+
+		if($user_response == false) {
+			return false;
+		}
+
+		$pledge = null;
+		if (array_key_exists('included', $user_response)) {
+			foreach ($user_response['included'] as $obj) {
+				if ($obj["type"] == "pledge") {
+					$pledge = $obj;
+					break;
+				}
+			}
+		}
+
+		var_dump($pledge['relationships']);
 
 		$user_patronage = array(
 			'patreon_user'		=> $user_meta['patreon_user'],

@@ -57,9 +57,6 @@ class Patreon_Login {
 			update_user_meta($user->ID, 'user_lastname', $user_response['data']['attributes']['last_name']);
 		}
 
-		wp_redirect( home_url() );
-        exit;
-
 	}
 
 }
