@@ -41,13 +41,18 @@ function patreon_plugin_setup_page(){
     <table class="form-table">
 
         <tr valign="top">
+        <th scope="row">Redirect URI</th>
+        <td><input type="text" value="<?php echo site_url().'/patreon-authorization/'; ?>" disabled class="large-text" /></td>
+        </tr>
+
+        <tr valign="top">
         <th scope="row">Client ID</th>
-        <td><input type="text" name="patreon-client-id" value="<?php echo esc_attr( get_option('patreon-client-id', '') ); ?>" class="regular-text" /></td>
+        <td><input type="text" name="patreon-client-id" value="<?php echo esc_attr( get_option('patreon-client-id', '') ); ?>" class="large-text" /></td>
         </tr>
 
         <tr valign="top">
         <th scope="row">Client Secret</th>
-        <td><input type="text" name="patreon-client-secret" value="<?php echo esc_attr( get_option('patreon-client-secret', '') ); ?>" class="regular-text" /></td>
+        <td><input type="text" name="patreon-client-secret" value="<?php echo esc_attr( get_option('patreon-client-secret', '') ); ?>" class="large-text" /></td>
         </tr>
 
     </table>

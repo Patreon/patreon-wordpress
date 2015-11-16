@@ -24,25 +24,31 @@ class Patreon_Login {
 
 		if($user == false) {
 
-			//create user
+			/* create wordpress user if no account exists with provided email address */
 			$random_password = wp_generate_password( 12, false );
 			$user_id = wp_create_user( $email, $random_password, $email );
 
 			if($user_id) {
+				/* update user meta data with patreon data */
 				update_user_meta($user_id, 'patreon_refresh_token', $tokens['refresh_token']);
 				update_user_meta($user_id, 'patreon_access_token', $tokens['access_token']);
 				update_user_meta($user_id, 'patreon_user', $user_response['data']['attributes']['vanity']);
 				update_user_meta($user_id, 'patreon_created', $user_response['data']['attributes']['created']);
 				update_user_meta($user_id, 'user_firstname', $user_response['data']['attributes']['first_name']);
 				update_user_meta($user_id, 'user_lastname', $user_response['data']['attributes']['last_name']);
+				update_user_meta($user_id, 'patreon_token_minted', microtime());
+			} else {
+				/* wordpress account creation failed #HANDLE_ERROR */
 			}
 
 		} else {
 
-			//log user in
+			/* log user into existing wordpress account with matching email address */
 			wp_set_current_user( $user->ID, $user->user_login );
 			wp_set_auth_cookie( $user->ID );
 			do_action( 'wp_login', $user->user_login );
+
+			/* update user meta data with patreon data */
 			update_user_meta($user->ID, 'patreon_refresh_token', $tokens['refresh_token']);
 			update_user_meta($user->ID, 'patreon_access_token', $tokens['access_token']);
 			update_user_meta($user->ID, 'patreon_user', $user_response['data']['attributes']['vanity']);
