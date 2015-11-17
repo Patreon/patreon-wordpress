@@ -68,9 +68,7 @@ class Patreon_Frontend {
 				return false;
 			}
 
-			/* check users patronage level */
-			/* TODO: get users patronage level */
-			$patronage_level = Patreon_Wordpress::checkUserPatronage($user);
+			$patronage_level = Patreon_Wordpress::getUserPatronage($user);
 
 			if($patreon_content != false && $patronage_level != false) {
 				return $patreon_content->post_content;

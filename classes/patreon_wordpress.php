@@ -71,7 +71,27 @@ class Patreon_Wordpress {
 
 	}
 
-	public static function checkUserPatronage($user) {
+	public static function getPatreonCreatorID() {
+
+		$api_client = new Patreon\API(get_option('patreon-creators-access-token', false));
+        $user_response = $api_client->fetch_campaign();
+
+        $creator_id = false;
+
+        if (array_key_exists('data', $user_response)) {
+            foreach ($user_response['included'] as $obj) {
+                if ($obj["type"] == "user") {
+                    $creator_id = $obj['id'];
+                    break;
+                }
+            }
+        }
+
+        return $creator_id;
+
+	}
+
+	public static function getUserPatronage($user) {
 
 		/* get current users meta data */
 		$user_meta = get_user_meta($user->ID);
@@ -82,26 +102,33 @@ class Patreon_Wordpress {
 			return false;
 		}
 
-		$pledge = null;
+		$pledge = false;
 		if (array_key_exists('included', $user_response)) {
 			foreach ($user_response['included'] as $obj) {
-				if ($obj["type"] == "pledge") {
+				if ($obj["type"] == "pledge" && $obj["relationships"]["creator"]["data"]["id"] == get_option('patreon-creator-id', false)) {
 					$pledge = $obj;
 					break;
 				}
 			}
 		}
 
-		var_dump($pledge['relationships']);
+		if($pledge != false) {
+			return self::getUserPatronageLevel($pledge);
+		}
 
-		$user_patronage = array(
-			'patreon_user'		=> $user_meta['patreon_user'],
-			'patreon_created'	=> $user_meta['patreon_created'],
-			);
-
-		/* check users patronage level and return boolean for content security */
-		/* TODO */
 		return false;
+
+	}
+
+	public static function getUserPatronageLevel($pledge) {
+
+		$patronage_level = 0;
+
+		if(isset($pledge['attributes']['amount_cents'])) {
+			$patronage_level = $pledge['attributes']['amount_cents'];
+		}
+
+		return $patronage_level;
 
 	}
 

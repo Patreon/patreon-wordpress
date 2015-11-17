@@ -21,13 +21,25 @@ function patreon_plugin_register_settings() { // whitelist options
     register_setting( 'patreon-options', 'patreon-client-secret' );
     register_setting( 'patreon-options', 'patreon-creators-access-token' );
     register_setting( 'patreon-options', 'patreon-creators-refresh-token' );
+    register_setting( 'patreon-options', 'patreon-creator-id' );
 }
 
 function patreon_plugin_setup(){
     add_menu_page( 'Patreon Settings', 'Patreon Settings', 'manage_options', 'patreon-plugin', 'patreon_plugin_setup_page' );
 }
  
-function patreon_plugin_setup_page(){    
+function patreon_plugin_setup_page(){
+
+    /* update Patreon creator ID on page load */
+    if(get_option('patreon-client-id', false) && get_option('patreon-client-secret', false) && get_option('patreon-creators-access-token', false)) {
+        
+        $creator_id = Patreon_Wordpress::getPatreonCreatorID();
+
+        if($creator_id != false) {
+            update_option( 'patreon-creator-id', $creator_id );
+        }
+
+    }
     
 ?>
 
@@ -66,6 +78,13 @@ function patreon_plugin_setup_page(){
         <th scope="row">Creator's Refresh Token</th>
         <td><input type="text" name="patreon-creators-refresh-token" value="<?php echo esc_attr( get_option('patreon-creators-refresh-token', '') ); ?>" class="large-text" /></td>
         </tr>
+
+        <?php if(get_option('patreon-creator-campaign-id', false)) { ?>
+        <tr valign="top">
+        <th scope="row">Creator ID</th>
+        <td><input type="text" value="<?php echo esc_attr( get_option('patreon-creator-id', '') ); ?>" disabled class="large-text" /></td>
+        </tr>
+        <?php } ?>
 
     </table>
 
