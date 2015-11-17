@@ -1,0 +1,79 @@
+<?php
+
+/*
+Plugin Name: Patreon
+Plugin URI: 
+Description: Stay close with the Artists & Creators you're supporting
+Version: 1.0
+Author: Ben Parry
+Author URI: http://uiux.me
+*/
+
+if( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+
+add_action( 'load-post.php', 'patreon_plugin_meta_boxes_setup' );
+add_action( 'load-post-new.php', 'patreon_plugin_meta_boxes_setup' );
+
+
+function patreon_plugin_meta_boxes_setup() {
+	add_action( 'add_meta_boxes', 'patreon_plugin_meta_boxes' );
+	add_action( 'save_post', 'patreon_plugin_save_post_class_meta', 10, 2 );
+}
+
+function patreon_plugin_meta_boxes() {
+
+	add_meta_box(
+		'patreon-level',      // Unique ID
+		esc_html__( 'Patreon Level', 'Patreon Contribution Requirement' ),
+		'patreon_plugin_meta_box',
+		'patreon-content',
+		'side',
+		'default'
+	);
+
+}
+
+function patreon_plugin_meta_box( $object, $box ) { ?>
+
+	<?php wp_nonce_field( basename( __FILE__ ), 'patreon_metabox_nonce' ); ?>
+	<p>
+		<label for="patreon-level"><?php _e( "Add a minimum Patreon contribution required to access this content.", '1' ); ?></label>
+		<br><br>
+		<strong>&#36; </strong><input type="number" id="patreon-level" name="patreon-level" value="<?php echo esc_attr( get_post_meta( $object->ID, 'patreon-level', true ) ); ?>">
+	</p>
+
+<?php }
+
+
+function patreon_plugin_save_post_class_meta( $post_id, $post ) {
+
+	if ( !isset( $_POST['patreon_metabox_nonce'] ) || !wp_verify_nonce( $_POST['patreon_metabox_nonce'], basename( __FILE__ ) ) )
+		return $post_id;
+
+	$post_type = get_post_type_object( $post->post_type );
+
+	if ( !current_user_can( $post_type->cap->edit_post, $post_id ) )
+		return $post_id;
+
+	$new_patreon_level = ( isset( $_POST['patreon-level']) && is_numeric($_POST['patreon-level']) ? $_POST['patreon-level'] : 999 );
+
+	$patreon_level = get_post_meta( $post_id, 'patreon-level', true );
+
+	if ( $new_patreon_level && '' == $patreon_level ) {
+
+		add_post_meta( $post_id, 'patreon-level', $new_patreon_level, true );
+
+	} else if ( $new_patreon_level && $new_patreon_level != $patreon_level ) {
+
+		update_post_meta( $post_id, 'patreon-level', $new_patreon_level );
+
+	} else if ( '' == $new_patreon_level && $patreon_level ) {
+
+		delete_post_meta( $post_id, 'patreon-level', $patreon_level );
+	}
+
+}
+
+
+
+?>

@@ -22,6 +22,7 @@ use Patreon\API;
 use Patreon\OAuth;
 
 include 'admin/patreon-options-page.php';
+include 'admin/patreon-content-metabox.php';
 include 'classes/patreon_wordpress.php';
 
 $Patreon_Wordpress = new Patreon_Wordpress;

@@ -19,6 +19,7 @@ class Patreon_Frontend {
 	function __construct() {
 		add_action( 'login_form', array($this, 'showPatreonButton' ) );
 		add_shortcode( 'patreon_content', array($this, 'embedPatreonContent') );
+		add_filter( 'the_content', array($this, 'protectContentFromUsers') );
 	}
 
 	public function showPatreonButton() {
@@ -48,7 +49,7 @@ class Patreon_Frontend {
 
 		/* patreon banner when user patronage not high enough */
 		/* TODO: get marketing collateral */
-		echo '<img src="http://placehold.it/500x150?text=PATREON MARKETING COLLATERAL"/>';
+		return '<img src="http://placehold.it/500x150?text=PATREON MARKETING COLLATERAL"/>';
 
 	}
 
@@ -56,27 +57,54 @@ class Patreon_Frontend {
 
 		/* example shortcode [patreon_content slug="test-example"]
 
-
 		/* check if shortcode has slug parameter */
 		if(isset($args['slug'])) {
 
 			/* get patreon-content post with matching url slug */
 			$patreon_content = get_page_by_path($args['slug'],OBJECT,'patreon-content');
+
+			if($patreon_content == false) {
+				return 'Patreon content not found.';
+			}
 			
 			$user = wp_get_current_user();
 			if($user == false) {
 				return false;
 			}
 
-			$patronage_level = Patreon_Wordpress::getUserPatronage($user);
+			$user_patronage = Patreon_Wordpress::getUserPatronage($user);
 
-			if($patreon_content != false && $patronage_level != false) {
+			$patreon_level = get_post_meta( $patreon_content->ID, 'patreon-level', true );
+
+			if(is_numeric($patreon_level) && $user_patronage >= ($patreon_level*100) ) {
 				return $patreon_content->post_content;
 			}
 
 			return self::displayPatreonCampaignBanner();
 
 		}
+
+	}
+
+	function protectContentFromUsers($content) {
+
+		global $post;
+
+		if(is_singular('patreon-content') && get_post_type() == 'patreon-content') {
+
+			$user = wp_get_current_user();
+
+			$user_patronage = Patreon_Wordpress::getUserPatronage($user);
+
+			$patreon_level = get_post_meta( $post->ID, 'patreon-level', true );
+
+			if(empty($patreon_level) || $user_patronage < ($patreon_level*100) ) {
+				$content = self::displayPatreonCampaignBanner();
+			}
+
+		}
+
+		return $content;
 
 	}
 

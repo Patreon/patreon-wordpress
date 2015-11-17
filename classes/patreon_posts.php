@@ -18,8 +18,6 @@ class Patreon_Posts {
 
 	function __construct() {
 		add_action( 'init', array($this, 'registerPatreonPost') );
-		add_action( 'init', array($this, 'registerPatreonTier'), 0 );
-		add_filter( 'the_content', array($this, 'protectContentFromUsers') );
 	}
 
 	function registerPatreonPost() {
@@ -47,47 +45,11 @@ class Patreon_Posts {
 			'supports'      => array( 'title', 'editor'),
 			'capability_type' => 'post',
 			'has_archive'   => false,
-			'taxonomies' 	=> array('patreon-tier'),
 			'rewrite'       => array( 'slug' => 'patreon-content' ),
 		);
 		register_post_type( 'patreon-content', $args );	
 	}
 
-	function registerPatreonTier() {
-		register_taxonomy(
-	        'patreon-tier',
-	        'patreon-tier',
-	        array(
-	            'labels' => array(
-	                'name' => 'Patreon Tier',
-	                'add_new_item' => 'Add New Patreon Tier',
-	                'new_item_name' => 'New Patreon Tier'
-	            ),
-	            'show_ui' => true,
-	            'show_tagcloud' => false,
-	            'hierarchical' => false
-	        )
-	    );
-	}
-
-	function protectContentFromUsers($content) {
-
-		if(is_singular('patreon-content') && get_post_type() == 'patreon-content') {
-
-			$user = wp_get_current_user();
-
-			$user_patronage = Patreon_Wordpress::checkUserPatronage($user);
-
-			/* if user patronage > X amount etc */
-			/* else show patreon campaign banner */
-			$content = Patreon_Wordpress::displayPatreonCampaignBanner();
-
-
-		}
-
-		return $content;
-
-	}
 
 }
 
