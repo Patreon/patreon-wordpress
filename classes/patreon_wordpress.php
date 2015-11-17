@@ -132,6 +132,23 @@ class Patreon_Wordpress {
 
 	}
 
+	public static function isPatron() {
+
+		$user = wp_get_current_user();
+		if($user == false) {
+			return false;
+		}
+
+		$user_patronage = self::getUserPatronage($user);
+
+		if($user_patronage > 0) {
+			return true;
+		}
+
+		return false;
+
+	}
+
 }
 
 ?>
