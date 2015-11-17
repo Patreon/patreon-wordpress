@@ -91,7 +91,12 @@ class Patreon_Wordpress {
 
 	}
 
-	public static function getUserPatronage($user) {
+	public static function getUserPatronage() {
+
+		$user = wp_get_current_user();
+		if($user == false) {
+			return false;
+		}
 
 		/* get current users meta data */
 		$user_meta = get_user_meta($user->ID);
@@ -133,11 +138,6 @@ class Patreon_Wordpress {
 	}
 
 	public static function isPatron() {
-
-		$user = wp_get_current_user();
-		if($user == false) {
-			return false;
-		}
 
 		$user_patronage = self::getUserPatronage($user);
 

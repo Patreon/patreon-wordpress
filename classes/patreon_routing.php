@@ -59,7 +59,7 @@ class Patreon_Routing {
 
 				if(get_option('patreon-client-id', false) == false || get_option('patreon-client-secret', false) == false) {
 
-					/* redirect to homepage because of oauth client_id or secrety_key error #HANDLE_ERROR */
+					/* redirect to homepage because of oauth client_id or secure_key error #HANDLE_ERROR */
 					wp_redirect( home_url() );
 					exit;
 				} else {
@@ -80,7 +80,9 @@ class Patreon_Routing {
 					$api_client = new Patreon\API($tokens['access_token']);
 					$user_response = $api_client->fetch_user();
 					$user = Patreon_Login::createUserFromPatreon($user_response, $tokens);
+
 					wp_redirect( home_url(), 302 );
+					exit;
 
 				}
 

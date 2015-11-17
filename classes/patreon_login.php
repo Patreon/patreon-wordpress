@@ -29,6 +29,7 @@ class Patreon_Login {
 			$user_id = wp_create_user( $email, $random_password, $email );
 
 			if($user_id) {
+
 				/* update user meta data with patreon data */
 				update_user_meta($user_id, 'patreon_refresh_token', $tokens['refresh_token']);
 				update_user_meta($user_id, 'patreon_access_token', $tokens['access_token']);
@@ -37,6 +38,7 @@ class Patreon_Login {
 				update_user_meta($user_id, 'user_firstname', $user_response['data']['attributes']['first_name']);
 				update_user_meta($user_id, 'user_lastname', $user_response['data']['attributes']['last_name']);
 				update_user_meta($user_id, 'patreon_token_minted', microtime());
+				
 			} else {
 				/* wordpress account creation failed #HANDLE_ERROR */
 			}
