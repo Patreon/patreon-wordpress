@@ -103,6 +103,20 @@ class Patreon_Frontend {
 				
 			}
 
+		} else if (is_singular() && get_post_type() == 'post') {
+
+			$patreon_level = get_post_meta( $post->ID, 'patreon-level', true );
+
+			if($patreon_level !== null) {
+
+				$user_patronage = Patreon_Wordpress::getUserPatronage();
+
+				if($user_patronage < ($patreon_level*100)) {
+					$content = self::displayPatreonCampaignBanner();
+				}
+
+			}
+
 		}
 
 		return $content;

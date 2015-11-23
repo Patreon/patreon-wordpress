@@ -63,7 +63,7 @@ class Patreon_Routing {
 					wp_redirect( home_url() );
 					exit;
 				} else {
-					$oauth_client = new Patreon\OAuth(get_option('patreon-client-id', false), get_option('patreon-client-secret', false));;
+					$oauth_client = new Patreon_Oauth;
 				}
 
 				$tokens = $oauth_client->get_tokens($wp->query_vars['code'], site_url().'/patreon-authorization/');
@@ -77,7 +77,7 @@ class Patreon_Routing {
 				} else {
 
 					/* redirect to homepage successfully #HANDLE_SUCCESS */
-					$api_client = new Patreon\API($tokens['access_token']);
+					$api_client = new Patreon_API($tokens['access_token']);
 					$user_response = $api_client->fetch_user();
 					$user = Patreon_Login::createUserFromPatreon($user_response, $tokens);
 

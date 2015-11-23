@@ -26,6 +26,8 @@ class Patreon_Wordpress {
 		include 'patreon_routing.php';
 		include 'patreon_frontend.php';
 		include 'patreon_posts.php';
+		include 'patreon_api.php';
+		include 'patreon_oauth.php';
 
 		self::$Patreon_Routing = new Patreon_Routing;
 		self::$Patreon_Frontend = new Patreon_Frontend;
@@ -40,7 +42,7 @@ class Patreon_Wordpress {
 		/* get user meta data and query patreon api */
 		$user_meta = get_user_meta($user->ID);
 		if(isset($user_meta['patreon_access_token'][0])) {
-			$api_client = new Patreon\API($user_meta['patreon_access_token'][0]);
+			$api_client = new Patreon_API($user_meta['patreon_access_token'][0]);
 			$user = $api_client->fetch_user();
 			return $user;
 		}
@@ -73,7 +75,7 @@ class Patreon_Wordpress {
 
 	public static function getPatreonCreatorID() {
 
-		$api_client = new Patreon\API(get_option('patreon-creators-access-token', false));
+		$api_client = new Patreon_API(get_option('patreon-creators-access-token', false));
         $user_response = $api_client->fetch_campaign();
 
         $creator_id = false;
