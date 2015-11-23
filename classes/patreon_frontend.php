@@ -111,8 +111,12 @@ class Patreon_Frontend {
 
 				$user_patronage = Patreon_Wordpress::getUserPatronage();
 
-				if($user_patronage < ($patreon_level*100)) {
-					$content = self::displayPatreonCampaignBanner();
+				if($user_patronage != false) {
+
+					if($user_patronage < ($patreon_level*100)) {
+						$content = self::displayPatreonCampaignBanner();
+					}
+
 				}
 
 			}
