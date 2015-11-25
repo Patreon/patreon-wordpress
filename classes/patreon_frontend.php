@@ -40,9 +40,15 @@ class Patreon_Frontend {
 		.ptrn-button{display:block;margin-bottom:20px!important;background: #232D32;line-height:1;color: white;text-decoration: none;vertical-align: middle;padding: 10px;text-align: center;border-radius: 6px;font-size: 17px;}
 		.ptrn-button:hover,.ptrn-button:active,.ptrn-button:focus {color:white;}
 		.ptrn-button img {height:30px;}
+		.patreon-msg {-webkit-border-radius: 6px;-moz-border-radius: 6px;-ms-border-radius: 6px;-o-border-radius: 6px;border-radius: 6px;padding:8px;margin-bottom:20px!important;display:block;border:1px solid #E6461A;background-color:#484848;color:#ffffff;}
 		</style>';
 
-		echo apply_filters('ptrn/login_button', '<a href="'.$href.'" class="ptrn-button" data-ptrn_nonce="' . wp_create_nonce( 'patreon-nonce' ).'">Connect with&nbsp;&nbsp; <img src="'.$logo_img.'"/></a>');
+		if(isset($_REQUEST['patreon-msg']) && $_REQUEST['patreon-msg'] == 'login_with_patreon') {
+			echo '<p class="patreon-msg">You can now login with your wordpress username/password.</p>';
+		} else {
+			echo apply_filters('ptrn/login_button', '<a href="'.$href.'" class="ptrn-button" data-ptrn_nonce="' . wp_create_nonce( 'patreon-nonce' ).'">Connect with&nbsp;&nbsp; <img src="'.$logo_img.'"/></a>');
+		}
+		
 	}
 
 	public function displayPatreonCampaignBanner() {
@@ -111,12 +117,8 @@ class Patreon_Frontend {
 
 				$user_patronage = Patreon_Wordpress::getUserPatronage();
 
-				if($user_patronage != false) {
-
-					if($user_patronage < ($patreon_level*100)) {
-						$content = self::displayPatreonCampaignBanner();
-					}
-
+				if($user_patronage === false || $user_patronage < ($patreon_level*100)) {
+					$content = self::displayPatreonCampaignBanner();
 				}
 
 			}

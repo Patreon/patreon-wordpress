@@ -64,7 +64,7 @@ class Patreon_Login {
 			update_user_meta($user->ID, 'user_firstname', $user_response['data']['attributes']['first_name']);
 			update_user_meta($user->ID, 'user_lastname', $user_response['data']['attributes']['last_name']);
 
-			auth_redirect();
+			wp_redirect( wp_login_url().'?patreon-msg=login_with_patreon', '301' );
 			exit;
 
 		}
