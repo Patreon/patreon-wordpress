@@ -73,11 +73,15 @@ class Patreon_Frontend {
 				return 'Patreon content not found.';
 			}
 
+			$patreon_level = get_post_meta( $patreon_content->ID, 'patreon-level', true );
+
+			if($patreon_level == 0) {
+				return $patreon_content->post_content;
+			}
+
 			$user_patronage = Patreon_Wordpress::getUserPatronage();
 
 			if($user_patronage != false) {
-
-				$patreon_level = get_post_meta( $patreon_content->ID, 'patreon-level', true );
 
 				if(is_numeric($patreon_level) && $user_patronage >= ($patreon_level*100) ) {
 					return $patreon_content->post_content;
@@ -85,7 +89,11 @@ class Patreon_Frontend {
 
 			}
 
-			return self::displayPatreonCampaignBanner();
+			if(isset($args['youtube_id']) && isset($args['youtube_width']) && is_numeric($args['youtube_width']) && isset($args['youtube_height']) && is_numeric($args['youtube_height']) ) {
+				return '<iframe width="'.$args['youtube_width'].'" height="'.$args['youtube_height'].'" src="https://www.youtube.com/embed/'.$args['youtube_id'].'?rel=0&amp;controls=0&amp;showinfo=0" frameborder="0" allowfullscreen></iframe>';
+			} else {
+				return self::displayPatreonCampaignBanner();
+			}
 
 		}
 
@@ -97,11 +105,15 @@ class Patreon_Frontend {
 
 		if(is_singular('patreon-content') && get_post_type() == 'patreon-content') {
 
+			$patreon_level = get_post_meta( $post->ID, 'patreon-level', true );
+
+			if($patreon_level == 0) {
+				return $content;
+			}
+
 			$user_patronage = Patreon_Wordpress::getUserPatronage();
 
 			if($user_patronage != false) {
-
-				$patreon_level = get_post_meta( $post->ID, 'patreon-level', true );
 
 				if(empty($patreon_level) || $user_patronage < ($patreon_level*100) ) {
 					$content = self::displayPatreonCampaignBanner();
@@ -113,14 +125,14 @@ class Patreon_Frontend {
 
 			$patreon_level = get_post_meta( $post->ID, 'patreon-level', true );
 
-			if($patreon_level !== null) {
+			if($patreon_level == 0) {
+				return $content;
+			}
 
-				$user_patronage = Patreon_Wordpress::getUserPatronage();
+			$user_patronage = Patreon_Wordpress::getUserPatronage();
 
-				if($user_patronage === false || $user_patronage < ($patreon_level*100)) {
-					$content = self::displayPatreonCampaignBanner();
-				}
-
+			if($user_patronage == false || $user_patronage < ($patreon_level*100)) {
+				$content = self::displayPatreonCampaignBanner();
 			}
 
 		}
