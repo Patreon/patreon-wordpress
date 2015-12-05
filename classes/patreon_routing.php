@@ -22,6 +22,7 @@ class Patreon_Routing {
 		add_action( 'generate_rewrite_rules', array($this, 'add_rewrite_rules') );
 		add_filter( 'query_vars', array($this, 'query_vars') );
 		add_action( 'parse_request', array($this, 'parse_request') );
+		add_action( 'init', array($this, 'force_rewrite_rules') );
 	}
 
 	function activate() {
@@ -33,6 +34,14 @@ class Patreon_Routing {
 		remove_action( 'generate_rewrite_rules','add_rewrite_rules' );
 		global $wp_rewrite;
 		$wp_rewrite->flush_rules();
+	}
+
+	function force_rewrite_rules() {
+		global $wp_rewrite;
+		if(get_option('patreon-rewrite-rules-flushed', false) == false) {
+			$wp_rewrite->flush_rules();
+			update_option( 'patreon-rewrite-rules-flushed', true );
+		}
 	}
 
 	function add_rewrite_rules($wp_rewrite) {

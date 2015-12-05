@@ -76,7 +76,12 @@ class Patreon_Wordpress {
 	public static function getPatreonCreatorID() {
 
 		$api_client = new Patreon_API(get_option('patreon-creators-access-token', false));
-        $user_response = $api_client->fetch_campaign();
+
+        $user_response = $api_client->fetch_campaign_and_patrons();
+
+        if(empty($user_response)) {
+        	return false;
+        }
 
         $creator_id = false;
 

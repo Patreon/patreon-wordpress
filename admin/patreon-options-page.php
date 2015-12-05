@@ -22,6 +22,7 @@ function patreon_plugin_register_settings() { // whitelist options
     register_setting( 'patreon-options', 'patreon-creators-access-token' );
     register_setting( 'patreon-options', 'patreon-creators-refresh-token' );
     register_setting( 'patreon-options', 'patreon-creator-id' );
+    register_setting( 'patreon-options', 'patreon-rewrite-rules-flushed' );
 }
 
 function patreon_plugin_setup(){
@@ -48,6 +49,11 @@ function patreon_plugin_setup_page(){
 <form method="post" action="options.php">
     <?php settings_fields( 'patreon-options' ); ?>
     <?php do_settings_sections( 'patreon-options' ); ?> 
+
+    <?php if($creator_id == false) { ?>
+    <br>
+    <p>Cannot retrieve creator ID. Error connecting with Patreon.</p>
+    <?php } ?>
 
     <br>
 
@@ -79,7 +85,7 @@ function patreon_plugin_setup_page(){
         <td><input type="text" name="patreon-creators-refresh-token" value="<?php echo esc_attr( get_option('patreon-creators-refresh-token', '') ); ?>" class="large-text" /></td>
         </tr>
 
-        <?php if(get_option('patreon-creator-campaign-id', false)) { ?>
+        <?php if(get_option('patreon-creator-id', false)) { ?>
         <tr valign="top">
         <th scope="row">Creator ID</th>
         <td><input type="text" value="<?php echo esc_attr( get_option('patreon-creator-id', '') ); ?>" disabled class="large-text" /></td>
