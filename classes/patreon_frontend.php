@@ -103,7 +103,7 @@ class Patreon_Frontend {
 
 		global $post;
 
-		if(is_singular('patreon-content') && get_post_type() == 'patreon-content') {
+		if(is_singular('patreon-content') && get_post_type() == 'patreon-content' || is_singular() && get_post_type() == 'post') {
 
 			$patreon_level = get_post_meta( $post->ID, 'patreon-level', true );
 
@@ -113,25 +113,7 @@ class Patreon_Frontend {
 
 			$user_patronage = Patreon_Wordpress::getUserPatronage();
 
-			if($user_patronage != false) {
-
-				if(empty($patreon_level) || $user_patronage < ($patreon_level*100) ) {
-					$content = self::displayPatreonCampaignBanner();
-				}
-				
-			}
-
-		} else if (is_singular() && get_post_type() == 'post') {
-
-			$patreon_level = get_post_meta( $post->ID, 'patreon-level', true );
-
-			if($patreon_level == 0) {
-				return $content;
-			}
-
-			$user_patronage = Patreon_Wordpress::getUserPatronage();
-
-			if($user_patronage == false || $user_patronage < ($patreon_level*100)) {
+			if( $user_patronage == false || $user_patronage < ($patreon_level*100) ) {
 				$content = self::displayPatreonCampaignBanner();
 			}
 

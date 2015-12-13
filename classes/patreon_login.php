@@ -18,7 +18,30 @@ class Patreon_Login {
 
 	public static function createUserFromPatreon($user_response, $tokens) {
 
+		global $wpdb;
+
 		$email = $user_response['data']['attributes']['email'];
+
+		$name = strtolower(str_replace(' ', '', $user_response['data']['attributes']['first_name'].'_'.$user_response['data']['attributes']['last_name']));
+		
+		if(validate_username($name) && username_exists($name) == false) {
+			$username = sanitize_user( $name, true );
+		} else {
+			$username = explode('@', $user_response['data']['attributes']['email']);
+			$username = strtolower(sanitize_user($username[0]));
+		}
+
+		if(username_exists($username)) {
+
+			$suffix = $wpdb->get_var( $wpdb->prepare(
+				"SELECT 1 + SUBSTR(user_login, %d) FROM $wpdb->users WHERE user_login REGEXP %s ORDER BY 1 DESC LIMIT 1",
+				strlen( $username ) + 2, '^' . $username . '(\.[0-9]+)?$' ) );
+
+			if( !empty( $suffix ) ) {
+				$username .= ".{$suffix}";
+			}
+
+		}
 
 		$user = get_user_by( 'email', $email );
 
@@ -26,7 +49,7 @@ class Patreon_Login {
 
 			/* create wordpress user if no account exists with provided email address */
 			$random_password = wp_generate_password( 12, false );
-			$user_id = wp_create_user( $email, $random_password, $email );
+			$user_id = wp_create_user( $username, $random_password, $email );
 
 			if($user_id) {
 
