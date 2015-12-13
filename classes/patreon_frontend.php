@@ -103,7 +103,7 @@ class Patreon_Frontend {
 
 		global $post;
 
-		if(is_singular('patreon-content') && get_post_type() == 'patreon-content' || is_singular() && get_post_type() == 'post') {
+		if((is_singular('patreon-content') && get_post_type() == 'patreon-content') || (is_singular() && get_post_type() == 'post')) {
 
 			$patreon_level = get_post_meta( $post->ID, 'patreon-level', true );
 
