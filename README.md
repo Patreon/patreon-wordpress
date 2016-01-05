@@ -15,4 +15,4 @@
   * "Add New Patreon Content"
   * Fill out the patron-only content
   * Use the "Patreon Level" widget on the right side to choose what level of patronage to restrict visibility to
-  * To use this piece of content in a post, put the slug in your post, like so: [patreon_content slug="this-content-is-for-patrons-only"] (the thing in quotes can be found highlighted in yellow under the title field in the Add New Patreon Content page (not the full URL, just the yellow bit))
+  * To use this piece of content in a post, put the slug in your post, like so: `[patreon_content slug="this-content-is-for-patrons-only"]` (the thing in quotes can be found highlighted in yellow under the title field in the Add New Patreon Content page (not the full URL, just the yellow bit))
