@@ -24,7 +24,7 @@ class Patreon_Frontend {
 
 	public function showPatreonButton() {
 
-		$logo_img = PATREON_PLUGIN_URL . 'img/patreon-logo.png';
+		$log_in_img = PATREON_PLUGIN_URL . 'img/log-in-with-patreon-med@2x.png';
 
 		$client_id = get_option('patreon-client-id', false);
 
@@ -37,16 +37,15 @@ class Patreon_Frontend {
 		/* inline styles, for shame */
 		echo '
 		<style type="text/css">
-		.ptrn-button{display:block;margin-bottom:20px!important;background: #232D32;line-height:1;color: white;text-decoration: none;vertical-align: middle;padding: 10px;text-align: center;border-radius: 6px;font-size: 17px;}
-		.ptrn-button:hover,.ptrn-button:active,.ptrn-button:focus {color:white;}
-		.ptrn-button img {height:30px;}
+		.ptrn-button{display:block;margin-bottom:20px!important;}
+		.ptrn-button img {width: 192px; height:40px;}
 		.patreon-msg {-webkit-border-radius: 6px;-moz-border-radius: 6px;-ms-border-radius: 6px;-o-border-radius: 6px;border-radius: 6px;padding:8px;margin-bottom:20px!important;display:block;border:1px solid #E6461A;background-color:#484848;color:#ffffff;}
 		</style>';
 
 		if(isset($_REQUEST['patreon-msg']) && $_REQUEST['patreon-msg'] == 'login_with_patreon') {
 			echo '<p class="patreon-msg">You can now login with your wordpress username/password.</p>';
 		} else {
-			echo apply_filters('ptrn/login_button', '<a href="'.$href.'" class="ptrn-button" data-ptrn_nonce="' . wp_create_nonce( 'patreon-nonce' ).'">Connect with&nbsp;&nbsp; <img src="'.$logo_img.'"/></a>');
+			echo apply_filters('ptrn/login_button', '<a href="'.$href.'" class="ptrn-button" data-ptrn_nonce="' . wp_create_nonce( 'patreon-nonce' ).'"><img src="'.$log_in_img.'" width="192" height="40" /></a>');
 		}
 		
 	}
