@@ -50,11 +50,43 @@ class Patreon_Frontend {
 		
 	}
 
-	public function displayPatreonCampaignBanner() {
+	public function displayPatreonCampaignBanner($patreon_level) {
 
 		/* patreon banner when user patronage not high enough */
 		/* TODO: get marketing collateral */
-		return '<img src="http://placehold.it/500x150?text=PATREON MARKETING COLLATERAL"/>';
+		//return '<img src="http://placehold.it/500x150?text=PATREON MARKETING COLLATERAL"/>';
+
+		//TAO get the patreon pitch page and display it
+		//TAO this is the patreon pitch page
+		$TAO_patreon_pitch_page_url = get_option('tao-patreon-pitch-page', '');
+			//if options comes back with something, then replace the $content		
+			if($TAO_patreon_pitch_page_url)
+				{
+					//I have a full url from the options page, convert that into an DI
+					$TAO_patreon_pitch_page_id  = url_to_postid( $TAO_patreon_pitch_page_url );
+						//the id was found, get the content of that post now
+						if($TAO_patreon_pitch_page_id)
+								{
+									//Display a message for the viewer to usnderstand why they cannot see the content if the option is filled out
+									$TAO_patreon_pitch_reason = get_option('tao-patreon-pitch-reason', '');
+										if($TAO_patreon_pitch_reason)
+												{
+													//check to see if $patreon_level exists in string and replace it with $patreon_level var
+													$TAO_patreon_pitch_reason = str_replace('$patreon_level','$'.$patreon_level,$TAO_patreon_pitch_reason);
+
+													//$content = '[message_box type="note" icon="yes"]' . $TAO_patreon_pitch_reason . '[/message_box][hr]';
+													$content = $TAO_patreon_pitch_reason;
+												}
+									
+
+									//get the content from a post ID, which is the patreon pitch page
+									$content .= get_post_field('post_content', $TAO_patreon_pitch_page_id);
+									return $content;
+
+								}
+				}
+
+
 
 	}
 
@@ -112,8 +144,9 @@ class Patreon_Frontend {
 
 			$user_patronage = Patreon_Wordpress::getUserPatronage();
 
-			if( $user_patronage == false || $user_patronage < ($patreon_level*100) ) {
-				$content = self::displayPatreonCampaignBanner();
+			if( $user_patronage == false || $user_patronage < ($patreon_level) ) {
+				$content = self::displayPatreonCampaignBanner($patreon_level);
+
 			}
 
 		}
