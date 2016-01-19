@@ -23,6 +23,10 @@ function patreon_plugin_register_settings() { // whitelist options
     register_setting( 'patreon-options', 'patreon-creators-refresh-token' );
     register_setting( 'patreon-options', 'patreon-creator-id' );
     register_setting( 'patreon-options', 'patreon-rewrite-rules-flushed' );
+    //TAO adding own patreon pitch page message on why content cannot be seen
+    register_setting( 'patreon-options', 'tao-patreon-pitch-reason' );
+    //TAO add my own patreon pitch page option.  I also added to the table of options below
+    register_setting( 'patreon-options', 'tao-patreon-pitch-page' );
 }
 
 function patreon_plugin_setup(){
@@ -84,6 +88,16 @@ function patreon_plugin_setup_page(){
         <th scope="row">Creator's Refresh Token</th>
         <td><input type="text" name="patreon-creators-refresh-token" value="<?php echo esc_attr( get_option('patreon-creators-refresh-token', '') ); ?>" class="large-text" /></td>
         </tr>
+        
+        <tr valign="top">
+        <th scope="row">Patreon Pitch Reason</th>
+        <td><input type="text" name="tao-patreon-pitch-reason" value="<?php echo esc_attr( get_option('tao-patreon-pitch-reason', '') ); ?>" class="large-text" /></td>
+        </tr>            
+
+        <tr valign="top">
+        <th scope="row">Patreon Pitch Page</th>
+        <td><input type="url" name="tao-patreon-pitch-page" value="<?php echo esc_attr( get_option('tao-patreon-pitch-page', '') ); ?>" class="large-text" /></td>
+        </tr>        
 
         <?php if(get_option('patreon-creator-id', false)) { ?>
         <tr valign="top">
