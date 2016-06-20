@@ -1,8 +1,8 @@
-<?php 
+<?php
 
 /*
 Plugin Name: Patreon
-Plugin URI: 
+Plugin URI:
 Description: Stay close with the Artists & Creators you're supporting
 Version: 1.0
 Author: Ben Parry
@@ -47,14 +47,38 @@ class Patreon_Frontend {
 		} else {
 			echo apply_filters('ptrn/login_button', '<a href="'.$href.'" class="ptrn-button" data-ptrn_nonce="' . wp_create_nonce( 'patreon-nonce' ).'"><img src="'.$log_in_img.'" width="272" height="42" /></a>');
 		}
-		
+
 	}
+
+    function currentPageURL() {
+        $pageURL = 'http';
+        if ($_SERVER["HTTPS"] == "on") {
+            $pageURL .= "s";
+        }
+        $pageURL .= "://";
+        if ($_SERVER["SERVER_PORT"] != "80") {
+            $pageURL .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];
+        } else {
+            $pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];
+        }
+        return $pageURL;
+    }
 
 	public function displayPatreonCampaignBanner() {
 
 		/* patreon banner when user patronage not high enough */
-		/* TODO: get marketing collateral */
-		return '<img src="http://placehold.it/500x150?text=PATREON MARKETING COLLATERAL"/>';
+		$paywall_img = get_option('patreon-paywall-img-url', '');
+        if ($paywall_img == '') {
+            $paywall_img = 'https://s3-us-west-1.amazonaws.com/widget-images/become-patron-widget-medium.png';
+        }
+        $paywall_img_elem = '<img src="'.$paywall_img.'"/>';
+        $creator_id = get_option('patreon-creator-id', '');
+        $current_url = urlencode(self::currentPageURL());
+        if ($creator_id != '') {
+            return '<a href="https://www.patreon.com/bePatron?u='.$creator_id.'&redirect_uri='.$current_url.'">'.$paywall_img_elem.'</a>';
+        } else {
+            return $paywall_img_elem;
+        }
 
 	}
 

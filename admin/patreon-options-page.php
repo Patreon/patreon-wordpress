@@ -2,7 +2,7 @@
 
 /*
 Plugin Name: Patreon
-Plugin URI: 
+Plugin URI:
 Description: Stay close with the Artists & Creators you're supporting
 Version: 1.0
 Author: Ben Parry
@@ -22,18 +22,19 @@ function patreon_plugin_register_settings() { // whitelist options
     register_setting( 'patreon-options', 'patreon-creators-access-token' );
     register_setting( 'patreon-options', 'patreon-creators-refresh-token' );
     register_setting( 'patreon-options', 'patreon-creator-id' );
+    register_setting( 'patreon-options', 'patreon-paywall-img-url' );
     register_setting( 'patreon-options', 'patreon-rewrite-rules-flushed' );
 }
 
 function patreon_plugin_setup(){
     add_menu_page( 'Patreon Settings', 'Patreon Settings', 'manage_options', 'patreon-plugin', 'patreon_plugin_setup_page' );
 }
- 
+
 function patreon_plugin_setup_page(){
 
     /* update Patreon creator ID on page load */
     if(get_option('patreon-client-id', false) && get_option('patreon-client-secret', false) && get_option('patreon-creators-access-token', false)) {
-        
+
         $creator_id = Patreon_Wordpress::getPatreonCreatorID();
 
         if($creator_id != false) {
@@ -41,14 +42,14 @@ function patreon_plugin_setup_page(){
         }
 
     }
-    
+
 ?>
 
 <h1>Patreon API Settings</h1>
 
 <form method="post" action="options.php">
     <?php settings_fields( 'patreon-options' ); ?>
-    <?php do_settings_sections( 'patreon-options' ); ?> 
+    <?php do_settings_sections( 'patreon-options' ); ?>
 
     <?php if($creator_id == false) { ?>
     <br>
@@ -91,6 +92,11 @@ function patreon_plugin_setup_page(){
         <td><input type="text" value="<?php echo esc_attr( get_option('patreon-creator-id', '') ); ?>" disabled class="large-text" /></td>
         </tr>
         <?php } ?>
+
+        <tr valign="top">
+        <th scope="row">URL for image to show when user is not yet a patron (or not yet paying enough)</th>
+        <td><input type="text" name="patreon-paywall-img-url" value="<?php echo esc_attr( get_option('patreon-paywall-img-url', '') ); ?>" class="large-text" /></td>
+        </tr>
 
     </table>
 
