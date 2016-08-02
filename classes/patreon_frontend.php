@@ -137,7 +137,13 @@ class Patreon_Frontend {
 			$user_patronage = Patreon_Wordpress::getUserPatronage();
 
 			if( $user_patronage == false || $user_patronage < ($patreon_level*100) ) {
-				$content = self::displayPatreonCampaignBanner();
+				if (strpos($content, '<!--patron-->') !== false) {
+				    $content = explode('<!--patron-->', $content)[0];
+				} else {
+					$content = "";
+				}
+
+				$content .= self::displayPatreonCampaignBanner();
 			}
 
 		}
