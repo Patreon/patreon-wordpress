@@ -1,13 +1,14 @@
-<?php 
+<?php
 
 /*
 Plugin Name: Patreon
-Plugin URI: 
+Plugin URI:
 Description: Stay close with the Artists & Creators you're supporting
 Version: 1.0
 Author: Ben Parry
 Author URI: http://uiux.me
 */
+namespace patreon;
 
 // If this file is called directly, abort.
 if ( ! defined( 'WPINC' ) ) {
@@ -22,12 +23,12 @@ class Patreon_Wordpress {
 
 	function __construct() {
 
-		include 'patreon_login.php';
-		include 'patreon_routing.php';
-		include 'patreon_frontend.php';
-		include 'patreon_posts.php';
-		include 'patreon_api.php';
-		include 'patreon_oauth.php';
+		include 'includes/class-patreon-login.php';
+		include 'includes/class-patreon-routing.php';
+		include 'frontend/class-frontend.php';
+		include 'includes/class-patreon-posts.php';
+		include 'includes/class-patreon-api.php';
+		include 'includes/class-patreon-oauth.php';
 
 		self::$Patreon_Routing = new Patreon_Routing;
 		self::$Patreon_Frontend = new Patreon_Frontend;

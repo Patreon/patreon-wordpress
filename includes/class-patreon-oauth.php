@@ -1,4 +1,5 @@
-<?php 
+<?php
+namespace patreon;
 
 if( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 

@@ -1,13 +1,14 @@
-<?php 
+<?php
 
 /*
 Plugin Name: Patreon
-Plugin URI: 
+Plugin URI:
 Description: Stay close with the Artists & Creators you're supporting
 Version: 1.0
 Author: Ben Parry
 Author URI: http://uiux.me
 */
+namespace patreon;
 
 // If this file is called directly, abort.
 if ( ! defined( 'WPINC' ) ) {
@@ -16,6 +17,14 @@ if ( ! defined( 'WPINC' ) ) {
 
 class Patreon_Login {
 
+    private static function linkPatreonIdToExistingAccount() {
+
+    }
+
+    private static function createNewWordpressUserFromPatreon() {
+
+    }
+
 	public static function createUserFromPatreon($user_response, $tokens) {
 
 		global $wpdb;
@@ -23,7 +32,7 @@ class Patreon_Login {
 		$email = $user_response['data']['attributes']['email'];
 
 		$name = strtolower(str_replace(' ', '', $user_response['data']['attributes']['first_name'].'_'.$user_response['data']['attributes']['last_name']));
-		
+
 		if(validate_username($name) && username_exists($name) == false) {
 			$username = sanitize_user( $name, true );
 		} else {
@@ -32,7 +41,8 @@ class Patreon_Login {
 		}
 
 		if(username_exists($username)) {
-
+            // TODO: prompt the user to login and "Connect Patreon" instead
+            // When they login properly, associate the account
 			$suffix = $wpdb->get_var( $wpdb->prepare(
 				"SELECT 1 + SUBSTR(user_login, %d) FROM $wpdb->users WHERE user_login REGEXP %s ORDER BY 1 DESC LIMIT 1",
 				strlen( $username ) + 2, '^' . $username . '(\.[0-9]+)?$' ) );
@@ -67,7 +77,7 @@ class Patreon_Login {
 				update_user_meta($user_id, 'user_firstname', $user_response['data']['attributes']['first_name']);
 				update_user_meta($user_id, 'user_lastname', $user_response['data']['attributes']['last_name']);
 				update_user_meta($user_id, 'patreon_token_minted', microtime());
-				
+
 			} else {
 				/* wordpress account creation failed #HANDLE_ERROR */
 			}

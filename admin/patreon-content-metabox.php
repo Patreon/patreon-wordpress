@@ -2,11 +2,11 @@
 
 /*
 Plugin Name: Patreon
-Plugin URI: 
+Plugin URI:
 Description: Stay close with the Artists & Creators you're supporting
-Version: 1.0
-Author: Ben Parry
-Author URI: http://uiux.me
+Version: 1.1
+Author: Patreon
+Author URI: http://patreon.com
 */
 
 if( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
@@ -21,25 +21,17 @@ function patreon_plugin_meta_boxes_setup() {
 }
 
 function patreon_plugin_meta_boxes() {
-
-	add_meta_box(
-		'patreon-level',      // Unique ID
-		esc_html__( 'Patreon Level', 'Patreon Contribution Requirement' ),
-		'patreon_plugin_meta_box',
-		'patreon-content',
-		'side',
-		'default'
-	);
-
-	add_meta_box(
-		'patreon-level',      // Unique ID
-		esc_html__( 'Patreon Level', 'Patreon Contribution Requirement' ),
-		'patreon_plugin_meta_box',
-		'post',
-		'side',
-		'default'
-	);
-
+    $screens = ['post', 'patreon-content'];
+    foreach ($screens as $screen) {
+        add_meta_box(
+            'patreon-level',      // Unique ID
+            esc_html__( 'Patreon Level', 'Patreon Contribution Requirement' ),
+            'patreon_plugin_meta_box',
+            $screen,
+            'side',
+            'default'
+        );
+    }
 }
 
 function patreon_plugin_meta_box( $object, $box ) { ?>
