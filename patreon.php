@@ -14,11 +14,6 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
-define("PATREON_PLUGIN_URL", plugin_dir_url( __FILE__ ) );
-
-// include 'admin/patreon-options-page.php';
-// include 'admin/patreon-content-metabox.php';
-// include 'classes/patreon_wordpress.php';
 // If this file is called directly, abort.
 // The class that contains the plugin info.
 require_once plugin_dir_path(__FILE__) . 'includes/class-info.php';

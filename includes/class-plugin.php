@@ -28,7 +28,8 @@ class Plugin
         require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-loader.php';
         require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-patreon-posts.php';
         require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-patreon-routing.php';
-        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-patreon-api.php';
+        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-patreon-routing.php';
+        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-patreon-metabox.php';
         require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-patreon-api.php';
         require_once plugin_dir_path(dirname(__FILE__)) . 'util.php';
         require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-patreon-login.php';
@@ -38,9 +39,13 @@ class Plugin
 
     private function define_admin_hooks() {
         $plugin_admin = new Admin($this->plugin_slug, $this->version, $this->option_name);
+        $plugin_metabox = new Patreon_Metabox($this->plugin_slug, $this->version, $this->option_name);
         $this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'assets');
         $this->loader->add_action('admin_init', $plugin_admin, 'patreon_plugin_register_settings' );
         $this->loader->add_action('admin_menu', $plugin_admin, 'patreon_plugin_setup_page');
+        $this->loader->add_action('load-post.php', $plugin_metabox, 'patreon_plugin_meta_boxes_setup' );
+        $this->loader->add_action('load-post-new.php', $plugin_metabox, 'patreon_plugin_meta_boxes_setup' );
+
     }
 
     private function define_frontend_hooks() {
