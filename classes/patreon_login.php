@@ -55,10 +55,6 @@ class Patreon_Login {
 
 				$user = get_user_by( 'id', $user_id );
 
-				wp_set_current_user( $user->ID, $user->user_login );
-				wp_set_auth_cookie( $user->ID );
-				do_action( 'wp_login', $user->user_login );
-
 				/* update user meta data with patreon data */
 				update_user_meta($user_id, 'patreon_refresh_token', $tokens['refresh_token']);
 				update_user_meta($user_id, 'patreon_access_token', $tokens['access_token']);
@@ -68,6 +64,10 @@ class Patreon_Login {
 				update_user_meta($user_id, 'user_lastname', $user_response['data']['attributes']['last_name']);
 				update_user_meta($user_id, 'patreon_token_minted', microtime());
 				
+				wp_set_current_user( $user->ID, $user->user_login );
+				wp_set_auth_cookie( $user->ID );
+				do_action( 'wp_login', $user->user_login );
+
 			} else {
 				/* wordpress account creation failed #HANDLE_ERROR */
 			}
