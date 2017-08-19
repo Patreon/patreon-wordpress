@@ -71,6 +71,8 @@ class Patreon_Wordpress {
 		update_user_meta($user->ID, 'user_firstname', $user_reponse['data']['attributes']['first_name']);
 		update_user_meta($user->ID, 'user_lastname', $user_reponse['data']['attributes']['last_name']);
 
+		/* give other plugins the chance to use patreon data */
+		do_action( 'patreon_user_data', $user_reponse );
 	}
 
 	public static function getPatreonCreatorID() {
