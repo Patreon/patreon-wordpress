@@ -137,15 +137,16 @@ class Patreon_Frontend {
 			$user_patronage = Patreon_Wordpress::getUserPatronage();
 
 			if( $user_patronage == false || $user_patronage < ($patreon_level*100) ) {
-				$content = self::displayPatreonCampaignBanner();
+				/* Cuts the content to "<!--patreon-->" slug and displays the button after */
+				/* If the slug doesn't exist, only the button is displayed */
+				$pos = strpos($content, '<!--patreon-->');
+				$pos = $pos ? $pos : 0;
+				$content = substr($content, 0, $pos) . self::displayPatreonCampaignBanner();
 			}
-
 		}
 
 		return $content;
-
 	}
-
 }
 
 ?>
