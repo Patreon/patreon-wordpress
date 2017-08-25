@@ -1,49 +1,4 @@
-<?php
-
-/*
-Plugin Name: Patreon
-Plugin URI:
-Description: Stay close with the Artists & Creators you're supporting
-Version: 1.0
-Author: Ben Parry
-Author URI: http://uiux.me
-*/
-
-if( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
-
-if ( is_admin() ){
-  add_action('admin_menu', 'patreon_plugin_setup');
-  add_action('admin_init', 'patreon_plugin_register_settings' );
-}
-
-function patreon_plugin_register_settings() { // whitelist options
-	register_setting( 'patreon-options', 'patreon-client-id' );
-    register_setting( 'patreon-options', 'patreon-client-secret' );
-    register_setting( 'patreon-options', 'patreon-creators-access-token' );
-    register_setting( 'patreon-options', 'patreon-creators-refresh-token' );
-    register_setting( 'patreon-options', 'patreon-creator-id' );
-    register_setting( 'patreon-options', 'patreon-paywall-img-url' );
-    register_setting( 'patreon-options', 'patreon-rewrite-rules-flushed' );
-}
-
-function patreon_plugin_setup(){
-    add_menu_page( 'Patreon Settings', 'Patreon Settings', 'manage_options', 'patreon-plugin', 'patreon_plugin_setup_page' );
-}
-
-function patreon_plugin_setup_page(){
-
-    /* update Patreon creator ID on page load */
-    if(get_option('patreon-client-id', false) && get_option('patreon-client-secret', false) && get_option('patreon-creators-access-token', false)) {
-
-        $creator_id = Patreon_Wordpress::getPatreonCreatorID();
-
-        if($creator_id != false) {
-            update_option( 'patreon-creator-id', $creator_id );
-        }
-
-    }
-
-?>
+<div>
 
 <h1>Patreon API Settings</h1>
 
@@ -103,8 +58,4 @@ function patreon_plugin_setup_page(){
     <?php submit_button(); ?>
 
 </form>
-
-<?php
-}
-
-?>
+</div>

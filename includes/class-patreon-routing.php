@@ -2,13 +2,13 @@
 
 /*
 Plugin Name: Patreon
-Plugin URI: 
+Plugin URI:
 Description: Stay close with the Artists & Creators you're supporting
 Version: 1.0
 Author: Ben Parry
 Author URI: http://uiux.me
 */
-
+namespace patreon;
 // If this file is called directly, abort.
 if ( ! defined( 'WPINC' ) ) {
 	die;

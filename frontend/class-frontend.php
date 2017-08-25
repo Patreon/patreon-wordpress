@@ -8,7 +8,7 @@ Version: 1.0
 Author: Ben Parry
 Author URI: http://uiux.me
 */
-
+namespace patreon;
 // If this file is called directly, abort.
 if ( ! defined( 'WPINC' ) ) {
 	die;
