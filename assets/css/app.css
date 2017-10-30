@@ -1,14 +1,36 @@
-.ptrn-button{display:block;margin-bottom:30px!important;border: none!important;}
-.ptrn-button img {width: 272px; height:42px;}
-.patreon-msg {-webkit-border-radius: 6px;-moz-border-radius: 6px;-ms-border-radius: 6px;-o-border-radius: 6px;border-radius: 6px;padding:8px;margin-bottom:20px!important;display:block;border:1px solid #E6461A;background-color:#484848;color:#ffffff;}
+.ptrn-button {
+    display: block;
+    margin-bottom: 30px !important;
+    border: none !important;
+}
+.ptrn-button img {
+    width: 272px;
+    height: 42px;
+}
+.patreon-msg {
+    -webkit-border-radius: 6px;
+    -moz-border-radius: 6px;
+    -ms-border-radius: 6px;
+    -o-border-radius: 6px;
+    border-radius: 6px;
+    padding: 8px;
+    margin-bottom: 20px !important;
+    display: block;
+    border: 1px solid #e6461a;
+    background-color: #484848;
+    color: #ffffff;
+}
 
-.ptrn-branding {color:#fff;background-color:#F96854;}
+.ptrn-branding {
+    color: #fff;
+    background-color: #f76959;
+}
 
 .ptrn-branded-button {
-	box-shadow: none!important;
-	color:#fff!important;
-	background-color:#F96854;
-	border: 0;
+    box-shadow: none !important;
+    color: #fff !important;
+    background-color: #f76959;
+    border: 0;
     -webkit-border-radius: 2px;
     border-radius: 2px;
     -webkit-box-shadow: none;
@@ -16,14 +38,12 @@
     color: #fff;
     cursor: pointer;
     font-size: 14px;
-    font-size: 0.875rem;
     font-weight: 800;
+    font-family: sans-serif;
     line-height: 1;
     padding: 1em 2em;
     text-shadow: none;
-    -webkit-transition: background 0.2s;
-    transition: background 0.2s;
-    text-decoration: none!important;
+    text-decoration: none !important;
     margin-bottom: 1rem;
     display: block;
     width: 260px;
@@ -31,13 +51,14 @@
     text-transform: uppercase;
 }
 .ptrn-branded-button .logo {
-	width:20px;
-	color:#fff!important;
-	vertical-align: middle;
+    width: 20px;
+    color: #fff !important;
+    vertical-align: middle;
+    display: inline-block;
     margin-right: 0.5rem;
-    box-shadow: none!important;
+    box-shadow: none !important;
 }
 
 #login .ptrn-branded-button {
-    width:auto;
+    width: auto;
 }

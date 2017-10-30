@@ -163,7 +163,7 @@ class Patreon_Options {
 
                                 <div class="inside">
 
-                                    <p>Get your Creator ID <a href="https://www.patreon.com/dashboard/widgets" target="_blank">here</a>, in the url for the button you can find your creator ID.</p>
+                                    <p>Get your Creator ID <a href="https://www.patreon.com/apps/wordpress" target="_blank">here</a>, under installation instructions while logged in.</p>
                                     <p><em>https://www.patreon.com/bePatron?u=<strong>XXXXXXXXXX</strong></em></p>
 
                                     <table class="widefat">

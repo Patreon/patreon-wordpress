@@ -16,9 +16,11 @@ class Patreon_Wordpress {
 	private static $Patron_Metabox;
 	private static $Patreon_User_Profiles;
 	private static $Patreon_Shortcodes;
+	private static $Patreon_Welcome;
 
 	function __construct() {
-
+		
+		include 'patreon_welcome_page.php';
 		include 'patreon_login.php';
 		include 'patreon_routing.php';
 		include 'patreon_frontend.php';
@@ -31,6 +33,7 @@ class Patreon_Wordpress {
 		include 'patreon_user_profiles.php';
 		include 'patreon_shortcodes.php';
 
+		self::$Patreon_Welcome = new Patreon_Welcome;
 		self::$Patreon_Routing = new Patreon_Routing;
 		self::$Patreon_Frontend = new Patreon_Frontend;
 		self::$Patreon_Posts = new Patreon_Posts;
@@ -41,7 +44,6 @@ class Patreon_Wordpress {
 		self::$Patreon_Shortcodes = new Patreon_Shortcodes;
 
 		add_action('wp_head', array($this, 'updatePatreonUser') );
-
 	}
 
 	static function getPatreonUser($user) {
