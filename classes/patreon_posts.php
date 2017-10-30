@@ -1,13 +1,5 @@
-<?php 
+<?php
 
-/*
-Plugin Name: Patreon
-Plugin URI: 
-Description: Stay close with the Artists & Creators you're supporting
-Version: 1.0
-Author: Ben Parry
-Author URI: http://uiux.me
-*/
 
 // If this file is called directly, abort.
 if ( ! defined( 'WPINC' ) ) {
@@ -32,7 +24,7 @@ class Patreon_Posts {
 			'view_item'          => __( 'View Patreon Content' ),
 			'search_items'       => __( 'Search Patreon Content' ),
 			'not_found'          => __( 'No Patreon Content found' ),
-			'not_found_in_trash' => __( 'No Patreon Content found in the Trash' ), 
+			'not_found_in_trash' => __( 'No Patreon Content found in the Trash' ),
 			'parent_item_colon'  => '',
 			'menu_name'          => 'Patreon Content'
 		);
@@ -47,7 +39,7 @@ class Patreon_Posts {
 			'has_archive'   => false,
 			'rewrite'       => array( 'slug' => 'patreon-content' ),
 		);
-		register_post_type( 'patreon-content', $args );	
+		register_post_type( 'patreon-content', $args );
 	}
 
 

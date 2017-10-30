@@ -1,12 +1,12 @@
-<?php 
+<?php
 
 /*
-Plugin Name: Patreon
-Plugin URI: 
-Description: Stay close with the Artists & Creators you're supporting
-Version: 1.0
-Author: Ben Parry
-Author URI: http://uiux.me
+Plugin Name: Patreon Wordpress
+Plugin URI: https://www.patreon.com/apps/wordpress
+Description: Serve patron-only posts - and give ad-free experiences - directly on your website.
+Version: 1.2.4
+Author: Patreon <platform@patreon.com>
+Author URI: https://patreon.com
 */
 
 // If this file is called directly, abort.
