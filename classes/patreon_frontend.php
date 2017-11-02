@@ -123,6 +123,21 @@ class Patreon_Frontend {
         }
 
 	}
+	
+	function patreonMakeLoginButton($client_id=false) {
+		
+		if(!$client_id)
+		{
+			$client_id = get_option('patreon-client-id', false);
+		}
+		
+		$redirect_uri = site_url().'/patreon-authorization/';
+
+		$href = 'https://www.patreon.com/oauth2/authorize?response_type=code&client_id='.$client_id.'&redirect_uri='.$redirect_uri;
+		
+		return apply_filters('ptrn/login_button', '<a href="'.$href.'" class="ptrn-branded-button ptrn-login" data-ptrn_nonce="' . wp_create_nonce( 'patreon-nonce' ).'"><img class="logo" src="'.PATREON_PLUGIN_ASSETS.'/img/patreon-logomark-on-coral.svg" alt=""> Login with Patreon</a>', $href);
+
+	}	
 
 	function protectContentFromUsers($content) {
 
