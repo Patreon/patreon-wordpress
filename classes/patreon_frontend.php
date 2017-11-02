@@ -69,6 +69,7 @@ class Patreon_Frontend {
 		wp_enqueue_style('patreon-wordpress-css', PATREON_PLUGIN_ASSETS.'/css/app.css' );
 	}
 
+
 	public static function displayPatreonCampaignBanner($patreon_level = false) {
 
 		global $wp;
@@ -93,7 +94,11 @@ class Patreon_Frontend {
         	$contribution_required = apply_filters('ptrn/contribution_required',$contribution_required,$patreon_level);
 
         }
-
+		
+		if($login_with_patreon)
+		{
+			$login_with_patreon_button = Patreon_Frontend::patreonMakeLoginButton();
+		}
         if ($creator_id) {
 
         	$patreon_post_banner = get_post_meta($post->ID, 'patreon_post_banner', true);
@@ -112,18 +117,30 @@ class Patreon_Frontend {
         		$redirect_uri = get_permalink($post->ID);
         	}
 
-
         	$href = 'https://www.patreon.com/bePatron?u='.$creator_id.'&redirect_uri='.urlencode($redirect_uri);
 
-        	$campaign_banner = $contribution_required.'<a href="'.$href.'">'.$paywall_img.'</a>';
+			// Wrap message and buttons in divs for responsive interface mechanics
+			
+			$contribution_required = '<div class="patreon-locked-content-message">'.$contribution_required.'</div>';
+			
+			$be_a_patron_button = '<div class="patreon-be-patron-button"><a href="'.$href.'">'.$paywall_img.'</a></div>';
+			
+        	$login_with_patreon_button = '<div class="patreon-login-refresh-button">'.$login_with_patreon_button.'</div>';
+			
+			// Wrap all of them in a responsive div
+			
+			$campaign_banner = '<div class="patreon-campaign-banner">'.
+									$contribution_required.
+									$be_a_patron_button.
+									$login_with_patreon_button.
+								'</div>';
 
         	$campaign_banner = apply_filters('ptrn/campaign_banner', $campaign_banner, $patreon_level);
 
             return $campaign_banner;
         }
 
-	}
-	
+	}	
 	function patreonMakeLoginButton($client_id=false) {
 		
 		if(!$client_id)
