@@ -125,7 +125,10 @@ class Patreon_Frontend {
 			
 			$be_a_patron_button = '<div class="patreon-be-patron-button"><a href="'.$href.'">'.$paywall_img.'</a></div>';
 			
-        	$login_with_patreon_button = '<div class="patreon-login-refresh-button">'.$login_with_patreon_button.'</div>';
+			if(isset($login_with_patreon_button))
+			{
+				$login_with_patreon_button = '<div class="patreon-login-refresh-button">'.$login_with_patreon_button.'</div>';
+			}
 			
 			// Wrap all of them in a responsive div
 			
