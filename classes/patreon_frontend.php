@@ -69,7 +69,6 @@ class Patreon_Frontend {
 		wp_enqueue_style('patreon-wordpress-css', PATREON_PLUGIN_ASSETS.'/css/app.css' );
 	}
 
-
 	public static function displayPatreonCampaignBanner($patreon_level = false) {
 
 		global $wp;
@@ -78,6 +77,7 @@ class Patreon_Frontend {
 		$login_with_patreon = get_option('patreon-enable-login-with-patreon', false);
 
 		/* patreon banner when user patronage not high enough */
+				
 		$paywall_img = get_option('patreon-paywall-img-url', false);
         if ($paywall_img == false) {
         	$paywall_img = '<span class="ptrn-branded-button"><img class="logo" src="'.PATREON_PLUGIN_ASSETS.'/img/patreon-logomark-on-coral.svg" alt=""> Support on Patreon</span>';
@@ -143,7 +143,8 @@ class Patreon_Frontend {
             return $campaign_banner;
         }
 
-	}	
+	}
+	
 	function patreonMakeLoginButton($client_id=false) {
 		
 		if(!$client_id)
@@ -151,11 +152,36 @@ class Patreon_Frontend {
 			$client_id = get_option('patreon-client-id', false);
 		}
 		
+		// Check if user is logged in to WP, for determination of label text
+		
+		// Set login label to default
+		$login_label = PATREON_TEXT_CONNECT;
+		
+		if(is_user_logged_in()){
+			// User is logged into WP. Check if user has valid patreon data :
+			
+			$user = wp_get_current_user();
+
+			if($user) {
+				
+				
+				$user_response = Patreon_Wordpress::getPatreonUser($user);
+				// ^ REVISIT - whats above may be a concern - it connects to API to check for every generation of button. If we could cache it it would be better
+
+				if($user_response) {
+					// This is a user logged into Patreon. use refresh text
+					$login_label = PATREON_TEXT_REFRESH;
+				}					
+			}
+			
+			
+		}
+		
 		$redirect_uri = site_url().'/patreon-authorization/';
 
 		$href = 'https://www.patreon.com/oauth2/authorize?response_type=code&client_id='.$client_id.'&redirect_uri='.$redirect_uri;
 		
-		return apply_filters('ptrn/login_button', '<a href="'.$href.'" class="ptrn-branded-button ptrn-login" data-ptrn_nonce="' . wp_create_nonce( 'patreon-nonce' ).'"><img class="logo" src="'.PATREON_PLUGIN_ASSETS.'/img/patreon-logomark-on-coral.svg" alt=""> Login with Patreon</a>', $href);
+		return apply_filters('ptrn/login_button', '<a href="'.$href.'" class="ptrn-branded-button ptrn-login" data-ptrn_nonce="' . wp_create_nonce( 'patreon-nonce' ).'"><img class="logo" src="'.PATREON_PLUGIN_ASSETS.'/img/patreon-logomark-on-coral.svg" alt=""> '.$login_label.'</a>', $href);
 
 	}	
 
