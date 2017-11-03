@@ -137,6 +137,11 @@ class Patreon_Frontend {
 									$be_a_patron_button.
 									$login_with_patreon_button.
 								'</div>';
+			
+			// This extra button is solely here to test whether new wrappers cause any design issues in different themes. For easy comparison with existing unwrapped button. Remove when confirmed.
+			
+			$campaign_banner .= '<div style="margin-top:30px;"><h6>Below button is for comparing if there are any style differences</h6></div>'.$be_a_patron_button;
+			$campaign_banner .= '<div style="margin-top:30px;"><h6>Below button is for comparing if there are any style differences</h6></div>'.$login_with_patreon_button;
 
         	$campaign_banner = apply_filters('ptrn/campaign_banner', $campaign_banner, $patreon_level);
 
@@ -164,9 +169,8 @@ class Patreon_Frontend {
 
 			if($user) {
 				
-				
 				$user_response = Patreon_Wordpress::getPatreonUser($user);
-				// ^ REVISIT - whats above may be a concern - it connects to API to check for every generation of button. If we could cache it it would be better
+				// ^ REVISIT - whats above may be a concern - it connects to API to check for valid user for every generation of button. If we could cache it it would be better
 
 				if($user_response) {
 					// This is a user logged into Patreon. use refresh text
