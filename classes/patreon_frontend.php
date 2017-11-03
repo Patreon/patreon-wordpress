@@ -76,15 +76,6 @@ class Patreon_Frontend {
 
 		$login_with_patreon = get_option('patreon-enable-login-with-patreon', false);
 
-		/* patreon banner when user patronage not high enough */
-				
-		$paywall_img = get_option('patreon-paywall-img-url', false);
-        if ($paywall_img == false) {
-        	$paywall_img = '<span class="ptrn-branded-button"><img class="logo" src="'.PATREON_PLUGIN_ASSETS.'/img/patreon-logomark-on-coral.svg" alt=""> Support on Patreon</span>';
-        } else {
-        	$paywall_img = '<img src="'.$paywall_img.'" />';
-        }
-
         $creator_id = get_option('patreon-creator-id', false);
 
         $contribution_required = '';
@@ -97,7 +88,7 @@ class Patreon_Frontend {
 		
 		if($login_with_patreon)
 		{
-			$login_with_patreon_button = Patreon_Frontend::patreonMakeLoginButton();
+			$login_with_patreon_button = self::patreonMakeLoginButton();
 		}
         if ($creator_id) {
 
@@ -106,24 +97,14 @@ class Patreon_Frontend {
         	if(empty($patreon_post_banner ) == false) {
         		return $patreon_post_banner;
         	}
-
-        	if($login_with_patreon) {
-        		$redirect_uri = wp_login_url().'?patreon-msg=login_with_patreon&patreon-redirect='.$post->ID;
-        	} else {
-        		$redirect_uri = wp_login_url().'?patreon-user-redirect='.$post->ID;
-        	}
-
-        	if(Patreon_Wordpress::isPatron()) {
-        		$redirect_uri = get_permalink($post->ID);
-        	}
-
-        	$href = 'https://www.patreon.com/bePatron?u='.$creator_id.'&redirect_uri='.urlencode($redirect_uri);
-
+			
+			$be_a_patron_button = self::patreonMakePatronButton($creator_id);
+	
 			// Wrap message and buttons in divs for responsive interface mechanics
 			
 			$contribution_required = '<div class="patreon-locked-content-message">'.$contribution_required.'</div>';
 			
-			$be_a_patron_button = '<div class="patreon-be-patron-button"><a href="'.$href.'">'.$paywall_img.'</a></div>';
+			$be_a_patron_button = '<div class="patreon-be-patron-button">'.$be_a_patron_button.'</div>';
 			
 			if(isset($login_with_patreon_button))
 			{
@@ -140,8 +121,6 @@ class Patreon_Frontend {
 			
 			// This extra button is solely here to test whether new wrappers cause any design issues in different themes. For easy comparison with existing unwrapped button. Remove when confirmed.
 			
-			$campaign_banner .= '<div style="margin-top:30px;"><h6>Below button is for comparing if there are any style differences</h6></div>'.$be_a_patron_button;
-			$campaign_banner .= '<div style="margin-top:30px;"><h6>Below button is for comparing if there are any style differences</h6></div>'.$login_with_patreon_button;
 
         	$campaign_banner = apply_filters('ptrn/campaign_banner', $campaign_banner, $patreon_level);
 
@@ -163,7 +142,7 @@ class Patreon_Frontend {
 		$paywall_img = get_option('patreon-paywall-img-url', false);
 		
         if ($paywall_img == false) {
-        	$paywall_img = '<span class="ptrn-branded-button"><img class="logo" src="'.PATREON_PLUGIN_ASSETS.'/img/patreon-logomark-on-coral.svg" alt=""> Support on Patreon</span>';
+        	$paywall_img = '<div class="patreon-responsive-button-wrapper"><div class="patreon-responsive-button"><img class="patreon_logo" src="'.PATREON_PLUGIN_ASSETS.'/img/patreon-logomark-on-coral.svg" alt=""> Support on Patreon</div></div>';
         } else {
         	$paywall_img = '<img src="'.$paywall_img.'" />';
         }		
@@ -220,8 +199,8 @@ class Patreon_Frontend {
 		$redirect_uri = site_url().'/patreon-authorization/';
 
 		$href = 'https://www.patreon.com/oauth2/authorize?response_type=code&client_id='.$client_id.'&redirect_uri='.$redirect_uri;
-		
-		return apply_filters('ptrn/login_button', '<a href="'.$href.'" class="ptrn-branded-button ptrn-login" data-ptrn_nonce="' . wp_create_nonce( 'patreon-nonce' ).'"><img class="logo" src="'.PATREON_PLUGIN_ASSETS.'/img/patreon-logomark-on-coral.svg" alt=""> '.$login_label.'</a>', $href);
+	
+		return apply_filters('ptrn/login_button', '<a href="'.$href.'" data-ptrn_nonce="' . wp_create_nonce( 'patreon-nonce' ).'"><div class="patreon-responsive-button-wrapper"><div class="patreon-responsive-button"><img class="patreon_logo" src="'.PATREON_PLUGIN_ASSETS.'/img/patreon-logomark-on-coral.svg" alt=""> '.$login_label.'</div></div></a>', $href);
 
 	}	
 
