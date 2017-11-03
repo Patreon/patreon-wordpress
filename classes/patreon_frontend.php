@@ -150,6 +150,42 @@ class Patreon_Frontend {
 
 	}
 	
+	function patreonMakePatronButton($creator_id=false) {
+		global $post;
+		
+		if(!$creator_id)
+		{
+			$creator_id = get_option('patreon-creator-id', false);
+		}
+		
+		/* patreon banner when user patronage not high enough */
+				
+		$paywall_img = get_option('patreon-paywall-img-url', false);
+		
+        if ($paywall_img == false) {
+        	$paywall_img = '<span class="ptrn-branded-button"><img class="logo" src="'.PATREON_PLUGIN_ASSETS.'/img/patreon-logomark-on-coral.svg" alt=""> Support on Patreon</span>';
+        } else {
+        	$paywall_img = '<img src="'.$paywall_img.'" />';
+        }		
+		
+		$login_with_patreon = get_option('patreon-enable-login-with-patreon', false);
+
+		if($login_with_patreon) {
+			$redirect_uri = wp_login_url().'?patreon-msg=login_with_patreon&patreon-redirect='.$post->ID;
+		} else {
+			$redirect_uri = wp_login_url().'?patreon-user-redirect='.$post->ID;
+		}
+
+		if(Patreon_Wordpress::isPatron() AND isset($post)) {
+			$redirect_uri = get_permalink($post->ID);
+		}
+		
+		$href = 'https://www.patreon.com/bePatron?u='.$creator_id.'&redirect_uri='.urlencode($redirect_uri);
+		
+		return apply_filters('ptrn/patron_button', '<a href="'.$href.'">'.$paywall_img.'</a>');
+	
+	
+	}
 	function patreonMakeLoginButton($client_id=false) {
 		
 		if(!$client_id)
