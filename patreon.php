@@ -16,6 +16,13 @@ if ( ! defined( 'WPINC' ) ) {
 
 define("PATREON_PLUGIN_URL", plugin_dir_url( __FILE__ ) );
 define("PATREON_PLUGIN_ASSETS", plugin_dir_url( __FILE__ ).'/assets' );
+define("PATREON_TEXT_CONNECT", 'Connect' );
+define("PATREON_TEXT_REFRESH", 'Refresh' );
+define("PATREON_TEXT_NOT_PATRON", 'Not a Patron?' );
+define("PATREON_TEXT_ALREADY_PATRON", 'Already a Patron?' );
+define("PATREON_TEXT_BECOME_PATRON", 'Become a Patron!' );
+define("PATREON_TEXT_MISTAKEN_PATRON", 'Patron but can\'t see?' );
+define("PATREON_TEXT_PLEDGE_NOT_ENOUGH", 'Upgrade!' );
 
 include 'classes/patreon_wordpress.php';
 
