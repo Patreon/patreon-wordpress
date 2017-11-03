@@ -41,3 +41,30 @@
 #login .ptrn-branded-button {
     width:auto;
 }
+
+.patreon-locked-content-message{
+	display:block;
+	clear:both;
+	
+}
+.patreon-be-patron-button{
+	display:inline-block;
+	width:auto;
+	margin:0.1em;
+}
+.patreon-login-refresh-button{
+	display:inline-block;
+	width:auto;
+	margin:0.1em;
+}
+
+/* A responsive wrapper */
+.patreon-campaign-banner{
+	
+	max-width: 1200px;
+	width :100%;
+	display:block;
+	text-align:center;
+	
+	
+}
