@@ -111,12 +111,15 @@ class Patreon_Frontend {
 				$login_with_patreon_button = '<div class="patreon-login-refresh-button">'.$login_with_patreon_button.'</div>';
 			}
 			
+			$label_over_patron_button = self::getLabelOverPatronButton();
+			$label_over_login_button = self::getLabelOverLoginButton();
+			
 			// Wrap all of them in a responsive div
 			
 			$campaign_banner = '<div class="patreon-campaign-banner">'.
 									$contribution_required.
-									$be_a_patron_button.
-									$login_with_patreon_button.
+									'<div class="patreon-patron-button-wrapper">'.$label_over_patron_button.$be_a_patron_button.'</div>'.
+									'<div class="patreon-login-button-wrapper">'.$label_over_login_button.$login_with_patreon_button.'</div>'.
 								'</div>';
 			
 			// This extra button is solely here to test whether new wrappers cause any design issues in different themes. For easy comparison with existing unwrapped button. Remove when confirmed.
@@ -127,6 +130,48 @@ class Patreon_Frontend {
             return $campaign_banner;
         }
 
+	}
+	
+	function getLabelOverPatronButton() {
+		
+		
+		$user_logged_into_patreon = self::isUserLoggedInPatreon();
+
+		$is_patron = Patreon_Wordpress::isPatron();
+		
+		if($is_patron AND $user_logged_into_patreon)
+		{
+			// Patron logged in and patron, but we are still showing the banner. This means pledge level is not enough.
+			return PATREON_TEXT_PLEDGE_NOT_ENOUGH;
+			
+		}
+		if(!$is_patron AND $user_logged_into_patreon)
+		{
+			// Patron logged in and not patron
+			
+			return PATREON_TEXT_BECOME_PATRON;
+			
+		}
+	
+		// User not logged in
+		
+		
+		return PATREON_TEXT_BECOME_PATRON;
+		
+		
+	}
+	function getLabelOverLoginButton() {
+		
+
+		if(!self::isUserLoggedInPatreon())
+		{
+			return PATREON_TEXT_ALREADY_PATRON;			
+		}
+
+	
+		return PATREON_TEXT_MISTAKEN_PATRON;			
+			
+		
 	}
 	
 	function patreonMakePatronButton($creator_id=false) {
