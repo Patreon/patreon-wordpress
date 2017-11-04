@@ -54,7 +54,7 @@ class Patreon_Frontend {
 		} else if( $login_with_patreon == false && isset($_REQUEST['patreon-msg']) && $_REQUEST['patreon-msg'] == 'login_with_patreon') {
 			echo '<p class="patreon-msg">You can now login with your wordpress username/password.</p>';
 		} else {
-			echo apply_filters('ptrn/login_button', '<a href="'.$href.'" class="ptrn-branded-button ptrn-login" data-ptrn_nonce="' . wp_create_nonce( 'patreon-nonce' ).'"><img class="logo" src="'.PATREON_PLUGIN_ASSETS.'/img/patreon-logomark-on-coral.svg" alt=""> Login with Patreon</a>', $href);
+			echo '<div class="patreon-login-refresh-button">'.self::patreonMakeLoginButton().'</div>';
 		}
 
 	}
@@ -79,9 +79,8 @@ class Patreon_Frontend {
         $creator_id = get_option('patreon-creator-id', false);
 
         $contribution_required = '';
+		
         if($patreon_level != false) {
-			
-			
 			
         	$contribution_required = str_replace('%%pledgelevel%%',$patreon_level,PATREON_TEXT_LOCKED_POST);
         	$contribution_required = apply_filters('ptrn/contribution_required',$contribution_required,$patreon_level);
@@ -307,6 +306,7 @@ class Patreon_Frontend {
 			}
 
 			$user_patronage = Patreon_Wordpress::getUserPatronage();
+			
 
 			if( $user_patronage == false || $user_patronage < ($patreon_level*100) ) {
 
