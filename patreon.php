@@ -23,8 +23,9 @@ define("PATREON_TEXT_ALREADY_PATRON", 'Already a Patron?' );
 define("PATREON_TEXT_BECOME_PATRON", 'Become a Patron!' );
 define("PATREON_TEXT_SUPPORT_ON_PATREON", 'Support on Patreon' );
 define("PATREON_TEXT_MISTAKEN_PATRON", 'Patron but can\'t see?' );
-define("PATREON_TEXT_PLEDGE_NOT_ENOUGH", 'Upgrade!' );
+define("PATREON_TEXT_PLEDGE_NOT_ENOUGH", 'Upgrade your Pledge!' );
 define("PATREON_TEXT_UPGRADE_PLEDGE", 'Upgrade Pledge' );
+define("PATREON_TEXT_LOCKED_POST", 'Sorry! This content is for our Patrons who pledge $%%pledgelevel%% and over!' );
 
 include 'classes/patreon_wordpress.php';
 
