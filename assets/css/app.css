@@ -17,12 +17,12 @@
 .patreon-be-patron-button{
 	display:inline-block;
 	width:auto;
-	margin:0.1em;
+	margin:5px;
 }
 .patreon-login-refresh-button{
 	display:inline-block;
 	width:auto;
-	margin:0.1em;
+	margin:5px;
 }
 
 /* A responsive wrapper */
@@ -91,5 +91,22 @@
     margin-right: 10px;
     box-shadow: none!important;	
 	
+	
+}
+
+.patreon-patron-button-wrapper{
+	display:inline-block;
+	max-width : 265px;
+	width:100%;
+	font-size:14px;
+	margin:5px;
+}
+
+.patreon-login-button-wrapper{
+	display:inline-block;
+	max-width : 265px;
+	width:100%;
+	font-size:14px;
+	margin:5px;
 	
 }
