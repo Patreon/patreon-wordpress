@@ -80,8 +80,10 @@ class Patreon_Frontend {
 
         $contribution_required = '';
         if($patreon_level != false) {
-
-        	$contribution_required = 'Min. Contribution required: $'.$patreon_level;
+			
+			
+			
+        	$contribution_required = str_replace('%%pledgelevel%%',$patreon_level,PATREON_TEXT_LOCKED_POST);
         	$contribution_required = apply_filters('ptrn/contribution_required',$contribution_required,$patreon_level);
 
         }
