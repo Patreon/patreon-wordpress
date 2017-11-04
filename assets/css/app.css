@@ -11,7 +11,10 @@
 
 .patreon-locked-content-message{
 	display:block;
-	clear:both;
+	width:100%;
+	font-size:150%;
+	margin:10px;
+	clear:both; 
 	
 }
 .patreon-be-patron-button{
