@@ -137,15 +137,10 @@ class Patreon_Frontend {
 			$creator_id = get_option('patreon-creator-id', false);
 		}
 		
-		/* patreon banner when user patronage not high enough */
-				
-		$paywall_img = get_option('patreon-paywall-img-url', false);
+		$label_text = PATREON_TEXT_SUPPORT_ON_PATREON;
 		
-        if ($paywall_img == false) {
-        	$paywall_img = '<div class="patreon-responsive-button-wrapper"><div class="patreon-responsive-button"><img class="patreon_logo" src="'.PATREON_PLUGIN_ASSETS.'/img/patreon-logomark-on-coral.svg" alt=""> Support on Patreon</div></div>';
-        } else {
-        	$paywall_img = '<img src="'.$paywall_img.'" />';
-        }		
+		/* patreon banner when user patronage not high enough */
+					
 		
 		$login_with_patreon = get_option('patreon-enable-login-with-patreon', false);
 
@@ -154,16 +149,58 @@ class Patreon_Frontend {
 		} else {
 			$redirect_uri = wp_login_url().'?patreon-user-redirect='.$post->ID;
 		}
+		
+		$user_logged_into_patreon = self::isUserLoggedInPatreon();
 
-		if(Patreon_Wordpress::isPatron() AND isset($post)) {
+		$is_patron = Patreon_Wordpress::isPatron();
+		
+		if($is_patron AND isset($post)) {
 			$redirect_uri = get_permalink($post->ID);
+		}	
+		if($is_patron) {
+			$label_text = PATREON_TEXT_UPGRADE_PLEDGE;
 		}
+		
+		if(!$is_patron AND $user_logged_into_patreon) {
+			$label_text = PATREON_TEXT_SUPPORT_ON_PATREON;
+		}
+		
+		$paywall_img = get_option('patreon-paywall-img-url', false);
+		
+        if ($paywall_img == false) {
+        	$paywall_img = '<div class="patreon-responsive-button-wrapper"><div class="patreon-responsive-button"><img class="patreon_logo" src="'.PATREON_PLUGIN_ASSETS.'/img/patreon-logomark-on-coral.svg" alt=""> '.$label_text.'</div></div>';
+        } else {
+        	$paywall_img = '<img src="'.$paywall_img.'" />';
+        }
 		
 		$href = 'https://www.patreon.com/bePatron?u='.$creator_id.'&redirect_uri='.urlencode($redirect_uri);
 		
 		return apply_filters('ptrn/patron_button', '<a href="'.$href.'">'.$paywall_img.'</a>');
 	
 	
+	}
+	function isUserLoggedInPatreon() {
+		 
+		$user_logged_into_patreon = false;
+		
+		if(is_user_logged_in()){
+			// User is logged into WP. Check if user has valid patreon data :
+			
+			$user = wp_get_current_user();
+
+			if($user) {
+				
+				$user_response = Patreon_Wordpress::getPatreonUser($user);
+				// ^ REVISIT - whats above may be a concern - it connects to API to check for valid user for every generation of button. If we could cache it it would be better
+
+				if($user_response) {
+					// This is a user logged into Patreon. 
+					$user_logged_into_patreon = true;
+				}					
+			}
+			
+		}		
+		return $user_logged_into_patreon;
 	}
 	function patreonMakeLoginButton($client_id=false) {
 		
