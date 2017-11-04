@@ -103,6 +103,8 @@
 	width:100%;
 	font-size:14px;
 	margin:5px;
+	font-size: 125%;
+	font-weight:bold;
 }
 
 .patreon-login-button-wrapper{
@@ -111,5 +113,7 @@
 	width:100%;
 	font-size:14px;
 	margin:5px;
+	font-size: 125%;
+	font-weight:bold;
 	
 }
