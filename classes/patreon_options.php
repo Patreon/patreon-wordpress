@@ -37,9 +37,6 @@ class Patreon_Options {
         register_setting( 'patreon-options', 'patreon-enable-login-with-patreon' );
         register_setting( 'patreon-options', 'patreon-enable-connect-with-patreon-in-userprofile' );
         register_setting( 'patreon-options', 'patreon-enable-allow-admins-login-with-patreon' );
-        register_setting( 'patreon-options', 'patreon-enable-walled-garden' );
-        register_setting( 'patreon-options', 'patreon-enable-walled-garden-minimum' );
-        register_setting( 'patreon-options', 'patreon-enable-walled-garden-page' );
         register_setting( 'patreon-options', 'patreon-enable-safe-patreon-embeds' );
         register_setting( 'patreon-options', 'patreon-enable-redirect-to-page-after-login' );
         register_setting( 'patreon-options', 'patreon-enable-redirect-to-page-id' );
@@ -240,30 +237,6 @@ class Patreon_Options {
                                         </tr>
                                         <?php } ?>
 
-                                        <tr valign="top">
-                                        <th scope="row"><strong>Enable 'Walled Garden'</strong></th>
-                                        <td><input type="checkbox" name="patreon-enable-walled-garden" value="1"<?php checked( get_option('patreon-enable-walled-garden', false) ); ?> /></td>
-                                        </tr>
-
-                                        <?php if(get_option('patreon-enable-walled-garden', false)) { ?>
-                                        <tr valign="top">
-                                        <th scope="row"><strong>Minimum dollar value to avoid Walled Garden ($)</strong></th>
-                                        <td><input type="text" name="patreon-enable-walled-garden-minimum" value="<?php echo esc_attr( get_option('patreon-enable-walled-garden-minimum', 0) ); ?>" class="large-text" /></td>
-                                        </tr>
-
-                                        <tr valign="top">
-                                        <th scope="row"><strong>Walled Garden Page</strong></th>
-                                        <td>
-                                            <select name="patreon-enable-walled-garden-page">
-                                                <?php foreach($all_pages as $page) {
-
-                                                    $selected = ( $page->ID == get_option('patreon-enable-walled-garden-page', false) ? 'selected="selected"' : '' );
-                                                    echo '<option value="'.$page->ID.'" '.$selected.'>'.$page->post_title.'</option>';
-
-                                                } ?>
-                                            </select>
-                                        </td>
-                                        </tr>
 
                                         <?php } ?>
 
