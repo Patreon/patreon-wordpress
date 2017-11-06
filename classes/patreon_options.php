@@ -237,8 +237,11 @@ class Patreon_Options {
                                         </tr>
                                         <?php } ?>
 
+                                        <tr valign="top">
+                                        <th scope="row"><strong>Enable 'Walled Garden'</strong></th>
+                                        <td><input type="checkbox" name="patreon-enable-walled-garden" value="1"<?php checked( get_option('patreon-enable-walled-garden', false) ); ?> /></td>
+                                        </tr>
 
-                                        <?php } ?>
 
                                         <tr valign="top">
                                         <th scope="row"><strong>Default Minimum Contribution required for Protected Images ($)</strong></th>
