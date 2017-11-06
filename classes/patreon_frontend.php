@@ -26,10 +26,7 @@ class Patreon_Frontend {
 
 		add_filter( 'the_content', array($this, 'protectContentFromUsers'), PHP_INT_MAX );
 
-		if(get_option('patreon-enable-walled-garden', false)) {
-			add_action( 'wp', array($this, 'patreonWalledGarden') );
-		}
-
+	
 	}
 
 	public function showPatreonButton() {
@@ -324,36 +321,6 @@ class Patreon_Frontend {
 
 	}
 
-	function patreonWalledGarden() {
-
-		$walled_garden_minimum = get_option('patreon-enable-walled-garden-minimum', 0);
-		$walled_garden_page = get_option('patreon-enable-walled-garden-page', false);
-
-		if(is_user_logged_in() && is_admin() == false && current_user_can('manage_options') == false) {
-
-			$user_patronage = Patreon_Wordpress::getUserPatronage();
-
-			if($user_patronage == false) {
-				$user_patronage = 0;
-			}
-
-			$walled_garden_page = apply_filters('ptrn/walled_garden_page', $walled_garden_page, $user_patronage);
-
-			if($user_patronage < ($walled_garden_minimum*100) ) {
-				if($walled_garden_page != false && is_numeric($walled_garden_page)) {
-
-					if(is_page($walled_garden_page) == false) {
-						$url = get_permalink($walled_garden_page);
-						wp_redirect($url);
-						exit;
-					}
-
-				}
-			}
-
-		}
-
-	}
 
 	public static function returnPatreonEmbeddedContent($the_content) {
 
