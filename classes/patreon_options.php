@@ -45,6 +45,7 @@ class Patreon_Options {
         register_setting( 'patreon-options', 'patreon-enable-redirect-to-page-id' );
         register_setting( 'patreon-options', 'patreon-protect-default-image-patreon-level' );
         register_setting( 'patreon-options', 'patreon-enable-strict-oauth' );
+        register_setting( 'patreon-options', 'patreon-lock-entire-site' );
     }
 
     function patreon_plugin_login_warning() {
@@ -200,6 +201,11 @@ class Patreon_Options {
                                         <tr valign="top">
                                         <th scope="row"><strong>Enable strict oAuth</strong> <br>(Only connects logged in users)</th>
                                         <td><input type="checkbox" name="patreon-enable-strict-oauth" value="1"<?php checked( get_option('patreon-enable-strict-oauth', true) ); ?> /></td>
+                                        </tr>
+										
+                                        <tr valign="top">
+                                        <th scope="row"><strong>Make entire site Patron-only</strong> <br>(Only Patrons will be able to see Posts)</th>
+                                        <td><input type="checkbox" name="patreon-lock-entire-site" value="1"<?php checked( get_option('patreon-lock-entire-site', true) ); ?> /></td>
                                         </tr>
 
                                         <tr valign="top">
