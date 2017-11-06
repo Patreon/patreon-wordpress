@@ -67,12 +67,8 @@ class Patron_Metabox {
 			$new_patreon_level = 0;
 		} else {
 
-			if($post->post_type == 'patreon-content') {
-				$new_patreon_level = 9999;
-			} else {
-				$new_patreon_level = 0;
-			}
-
+			$new_patreon_level = 0;
+			
 		}
 
 		$patreon_level = get_post_meta( $post_id, 'patreon-level', true );
