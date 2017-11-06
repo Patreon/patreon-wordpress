@@ -205,7 +205,7 @@ class Patreon_Options {
 										
                                         <tr valign="top">
                                         <th scope="row"><strong>Make entire site Patron-only</strong> <br>(Only Patrons will be able to see Posts)</th>
-                                        <td><input type="checkbox" name="patreon-lock-entire-site" value="1"<?php checked( get_option('patreon-lock-entire-site', true) ); ?> /></td>
+                                        <td><input type="checkbox" name="patreon-lock-entire-site" value="1"<?php checked( get_option('patreon-lock-entire-site', false) ); ?> /></td>
                                         </tr>
 
                                         <tr valign="top">
