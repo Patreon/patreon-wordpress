@@ -201,8 +201,8 @@ class Patreon_Options {
                                         </tr>
 										
                                         <tr valign="top">
-                                        <th scope="row"><strong>Make entire site Patron-only</strong> <br>(Only Patrons will be able to see Posts)</th>
-                                        <td><input type="checkbox" name="patreon-lock-entire-site" value="1"<?php checked( get_option('patreon-lock-entire-site', false) ); ?> /></td>
+                                        <th scope="row"><strong>Make entire site Patron-only with Pledge Level</strong> <br>(Only Patrons at and over this pledge level will be able to see Posts)</th>
+                                        <td>$<input type="text" name="patreon-lock-entire-site" value="<?php echo get_option('patreon-lock-entire-site'); ?>" /></td>
                                         </tr>
 
                                         <tr valign="top">
@@ -236,17 +236,6 @@ class Patreon_Options {
                                         <td><input type="checkbox" name="patreon-enable-allow-admins-login-with-patreon" value="1"<?php checked( get_option('patreon-enable-allow-admins-login-with-patreon', false) ); ?> /></td>
                                         </tr>
                                         <?php } ?>
-
-                                        <tr valign="top">
-                                        <th scope="row"><strong>Enable 'Walled Garden'</strong></th>
-                                        <td><input type="checkbox" name="patreon-enable-walled-garden" value="1"<?php checked( get_option('patreon-enable-walled-garden', false) ); ?> /></td>
-                                        </tr>
-
-
-                                        <tr valign="top">
-                                        <th scope="row"><strong>Default Minimum Contribution required for Protected Images ($)</strong></th>
-                                        <td><input type="text" name="patreon-protect-default-image-patreon-level" value="<?php echo esc_attr( get_option('patreon-protect-default-image-patreon-level', 0) ); ?>" class="large-text" /></td>
-                                        </tr>
 
                                         <tr valign="top">
                                         <th scope="row"><strong>After Login/Register redirect user to specific page</strong></th>

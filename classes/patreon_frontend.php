@@ -298,13 +298,13 @@ class Patreon_Frontend {
 
 			$patreon_level = get_post_meta( $post->ID, 'patreon-level', true );
 
-			if($patreon_level == 0 AND !get_option('patreon-lock-entire-site',false)) {
+			if($patreon_level == 0 AND (!get_option('patreon-lock-entire-site',false) OR get_option('patreon-lock-entire-site',false)==0)) {
 				return $content;
 			}
 
 			$user_patronage = Patreon_Wordpress::getUserPatronage();
 	
-			if( $user_patronage == false || $user_patronage < ($patreon_level*100) || get_option('patreon-lock-entire-site',false) ) {
+			if( $user_patronage == false || $user_patronage < ($patreon_level*100) || get_option('patreon-lock-entire-site',false)>0 ) {
 
 				//protect content from user
 
