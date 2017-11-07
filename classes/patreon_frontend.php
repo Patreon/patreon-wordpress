@@ -89,12 +89,6 @@ class Patreon_Frontend {
 			$login_with_patreon_button = self::patreonMakeLoginButton();
 		}
         if ($creator_id) {
-
-        	$patreon_post_banner = get_post_meta($post->ID, 'patreon_post_banner', true);
-
-        	if(empty($patreon_post_banner ) == false) {
-        		return $patreon_post_banner;
-        	}
 			
 			$be_a_patron_button = self::patreonMakePatronButton($creator_id);
 	
