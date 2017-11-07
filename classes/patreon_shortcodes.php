@@ -107,14 +107,8 @@ class Patreon_Shortcodes {
 		if($client_id == false) {
 			return '';
 		}
-
-		$redirect_uri = site_url().'/patreon-authorization/';
-
-		$href = 'https://www.patreon.com/oauth2/authorize?response_type=code&client_id='.$client_id.'&redirect_uri='.urlencode($redirect_uri);
-
-		$button_html = '<a href="'.$href.'" class="ptrn-branded-button ptrn-login" data-ptrn_nonce="' . wp_create_nonce( 'patreon-nonce' ).'"><img class="logo" src="'.PATREON_PLUGIN_ASSETS.'/img/patreon-logomark-on-coral.svg" alt=""> Login with Patreon</a>';
-
-		return $button_html;
+	
+		return Patreon_Frontend::patreonMakeLoginButton($client_id);
 
 	}
 
