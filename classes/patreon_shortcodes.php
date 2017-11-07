@@ -25,7 +25,7 @@ class Patreon_Shortcodes {
 		if(isset($args['min_level']) && is_numeric($args['min_level'])) {
 			$min_level = $args['min_level'];
 		}
-
+	
 		if($user_patronage == false || $user_patronage < ($min_level*100)) {
 
 			/* check if shortcode has slug parameter */

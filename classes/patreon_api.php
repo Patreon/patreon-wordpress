@@ -30,6 +30,7 @@ class Patreon_API {
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 		$authorization_header = "Authorization: Bearer " . $this->access_token;
 		curl_setopt($ch, CURLOPT_HTTPHEADER, array($authorization_header));
+
 		return json_decode(curl_exec($ch), true);
 	}
 

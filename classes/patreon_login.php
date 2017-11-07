@@ -46,6 +46,7 @@ class Patreon_Login {
 		global $wpdb;
 
 		$login_with_patreon = get_option('patreon-enable-login-with-patreon', false);
+
 		$admins_editors_login_with_patreon = get_option('patreon-enable-allow-admins-login-with-patreon', false);
 
 		$email = $user_response['data']['attributes']['email'];
