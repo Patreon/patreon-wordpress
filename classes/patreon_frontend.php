@@ -121,6 +121,7 @@ class Patreon_Frontend {
 
             return $campaign_banner;
         }
+		
 
 	}
 	
@@ -301,12 +302,21 @@ class Patreon_Frontend {
 			if( $user_patronage == false || $user_patronage < ($patreon_level*100) || get_option('patreon-lock-entire-site',false)>0 ) {
 
 				//protect content from user
+				
+				// Check if creator id exists. 
+				
+				$creator_id = get_option('patreon-creator-id', false);
+				
+				// // IF creator id exists. Do the banner. If not, no point in protecting since we wont be able to send people to patronage. If so dont modify normal content.
+				
+				if($creator_id) {
+					
+					$content = self::displayPatreonCampaignBanner($patreon_level);
 
-				$content = self::displayPatreonCampaignBanner($patreon_level);
-
-				$content = apply_filters('ptrn/post_content', $content, $user_patronage);
-
-
+					$content = apply_filters('ptrn/post_content', $content, $user_patronage);				
+					
+				}
+				
 			}
 
 		}
