@@ -43,6 +43,7 @@ class Patreon_Options {
         register_setting( 'patreon-options', 'patreon-protect-default-image-patreon-level' );
         register_setting( 'patreon-options', 'patreon-enable-strict-oauth' );
         register_setting( 'patreon-options', 'patreon-lock-entire-site' );
+        register_setting( 'patreon-options', 'patreon-custom-universal-banner' );
     }
 
     function patreon_plugin_login_warning() {
@@ -203,6 +204,10 @@ class Patreon_Options {
                                         <tr valign="top">
                                         <th scope="row"><strong>Make entire site Patron-only with Pledge Level</strong> <br>(Only Patrons at and over this pledge level will be able to see Posts)</th>
                                         <td>$<input type="text" name="patreon-lock-entire-site" value="<?php echo get_option('patreon-lock-entire-site'); ?>" /></td>
+                                        </tr>
+                                        <tr valign="top">
+                                        <th scope="row" colspan="2"><strong>Custom Call to Action Banner</strong> <br>Instead of default text, you can show a custom Call to Action Notification and Banner (ie, "Be our Patron to see this content!") to your visitors. You can use HTML too. Leave empty to disable.<br /><br />
+										<?php wp_editor(get_option('patreon-custom-universal-banner'),'patreon_custom_universal_banner',array('textarea_name'=>'patreon-custom-universal-banner','textarea_rows'=>5)); ?></th>
                                         </tr>
 
                                         <tr valign="top">
