@@ -290,7 +290,15 @@ class Patreon_Frontend {
 			if(current_user_can('manage_options')) {
 				return $content;
 			}
-
+		
+			// Below define can be defined in any plugin to bypass core locking function and use a custom one from plugin
+			// It is independent of the plugin load order since it checks if it is defined.
+			// It can be defined by any plugin until right before the_content filter is run.
+			
+			if(defined('PATREON_BYPASS_FILTERING')) {
+                return $content;
+            }
+			
 			$patreon_level = get_post_meta( $post->ID, 'patreon-level', true );
 
 			if($patreon_level == 0 AND (!get_option('patreon-lock-entire-site',false) OR get_option('patreon-lock-entire-site',false)==0)) {
