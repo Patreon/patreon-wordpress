@@ -135,6 +135,15 @@ class Patreon_Options {
                                         <th scope="row"><strong>Client Secret</strong></th>
                                         <td><input type="text" name="patreon-client-secret" value="<?php echo esc_attr( get_option('patreon-client-secret', '') ); ?>" class="large-text" /></td>
                                         </tr>
+                                        <tr valign="top">
+                                        <th scope="row"><strong>Creator's Access Token</strong></th>
+                                        <td><input type="text" name="patreon-creators-access-token" value="<?php echo esc_attr( get_option('patreon-creators-access-token', '') ); ?>" class="large-text" /></td>
+                                        </tr>
+
+                                        <tr valign="top">
+                                        <th scope="row"><strong>Creator's Refresh Token</strong></th>
+                                        <td><input type="text" name="patreon-creators-refresh-token" value="<?php echo esc_attr( get_option('patreon-creators-refresh-token', '') ); ?>" class="large-text" /></td>
+                                        </tr>
 
                                     </table>
 
