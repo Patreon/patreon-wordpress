@@ -39,6 +39,7 @@ class Patreon_Wordpress {
 		self::$Patreon_Shortcodes = new Patreon_Shortcodes;
 
 		add_action('wp_head', array($this, 'updatePatreonUser') );
+		add_action('init', array($this, 'checkPatreonCreatorID'));
 
 	}
 
@@ -113,6 +114,29 @@ class Patreon_Wordpress {
 
 	}
 
+	public static function checkPatreonCreatorID() {
+		
+		// Check if creator id doesnt exist. Account for the case in which creator id was saved as empty by the Creator
+		
+		if(!get_option('patreon-creator-id', false) OR get_option('patreon-creator-id', false)=='')
+		{	
+			// Making sure access credentials are there to avoid fruitlessly contacting the api:
+			
+			if(get_option('patreon-client-id', false) && get_option('patreon-client-secret', false) && get_option('patreon-creators-access-token', false)) {
+				
+				// Credentials are in. Go.
+				
+				$creator_id = self::getPatreonCreatorID();
+			}
+			if(isset($creator_id))
+			{
+				// Creator id acquired. Update.
+				
+				update_option( 'patreon-creator-id', $creator_id );
+			}
+		}
+		
+	}
 	public static function getPatreonCreatorID() {
 
 		$api_client = new Patreon_API(get_option('patreon-creators-access-token', false));
@@ -122,6 +146,9 @@ class Patreon_Wordpress {
         if(empty($user_response)) {
         	return false;
         }
+
+
+		$creator_id=false;
 
         if(isset($user_response['errors']) && is_array($user_response['errors'])) {
 
