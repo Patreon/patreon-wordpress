@@ -19,6 +19,7 @@ class Patreon_Login {
 		update_user_meta($user_id, 'user_lastname', $user_response['data']['attributes']['last_name']);
 		update_user_meta($user_id, 'patreon_token_minted', microtime());
 		update_user_meta($user_id, 'patreon_token_expires_in', $tokens['expires_in']);
+
 	}
 
 	public static function updateLoggedInUser($user_response, $tokens, $redirect = false) {
@@ -38,6 +39,47 @@ class Patreon_Login {
 			wp_redirect( get_permalink($redirect) );
 			exit;
 		}
+
+	}
+
+	public static function checkTokenExpiration($user_id=false) {
+
+		if($user_id)
+		{
+			$user = get_user_by('ID',$user_id);
+		}
+		else
+		{
+			$user = wp_get_current_user();
+		}
+
+		if(!$user OR 0 == $user->ID) {
+		} else {
+			
+			// Valid user is logged in. Check the token:
+			
+			$expiration = get_user_meta($user->ID,'patreon_token_expires_in',true);
+			$minted = get_user_meta($user->ID,'patreon_token_minted',true);
+			if($minted!='')
+			{
+				// We have value. get secs to use them in comparison.
+
+				$minted = explode(' ',$minted);
+				// Cast to integer
+				$minted = (int) $minted[1];
+				
+				if((int)microtime(true) >= ($minted+$expiration))
+				{
+					// This token is expired. Nuke it.
+					
+					delete_user_meta($user->ID,'patreon_access_token');
+			
+				}
+		
+			}
+	
+		}
+
 
 	}
 
