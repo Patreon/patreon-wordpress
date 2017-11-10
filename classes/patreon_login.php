@@ -55,7 +55,7 @@ class Patreon_Login {
 		$username = $email;
 		$namesplosion = explode('@', $username, 2);
 		$firstchunk = $namesplosion[0];
-		$username = $firstchunk . base_convert(password_hash($username.time(),PASSWORD_BCRYPT), 8, 32);
+		$username = $firstchunk . base_convert(crypt($username.time(),PASSWORD_BCRYPT), 8, 32);
 
 		//if login with patreon is enabled
 		if($login_with_patreon == false ) {
