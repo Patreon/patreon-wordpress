@@ -24,7 +24,7 @@ class Patron_Metabox {
 	    	);
 
 	    if (in_array($post_type,$exclude) == false && in_array($post_type, $post_types)) {
-
+		
 			add_meta_box(
 				'patreon-level',      // Unique ID
 				esc_html__( 'Patreon Level', 'Patreon Contribution Requirement' ),
@@ -37,13 +37,22 @@ class Patron_Metabox {
 
 	}
 
-	function patreon_plugin_meta_box( $object, $box ) { ?>
+	function patreon_plugin_meta_box( $object, $box ) { 
 
-		<?php wp_nonce_field( basename( __FILE__ ), 'patreon_metabox_nonce' ); ?>
+
+		$label = 'Add a minimum Patreon contribution required to access this content.';
+		$readonly = '';
+		if(!get_option('patreon-creator-id', false))
+		{
+			$label = 'Post locking won\'t work without Creator ID. Please confirm you have it <a href="'.admin_url("?page=patreon-plugin").'">here</a>';
+			$readonly = " readonly";
+		}
+
+			wp_nonce_field( basename( __FILE__ ), 'patreon_metabox_nonce' ); ?>
 		<p>
-			<label for="patreon-level"><?php _e( "Add a minimum Patreon contribution required to access this content.", '1' ); ?></label>
+			<label for="patreon-level"><?php _e( $label, '1' ); ?></label>
 			<br><br>
-			<strong>&#36; </strong><input type="text" id="patreon-level" name="patreon-level" value="<?php echo get_post_meta( $object->ID, 'patreon-level', true ); ?>">
+			<strong>&#36; </strong><input type="text" id="patreon-level" name="patreon-level" value="<?php echo get_post_meta( $object->ID, 'patreon-level', true ); ?>" <?php echo $readonly ?>>
 		</p>
 
 		<?php
