@@ -209,10 +209,22 @@ class Patreon_Options {
                                         <th scope="row"><strong>Enable strict oAuth</strong> <br>(Only connects logged in users)</th>
                                         <td><input type="checkbox" name="patreon-enable-strict-oauth" value="1"<?php checked( get_option('patreon-enable-strict-oauth', true) ); ?> /></td>
                                         </tr>
+										<?php
 										
+											$site_locking_info = '(Only Patrons at and over this pledge level will be able to see Posts)';
+											$readonly = '';
+											if(!get_option('patreon-creator-id', false))
+											{
+												$site_locking_info = 'Post locking won\'t work without Creator ID. Please confirm you have it <a href="'.admin_url("?page=patreon-plugin").'">here</a>';
+												$readonly = " readonly";
+											}
+											?>										
                                         <tr valign="top">
-                                        <th scope="row"><strong>Make entire site Patron-only with Pledge Level</strong> <br>(Only Patrons at and over this pledge level will be able to see Posts)</th>
-                                        <td>$<input type="text" name="patreon-lock-entire-site" value="<?php echo get_option('patreon-lock-entire-site'); ?>" /></td>
+                                        <th scope="row"><strong>Make entire site Patron-only with Pledge Level</strong>
+
+										
+										<br><?php echo $site_locking_info ?></th>
+                                        <td>$<input type="text" name="patreon-lock-entire-site" value="<?php echo get_option('patreon-lock-entire-site'); ?>" <?php echo $readonly ?>/></td>
                                         </tr>
                                         <tr valign="top">
                                         <th scope="row" colspan="2"><strong>Custom Call to Action Banner</strong> <br>Instead of default text, you can show a custom Call to Action Notification and Banner (ie, "Be our Patron to see this content!") to your visitors. You can use HTML too. Leave empty to disable.<br /><br />
