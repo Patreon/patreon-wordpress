@@ -51,13 +51,18 @@ class Patreon_Wordpress {
 		if(isset($user_meta['patreon_access_token'][0])) {
 			$api_client = new Patreon_API($user_meta['patreon_access_token'][0]);
 
+			// Below is a code that caches user object for 60 seconds. This can be commented out depending on the response from Infrastructure team about contacting api to check for user on every page load
+			/*
 			$cache_key = 'patreon_user_'.$user->ID;
 			$user = get_transient( $cache_key );
 			if ( false === $user ) {
 				$user = $api_client->fetch_user();
 				set_transient( $cache_key, $user, 60);
 			}
-
+			*/
+			// For now we are always getting user from APi fresh:
+			$user = $api_client->fetch_user();
+			
 			return $user;
 		}
 
