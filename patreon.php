@@ -25,6 +25,8 @@ define("PATREON_TEXT_SUPPORT_ON_PATREON", 'Support on Patreon' );
 define("PATREON_TEXT_MISTAKEN_PATRON", 'Patron but can\'t see?' );
 define("PATREON_TEXT_PLEDGE_NOT_ENOUGH", 'Upgrade your Pledge!' );
 define("PATREON_TEXT_UPGRADE_PLEDGE", 'Upgrade Pledge' );
+define("PATREON_TEXT_UNLOCK_WITH_PATREON", 'Unlock with Patreon' );
+define("PATREON_TEXT_UPDATE_PLEDGE", 'Update Pledge' );
 define("PATREON_TEXT_LOCKED_POST", 'Sorry! This content is for our Patrons who pledge $%%pledgelevel%% and over!' );
 
 include 'classes/patreon_wordpress.php';
