@@ -74,16 +74,23 @@ class Patreon_Frontend {
 		$login_with_patreon = get_option('patreon-enable-login-with-patreon', false);
 
         $creator_id = get_option('patreon-creator-id', false);
+		
+		// Check existence of a custom patreon banners as saved in plugin options
+		$custom_universal_banner = get_option('patreon-custom-universal-banner',false);
 
-        $contribution_required = '';
+        $contribution_required = PATREON_TEXT_LOCKED_POST;
+		
+        if($custom_universal_banner AND $custom_universal_banner!='') {
+			// Custom banner exists and it is not empty. Override the message
+			$contribution_required = $custom_universal_banner;	
+		}
 		
         if($patreon_level != false) {
 			
-        	$contribution_required = str_replace('%%pledgelevel%%',$patreon_level,PATREON_TEXT_LOCKED_POST);
+        	$contribution_required = str_replace('%%pledgelevel%%',$patreon_level,$contribution_required);
         	$contribution_required = apply_filters('ptrn/contribution_required',$contribution_required,$patreon_level);
-
-        }
-		 
+		}
+		
 		if($login_with_patreon)
 		{
 			$login_with_patreon_button = self::patreonMakeLoginButton();
