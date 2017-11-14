@@ -149,21 +149,20 @@ class Patreon_Frontend {
 		{
 			// Patron logged in and patron, but we are still showing the banner. This means pledge level is not enough.
 			
-			$label = str_replace('%%pledgelevel%%',$patreon_level,PATREON_TEXT_OVER_BUTTON_1);
+			return str_replace('%%pledgelevel%%',$patreon_level,PATREON_TEXT_OVER_BUTTON_1);
 		
-			
 		}
 		if(!$is_patron)
 		{
 			// Patron logged in and not patron
 			
-			$label = str_replace('%%pledgelevel%%',$patreon_level,PATREON_TEXT_OVER_BUTTON_1);
+			return str_replace('%%pledgelevel%%',$patreon_level,PATREON_TEXT_OVER_BUTTON_1);
 		
 		}
 		
 		$user_patronage = Patreon_Wordpress::getUserPatronage();
 		
-		if($user_patronage < ($patreon_level*100))
+		if($user_patronage < ($patreon_level*100) AND $user_patronage>0)
 		{
 			// Patron logged in and not patron
 			
@@ -172,7 +171,7 @@ class Patreon_Frontend {
 			$label = str_replace('%%creator%%','(Creator Name Here)',$label);
 			
 			// REVISIT - calculating user patronage value by dividing patronage var may be bad.
-			$label = str_replace('%%currentpledgelevel%%',($user_patronage/100),$label);
+			return str_replace('%%currentpledgelevel%%',($user_patronage/100),$label);
 			
 		
 		}
@@ -193,26 +192,26 @@ class Patreon_Frontend {
 		{
 			// Patron logged in and patron, but we are still showing the banner. This means pledge level is not enough.
 			
-			$label = PATREON_TEXT_UNDER_BUTTON_1;
+			return PATREON_TEXT_UNDER_BUTTON_1;
 		
 		}
 		if(!$is_patron)
 		{
 			// Patron logged in and not patron
 			
-			$label = str_replace('%%pledgelevel%%',$patreon_level,PATREON_TEXT_UNDER_BUTTON_2);
+			return str_replace('%%pledgelevel%%',$patreon_level,PATREON_TEXT_UNDER_BUTTON_2);
 		
 		}
 	 
 		$user_patronage = Patreon_Wordpress::getUserPatronage();
 		
-		if($user_patronage < ($patreon_level*100))
+		if($user_patronage < ($patreon_level*100) AND $user_patronage>0)
 		{
 			// Patron logged in and not patron
 			
 			$label = str_replace('%%pledgelevel%%',$patreon_level,PATREON_TEXT_UNDER_BUTTON_2);
 			$refresh_link = '<a href="'.self::patreonMakeLoginLink().'">Refresh</a>';
-			$label = str_replace('%%flowlink%%',$refresh_link,$label);
+			return str_replace('%%flowlink%%',$refresh_link,$label);
 			
 		
 		}
