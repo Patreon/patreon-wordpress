@@ -92,7 +92,7 @@ class Patreon_Frontend {
 		}
 		
         if ($client_id) {
-			
+		
 			// Wrap message and buttons in divs for responsive interface mechanics
 			
 			$contribution_required = '<div class="patreon-locked-content-message">'.$contribution_required.'</div>';
@@ -106,17 +106,21 @@ class Patreon_Frontend {
 				$login_with_patreon_button = '<div class="patreon-login-refresh-button">'.$login_with_patreon_button.'</div>';
 			}
 			
-			$text_over_universal_button = self::getLabelOverUniversalButton();
-			$text_under_universal_button = self::getLabelUnderUniversalButton();
+			$text_over_universal_button = self::getLabelOverUniversalButton($patreon_level);
+			$text_under_universal_button = self::getLabelUnderUniversalButton($patreon_level);
 			
 			// Wrap all of them in a responsive div
 			
 			$campaign_banner = '<div class="patreon-campaign-banner">'.
 									$contribution_required.
 									'<div class="patreon-patron-button-wrapper">'.
-										$text_over_universal_button.
+										'<div class="patreon-text-over-button">'.
+											$text_over_universal_button.
+										'</div>'.
 										$universal_button.
-										$text_under_universal_button.
+										'<div class="patreon-text-under-button">'.
+											$text_under_universal_button.
+										'</div>'.
 									'</div>'.
 								'</div>';
 			
@@ -131,60 +135,82 @@ class Patreon_Frontend {
 
 	}
 	
-	function getLabelOverUniversalButton() {
+	function getLabelOverUniversalButton($patreon_level) {
 		
-		
+
 		$user_logged_into_patreon = self::isUserLoggedInPatreon();
 
 		$is_patron = Patreon_Wordpress::isPatron();
 		
-		if($is_patron AND $user_logged_into_patreon)
+		$is_patron = Patreon_Wordpress::isPatron();
+		
+		if(!$user_logged_into_patreon)
 		{
 			// Patron logged in and patron, but we are still showing the banner. This means pledge level is not enough.
-			return PATREON_TEXT_PLEDGE_NOT_ENOUGH;
+			
+			return str_replace('%%pledgelevel%%',$patreon_level,PATREON_TEXT_OVER_BUTTON_1);
+		
 			
 		}
-		if(!$is_patron AND $user_logged_into_patreon)
+		if(!$is_patron)
 		{
 			// Patron logged in and not patron
 			
-			return PATREON_TEXT_BECOME_PATRON;
+			return str_replace('%%pledgelevel%%',$patreon_level,PATREON_TEXT_OVER_BUTTON_1);
+		
+		}
+		
+		$user_patronage = Patreon_Wordpress::getUserPatronage();
+		
+		if($user_patronage < ($patreon_level*100))
+		{
+			// Patron logged in and not patron
 			
+			return str_replace('%%pledgelevel%%',$patreon_level,PATREON_TEXT_OVER_BUTTON_1);
+		
 		}
 	
-		// User not logged in
 		
-		
-		return PATREON_TEXT_BECOME_PATRON;
-		
+		return PATREON_TEXT_OVER_BUTTON_1;
 		
 	}
-	function getLabelUnderUniversalButton() {
+	function getLabelUnderUniversalButton($patreon_level) {
 		
-		
+		$label = PATREON_TEXT_UNDER_BUTTON_1;
+	
 		$user_logged_into_patreon = self::isUserLoggedInPatreon();
 
 		$is_patron = Patreon_Wordpress::isPatron();
 		
-		if($is_patron AND $user_logged_into_patreon)
+		if(!$user_logged_into_patreon)
 		{
 			// Patron logged in and patron, but we are still showing the banner. This means pledge level is not enough.
-			return PATREON_TEXT_PLEDGE_NOT_ENOUGH;
 			
+			$label = PATREON_TEXT_UNDER_BUTTON_1;
+		
 		}
-		if(!$is_patron AND $user_logged_into_patreon)
+		if(!$is_patron)
 		{
 			// Patron logged in and not patron
 			
-			return PATREON_TEXT_BECOME_PATRON;
-			
+			$label = str_replace('%%pledgelevel%%',$patreon_level,PATREON_TEXT_UNDER_BUTTON_2);
+		
 		}
-	
-		// User not logged in
+	 
+		$user_patronage = Patreon_Wordpress::getUserPatronage();
 		
+		if($user_patronage < ($patreon_level*100))
+		{
+			// Patron logged in and not patron
+			
+			$label = str_replace('%%pledgelevel%%',$patreon_level,PATREON_TEXT_UNDER_BUTTON_2);
+			$refresh_link = '<a href="'.self::patreonMakeLoginLink().'">Refresh</a>';
+			$label = str_replace('%%flowlink%%',$refresh_link,$label);
+			
 		
-		return PATREON_TEXT_BECOME_PATRON;
+		}
 		
+		return $label;
 		
 	}
 	function getLabelOverLoginButton() {
@@ -237,6 +263,7 @@ class Patreon_Frontend {
 		
 		$final_redirect = home_url();
 		
+		
 		if($post)
 		{
 			$final_redirect = get_permalink($post->ID);
@@ -244,16 +271,8 @@ class Patreon_Frontend {
 		
 		$state['final_redirect_uri'] = $final_redirect;
 		
-		//http://www.patreon.com/check-auth-route?min_cents='..'&client_id='..'&redirect_uri='..'&state='..'">LABEL</a>
-		
-		$redirect_uri = site_url().'/patreon-authorization/';
-		
-		$href = 'https://www.patreon.com/check-auth-route?min_cents='.$send_pledge_level.'&client_id='.$client_id.'&redirect_uri='.$redirect_uri.'&state='.base64_encode(serialize($state));
-		
-		// 3rd party dev goodie! Apply custom filters so they can manipulate the url:
-		
-		$href = apply_filters('ptrn/patron_link', $href);		
-		
+		$href = self::MakeUniversalFlowLink($send_pledge_level,$state,$client_id);
+			
 		$label_text = self::patreonMakeUniversalButtonLabel();
 		
 		$paywall_img = get_option('patreon-paywall-img-url', false);
@@ -265,6 +284,22 @@ class Patreon_Frontend {
         }
 		
 		return apply_filters('ptrn/patron_button', '<a href="'.$href.'">'.$paywall_img.'</a>');		
+		
+	}
+	function MakeUniversalFlowLink($pledge_level,$state,$client_id = false) {
+		
+		if(!$client_id)
+		{
+			$client_id = get_option('patreon-client-id', false);
+		}	
+		
+		$redirect_uri = site_url().'/patreon-authorization/';
+		
+		$href = 'https://www.patreon.com/check-auth-route?min_cents='.$pledge_level.'&client_id='.$client_id.'&redirect_uri='.$redirect_uri.'&state='.base64_encode(serialize($state));
+
+		// 3rd party dev goodie! Apply custom filters so they can manipulate the url:
+		
+		return apply_filters('ptrn/patron_link', $href);			
 		
 	}
 	function patreonMakeUniversalButtonLabel() {
@@ -356,6 +391,21 @@ class Patreon_Frontend {
 		}		
 		return $user_logged_into_patreon;
 	}
+	function patreonMakeLoginLink($client_id=false) {
+		
+		if(!$client_id)
+		{
+			$client_id = get_option('patreon-client-id', false);
+		}
+		
+		
+		$redirect_uri = site_url().'/patreon-authorization/';
+
+		$href = 'https://www.patreon.com/oauth2/authorize?response_type=code&client_id='.$client_id.'&redirect_uri='.$redirect_uri;
+	
+		return apply_filters('ptrn/login_link', $href);
+
+	}
 	function patreonMakeLoginButton($client_id=false) {
 		
 		if(!$client_id)
@@ -394,7 +444,6 @@ class Patreon_Frontend {
 		return apply_filters('ptrn/login_button', '<a href="'.$href.'" class="ptrn-login" data-ptrn_nonce="' . wp_create_nonce( 'patreon-nonce' ).'"><div class="patreon-responsive-button-wrapper"><div class="patreon-responsive-button"><img class="patreon_logo" src="'.PATREON_PLUGIN_ASSETS.'/img/patreon-logomark-on-coral.svg" alt=""> '.$login_label.'</div></div></a>', $href);
 
 	}	
-
 
 	function protectContentFromUsers($content) {
 
@@ -471,6 +520,8 @@ class Patreon_Frontend {
 		return $content;
 
 	}
+
+
 	public static function returnPatreonEmbeddedContent($the_content) {
 
 		$safety_embeds = get_option('patreon-enable-safe-patreon-embeds', false);
