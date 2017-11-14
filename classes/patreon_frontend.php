@@ -137,7 +137,8 @@ class Patreon_Frontend {
 	
 	function getLabelOverUniversalButton($patreon_level) {
 		
-
+		$label = PATREON_TEXT_OVER_BUTTON_1;
+		
 		$user_logged_into_patreon = self::isUserLoggedInPatreon();
 
 		$is_patron = Patreon_Wordpress::isPatron();
@@ -148,7 +149,7 @@ class Patreon_Frontend {
 		{
 			// Patron logged in and patron, but we are still showing the banner. This means pledge level is not enough.
 			
-			return str_replace('%%pledgelevel%%',$patreon_level,PATREON_TEXT_OVER_BUTTON_1);
+			$label = str_replace('%%pledgelevel%%',$patreon_level,PATREON_TEXT_OVER_BUTTON_1);
 		
 			
 		}
@@ -156,7 +157,7 @@ class Patreon_Frontend {
 		{
 			// Patron logged in and not patron
 			
-			return str_replace('%%pledgelevel%%',$patreon_level,PATREON_TEXT_OVER_BUTTON_1);
+			$label = str_replace('%%pledgelevel%%',$patreon_level,PATREON_TEXT_OVER_BUTTON_1);
 		
 		}
 		
@@ -166,12 +167,18 @@ class Patreon_Frontend {
 		{
 			// Patron logged in and not patron
 			
-			return str_replace('%%pledgelevel%%',$patreon_level,PATREON_TEXT_OVER_BUTTON_1);
+			$label = str_replace('%%pledgelevel%%',$patreon_level,PATREON_TEXT_OVER_BUTTON_2);
+			
+			$label = str_replace('%%creator%%','(Creator Name Here)',$label);
+			
+			// REVISIT - calculating user patronage value by dividing patronage var may be bad.
+			$label = str_replace('%%currentpledgelevel%%',($user_patronage/100),$label);
+			
 		
 		}
 	
 		
-		return PATREON_TEXT_OVER_BUTTON_1;
+		return $label;
 		
 	}
 	function getLabelUnderUniversalButton($patreon_level) {
