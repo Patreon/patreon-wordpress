@@ -28,6 +28,9 @@ define("PATREON_TEXT_UPGRADE_PLEDGE", 'Upgrade Pledge' );
 define("PATREON_TEXT_UNLOCK_WITH_PATREON", 'Unlock with Patreon' );
 define("PATREON_TEXT_UPDATE_PLEDGE", 'Update Pledge' );
 define("PATREON_TEXT_LOCKED_POST", 'Sorry! This content is for our Patrons who pledge $%%pledgelevel%% and over!' );
+define("PATREON_TEXT_OVER_BUTTON_1", 'This content is available to Patrons pledging $%%pledgelevel%% or more on Patreon' );
+define("PATREON_TEXT_OVER_BUTTON_2", 'Edit your pledge to %%creator%% to $%%pledgelevel%% or more to access this content. You\'re currently pledging $%%currentpledgelevel%%.' );
+define("PATREON_TEXT_OVER_BUTTON_3", 'Your Patreon payment method appears to be declined. Update your pledge to access this post.' );
 
 include 'classes/patreon_wordpress.php';
 
