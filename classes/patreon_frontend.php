@@ -73,8 +73,8 @@ class Patreon_Frontend {
 
 		$login_with_patreon = get_option('patreon-enable-login-with-patreon', false);
 
-        $creator_id = get_option('patreon-creator-id', false);
-		
+		$client_id = get_option('patreon-client-id', false);
+	
 		// Check existence of a custom patreon banners as saved in plugin options
 		$custom_universal_banner = get_option('patreon-custom-universal-banner',false);
 
@@ -91,34 +91,28 @@ class Patreon_Frontend {
         	$contribution_required = apply_filters('ptrn/contribution_required',$contribution_required,$patreon_level);
 		}
 		
-		if($login_with_patreon)
-		{
-			$login_with_patreon_button = self::patreonMakeLoginButton();
-		}
-        if ($creator_id) {
+        if ($client_id) {
 			
-			$be_a_patron_button = self::patreonMakePatronButton($creator_id);
-	
 			// Wrap message and buttons in divs for responsive interface mechanics
 			
 			$contribution_required = '<div class="patreon-locked-content-message">'.$contribution_required.'</div>';
 			
-			$be_a_patron_button = '<div class="patreon-be-patron-button">'.$be_a_patron_button.'</div>';
+			$universal_button = self::patreonMakeUniversalButton();
+	
+			$universal_button = '<div class="patreon-universal-button">'.$universal_button.'</div>';
 			
 			if(isset($login_with_patreon_button))
 			{
 				$login_with_patreon_button = '<div class="patreon-login-refresh-button">'.$login_with_patreon_button.'</div>';
 			}
 			
-			$label_over_patron_button = self::getLabelOverPatronButton();
-			$label_over_login_button = self::getLabelOverLoginButton();
+			$label_over_universal_button = self::getLabelOverPatronButton();
 			
 			// Wrap all of them in a responsive div
 			
 			$campaign_banner = '<div class="patreon-campaign-banner">'.
 									$contribution_required.
-									'<div class="patreon-patron-button-wrapper">'.$label_over_patron_button.$be_a_patron_button.'</div>'.
-									'<div class="patreon-login-button-wrapper">'.$label_over_login_button.$login_with_patreon_button.'</div>'.
+									'<div class="patreon-patron-button-wrapper">'.$label_over_universal_button.$universal_button.'</div>'.
 								'</div>';
 			
 			// This extra button is solely here to test whether new wrappers cause any design issues in different themes. For easy comparison with existing unwrapped button. Remove when confirmed.
@@ -174,6 +168,76 @@ class Patreon_Frontend {
 		
 	}
 	
+	function patreonMakeUniversalButton($mincents=false,$state=false,$post=false,$client_id=false) {
+		
+		// This very customizable function takes numerous parameters to customize universal flow links and creates the desired link
+
+		// If no post is given, get the active post:
+		
+		if(!$post)
+		{
+			global $post;
+		}
+				
+		// If no post object given, 
+		
+		$send_pledge_level=0;
+		
+		if($mincents)
+		{
+			$send_pledge_level=$mincents;
+		}
+		
+		if(!$client_id)
+		{
+			$client_id = get_option('patreon-client-id', false);
+		}
+		
+		// If we werent given any state vars to send, initialize the array
+		if(!$state)
+		{
+			$state=array();
+		}
+
+		// Get the address of the current page, and save it as final redirect uri.		
+		// Start with home url for redirect. If post is valid, get permalink. 
+		
+		$final_redirect = home_url();
+		
+		if($post)
+		{
+			$final_redirect = get_permalink($post->ID);
+		}
+		
+		$state['final_redirect_uri'] = $final_redirect;
+		
+		//http://www.patreon.com/check-auth-route?min_cents='..'&client_id='..'&redirect_uri='..'&state='..'">LABEL</a>
+		
+		$redirect_uri = site_url().'/patreon-authorization/';
+		
+		$href = 'https://www.patreon.com/check-auth-route?min_cents='.$send_pledge_level.'&client_id='.$client_id.'&redirect_uri='.$redirect_uri.'&state='.base64_encode(serialize($state));
+		
+		// 3rd party dev goodie! Apply custom filters so they can manipulate the url:
+		
+		$href = apply_filters('ptrn/patron_link', $href);		
+		
+		$label_text = self::patreonMakeUniversalButtonLabel();
+		
+		$paywall_img = get_option('patreon-paywall-img-url', false);
+		
+        if ($paywall_img == false) {
+        	$paywall_img = '<div class="patreon-responsive-button-wrapper"><div class="patreon-responsive-button"><img class="patreon_logo" src="'.PATREON_PLUGIN_ASSETS.'/img/patreon-logomark-on-coral.svg" alt=""> '.$label_text.'</div></div>';
+        } else {
+        	$paywall_img = '<img src="'.$paywall_img.'" />';
+        }
+		
+		return apply_filters('ptrn/patron_button', '<a href="'.$href.'">'.$paywall_img.'</a>');		
+		
+	}
+	function patreonMakeUniversalButtonLabel() {
+		
+		return PATREON_TEXT_SUPPORT_ON_PATREON;
+	}
 	function patreonMakePatronButton($creator_id=false) {
 		global $post;
 		
@@ -306,25 +370,47 @@ class Patreon_Frontend {
                 return $content;
             }
 			
-			$patreon_level = get_post_meta( $post->ID, 'patreon-level', true );
-
-			if($patreon_level == 0 AND (!get_option('patreon-lock-entire-site',false) OR get_option('patreon-lock-entire-site',false)==0)) {
-				return $content;
+			// First check if entire site is locked, get the level for locking.
+			
+			$patreon_level = get_option('patreon-lock-entire-site',false);
+			
+			// Check if specific level is given for this post:
+			
+			$post_level = get_post_meta( $post->ID, 'patreon-level', true );
+			
+			// get post meta returns empty if no value is found. If so, set the value to 0.
+			
+			if($post_level == '')
+			{
+				$post_level = 0;				
 			}
 
+			// Check if both post level and site lock level are set to 0 or nonexistent. If so return normal content.
+			
+			if($post_level == 0 AND (!get_option('patreon-lock-entire-site',false) OR get_option('patreon-lock-entire-site',false)==0)) {
+				return $content;
+			}
+			
+			// Passed checks. If post level is not 0, override patreon level and hence site locking value with post's. This will allow Creators to lock entire site and then set a different value for individual posts for access. Ie, site locking is $5, but one particular post can be $10, and it will require $10 to see. 
+			
+			if($post_level!=0)
+			{
+				$patreon_level = $post_level;
+			}
+			
 			$user_patronage = Patreon_Wordpress::getUserPatronage();
 	
 			if( $user_patronage == false || $user_patronage < ($patreon_level*100) || get_option('patreon-lock-entire-site',false)>0 ) {
 
 				//protect content from user
 				
-				// Check if creator id exists. 
+				// Get client id
 				
-				$creator_id = get_option('patreon-creator-id', false);
+				$client_id = get_option('patreon-client-id', false);
 				
-				// // IF creator id exists. Do the banner. If not, no point in protecting since we wont be able to send people to patronage. If so dont modify normal content.
+				// // If client id exists. Do the banner. If not, no point in protecting since we wont be able to send people to patronage. If so dont modify normal content.
 				
-				if($creator_id) {
+				if($client_id) {
 					
 					$content = self::displayPatreonCampaignBanner($patreon_level);
 
