@@ -269,7 +269,19 @@ class Patreon_Frontend {
 	}
 	function patreonMakeUniversalButtonLabel() {
 		
-		return PATREON_TEXT_SUPPORT_ON_PATREON;
+		// Default label:
+		
+		$label = PATREON_TEXT_UNLOCK_WITH_PATREON;
+		
+		$user_logged_into_patreon = self::isUserLoggedInPatreon();
+
+		$is_patron = Patreon_Wordpress::isPatron();
+		
+		// Change this after getting info about which value confirms user's payment is declined. The only different button label is for that condition.
+		
+		return $label;		
+		
+		
 	}
 	function patreonMakePatronButton($creator_id=false) {
 		global $post;
