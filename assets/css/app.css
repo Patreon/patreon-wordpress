@@ -102,21 +102,32 @@
 
 .patreon-patron-button-wrapper{
 	display:inline-block;
-	max-width : 265px;
 	width:100%;
-	font-size:14px;
 	margin:5px;
-	font-size: 125%;
-	font-weight:bold;
 }
 
 .patreon-login-button-wrapper{
 	display:inline-block;
 	max-width : 265px;
 	width:100%;
-	font-size:14px;
 	margin:5px;
-	font-size: 125%;
 	font-weight:bold;
+	
+}
+
+.patreon-text-over-button{
+	display:inline-block;
+	width:100%;
+	margin-bottom:20px;
+	font-size: 125%;
+	
+}
+
+.patreon-text-under-button{
+	display:inline-block;
+	width:100%;
+	margin-bottom:20px;
+	margin-top:20px;
+	font-size: 125%;
 	
 }
