@@ -395,6 +395,7 @@ class Patreon_Frontend {
 
 	}	
 
+
 	function protectContentFromUsers($content) {
 
 		global $post;
@@ -444,11 +445,11 @@ class Patreon_Frontend {
 			}
 			
 			$user_patronage = Patreon_Wordpress::getUserPatronage();
-	
-			if( $user_patronage == false || $user_patronage < ($patreon_level*100) || get_option('patreon-lock-entire-site',false)>0 ) {
+			
+			if($user_patronage == false || $user_patronage < ($patreon_level*100)) {
 
 				//protect content from user
-				
+			
 				// Get client id
 				
 				$client_id = get_option('patreon-client-id', false);
@@ -470,8 +471,6 @@ class Patreon_Frontend {
 		return $content;
 
 	}
-
-
 	public static function returnPatreonEmbeddedContent($the_content) {
 
 		$safety_embeds = get_option('patreon-enable-safe-patreon-embeds', false);
