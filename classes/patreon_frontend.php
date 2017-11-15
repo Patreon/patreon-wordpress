@@ -462,27 +462,6 @@ class Patreon_Frontend {
 
 	}
 
-	public static function returnPatreonEmbeddedContent($the_content) {
-
-		$safety_embeds = get_option('patreon-enable-safe-patreon-embeds', false);
-
-		if($safety_embeds) {
-
-			$the_content = wptexturize($the_content);
-			$the_content = convert_smilies($the_content);
-			$the_content = convert_chars($the_content);
-			$the_content = wpautop($the_content);
-			$the_content = shortcode_unautop($the_content);
-			$the_content = prepend_attachment($the_content);
-			$the_content = do_shortcode($the_content);
-
-			return $the_content;
-		}
-
-		return apply_filters('the_content', $the_content );
-
-	}
-
 
 }
 
