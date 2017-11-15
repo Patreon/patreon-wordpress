@@ -168,7 +168,16 @@ class Patreon_Frontend {
 			
 			$label = str_replace('%%pledgelevel%%',$patreon_level,PATREON_TEXT_OVER_BUTTON_2);
 			
-			$label = str_replace('%%creator%%','(Creator Name Here)',$label);
+			// Get creator full name:
+			
+			$creator_full_name = get_option('patreon-creator-full-name', false);
+			
+			if(!$creator_full_name OR $creator_full_name=='')
+			{
+				$creator_full_name = 'this creator';
+			}
+			
+			$label = str_replace('%%creator%%',$creator_full_name,$label);
 			
 			// REVISIT - calculating user patronage value by dividing patronage var may be bad.
 			return str_replace('%%currentpledgelevel%%',($user_patronage/100),$label);
