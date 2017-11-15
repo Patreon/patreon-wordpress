@@ -184,47 +184,12 @@ class Patreon_Wordpress {
 		return $user_response;
 	}	
 	
+
 	public static function getPatreonCreatorID() {
 
-		$api_client = new Patreon_API(get_option('patreon-creators-access-token', false));
-
-        $user_response = $api_client->fetch_campaign_and_patrons();
-
-        if(empty($user_response)) {
-        	return false;
-        }
-
-
-		$creator_id=false;
-
-        if(isset($user_response['errors']) && is_array($user_response['errors'])) {
-
-			foreach($user_response['errors'] as $error) {
-				if($error['code'] == 1) {
-
-					/* refresh creators token if error 1 */
-
-					$refresh_token = get_option('patreon-creators-refresh-token', false);
-
-					if($refresh_token == false) {
-						return false;
-					}
-
-					$oauth_client = new Patreon_Oauth;
-					$tokens = $oauth_client->refresh_token($refresh_token, site_url().'/patreon-authorization/');
-
-					if(isset($tokens['refresh_token']) && isset($tokens['access_token'])) {
-						update_option('patreon-creators-refresh-token', $tokens['refresh_token']);
-						update_option('patreon-creators-access-token', $tokens['access_token']);
-					}
-
-					$user_response = $api_client->fetch_campaign_and_patrons();
-				}
-			}
-
-		}
-
         $creator_id = false;
+		
+		$user_response = self::getPatreonCreatorInfo();
 
         if (array_key_exists('data', $user_response)) {
             foreach ($user_response['included'] as $obj) {
