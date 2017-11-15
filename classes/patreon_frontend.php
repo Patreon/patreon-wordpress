@@ -219,20 +219,6 @@ class Patreon_Frontend {
 		return $label;
 		
 	}
-	function getLabelOverLoginButton() {
-		
-
-		if(!self::isUserLoggedInPatreon())
-		{
-			return PATREON_TEXT_ALREADY_PATRON;			
-		}
-
-	
-		return PATREON_TEXT_MISTAKEN_PATRON;			
-			
-		
-	}
-	
 	function patreonMakeUniversalButton($mincents=false,$state=false,$post=false,$client_id=false) {
 		
 		// This very customizable function takes numerous parameters to customize universal flow links and creates the desired link
@@ -324,56 +310,6 @@ class Patreon_Frontend {
 		
 		
 	}
-	function patreonMakePatronButton($creator_id=false) {
-		global $post;
-		
-		if(!$creator_id)
-		{
-			$creator_id = get_option('patreon-creator-id', false);
-		}
-		
-		$label_text = PATREON_TEXT_SUPPORT_ON_PATREON;
-		
-		/* patreon banner when user patronage not high enough */
-					
-		
-		$login_with_patreon = get_option('patreon-enable-login-with-patreon', false);
-
-		if($login_with_patreon) {
-			$redirect_uri = wp_login_url().'?patreon-msg=login_with_patreon&patreon-redirect='.$post->ID;
-		} else {
-			$redirect_uri = wp_login_url().'?patreon-user-redirect='.$post->ID;
-		}
-		
-		$user_logged_into_patreon = self::isUserLoggedInPatreon();
-
-		$is_patron = Patreon_Wordpress::isPatron();
-		
-		if($is_patron AND isset($post)) {
-			$redirect_uri = get_permalink($post->ID);
-		}	
-		if($is_patron) {
-			$label_text = PATREON_TEXT_UPGRADE_PLEDGE;
-		}
-		
-		if(!$is_patron AND $user_logged_into_patreon) {
-			$label_text = PATREON_TEXT_SUPPORT_ON_PATREON;
-		}
-		
-		$paywall_img = get_option('patreon-paywall-img-url', false);
-		
-        if ($paywall_img == false) {
-        	$paywall_img = '<div class="patreon-responsive-button-wrapper"><div class="patreon-responsive-button"><img class="patreon_logo" src="'.PATREON_PLUGIN_ASSETS.'/img/patreon-logomark-on-coral.svg" alt=""> '.$label_text.'</div></div>';
-        } else {
-        	$paywall_img = '<img src="'.$paywall_img.'" />';
-        }
-		
-		$href = 'https://www.patreon.com/bePatron?u='.$creator_id.'&redirect_uri='.urlencode($redirect_uri);
-		
-		return apply_filters('ptrn/patron_button', '<a href="'.$href.'">'.$paywall_img.'</a>');
-	
-	
-	}
 	function isUserLoggedInPatreon() {
 		 
 		$user_logged_into_patreon = false;
@@ -450,7 +386,6 @@ class Patreon_Frontend {
 		return apply_filters('ptrn/login_button', '<a href="'.$href.'" class="ptrn-login" data-ptrn_nonce="' . wp_create_nonce( 'patreon-nonce' ).'"><div class="patreon-responsive-button-wrapper"><div class="patreon-responsive-button"><img class="patreon_logo" src="'.PATREON_PLUGIN_ASSETS.'/img/patreon-logomark-on-coral.svg" alt=""> '.$login_label.'</div></div></a>', $href);
 
 	}	
-
 	function protectContentFromUsers($content) {
 
 		global $post;
@@ -526,7 +461,6 @@ class Patreon_Frontend {
 		return $content;
 
 	}
-
 
 	public static function returnPatreonEmbeddedContent($the_content) {
 
