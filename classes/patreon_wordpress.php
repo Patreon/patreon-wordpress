@@ -159,6 +159,16 @@ class Patreon_Wordpress {
 				$creator_info = self::getPatreonCreatorInfo();
 			
 			}
+
+			if (array_key_exists('data', $user_response)) {
+				foreach ($user_response['included'] as $obj) {
+					if ($obj["type"] == "user") {
+						$creator_id = $obj['id'];
+						break;
+					}
+				}
+			}			
+			
 			if(isset($creator_info['full_name']))
 			{
 				// Creator id acquired. Update.
@@ -185,7 +195,7 @@ class Patreon_Wordpress {
 	
 		$api_client = new Patreon_API(get_option('patreon-creators-access-token', false));
 
-        $user_response = $api_client->fetch_campaign_and_patrons();
+        $user_response = $api_client->fetch_creator_info();
 
         if(empty($user_response)) {
         	return false;

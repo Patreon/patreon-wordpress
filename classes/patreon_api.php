@@ -18,6 +18,9 @@ class Patreon_API {
 	public function fetch_campaign_and_patrons() {
 		return $this->__get_json("current_user/campaigns?include=rewards,creator,goals,pledges");
 	}
+	public function fetch_creator_info() {
+		return $this->__get_json("current_user/campaigns?include=creator");
+	}
 
 	public function fetch_campaign() {
 		return $this->__get_json("current_user/campaigns?include=rewards,creator,goals");
@@ -30,7 +33,7 @@ class Patreon_API {
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 		$authorization_header = "Authorization: Bearer " . $this->access_token;
 		curl_setopt($ch, CURLOPT_HTTPHEADER, array($authorization_header));
-
+		
 		return json_decode(curl_exec($ch), true);
 	}
 
