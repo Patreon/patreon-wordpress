@@ -40,6 +40,7 @@ class Patreon_Wordpress {
 
 		add_action('wp_head', array($this, 'updatePatreonUser') );
 		add_action('init', array($this, 'checkPatreonCreatorID'));
+		add_action('init', array($this, 'checkPatreonCreatorName'));
 		add_action('init', 'Patreon_Login::checkTokenExpiration');
 
 	}
