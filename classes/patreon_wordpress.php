@@ -221,7 +221,7 @@ class Patreon_Wordpress {
 	}
 	public static function getPatreonCreatorID() {
 
-		$user_response = self::getPatreonCreatorInfo();
+		$creator_info = self::getPatreonCreatorInfo();
 
 		if(isset($creator_info['included'][0]['id']))
 		{
