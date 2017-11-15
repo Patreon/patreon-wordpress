@@ -37,7 +37,6 @@ class Patreon_Options {
         register_setting( 'patreon-options', 'patreon-enable-login-with-patreon' );
         register_setting( 'patreon-options', 'patreon-enable-connect-with-patreon-in-userprofile' );
         register_setting( 'patreon-options', 'patreon-enable-allow-admins-login-with-patreon' );
-        register_setting( 'patreon-options', 'patreon-enable-safe-patreon-embeds' );
         register_setting( 'patreon-options', 'patreon-enable-redirect-to-page-after-login' );
         register_setting( 'patreon-options', 'patreon-enable-redirect-to-page-id' );
         register_setting( 'patreon-options', 'patreon-protect-default-image-patreon-level' );
@@ -234,11 +233,6 @@ class Patreon_Options {
                                         <tr valign="top">
                                         <th scope="row"><strong>Image to show when user is not yet a patron</strong> <br>(Or not yet paying enough. Include full URL)</th>
                                         <td><input type="text" name="patreon-paywall-img-url" value="<?php echo esc_attr( get_option('patreon-paywall-img-url', '') ); ?>" class="large-text" /></td>
-                                        </tr>
-
-                                         <tr valign="top">
-                                        <th scope="row"><strong>Enable Safe Patreon Embeds</strong> <br>(Will only run generic content filters over embedded content)</th>
-                                        <td><input type="checkbox" name="patreon-enable-safe-patreon-embeds" value="1"<?php checked( get_option('patreon-enable-safe-patreon-embeds', false) ); ?> /></td>
                                         </tr>
 
                                         <tr valign="top">
