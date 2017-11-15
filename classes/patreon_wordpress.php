@@ -222,7 +222,7 @@ class Patreon_Wordpress {
 						update_option('patreon-creators-access-token', $tokens['access_token']);
 					}
 
-					$user_response = $api_client->fetch_campaign_and_patrons();
+					$user_response = $api_client->fetch_creator_info();
 				}
 			}
 
