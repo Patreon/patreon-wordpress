@@ -143,6 +143,42 @@ class Patreon_Wordpress {
 		}
 		
 	}
+	public static function checkPatreonCreatorName() {
+		
+		// This function checks and saves creator's full name, name and surname. These are used in post locking interface
+		
+		if(!get_option('patreon-creator-full-name', false) OR get_option('patreon-creator-full-name', false)=='')
+		{
+			// Making sure access credentials are there to avoid fruitlessly contacting the api:
+			
+			if(get_option('patreon-client-id', false) && get_option('patreon-client-secret', false) && get_option('patreon-creators-access-token', false)) {
+				
+				// Credentials are in. Go.
+				
+				$creator_info = self::getPatreonCreatorInfo();
+			
+			}
+			if(isset($creator_info['full_name']))
+			{
+				// Creator id acquired. Update.
+				
+				update_option( 'patreon-creator-full-name', $creator_info['full_name'] );
+			}
+			if(isset($creator_info['first_name']))
+			{
+				// Creator id acquired. Update.
+				
+				update_option( 'patreon-creator-first-name', $creator_info['first_name'] );
+			}
+			if(isset($creator_info['last_name']))
+			{
+				// Creator id acquired. Update.
+				
+				update_option( 'patreon-creator-last-name', $creator_info['last_name'] );
+			}
+		}
+		
+	}
 
 	public static function getPatreonCreatorInfo() {
 	
@@ -182,9 +218,7 @@ class Patreon_Wordpress {
 		}
 		
 		return $user_response;
-	}	
-	
-
+	}
 	public static function getPatreonCreatorID() {
 
         $creator_id = false;
