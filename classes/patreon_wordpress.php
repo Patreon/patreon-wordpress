@@ -157,35 +157,24 @@ class Patreon_Wordpress {
 				// Credentials are in. Go.
 				
 				$creator_info = self::getPatreonCreatorInfo();
-			
 			}
-
-			if (array_key_exists('data', $user_response)) {
-				foreach ($user_response['included'] as $obj) {
-					if ($obj["type"] == "user") {
-						$creator_id = $obj['id'];
-						break;
-					}
-				}
-			}			
-			
-			if(isset($creator_info['full_name']))
+			if(isset($creator_info['included'][0]['attributes']['full_name']))
 			{
 				// Creator id acquired. Update.
 				
-				update_option( 'patreon-creator-full-name', $creator_info['full_name'] );
+				update_option( 'patreon-creator-full-name', $creator_info['included'][0]['attributes']['full_name'] );
 			}
-			if(isset($creator_info['first_name']))
+			if(isset($creator_info['included'][0]['attributes']['first_name']))
 			{
 				// Creator id acquired. Update.
 				
-				update_option( 'patreon-creator-first-name', $creator_info['first_name'] );
+				update_option( 'patreon-creator-first-name', $creator_info['included'][0]['attributes']['first_name'] );
 			}
-			if(isset($creator_info['last_name']))
+			if(isset($creator_info['included'][0]['attributes']['last_name']))
 			{
 				// Creator id acquired. Update.
 				
-				update_option( 'patreon-creator-last-name', $creator_info['last_name'] );
+				update_option( 'patreon-creator-last-name', $creator_info['included'][0]['attributes']['last_name'] );
 			}
 		}
 		
@@ -232,20 +221,14 @@ class Patreon_Wordpress {
 	}
 	public static function getPatreonCreatorID() {
 
-        $creator_id = false;
-		
 		$user_response = self::getPatreonCreatorInfo();
 
-        if (array_key_exists('data', $user_response)) {
-            foreach ($user_response['included'] as $obj) {
-                if ($obj["type"] == "user") {
-                    $creator_id = $obj['id'];
-                    break;
-                }
-            }
-        }
+		if(isset($creator_info['included'][0]['id']))
+		{
+			return $creator_info['included'][0]['id'];
+		}
 
-        return $creator_id;
+        return false;
 
 	}
 
