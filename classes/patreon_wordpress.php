@@ -252,10 +252,6 @@ class Patreon_Wordpress {
 		/* get current users meta data */
 		$user_meta = get_user_meta($user->ID);
 
-		if(isset($user_meta['patreon_user_exception'][0]) && $user_meta['patreon_user_exception'][0] == true) {
-			return PHP_INT_MAX;
-		}
-
 		$user_response = self::getPatreonUser($user);
 
 		if($user_response == false) {
