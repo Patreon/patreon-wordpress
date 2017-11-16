@@ -39,21 +39,6 @@ class Patreon_User_Profiles {
 
 			<br>
 
-			<h3><?php _e("Patreon Exception", "blank"); ?></h3>
-
-			<p>Enabling this option allows the user to view ALL patreon protected content</p>
-
-			<table class="form-table">
-				<tr>
-					<th><label for="patreon_user_exception">Enable Patreon Exception "Golden Ticket"</label></th>
-					<td>
-						<input type="checkbox" id="patreon_user_exception" name="patreon_user_exception" value="1"<?php checked( get_the_author_meta( 'patreon_user_exception', $user->ID ) ); ?> />
-					</td>
-				</tr>
-			</table>
-
-			<br>
-
 			<h3><?php _e("Patreon Profile", "blank"); ?></h3>
 
 			<table class="form-table">
@@ -93,15 +78,6 @@ class Patreon_User_Profiles {
 
 		if ( !current_user_can( 'edit_user', $user_id ) ) {
 			return false;
-		}
-
-		if( current_user_can('manage_options')) {
-			if(isset($_POST['patreon_user_exception'])) {
-				update_user_meta( $user_id, 'patreon_user_exception', true );
-			} else {
-				update_user_meta( $user_id, 'patreon_user_exception', false );
-			}
-
 		}
 
 		// if ( is_email( $_POST['patreon_email'] ) ) {
