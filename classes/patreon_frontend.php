@@ -400,7 +400,8 @@ class Patreon_Frontend {
 		global $post;
 
 		$post_types = get_post_types(array('public'=>true),'names');
-
+	
+			
 		if(in_array(get_post_type(),$post_types)) {
 
 			if(current_user_can('manage_options')) {
@@ -432,7 +433,10 @@ class Patreon_Frontend {
 
 			// Check if both post level and site lock level are set to 0 or nonexistent. If so return normal content.
 			
-			if($post_level == 0 AND (!get_option('patreon-lock-entire-site',false) OR get_option('patreon-lock-entire-site',false)==0)) {
+			if($post_level == 0 
+				&& (!get_option('patreon-lock-entire-site',false) 
+					|| get_option('patreon-lock-entire-site',false)==0)
+			) {
 				return $content;
 			}
 			
@@ -445,7 +449,9 @@ class Patreon_Frontend {
 			
 			$user_patronage = Patreon_Wordpress::getUserPatronage();
 			
-			if($user_patronage == false || $user_patronage < ($patreon_level*100)) {
+			if($user_patronage == false 
+				|| $user_patronage < ($patreon_level*100)
+			) {
 
 				//protect content from user
 			
