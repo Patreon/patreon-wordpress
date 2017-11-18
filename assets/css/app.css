@@ -1,6 +1,20 @@
-.patreon-msg {-webkit-border-radius: 6px;-moz-border-radius: 6px;-ms-border-radius: 6px;-o-border-radius: 6px;border-radius: 6px;padding:8px;margin-bottom:20px!important;display:block;border:1px solid #E6461A;background-color:#484848;color:#ffffff;}
+.patreon-msg {
+	-webkit-border-radius: 6px;
+	-moz-border-radius: 6px;
+	-ms-border-radius: 6px;
+	-o-border-radius: 6px;
+	border-radius: 6px;
+	padding:8px;
+	margin-bottom:20px!important;
+	display:block;
+	border:1px solid #E6461A;
+	background-color:#484848;color:#ffffff;
+}
 
-.ptrn-branding {color:#fff;background-color:#F96854;}
+.ptrn-branding {
+	color:#fff;
+	background-color:#F96854;
+}
 
 
 #login .ptrn-branded-button {
@@ -43,13 +57,13 @@
 }
 
 .patreon-responsive-button-wrapper{
-		display:inline-table!important; /* some themes override this. hence important */
-		width : 260px;
-		height: 50px;
-		vertical-align:middle;
-		text-align:center;
-		background-color:#F96854!important;
-		box-sizing: border-box;
+	display:inline-table!important; /* some themes override this. hence important */
+	width : 260px;
+	height: 50px;
+	vertical-align:middle;
+	text-align:center;
+	background-color:#F96854!important;
+	box-sizing: border-box;
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
 }
