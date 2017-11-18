@@ -43,8 +43,6 @@ class Patreon_Options {
         register_setting( 'patreon-options', 'patreon-enable-strict-oauth' );
         register_setting( 'patreon-options', 'patreon-lock-entire-site' );
         register_setting( 'patreon-options', 'patreon-custom-universal-banner' );
-        register_setting( 'patreon-options', 'patreon-custom-universal-banner' );
-        register_setting( 'patreon-options', 'patreon-custom-universal-banner' );
     }
 
     function patreon_plugin_login_warning() {
