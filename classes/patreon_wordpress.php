@@ -44,7 +44,7 @@ class Patreon_Wordpress {
 		add_action('init', 'Patreon_Login::checkTokenExpiration');
 
 	}
-
+	
 	static function getPatreonUser($user) {
 
 		/* get user meta data and query patreon api */
@@ -70,7 +70,7 @@ class Patreon_Wordpress {
 		return false;
 
 	}
-
+	
 	static function updatePatreonUser() {
 
 		/* check if current user is loggedin, get ID */
@@ -120,7 +120,7 @@ class Patreon_Wordpress {
 		}
 
 	}
-
+	
 	public static function checkPatreonCreatorID() {
 		
 		// Check if creator id doesnt exist. Account for the case in which creator id was saved as empty by the Creator
@@ -144,6 +144,7 @@ class Patreon_Wordpress {
 		}
 		
 	}
+	
 	public static function checkPatreonCreatorName() {
 		
 		// This function checks and saves creator's full name, name and surname. These are used in post locking interface
@@ -179,7 +180,69 @@ class Patreon_Wordpress {
 		}
 		
 	}
+	
+	public static function makeRewardsSelect($post=false) {
+		
+		if(!$post) global $post;
+		
+		// This function makes a select box with rewards and reward ids from creator's campaign to be used in post locking and site locking
+		
+		$api_client = new Patreon_API(get_option('patreon-creators-access-token', false));
 
+		$creator_info = $api_client->fetch_rewards();
+		
+		// Set the select to default
+		$select_options = PATREON_TEXT_YOU_HAVE_NO_REWARDS_IN_THIS_CAMPAIGN;
+
+		// 1st element is 'everyone' and 2nd element is 'Patrons' (with cent amount 1) in the rewards array.
+		if(is_array($creator_info['included']))
+		{	
+			$select_options = '';
+			
+			// Lets get which is the reward id currently active for the post:
+			$current_reward_id = get_post_meta( $post->ID, 'patreon-level', true );
+			
+			
+			foreach($creator_info['included'] as $key => $value)
+			{
+				// If its not a reward element, continue
+				
+				if(	
+					!isset($creator_info['included'][$key]['type'])
+					|| $creator_info['included'][$key]['type'] != 'reward'
+				) 
+				{ continue; }
+				
+				// Special conditions for label for element 0, which is 'everyone' and '1, which is 'patron only'
+				
+				if($key == 0) $label = PATREON_TEXT_EVERYONE;
+				if($key == 1) $label = PATREON_TEXT_ANY_PATRON;
+				
+				// Use cents amount converted to dollar for any other reward level
+				if($key > 1)
+				{
+					$label = '$'.($creator_info['included'][$key]['attributes']['amount_cents']/100);
+				}
+				
+				$selected = '';
+				if($current_reward_id == $creator_info['included'][$key]['id'])
+				{
+					// selected = selected for XHTML compatibility
+					$selected = ' selected="selected"';
+					
+				}
+				
+				$select_options .= '<option value="'.$creator_info['included'][$key]['id'].'"'.$selected.'>'.
+								$label.
+							'</option>';
+			}
+			
+		}
+		
+		return apply_filters('ptrn/post_locking_reward_selection', $select_options, $post);
+	
+	}
+	
 	public static function getPatreonCreatorInfo() {
 	
 		$api_client = new Patreon_API(get_option('patreon-creators-access-token', false));
@@ -219,6 +282,7 @@ class Patreon_Wordpress {
 		
 		return $user_response;
 	}
+	
 	public static function getPatreonCreatorID() {
 
 		$creator_info = self::getPatreonCreatorInfo();
@@ -231,7 +295,7 @@ class Patreon_Wordpress {
         return false;
 
 	}
-
+	
 	public static function getUserPatronage() {
 
 		if(is_user_logged_in() == false) {
@@ -280,7 +344,7 @@ class Patreon_Wordpress {
 		return false;
 
 	}
-
+	
 	public static function getUserPatronageDuration($pledge) {
 
 		$user_response = self::getPatreonUser($user);
@@ -288,7 +352,7 @@ class Patreon_Wordpress {
 		$patronage_age = 0;
 
 	}
-
+	
 	public static function getUserPatronageLevel($pledge) {
 
 		$patronage_level = 0;
@@ -300,7 +364,7 @@ class Patreon_Wordpress {
 		return $patronage_level;
 
 	}
-
+	
 	public static function isPatron() {
 
 		$user_patronage = self::getUserPatronage();
