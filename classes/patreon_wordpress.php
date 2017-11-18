@@ -129,7 +129,10 @@ class Patreon_Wordpress {
 		{	
 			// Making sure access credentials are there to avoid fruitlessly contacting the api:
 			
-			if(get_option('patreon-client-id', false) && get_option('patreon-client-secret', false) && get_option('patreon-creators-access-token', false)) {
+			if(get_option('patreon-client-id', false) 
+				&& get_option('patreon-client-secret', false) 
+				&& get_option('patreon-creators-access-token', false)
+			) {
 				
 				// Credentials are in. Go.
 				
