@@ -17,11 +17,7 @@ class Patreon_API {
 	public function fetch_campaign_and_patrons() {
 		return $this->__get_json("current_user/campaigns?include=rewards,creator,goals,pledges");
 	}
-	
-	public function fetch_rewards() {
-		return $this->__get_json("current_user/campaigns?include=rewards");
-	}
-	
+		
 	public function fetch_creator_info() {
 		return $this->__get_json("current_user/campaigns?include=creator");
 	}
