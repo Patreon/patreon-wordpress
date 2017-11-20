@@ -34,9 +34,6 @@ define("PATREON_TEXT_OVER_BUTTON_3", 'Your Patreon payment method appears to be 
 define("PATREON_TEXT_UNDER_BUTTON_1", '' );
 define("PATREON_TEXT_UNDER_BUTTON_2", 'Already pledging $%%pledgelevel%% or more? %%flowlink%% to access this post.' );
 define("PATREON_TEXT_UNDER_BUTTON_3", 'Already updated? %%flowlink%% to access this post.' );
-define("PATREON_TEXT_EVERYONE", 'Everyone' );
-define("PATREON_TEXT_ANY_PATRON", 'Any Patron' );
-define("PATREON_TEXT_YOU_HAVE_NO_REWARDS_IN_THIS_CAMPAIGN", 'No rewards found. Set up rewards at Patreon.' );
 
 include 'classes/patreon_wordpress.php';
 
