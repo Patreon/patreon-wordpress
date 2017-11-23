@@ -112,7 +112,15 @@ class Patreon_Routing {
 					/* redirect to homepage successfully #HANDLE_SUCCESS */
 					$api_client = new Patreon_API($tokens['access_token']);
 					$user_response = $api_client->fetch_user();
-						
+					
+
+					// Get state var and check if final_redirect exists in vars:
+		
+					if($wp->query_vars['state']!='')
+					{
+						$state = unserialize(base64_decode($wp->query_vars['state']));
+						$redirect = $state['final_redirect_uri'];
+					}					
 		
 					if(get_option('patreon-enable-strict-oauth', true)) {
 						$user = Patreon_Login::updateLoggedInUser($user_response, $tokens, $redirect);
