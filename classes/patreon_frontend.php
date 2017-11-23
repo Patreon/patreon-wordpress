@@ -481,6 +481,21 @@ class Patreon_Frontend {
 			}
 
 		}
+		
+		// If we are here, it means post is protected, user is patron, patronage is valid. Slap the post footer:
+		// Get patreon creator url:
+		
+		$creator_profile_url = get_option('patreon-creator-url', false);
+
+		$post_footer = str_replace('%%pledgelevel%%',$post_level,PATREON_VALID_PATRON_POST_FOOTER_TEXT);
+		$post_footer = str_replace('%%creatorprofileurl%%','<a href="'.$creator_profile_url.'">Patreon</a>',$post_footer);
+		
+		$post_footer = 
+		'<div class="patreon-valid-patron-message">'.
+			$post_footer.
+		'</div>';
+		
+		$content .= $post_footer;
 
 		return $content;
 
