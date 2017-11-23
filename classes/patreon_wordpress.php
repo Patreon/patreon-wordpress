@@ -40,6 +40,7 @@ class Patreon_Wordpress {
 
 		add_action('wp_head', array($this, 'updatePatreonUser') );
 		add_action('init', array($this, 'checkPatreonCreatorID'));
+		add_action('init', array($this, 'checkPatreonCreatorURL'));
 		add_action('init', array($this, 'checkPatreonCreatorName'));
 		add_action('init', 'Patreon_Login::checkTokenExpiration');
 
@@ -63,7 +64,7 @@ class Patreon_Wordpress {
 			*/
 			// For now we are always getting user from APi fresh:
 			$user = $api_client->fetch_user();
-			
+	
 			return $user;
 		}
 
@@ -143,6 +144,32 @@ class Patreon_Wordpress {
 				// Creator id acquired. Update.
 				
 				update_option( 'patreon-creator-id', $creator_id );
+			}
+		}
+		
+	}
+	public static function checkPatreonCreatorURL() {
+		
+		// Check if creator url doesnt exist. 
+		
+		if(!get_option('patreon-creator-url', false) OR get_option('patreon-creator-url', false)=='')
+		{	
+			// Making sure access credentials are there to avoid fruitlessly contacting the api:
+			
+			if(get_option('patreon-client-id', false) 
+				&& get_option('patreon-client-secret', false) 
+				&& get_option('patreon-creators-access-token', false)
+			) {
+				
+				// Credentials are in. Go.
+				
+				$creator_url = self::getPatreonCreatorURL();
+			}
+			if(isset($creator_url))
+			{
+				// Creator id acquired. Update.
+				
+				update_option( 'patreon-creator-url', $creator_url );
 			}
 		}
 		
@@ -236,6 +263,18 @@ class Patreon_Wordpress {
         return false;
 
 	}
+	public static function getPatreonCreatorURL() {
+
+		$creator_info = self::getPatreonCreatorInfo();
+
+		if(isset($creator_info['included'][0]['attributes']['url']))
+		{
+			return $creator_info['included'][0]['attributes']['url'];
+		}
+
+        return false;
+
+	}
 	
 	public static function getUserPatronage() {
 
@@ -292,6 +331,40 @@ class Patreon_Wordpress {
 
 		$patronage_age = 0;
 
+	}
+	
+	public static function checkDeclinedPatronage($user) {
+		
+		if(!$user)
+		{
+			$user = wp_get_current_user();
+		}
+
+		$user_response = self::getPatreonUser($user);
+		
+		// If no user exists, the patronage cannot have been declined.
+		if(!$user_response)
+		{
+			return false;
+		}
+		
+		$creator_id = get_option('patreon-creator-id', false);
+
+		$pledge = false;
+		if (array_key_exists('included', $user_response)) {
+			foreach ($user_response['included'] as $obj) {
+				if ($obj["type"] == "pledge" && $obj["relationships"]["creator"]["data"]["id"] == $creator_id) {
+					$pledge = $obj;
+					break;
+				}
+			}
+		}		
+			
+		if(isset($pledge['attributes']['declined_since']) && !is_null($pledge['attributes']['declined_since'])) {
+			do_action('ptrn/declined_since', $pledge, $pledge['attributes']['declined_since']);
+			return true;
+		}
+		return false;
 	}
 	
 	public static function getUserPatronageLevel($pledge) {
