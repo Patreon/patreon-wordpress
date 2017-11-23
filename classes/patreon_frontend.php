@@ -89,6 +89,7 @@ class Patreon_Frontend {
 			
         	$contribution_required = str_replace('%%pledgelevel%%',$patreon_level,$contribution_required);
         	$contribution_required = apply_filters('ptrn/contribution_required',$contribution_required,$patreon_level);
+			
 		}
 		
         if ($client_id) {
@@ -97,13 +98,13 @@ class Patreon_Frontend {
 			
 			$contribution_required = '<div class="patreon-locked-content-message">'.$contribution_required.'</div>';
 			
-			$universal_button = self::patreonMakeUniversalButton();
+			$universal_button = self::patreonMakeUniversalButton($patreon_level);
 	
 			$universal_button = '<div class="patreon-universal-button">'.$universal_button.'</div>';
 			
 			if(isset($login_with_patreon_button))
 			{
-				$login_with_patreon_button = '<div class="patreon-login-refresh-button">'.$login_with_patreon_button.'</div>';
+				$login_with_patreon_button = '<div class="patreon-login-refresh-button">'.$universal_button.'</div>';
 			}
 			
 			$text_over_universal_button = self::getLabelOverUniversalButton($patreon_level);
