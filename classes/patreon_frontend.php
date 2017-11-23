@@ -204,13 +204,39 @@ class Patreon_Frontend {
 		return $label;
 		
 	}
-	function getLabelUnderUniversalButton($patreon_level) {
+	function getLabelUnderUniversalButton($patreon_level,$state =false,$post=false) {
 		
+		if(!$post)
+		{
+			global $post;
+		}
+			
 		$label = PATREON_TEXT_UNDER_BUTTON_1;
 	
 		$user_logged_into_patreon = self::isUserLoggedInPatreon();
 
 		$is_patron = Patreon_Wordpress::isPatron();
+		
+
+		// If we werent given any state vars to send, initialize the array
+		if(!$state)
+		{
+			$state=array();
+		}
+
+		// Get the address of the current page, and save it as final redirect uri.		
+		// Start with home url for redirect. If post is valid, get permalink. 
+		
+		$final_redirect = home_url();
+		
+		if($post)
+		{
+			$final_redirect = get_permalink($post->ID);
+		}
+		
+		$state['final_redirect_uri'] = $final_redirect;	
+
+		$refresh_link = '<a href="'.self::MakeUniversalFlowLink($patreon_level*100,$state).'">Refresh</a>';		
 		
 		if(!$user_logged_into_patreon)
 		{
@@ -223,7 +249,8 @@ class Patreon_Frontend {
 		{
 			// Patron logged in and not patron
 			
-			return str_replace('%%pledgelevel%%',$patreon_level,PATREON_TEXT_UNDER_BUTTON_2);
+			$label = str_replace('%%pledgelevel%%',$patreon_level,PATREON_TEXT_UNDER_BUTTON_2);
+			return str_replace('%%flowlink%%',$refresh_link,$label);
 		
 		}
 	 
@@ -232,9 +259,9 @@ class Patreon_Frontend {
 		if($user_patronage < ($patreon_level*100) AND $user_patronage>0)
 		{
 			// Patron logged in and not patron
+				
 			
 			$label = str_replace('%%pledgelevel%%',$patreon_level,PATREON_TEXT_UNDER_BUTTON_2);
-			$refresh_link = '<a href="'.self::patreonMakeLoginLink().'">Refresh</a>';
 			return str_replace('%%flowlink%%',$refresh_link,$label);
 			
 		
