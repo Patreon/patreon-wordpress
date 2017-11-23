@@ -405,6 +405,11 @@ class Patreon_Frontend {
 	
 			
 		if(in_array(get_post_type(),$post_types)) {
+			
+			// Dont protect page post type
+			if(get_post_type()=='page') {
+				return $content;
+			}			
 
 			if(current_user_can('manage_options')) {
 				return $content;
