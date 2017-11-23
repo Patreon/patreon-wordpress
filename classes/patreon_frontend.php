@@ -302,8 +302,7 @@ class Patreon_Frontend {
 		
 		return apply_filters('ptrn/patron_button', '<a href="'.$href.'">'.$paywall_img.'</a>');		
 		
-	}
-	function MakeUniversalFlowLink($pledge_level,$state,$client_id = false) {
+	}function MakeUniversalFlowLink($pledge_level,$state,$client_id = false) {
 		
 		if(!$client_id)
 		{
@@ -312,7 +311,7 @@ class Patreon_Frontend {
 		
 		$redirect_uri = site_url().'/patreon-authorization/';
 		
-		$href = 'https://www.patreon.com/check-auth-route?min_cents='.$pledge_level.'&client_id='.$client_id.'&redirect_uri='.$redirect_uri.'&state='.base64_encode(serialize($state));
+		$href = 'https://www.patreon.com/oauth2/become-patron?response_type=code&min_cents='.$pledge_level.'&client_id='.$client_id.'&redirect_uri='.$redirect_uri.'&state='.base64_encode(serialize($state));
 
 		// 3rd party dev goodie! Apply custom filters so they can manipulate the url:
 		
