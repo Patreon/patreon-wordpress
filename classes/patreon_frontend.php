@@ -411,6 +411,7 @@ class Patreon_Frontend {
 		return apply_filters('ptrn/login_button', '<a href="'.$href.'" class="ptrn-login" data-ptrn_nonce="' . wp_create_nonce( 'patreon-nonce' ).'"><div class="patreon-responsive-button-wrapper"><div class="patreon-responsive-button"><img class="patreon_logo" src="'.PATREON_PLUGIN_ASSETS.'/img/patreon-logomark-on-coral.svg" alt=""> '.$login_label.'</div></div></a>', $href);
 
 	}	
+	
 	function protectContentFromUsers($content) {
 
 		global $post;
@@ -419,16 +420,16 @@ class Patreon_Frontend {
 	
 			
 		if(in_array(get_post_type(),$post_types)) {
-			
+
 			// Dont protect page post type
 			if(get_post_type()=='page') {
 				return $content;
-			}			
-
+			}
+			
 			if(current_user_can('manage_options')) {
 				return $content;
 			}
-		
+			
 			// Below define can be defined in any plugin to bypass core locking function and use a custom one from plugin
 			// It is independent of the plugin load order since it checks if it is defined.
 			// It can be defined by any plugin until right before the_content filter is run.
@@ -468,10 +469,15 @@ class Patreon_Frontend {
 				$patreon_level = $post_level;
 			}
 			
+			$user = wp_get_current_user();
+			
 			$user_patronage = Patreon_Wordpress::getUserPatronage();
+			
+			$declined = Patreon_Wordpress::checkDeclinedPatronage($user);
 			
 			if($user_patronage == false 
 				|| $user_patronage < ($patreon_level*100)
+				|| $declined
 			) {
 
 				//protect content from user
@@ -486,11 +492,11 @@ class Patreon_Frontend {
 					
 					$content = self::displayPatreonCampaignBanner($patreon_level);
 
-					$content = apply_filters('ptrn/post_content', $content, $user_patronage);
-
-					return $content;					
+					$content = apply_filters('ptrn/post_content', $content, $user_patronage);				
 					
+					return $content;
 				}
+				
 				
 			}
 
