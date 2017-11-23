@@ -228,7 +228,7 @@ class Patreon_Frontend {
 		return $label;
 		
 	}
-	function patreonMakeUniversalButton($mincents=false,$state=false,$post=false,$client_id=false) {
+	function patreonMakeUniversalButton($min_cents=false,$state=false,$post=false,$client_id=false) {
 		
 		// This very customizable function takes numerous parameters to customize universal flow links and creates the desired link
 
@@ -243,9 +243,11 @@ class Patreon_Frontend {
 		
 		$send_pledge_level=0;
 		
-		if($mincents)
+		if($min_cents)
 		{
-			$send_pledge_level = $mincents;
+			$send_pledge_level = $min_cents;
+			
+			$send_pledge_level = $send_pledge_level * 100;
 		}
 		
 		if(!$client_id)
