@@ -135,6 +135,7 @@ class Patreon_Frontend {
 
 	}
 	
+	
 	function getLabelOverUniversalButton($patreon_level) {
 		
 		$label = PATREON_TEXT_OVER_BUTTON_1;
@@ -150,6 +151,19 @@ class Patreon_Frontend {
 			// Patron logged in and patron, but we are still showing the banner. This means pledge level is not enough.
 			
 			return str_replace('%%pledgelevel%%',$patreon_level,PATREON_TEXT_OVER_BUTTON_1);
+		
+		}
+		
+		
+		$user = wp_get_current_user();
+		
+		$declined = Patreon_Wordpress::checkDeclinedPatronage($user);
+		
+		if($declined)
+		{
+			// Patron logged in and not patron
+			
+			return PATREON_TEXT_OVER_BUTTON_3;
 		
 		}
 		if(!$is_patron)
