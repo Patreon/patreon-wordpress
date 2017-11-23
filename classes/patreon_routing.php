@@ -73,11 +73,10 @@ class Patreon_Routing {
 
 	function parse_request( &$wp ) {
 
-		if (array_key_exists( 'patreon-oauth', $wp->query_vars )) {
+		if (strpos($_SERVER['REQUEST_URI'],'/patreon-authorization/')!==false) {
+	
+			if(array_key_exists( 'code', $wp->query_vars )) {
 
-			if( array_key_exists( 'code', $wp->query_vars ) && array_key_exists( 'state', $wp->query_vars ) && isset($_COOKIE['ptrn_nonce']) && $wp->query_vars['state'] == $_COOKIE['ptrn_nonce']) {
-
-				unset($_COOKIE['ptrn_nonce']);
 
 				if(get_option('patreon-client-id', false) == false || get_option('patreon-client-secret', false) == false) {
 
@@ -106,18 +105,21 @@ class Patreon_Routing {
 						$redirect = get_post($_COOKIE['ptrn_dst']);
 						unset($_COOKIE['ptrn_dst']);
 					}
-
+					
+			
 					$redirect = apply_filters('ptrn/redirect', $redirect);
 
 					/* redirect to homepage successfully #HANDLE_SUCCESS */
 					$api_client = new Patreon_API($tokens['access_token']);
 					$user_response = $api_client->fetch_user();
-
+						
+		
 					if(get_option('patreon-enable-strict-oauth', true)) {
 						$user = Patreon_Login::updateLoggedInUser($user_response, $tokens, $redirect);
 					} else {
 						$user = Patreon_Login::createUserFromPatreon($user_response, $tokens, $redirect);
 					}
+					
 
 					//shouldn't get here
 					wp_redirect( home_url(), 302 );
@@ -133,9 +135,7 @@ class Patreon_Routing {
 
 			}
 
-
 		}
-
 	}
 
 }
