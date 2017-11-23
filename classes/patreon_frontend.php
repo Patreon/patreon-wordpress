@@ -472,7 +472,9 @@ class Patreon_Frontend {
 					
 					$content = self::displayPatreonCampaignBanner($patreon_level);
 
-					$content = apply_filters('ptrn/post_content', $content, $user_patronage);				
+					$content = apply_filters('ptrn/post_content', $content, $user_patronage);
+
+					return $content;					
 					
 				}
 				
