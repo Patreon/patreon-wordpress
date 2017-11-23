@@ -136,7 +136,6 @@ class Patreon_Frontend {
 
 	}
 	
-	
 	function getLabelOverUniversalButton($patreon_level) {
 		
 		$label = PATREON_TEXT_OVER_BUTTON_1;
@@ -330,7 +329,8 @@ class Patreon_Frontend {
 		
 		return apply_filters('ptrn/patron_button', '<a href="'.$href.'">'.$paywall_img.'</a>');		
 		
-	}function MakeUniversalFlowLink($pledge_level,$state,$client_id = false) {
+	}
+	function MakeUniversalFlowLink($pledge_level,$state,$client_id = false) {
 		
 		if(!$client_id)
 		{
@@ -438,7 +438,6 @@ class Patreon_Frontend {
 		return apply_filters('ptrn/login_button', '<a href="'.$href.'" class="ptrn-login" data-ptrn_nonce="' . wp_create_nonce( 'patreon-nonce' ).'"><div class="patreon-responsive-button-wrapper"><div class="patreon-responsive-button"><img class="patreon_logo" src="'.PATREON_PLUGIN_ASSETS.'/img/patreon-logomark-on-coral.svg" alt=""> '.$login_label.'</div></div></a>', $href);
 
 	}	
-	
 	function protectContentFromUsers($content) {
 
 		global $post;
