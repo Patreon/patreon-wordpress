@@ -20,7 +20,8 @@ class Patron_Metabox {
 		$post_types = get_post_types(array('public'=>true),'names');
 
 	    $exclude = array(
-	    	'attachment'
+	    	'attachment',
+	    	'page'
 	    	);
 
 	    if (in_array($post_type,$exclude) == false && in_array($post_type, $post_types)) {
