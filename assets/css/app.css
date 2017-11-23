@@ -145,3 +145,14 @@
 	font-size: 125%;
 	
 }
+
+.patreon-valid-patron-message{
+	display:block;
+	width:100%;
+	clear:both; 
+	padding-bottom: 25px;
+	padding-top: 25px;
+	margin-top: 25px;
+	border-top : 1px solid #f0f0f0;
+	
+}
