@@ -36,7 +36,7 @@ class Patreon_Login {
 			wp_redirect(home_url());
 			exit;
 		} else {
-			wp_redirect( get_permalink($redirect) );
+			wp_redirect( $redirect );
 			exit;
 		}
 
@@ -183,7 +183,7 @@ class Patreon_Login {
 				exit;
 			}
 
-			wp_redirect( get_permalink($redirect) );
+			wp_redirect( $redirect);
 			exit;
 
 		} else {
