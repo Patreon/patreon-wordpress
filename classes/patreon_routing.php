@@ -76,13 +76,47 @@ class Patreon_Routing {
 		if (strpos($_SERVER['REQUEST_URI'],'/patreon-authorization/')!==false) {
 	
 			if(array_key_exists( 'code', $wp->query_vars )) {
+				
 
+				// Get state vars if they exist
+	
+				if($wp->query_vars['state']!='')
+				{
+					$state = unserialize(base64_decode($wp->query_vars['state']));
+				}
 
+				$redirect = false;
+				
+				if(get_option('patreon-enable-redirect-to-page-after-login', false)) {
+					$redirect = get_option('patreon-enable-redirect-to-page-id', get_option('page_on_front') );
+				}
+							
+				// Check if final_redirect exists in state vars - if so, override redirect:
+	
+				if($state['final_redirect_uri']!='')
+				{
+					$redirect = $state['final_redirect_uri'];
+				}		
+			
+				
+				$redirect = apply_filters('ptrn/redirect', $redirect);		
+	
+				if($state['patreon_nonce'] != $_COOKIE['patreon_nonce'])
+				{
+					// Nonces do not match. Abort, show message.
+				
+					$redirect = add_query_arg( 'patreon_message', 'patreon_nonces_dont_match', $redirect);
+					
+					wp_redirect( $redirect );
+					exit;
+				}
+				
 				if(get_option('patreon-client-id', false) == false || get_option('patreon-client-secret', false) == false) {
 
-					/* redirect to homepage because of oauth client_id or secure_key error #HANDLE_ERROR */
-					wp_redirect( home_url() );
-					exit;
+					/* redirect to homepage because of oauth client_id or secure_key error  */
+					$redirect = add_query_arg( 'patreon_message', 'patreon_api_credentials_missing', $redirect);
+					wp_redirect( $redirect );
+					exit;			
 
 				} else {
 					$oauth_client = new Patreon_Oauth;
@@ -93,44 +127,30 @@ class Patreon_Routing {
 				if(array_key_exists('error', $tokens)) {
 
 					/* redirect to homepage because of some error #HANDLE_ERROR */
-					wp_redirect( home_url() );
+					$redirect = add_query_arg( 'patreon_message', 'patreon_cant_login_api_error', $redirect);
+					wp_redirect( $redirect );
 					exit;
 
 				} else {
 
-					$redirect = false;
-					if(get_option('patreon-enable-redirect-to-page-after-login', false)) {
-						$redirect = get_option('patreon-enable-redirect-to-page-id', get_option('page_on_front') );
-					} else if(isset($_COOKIE['ptrn_dst']) && is_numeric($_COOKIE['ptrn_dst'])) {
-						$redirect = get_post($_COOKIE['ptrn_dst']);
-						unset($_COOKIE['ptrn_dst']);
-					}
-					
-			
-					$redirect = apply_filters('ptrn/redirect', $redirect);
-
-					/* redirect to homepage successfully #HANDLE_SUCCESS */
 					$api_client = new Patreon_API($tokens['access_token']);
-					$user_response = $api_client->fetch_user();
 					
+					$user_response = $api_client->fetch_user();
+								
+						
+					if(apply_filters('ptrn/force_strict_oauth',get_option('patreon-enable-strict-oauth', true))) {
 
-					// Get state var and check if final_redirect exists in vars:
-		
-					if($wp->query_vars['state']!='')
-					{
-						$state = unserialize(base64_decode($wp->query_vars['state']));
-						$redirect = $state['final_redirect_uri'];
-					}					
-		
-					if(get_option('patreon-enable-strict-oauth', true)) {
 						$user = Patreon_Login::updateLoggedInUser($user_response, $tokens, $redirect);
 					} else {
+								
 						$user = Patreon_Login::createUserFromPatreon($user_response, $tokens, $redirect);
 					}
 					
 
 					//shouldn't get here
-					wp_redirect( home_url(), 302 );
+					$redirect = add_query_arg( 'patreon_message', 'patreon_weird_redirection_at_login', $redirect);
+					
+					wp_redirect( $redirect );
 					exit;
 
 				}
