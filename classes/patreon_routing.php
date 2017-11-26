@@ -12,7 +12,6 @@ class Patreon_Routing {
 		add_filter( 'query_vars', array($this, 'query_vars') );
 		add_action( 'parse_request', array($this, 'parse_request') );
 		add_action( 'init', array($this, 'force_rewrite_rules') );
-		add_action( 'init', array($this, 'set_patreon_redirect_cookie') );
 		add_action( 'init', array($this,'set_patreon_nonce'), 1);
 	}
 
@@ -53,20 +52,12 @@ class Patreon_Routing {
 		return $public_query_vars;
 	}
 
-	function set_patreon_redirect_cookie() {
-		if (isset($_REQUEST['patreon-redirect']) && is_numeric($_REQUEST['patreon-redirect'])) {
-			setcookie('ptrn_dst',$_REQUEST['patreon-redirect']);
-			$_COOKIE['ptrn_dst'] = $_REQUEST['patreon-redirect'];
-		} else {
-			unset($_COOKIE['ptrn_dst']);
-		}
-	}
-
 	function set_patreon_nonce() {
 
-		if(isset($_COOKIE['ptrn_nonce']) == false) {
-			$state = md5(bin2hex(openssl_random_pseudo_bytes(32) . md5(time()) . openssl_random_pseudo_bytes(32)));
-			setcookie('ptrn_nonce',$state, 0, COOKIEPATH, COOKIE_DOMAIN );
+		if(isset($_COOKIE['patreon_nonce']) == false) {
+			$nonce = md5(bin2hex(openssl_random_pseudo_bytes(32) . md5(time()) . openssl_random_pseudo_bytes(32)));
+			setcookie('patreon_nonce',$nonce, 0, COOKIEPATH, COOKIE_DOMAIN );
+			$_COOKIE['patreon_nonce'] = $nonce;
  		}
 
 	}
