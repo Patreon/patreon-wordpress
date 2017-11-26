@@ -282,6 +282,18 @@ class Patreon_Frontend {
 		return $label;
 		
 	}
+	function processPatreonMessages()
+	{
+
+		if(isset($_REQUEST['patreon_message']))
+		{
+				
+			return '<p class="patreon_message">'.self::$messages_map[$_REQUEST['patreon_message']].'</p>';
+		}
+		
+		return '';
+		
+	}
 	function patreonMakeUniversalButton($min_cents=false,$state=false,$post=false,$client_id=false) {
 		
 		// This very customizable function takes numerous parameters to customize universal flow links and creates the desired link
