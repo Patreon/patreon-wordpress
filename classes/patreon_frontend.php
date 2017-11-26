@@ -216,70 +216,75 @@ class Patreon_Frontend {
 		return $label;
 		
 	}
-	function getLabelUnderUniversalButton($patreon_level,$state =false,$post=false) {
+
+	function getLabelOverUniversalButton($patreon_level) {
 		
-		if(!$post)
-		{
-			global $post;
-		}
-			
-		$label = PATREON_TEXT_UNDER_BUTTON_1;
-	
+		$label = PATREON_TEXT_OVER_BUTTON_1;
+
+
+		// At this point process any messages if they are returned from Patreon:
+		
+		$messages = self::processPatreonMessages();		
+		
 		$user_logged_into_patreon = self::isUserLoggedInPatreon();
 
 		$is_patron = Patreon_Wordpress::isPatron();
 		
-
-		// If we werent given any state vars to send, initialize the array
-		if(!$state)
-		{
-			$state=array();
-		}
-
-		// Get the address of the current page, and save it as final redirect uri.		
-		// Start with home url for redirect. If post is valid, get permalink. 
-		
-		$final_redirect = home_url();
-		
-		if($post)
-		{
-			$final_redirect = get_permalink($post->ID);
-		}
-		
-		$state['final_redirect_uri'] = $final_redirect;	
-
-		$refresh_link = '<a href="'.self::MakeUniversalFlowLink($patreon_level*100,$state).'">Refresh</a>';		
+		$is_patron = Patreon_Wordpress::isPatron();
 		
 		if(!$user_logged_into_patreon)
 		{
 			// Patron logged in and patron, but we are still showing the banner. This means pledge level is not enough.
 			
-			return PATREON_TEXT_UNDER_BUTTON_1;
+			return $messages . str_replace('%%pledgelevel%%',$patreon_level,PATREON_TEXT_OVER_BUTTON_1);
+		
+		}
+		
+		
+		$user = wp_get_current_user();
+		
+		$declined = Patreon_Wordpress::checkDeclinedPatronage($user);
+		
+		if($declined)
+		{
+			// Patron logged in and not patron
+			
+			return $messages . PATREON_TEXT_OVER_BUTTON_3;
 		
 		}
 		if(!$is_patron)
 		{
 			// Patron logged in and not patron
 			
-			$label = str_replace('%%pledgelevel%%',$patreon_level,PATREON_TEXT_UNDER_BUTTON_2);
-			return str_replace('%%flowlink%%',$refresh_link,$label);
+			return $messages . str_replace('%%pledgelevel%%',$patreon_level,PATREON_TEXT_OVER_BUTTON_1);
 		
 		}
-	 
+		
 		$user_patronage = Patreon_Wordpress::getUserPatronage();
 		
 		if($user_patronage < ($patreon_level*100) AND $user_patronage>0)
 		{
 			// Patron logged in and not patron
-				
 			
-			$label = str_replace('%%pledgelevel%%',$patreon_level,PATREON_TEXT_UNDER_BUTTON_2);
-			return str_replace('%%flowlink%%',$refresh_link,$label);
+			$label = str_replace('%%pledgelevel%%',$patreon_level,PATREON_TEXT_OVER_BUTTON_2);
 			
-		
+			// Get creator full name:
+			
+			$creator_full_name = get_option('patreon-creator-full-name', false);
+			
+			if(!$creator_full_name OR $creator_full_name=='')
+			{
+				$creator_full_name = 'this creator';
+			}
+			
+			$label = str_replace('%%creator%%',$creator_full_name,$label);
+			
+			// REVISIT - calculating user patronage value by dividing patronage var may be bad.
+			return $messages . str_replace('%%currentpledgelevel%%',($user_patronage/100),$label);
+			
 		}
-		
-		return $label;
+	
+		return $messages . $label;
 		
 	}
 	function processPatreonMessages()
