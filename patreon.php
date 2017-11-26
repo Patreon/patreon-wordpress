@@ -35,6 +35,14 @@ define("PATREON_VALID_PATRON_POST_FOOTER_TEXT", 'This content is for Patrons ple
 define("PATREON_TEXT_UNDER_BUTTON_1", '' );
 define("PATREON_TEXT_UNDER_BUTTON_2", 'Already pledging $%%pledgelevel%% or more? %%flowlink%% to access this post.' );
 define("PATREON_TEXT_UNDER_BUTTON_3", 'Already updated? %%flowlink%% to access this post.' );
+define("PATREON_CANT_LOGIN_STRICT_OAUTH", 'Sorry, couldn\'t log you in with Patreon because you have to be logged in to '.get_bloginfo('NAME').' first' );
+define("PATREON_LOGIN_WITH_WORDPRESS_NOW", 'You can now login with your wordpress username/password.' );
+define("PATREON_CANT_LOGIN_NONCES_DONT_MATCH", 'Sorry. Aborted Patreon login for security because security cookies dont match.' );
+define("PATREON_CANT_LOGIN_DUE_TO_API_ERROR", 'Sorry. Login aborted due to an API error.' );
+define("PATREON_WEIRD_REDIRECTION_AT_LOGIN", 'This redirect should not have happened. Please contact site administration.' );
+define("PATREON_COULDNT_CREATE_WP_ACCOUNT", 'Sorry. Could not create a WordPress account. Please contact site administration.' );
+define("PATREON_API_CREDENTIALS_MISSING", 'Sorry. Could not login because API credentials are missing or incorrect. Please contact site administration.' );
+
 
 include 'classes/patreon_wordpress.php';
 
