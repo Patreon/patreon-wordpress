@@ -55,17 +55,12 @@ class Patreon_Frontend {
 			return '';
 		}
 
-		$redirect_uri = site_url().'/patreon-authorization/';
+		$href = self::patreonMakeLoginLink($client_id);
 
-		$href = 'https://www.patreon.com/oauth2/authorize?response_type=code&client_id='.$client_id.'&redirect_uri='.$redirect_uri;
-
-		if($login_with_patreon == true && $admins_editors_login_with_patreon == false && isset($_REQUEST['patreon-msg']) && $_REQUEST['patreon-msg'] == 'login_with_wordpress') {
-			echo '<p class="patreon-msg">You can now login with your wordpress username/password.</p>';
-		} else if( $login_with_patreon == false && isset($_REQUEST['patreon-msg']) && $_REQUEST['patreon-msg'] == 'login_with_patreon') {
-			echo '<p class="patreon-msg">You can now login with your wordpress username/password.</p>';
-		} else {
-			echo '<div class="patreon-login-refresh-button">'.self::patreonMakeLoginButton().'</div>';
-		}
+		echo self::processPatreonMessages();
+		
+		echo '<div class="patreon-login-refresh-button">'.self::patreonMakeLoginButton().'</div>';
+	
 
 	}
 
@@ -157,13 +152,13 @@ class Patreon_Frontend {
 
 		$is_patron = Patreon_Wordpress::isPatron();
 		
-		$is_patron = Patreon_Wordpress::isPatron();
+		$messages = self::processPatreonMessages();
 		
 		if(!$user_logged_into_patreon)
 		{
 			// Patron logged in and patron, but we are still showing the banner. This means pledge level is not enough.
 			
-			return str_replace('%%pledgelevel%%',$patreon_level,PATREON_TEXT_OVER_BUTTON_1);
+			return $messages . str_replace('%%pledgelevel%%',$patreon_level,PATREON_TEXT_OVER_BUTTON_1);
 		
 		}
 		
@@ -176,14 +171,14 @@ class Patreon_Frontend {
 		{
 			// Patron logged in and not patron
 			
-			return PATREON_TEXT_OVER_BUTTON_3;
+			return $messages . PATREON_TEXT_OVER_BUTTON_3;
 		
 		}
 		if(!$is_patron)
 		{
 			// Patron logged in and not patron
 			
-			return str_replace('%%pledgelevel%%',$patreon_level,PATREON_TEXT_OVER_BUTTON_1);
+			return $messages . str_replace('%%pledgelevel%%',$patreon_level,PATREON_TEXT_OVER_BUTTON_1);
 		
 		}
 		
@@ -207,13 +202,13 @@ class Patreon_Frontend {
 			$label = str_replace('%%creator%%',$creator_full_name,$label);
 			
 			// REVISIT - calculating user patronage value by dividing patronage var may be bad.
-			return str_replace('%%currentpledgelevel%%',($user_patronage/100),$label);
+			return $messages . str_replace('%%currentpledgelevel%%',($user_patronage/100),$label);
 			
 		
 		}
 	
 		
-		return $label;
+		return $messages . $label;
 		
 	}
 	
@@ -451,7 +446,6 @@ class Patreon_Frontend {
 		}
 		
 			$redirect_uri = site_url().'/patreon-authorization/';
-
 		// If we werent given any state vars to send, initialize the array
 		if(!$state)
 		{
@@ -485,7 +479,6 @@ class Patreon_Frontend {
 		$href = 'https://www.patreon.com/oauth2/authorize?response_type=code&client_id='.$client_id.'&redirect_uri='.$redirect_uri.'&state='.base64_encode(serialize($state));
 	
 		return apply_filters('ptrn/login_link', $href);
-
 	}
 	function patreonMakeLoginButton($client_id=false) {
 		
