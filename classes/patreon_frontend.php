@@ -8,6 +8,8 @@ if ( ! defined( 'WPINC' ) ) {
 
 class Patreon_Frontend {
 
+	public static $messages_map = array();
+	
 	function __construct() {
 
 		add_action( 'login_enqueue_scripts', array($this,'patreonEnqueueCss'), 10 );
@@ -26,6 +28,17 @@ class Patreon_Frontend {
 
 		add_filter( 'the_content', array($this, 'protectContentFromUsers'), PHP_INT_MAX );
 
+		self::$messages_map = array(
+			'patreon_cant_login_strict_oauth' => PATREON_CANT_LOGIN_STRICT_OAUTH,		
+			'login_with_wordpress' => PATREON_LOGIN_WITH_WORDPRESS_NOW,		
+			'patreon_nonces_dont_match' => PATREON_CANT_LOGIN_NONCES_DONT_MATCH,		
+			'patreon_cant_login_api_error' => PATREON_CANT_LOGIN_DUE_TO_API_ERROR,		
+			'patreon_weird_redirection_at_login' => PATREON_WEIRD_REDIRECTION_AT_LOGIN,		
+			'patreon_could_not_create_wp_account' => PATREON_COULDNT_CREATE_WP_ACCOUNT,		
+			'patreon_api_credentials_missing' => PATREON_API_CREDENTIALS_MISSING,		
+		
+		
+		);
 	
 	}
 
