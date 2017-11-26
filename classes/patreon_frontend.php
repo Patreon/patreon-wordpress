@@ -355,12 +355,40 @@ class Patreon_Frontend {
 		return apply_filters('ptrn/patron_button', '<a href="'.$href.'">'.$paywall_img.'</a>');		
 		
 	}
-	function MakeUniversalFlowLink($pledge_level,$state,$client_id = false) {
+	function MakeUniversalFlowLink($pledge_level,$state=false,$client_id = false) {
 		
 		if(!$client_id)
 		{
 			$client_id = get_option('patreon-client-id', false);
 		}	
+		
+		// If we werent given any state vars to send, initialize the array
+		if(!$state)
+		{
+			$state=array();
+		
+			// Get the address of the current page, and save it as final redirect uri.		
+			// Start with home url for redirect. If post is valid, get permalink. 
+			
+			$final_redirect = home_url();
+			
+			if($post)
+			{
+				$final_redirect = get_permalink($post->ID);
+			}
+			
+			// We dont want to redirect people to login page. So check if we are there.
+			if ( $GLOBALS['pagenow'] === 'wp-login.php' ) {
+				
+				$final_redirect = site_url();
+			}			
+			
+			$state['final_redirect_uri'] = $final_redirect;			
+			
+		}		
+		
+		// Add the patreon nonce that was set via init function to vars.
+		$state['patreon_nonce']=$_COOKIE['patreon_nonce'];
 		
 		$redirect_uri = site_url().'/patreon-authorization/';
 		
