@@ -127,8 +127,7 @@ class Patreon_Routing {
 					$api_client = new Patreon_API($tokens['access_token']);
 					
 					$user_response = $api_client->fetch_user();
-								
-						
+					
 					if(apply_filters('ptrn/force_strict_oauth',get_option('patreon-enable-strict-oauth', true))) {
 
 						$user = Patreon_Login::updateLoggedInUser($user_response, $tokens, $redirect);
