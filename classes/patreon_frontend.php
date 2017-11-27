@@ -63,17 +63,14 @@ class Patreon_Frontend {
 	
 
 	}
-
 	function patreonEnqueueJs() {
 		wp_register_script( 'patreon-wordpress-js', PATREON_PLUGIN_ASSETS.'/js/app.js', array( 'jquery' ) );
 		wp_enqueue_script( 'patreon-wordpress-js', PATREON_PLUGIN_ASSETS.'/js/app.js', false );
 	}
-
 	function patreonEnqueueCss() {
 		wp_register_style( 'patreon-wordpress-css', PATREON_PLUGIN_ASSETS.'/css/app.css', false );
 		wp_enqueue_style('patreon-wordpress-css', PATREON_PLUGIN_ASSETS.'/css/app.css' );
 	}
-
 	public static function displayPatreonCampaignBanner($patreon_level = false) {
 
 		global $wp;
@@ -96,7 +93,7 @@ class Patreon_Frontend {
         if($patreon_level != false) {
 			
         	$contribution_required = str_replace('%%pledgelevel%%',$patreon_level,$contribution_required);
-        	$contribution_required = apply_filters('ptrn/contribution_required',$contribution_required,$patreon_level);
+        	$contribution_required = apply_filters('ptrn/contribution_required',$contribution_required,'main_banner_message',$patreon_level,$post);
 			
 		}
 		
@@ -104,19 +101,15 @@ class Patreon_Frontend {
 		
 			// Wrap message and buttons in divs for responsive interface mechanics
 			
-			$contribution_required = '<div class="patreon-locked-content-message">'.$contribution_required.'</div>';
+			$contribution_required = apply_filters('ptrn/final_state_main_banner_message','<div class="patreon-locked-content-message">'.$contribution_required.'</div>',$patreon_level,$post);
 			
 			$universal_button = self::patreonMakeUniversalButton($patreon_level);
 	
-			$universal_button = '<div class="patreon-universal-button">'.$universal_button.'</div>';
+			$universal_button = apply_filters('ptrn/final_state_universal_button','<div class="patreon-universal-button">'.$universal_button.'</div>',$patreon_level,$post);
 			
-			if(isset($login_with_patreon_button))
-			{
-				$login_with_patreon_button = '<div class="patreon-login-refresh-button">'.$universal_button.'</div>';
-			}
+			$text_over_universal_button = apply_filters('ptrn/final_state_label_over_universal_button',self::getLabelOverUniversalButton($patreon_level),$patreon_level,$post);
 			
-			$text_over_universal_button = self::getLabelOverUniversalButton($patreon_level);
-			$text_under_universal_button = self::getLabelUnderUniversalButton($patreon_level);
+			$text_under_universal_button = apply_filters('ptrn/final_state_label_under_universal_button',self::getLabelUnderUniversalButton($patreon_level),$patreon_level,$post);
 			
 			// Wrap all of them in a responsive div
 			
@@ -136,16 +129,15 @@ class Patreon_Frontend {
 			// This extra button is solely here to test whether new wrappers cause any design issues in different themes. For easy comparison with existing unwrapped button. Remove when confirmed.
 			
 
-        	$campaign_banner = apply_filters('ptrn/campaign_banner', $campaign_banner, $patreon_level);
+        	$campaign_banner = apply_filters('ptrn/campaign_banner', $campaign_banner, $patreon_level,$post);
 
             return $campaign_banner;
         }
 		
 
 	}
-	
 	function getLabelOverUniversalButton($patreon_level) {
-		
+
 		$label = PATREON_TEXT_OVER_BUTTON_1;
 		
 		$user_logged_into_patreon = self::isUserLoggedInPatreon();
@@ -158,7 +150,7 @@ class Patreon_Frontend {
 		{
 			// Patron logged in and patron, but we are still showing the banner. This means pledge level is not enough.
 			
-			return $messages . str_replace('%%pledgelevel%%',$patreon_level,PATREON_TEXT_OVER_BUTTON_1);
+			return $messages . apply_filters('ptrn/label_text_over_universal_button',str_replace('%%pledgelevel%%',$patreon_level,PATREON_TEXT_OVER_BUTTON_1),'user_not_logged_in',$user_logged_into_patreon,$is_patron,$patreon_level);
 		
 		}
 		
@@ -171,15 +163,15 @@ class Patreon_Frontend {
 		{
 			// Patron logged in and not patron
 			
-			return $messages . PATREON_TEXT_OVER_BUTTON_3;
+			return $messages . apply_filters('ptrn/label_text_over_universal_button',PATREON_TEXT_OVER_BUTTON_3,'declined',$user_logged_into_patreon,$is_patron,$patreon_level);			
 		
 		}
 		if(!$is_patron)
 		{
 			// Patron logged in and not patron
 			
-			return $messages . str_replace('%%pledgelevel%%',$patreon_level,PATREON_TEXT_OVER_BUTTON_1);
-		
+			return $messages . apply_filters('ptrn/label_text_over_universal_button',str_replace('%%pledgelevel%%',$patreon_level,PATREON_TEXT_OVER_BUTTON_1),'not_a_patron',$user_logged_into_patreon,$is_patron,$patreon_level);
+			
 		}
 		
 		$user_patronage = Patreon_Wordpress::getUserPatronage();
@@ -202,22 +194,20 @@ class Patreon_Frontend {
 			$label = str_replace('%%creator%%',$creator_full_name,$label);
 			
 			// REVISIT - calculating user patronage value by dividing patronage var may be bad.
-			return $messages . str_replace('%%currentpledgelevel%%',($user_patronage/100),$label);
-			
+	
+			return $messages . apply_filters('ptrn/label_text_over_universal_button',str_replace('%%currentpledgelevel%%',($user_patronage/100),$label),'pledge_not_enough',$user_logged_into_patreon,$is_patron,$patreon_level,$creator_full_name);			
 		
 		}
 	
-		
-		return $messages . $label;
+		return $messages . apply_filters('ptrn/label_text_over_universal_button',$label,'valid_patron',$user_logged_into_patreon,$is_patron,$patreon_level,$creator_full_name);
 		
 	}
-	
 	function processPatreonMessages() {
 
 		if(isset($_REQUEST['patreon_message']))
 		{
 				
-			return '<p class="patreon_message">'.self::$messages_map[$_REQUEST['patreon_message']].'</p>';
+			return '<p class="patreon_message">'.apply_filters('ptrn/error_message',self::$messages_map[$_REQUEST['patreon_message']]).'</p>';
 		}
 		
 		return '';
@@ -229,14 +219,13 @@ class Patreon_Frontend {
 		{
 			global $post;
 		}
-			
+		
 		$label = PATREON_TEXT_UNDER_BUTTON_1;
 	
 		$user_logged_into_patreon = self::isUserLoggedInPatreon();
 
 		$is_patron = Patreon_Wordpress::isPatron();
 		
-
 		// If we werent given any state vars to send, initialize the array
 		if(!$state)
 		{
@@ -261,7 +250,7 @@ class Patreon_Frontend {
 		{
 			// Patron logged in and patron, but we are still showing the banner. This means pledge level is not enough.
 			
-			return PATREON_TEXT_UNDER_BUTTON_1;
+			return apply_filters('ptrn/label_text_under_universal_button',PATREON_TEXT_UNDER_BUTTON_1,'user_not_logged_in',$user_logged_into_patreon,$is_patron,$patreon_level,$state);
 		
 		}
 		if(!$is_patron)
@@ -269,7 +258,7 @@ class Patreon_Frontend {
 			// Patron logged in and not patron
 			
 			$label = str_replace('%%pledgelevel%%',$patreon_level,PATREON_TEXT_UNDER_BUTTON_2);
-			return str_replace('%%flowlink%%',$refresh_link,$label);
+			return apply_filters('ptrn/label_text_under_universal_button',str_replace('%%flowlink%%',$refresh_link,$label),'user_not_patron',$user_logged_into_patreon,$is_patron,$patreon_level,$state);
 		
 		}
 	 
@@ -281,12 +270,12 @@ class Patreon_Frontend {
 				
 			
 			$label = str_replace('%%pledgelevel%%',$patreon_level,PATREON_TEXT_UNDER_BUTTON_2);
-			return str_replace('%%flowlink%%',$refresh_link,$label);
+			return apply_filters('ptrn/label_text_under_universal_button',str_replace('%%flowlink%%',$refresh_link,$label),'pledge_not_enough',$user_logged_into_patreon,$is_patron,$patreon_level,$state,$user_patronage);			
 			
 		
 		}
 		
-		return $label;
+		return apply_filters('ptrn/label_text_under_universal_button',$label,'fail_case',$user_logged_into_patreon,$is_patron,$patreon_level,$state,$user_patronage);
 		
 	}
 	function patreonMakeUniversalButton($min_cents=false,$state=false,$post=false,$client_id=false) {
@@ -306,9 +295,8 @@ class Patreon_Frontend {
 		
 		if($min_cents)
 		{
-			$send_pledge_level = $min_cents;
+			$send_pledge_level = $min_cents * 100;;
 			
-			$send_pledge_level = $send_pledge_level * 100;
 		}
 		
 		if(!$client_id)
@@ -347,7 +335,7 @@ class Patreon_Frontend {
         	$paywall_img = '<img src="'.$paywall_img.'" />';
         }
 		
-		return apply_filters('ptrn/patron_button', '<a href="'.$href.'">'.$paywall_img.'</a>');		
+		return apply_filters('ptrn/patron_button', '<a href="'.$href.'">'.$paywall_img.'</a>',$min_cents);		
 		
 	}
 	function MakeUniversalFlowLink($pledge_level,$state=false,$client_id = false) {
@@ -398,8 +386,8 @@ class Patreon_Frontend {
 		
 		// Default label:
 		
-		$label = PATREON_TEXT_UNLOCK_WITH_PATREON;
-		
+		$label = apply_filters('ptrn/universal_button_label',PATREON_TEXT_UNLOCK_WITH_PATREON);
+
 		$user_logged_into_patreon = self::isUserLoggedInPatreon();
 
 		$is_patron = Patreon_Wordpress::isPatron();
@@ -490,7 +478,7 @@ class Patreon_Frontend {
 		// Check if user is logged in to WP, for determination of label text
 		
 		// Set login label to default
-		$login_label = PATREON_TEXT_CONNECT;
+		$login_label =  apply_filters('ptrn/login_button_label',PATREON_TEXT_CONNECT);
 		
 		if(is_user_logged_in()){
 			// User is logged into WP. Check if user has valid patreon data :
@@ -596,7 +584,7 @@ class Patreon_Frontend {
 					
 					$content = self::displayPatreonCampaignBanner($patreon_level);
 
-					$content = apply_filters('ptrn/post_content', $content, $user_patronage);				
+					$content = apply_filters('ptrn/post_content', $content, $patreon_level, $user_patronage);				
 					
 					return $content;
 				}
@@ -611,15 +599,16 @@ class Patreon_Frontend {
 		
 		$creator_profile_url = get_option('patreon-creator-url', false);
 
-		$post_footer = str_replace('%%pledgelevel%%',$post_level,PATREON_VALID_PATRON_POST_FOOTER_TEXT);
-		$post_footer = str_replace('%%creatorprofileurl%%','<a href="'.$creator_profile_url.'">Patreon</a>',$post_footer);
+		$post_footer = str_replace('%%pledgelevel%%',$patreon_level,  apply_filters('ptrn/valid_patron_footer_text',PATREON_VALID_PATRON_POST_FOOTER_TEXT,$patreon_level,$user_patronage));
+		
+		$post_footer = apply_filters('ptrn/valid_patron_processed_message',str_replace('%%creatorprofileurl%%',apply_filters('ptrn/valid_patron_creator_profile_url','<a href="'.$creator_profile_url.'">Patreon</a>',$creator_profile_url),$post_footer),$patreon_level,$user_patronage);
 		
 		$post_footer = 
 		'<div class="patreon-valid-patron-message">'.
 			$post_footer.
 		'</div>';
 		
-		$content .= $post_footer;
+		$content .= apply_filters('ptrn/valid_patron_final_footer',$post_footer,'valid_patron',$patreon_level,$user_patronage);
 
 		return $content;
 
