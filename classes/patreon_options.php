@@ -47,7 +47,7 @@ class Patreon_Options {
 
     function patreon_plugin_login_warning() {
 
-        $patreon_login = get_option('patreon-enable-login-with-patreon', false);
+        $patreon_login = get_option('patreon-enable-login-with-patreon', true);
         $patreon_admin_login = get_option('patreon-enable-allow-admins-login-with-patreon', false);
 
         $anchor_url = site_url().'/wp-admin/admin.php?page=patreon-plugin#danger-users';
@@ -209,10 +209,10 @@ class Patreon_Options {
 											<th scope="row">
 												<strong>Enable strict oAuth</strong>
 												<br>
-												(Only connects logged in users)
+												(Only connects users logged into WordPress)
 											</th>
 											<td>
-												<input type="checkbox" name="patreon-enable-strict-oauth" value="1"<?php checked( get_option('patreon-enable-strict-oauth', true) ); ?> />
+												<input type="checkbox" name="patreon-enable-strict-oauth" value="1"<?php checked( get_option('patreon-enable-strict-oauth', false) ); ?> />
 											</td>
                                         </tr>
 										<?php
@@ -271,14 +271,14 @@ class Patreon_Options {
 
                                         <tr valign="top">
 											<th scope="row">
-												<strong>Enable 'Login with Patreon' Button on Login Page</strong>
+												<strong>Enable Login with Patreon</strong>
 											</th>
 											<td>
-												<input type="checkbox" name="patreon-enable-login-with-patreon" value="1"<?php checked( get_option('patreon-enable-login-with-patreon', false) ); ?> />
+												<input type="checkbox" name="patreon-enable-login-with-patreon" value="1"<?php checked( get_option('patreon-enable-login-with-patreon', true) ); ?> />
 											</td>
                                         </tr>
 
-                                        <?php if(get_option('patreon-enable-login-with-patreon', false)) { ?>
+                                        <?php if(get_option('patreon-enable-login-with-patreon', true)) { ?>
                                         <tr valign="top">
 											<th scope="row">
 												<strong>Allow Admins/Editors to 'Login with Patreon' Button</strong>
@@ -377,64 +377,7 @@ class Patreon_Options {
 
 
         </form>
-
-        <?php
-
-        if(get_option('patreon-enable-login-with-patreon', false) && get_option('patreon-enable-allow-admins-login-with-patreon', false)) {
-
-        ?>
-
-        <div class="danger-users">
-            <a name="danger-users"></a>
-            <h2>DANGER USERS:</h2>
-            <p>If you have the 'Login with Patreon' enabled, and allowing Admins/Editors to login, please ensure the following users have a Patreon account. <br>This will prevent your website being 'hijacked' via an authoritive Patreon account.</p>
-
-            <table class="widefat fixed" cellspacing="0">
-                <tr>
-                    <th><strong>User ID</strong></th>
-                    <th><strong>Username</strong></th>
-                    <th><strong>Role</strong></th>
-                    <th><strong>Email Address</strong></th>
-                </tr>
-                <tbody>
-            <?php
-
-            if(!empty($danger_user_list)) {
-                $looper = 1;
-                foreach($danger_user_list as $danger_username=>$danger_user) {
-
-                    if($looper % 2 == 0) {
-                        $class = 'alternate';
-                    } else {
-                        $class = '';
-                    }
-
-                    ?>
-
-                    <tr class="<?php echo $class; ?>">
-                        <td class="column-columnname"><?php echo $danger_user->data->ID; ?></td>
-                        <td class="column-columnname"><?php echo $danger_username; ?></td>
-                        <td class="column-columnname"><?php foreach($danger_user->roles as $role) { echo $role . ' '; } ?></td>
-                        <td class="column-columnname"><?php echo $danger_user->data->user_email; ?></td>
-                    </tr>
-
-                    <?php
-
-                    $looper++;
-
-                }
-            }
-
-            ?>
-
-                </tbody>
-            </table>
-
-        </div>
-
-        <?php
-
-        }
+		<?php
 
 
     }
