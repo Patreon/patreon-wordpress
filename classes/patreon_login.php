@@ -24,7 +24,7 @@ class Patreon_Login {
 
 	}
 
-	public static function updateLoggedInUser($user_response, $tokens, $redirect = false) {
+	public static function updateLoggedInUserForStrictoAuth($user_response, $tokens, $redirect = false) {
 
 		$user = wp_get_current_user();
 
