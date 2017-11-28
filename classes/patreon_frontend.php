@@ -8,6 +8,7 @@ if ( ! defined( 'WPINC' ) ) {
 
 class Patreon_Frontend {
 
+	
 	public static $messages_map = array();
 	
 	function __construct() {
@@ -15,7 +16,8 @@ class Patreon_Frontend {
 		add_action( 'login_enqueue_scripts', array($this,'patreonEnqueueCss'), 10 );
 		add_action( 'login_enqueue_scripts', array($this,'patreonEnqueueJs'), 1 );
 		add_action( 'wp_enqueue_scripts', array($this,'patreonEnqueueCss') );
-		add_action( 'wp_enqueue_scripts', array($this,'patreonEnqueueJs') );
+		add_action( 'wp_enqueue_scripts', array($this,'patreonEnqueueJs') );		
+		add_action( 'login_form', array($this, 'showPatreonMessages' ) );
 
 		if(get_option('patreon-enable-register-with-patreon', false)) {
 			add_action( 'register_form', array($this, 'showPatreonButton' ) );
@@ -36,6 +38,8 @@ class Patreon_Frontend {
 			'patreon_weird_redirection_at_login' => PATREON_WEIRD_REDIRECTION_AT_LOGIN,		
 			'patreon_could_not_create_wp_account' => PATREON_COULDNT_CREATE_WP_ACCOUNT,		
 			'patreon_api_credentials_missing' => PATREON_API_CREDENTIALS_MISSING,		
+			'admin_login_with_patreon_disabled' => PATREON_ADMIN_LOGIN_WITH_PATREON_DISABLED,		
+			'login_with_patreon_disabled' => PATREON_LOGIN_WITH_PATREON_DISABLED,		
 		
 		
 		);
@@ -56,12 +60,9 @@ class Patreon_Frontend {
 		}
 
 		$href = self::patreonMakeLoginLink($client_id);
-
-		echo self::processPatreonMessages();
 		
 		echo '<div class="patreon-login-refresh-button">'.self::patreonMakeLoginButton().'</div>';
 	
-
 	}
 	function patreonEnqueueJs() {
 		wp_register_script( 'patreon-wordpress-js', PATREON_PLUGIN_ASSETS.'/js/app.js', array( 'jquery' ) );
@@ -202,11 +203,15 @@ class Patreon_Frontend {
 		return $messages . apply_filters('ptrn/label_text_over_universal_button',$label,'valid_patron',$user_logged_into_patreon,$is_patron,$patreon_level,$creator_full_name);
 		
 	}
+	function showPatreonMessages() {
+
+		echo self::processPatreonMessages();
+		
+	}
 	function processPatreonMessages() {
 
 		if(isset($_REQUEST['patreon_message']))
 		{
-				
 			return '<p class="patreon_message">'.apply_filters('ptrn/error_message',self::$messages_map[$_REQUEST['patreon_message']]).'</p>';
 		}
 		
