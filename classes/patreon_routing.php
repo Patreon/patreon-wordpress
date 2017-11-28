@@ -4,7 +4,7 @@
 if ( ! defined( 'WPINC' ) ) {
 	die;
 }
-
+ 
 class Patreon_Routing {
 
 	function __construct() {
@@ -127,13 +127,13 @@ class Patreon_Routing {
 					$api_client = new Patreon_API($tokens['access_token']);
 					
 					$user_response = $api_client->fetch_user();
-					
-					if(apply_filters('ptrn/force_strict_oauth',get_option('patreon-enable-strict-oauth', true))) {
+			
+					if(apply_filters('ptrn/force_strict_oauth',get_option('patreon-enable-strict-oauth', false))) {
 
-						$user = Patreon_Login::updateLoggedInUser($user_response, $tokens, $redirect);
+						$user = Patreon_Login::updateLoggedInUserForStrictoAuth($user_response, $tokens, $redirect);
 					} else {
 								
-						$user = Patreon_Login::createUserFromPatreon($user_response, $tokens, $redirect);
+						$user = Patreon_Login::createOrLogInUserFromPatreon($user_response, $tokens, $redirect);
 					}
 					
 
