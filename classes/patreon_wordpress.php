@@ -24,7 +24,6 @@ class Patreon_Wordpress {
 		include 'patreon_frontend.php';
 		include 'patreon_api.php';
 		include 'patreon_oauth.php';
-		include 'patreon_protect.php';
 		include 'patreon_options.php';
 		include 'patreon_metabox.php';
 		include 'patreon_user_profiles.php';
@@ -32,7 +31,6 @@ class Patreon_Wordpress {
 
 		self::$Patreon_Routing = new Patreon_Routing;
 		self::$Patreon_Frontend = new Patreon_Frontend;
-		self::$Patreon_Protect = new Patreon_Protect;
 		self::$Patreon_Options = new Patreon_Options;
 		self::$Patron_Metabox = new Patron_Metabox;
 		self::$Patreon_User_Profiles = new Patreon_User_Profiles;
