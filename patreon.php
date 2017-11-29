@@ -44,6 +44,7 @@ define("PATREON_COULDNT_CREATE_WP_ACCOUNT", 'Sorry. Could not create a WordPress
 define("PATREON_API_CREDENTIALS_MISSING", 'Sorry. Could not login because API credentials are missing or incorrect. Please contact site administration.' );
 define("PATREON_ADMIN_LOGIN_WITH_PATREON_DISABLED", 'Sorry. Logging in Administrators via Patreon is turned off in options. Please login with your WordPress account first' );
 define("PATREON_LOGIN_WITH_PATREON_DISABLED", 'Sorry. Logging in with Patreon is disabled in this Website. Please contact administrator.' );
+define("PATREON_ADMIN_BYPASSES_FILTER_MESSAGE", 'This content is not locked for you because you are an Administrator of this Website.' );
 
 
 include 'classes/patreon_wordpress.php';
