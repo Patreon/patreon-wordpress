@@ -553,9 +553,10 @@ class Patreon_Frontend {
 			if(current_user_can('manage_options')) {
 				// Here we need to put a notification to admins so they will know they can see the content because they are admin_login_with_patreon_disabled
 				
-				$admin_notification = '<div class="patreon-valid-patron-message">'.
+				$admin_notification = 
+									'<div class="patreon-valid-patron-message">'.
 											apply_filters('ptrn/admin_bypass_filter_message', PATREON_ADMIN_BYPASSES_FILTER_MESSAGE, $patreon_level).
-										'</div>';
+									'</div>';
 				
 				return $content . $admin_notification;
 			}	
