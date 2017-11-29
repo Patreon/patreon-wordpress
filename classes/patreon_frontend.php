@@ -40,6 +40,7 @@ class Patreon_Frontend {
 			'patreon_api_credentials_missing' => PATREON_API_CREDENTIALS_MISSING,		
 			'admin_login_with_patreon_disabled' => PATREON_ADMIN_LOGIN_WITH_PATREON_DISABLED,		
 			'login_with_patreon_disabled' => PATREON_LOGIN_WITH_PATREON_DISABLED,		
+			'admin_bypass_filter_message' => PATREON_ADMIN_BYPASSES_FILTER_MESSAGE,		
 		
 		
 		);
@@ -523,18 +524,6 @@ class Patreon_Frontend {
 				return $content;
 			}
 			
-			if(current_user_can('manage_options')) {
-				return $content;
-			}
-			
-			// Below define can be defined in any plugin to bypass core locking function and use a custom one from plugin
-			// It is independent of the plugin load order since it checks if it is defined.
-			// It can be defined by any plugin until right before the_content filter is run.
-			
-			if(defined('PATREON_BYPASS_FILTERING')) {
-                return $content;
-            }
-			
 			// First check if entire site is locked, get the level for locking.
 			
 			$patreon_level = get_option('patreon-lock-entire-site',false);
@@ -553,11 +542,31 @@ class Patreon_Frontend {
 			// Check if both post level and site lock level are set to 0 or nonexistent. If so return normal content.
 			
 			if($post_level == 0 
-				&& (!get_option('patreon-lock-entire-site',false) 
+				&& (!get_option('patreon-lock-entire-site',false)
 					|| get_option('patreon-lock-entire-site',false)==0)
 			) {
 				return $content;
 			}
+			
+			// If we are at this point, then this post is protected. 
+			
+			if(current_user_can('manage_options')) {
+				// Here we need to put a notification to admins so they will know they can see the content because they are admin_login_with_patreon_disabled
+				
+				$admin_notification = '<div class="patreon-valid-patron-message">'.
+											apply_filters('ptrn/admin_bypass_filter_message', PATREON_ADMIN_BYPASSES_FILTER_MESSAGE, $patreon_level).
+										'</div>';
+				
+				return $content . $admin_notification;
+			}	
+			
+			// Below define can be defined in any plugin to bypass core locking function and use a custom one from plugin
+			// It is independent of the plugin load order since it checks if it is defined.
+			// It can be defined by any plugin until right before the_content filter is run.
+			
+			if(defined('PATREON_BYPASS_FILTERING')) {
+                return $content;
+            }			
 			
 			// Passed checks. If post level is not 0, override patreon level and hence site locking value with post's. This will allow Creators to lock entire site and then set a different value for individual posts for access. Ie, site locking is $5, but one particular post can be $10, and it will require $10 to see. 
 			
