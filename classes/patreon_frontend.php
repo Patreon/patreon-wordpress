@@ -333,14 +333,8 @@ class Patreon_Frontend {
 			
 		$label_text = self::patreonMakeUniversalButtonLabel();
 		
-		$paywall_img = get_option('patreon-paywall-img-url', false);
-		
-        if ($paywall_img == false) {
-        	$paywall_img = '<div class="patreon-responsive-button-wrapper"><div class="patreon-responsive-button"><img class="patreon_logo" src="'.PATREON_PLUGIN_ASSETS.'/img/patreon-logomark-on-coral.svg" alt=""> '.$label_text.'</div></div>';
-        } else {
-        	$paywall_img = '<img src="'.$paywall_img.'" />';
-        }
-		
+        $paywall_img = '<div class="patreon-responsive-button-wrapper"><div class="patreon-responsive-button"><img class="patreon_logo" src="'.PATREON_PLUGIN_ASSETS.'/img/patreon-logomark-on-coral.svg" alt=""> '.$label_text.'</div></div>';
+
 		return apply_filters('ptrn/patron_button', '<a href="'.$href.'">'.$paywall_img.'</a>',$min_cents);		
 		
 	}
