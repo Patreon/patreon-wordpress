@@ -244,16 +244,6 @@ class Patreon_Options {
 
                                         <tr valign="top">
 											<th scope="row">
-												<strong>Image to show when user is not yet a patron</strong> 
-												<br>
-												(Or not yet paying enough. Include full URL)</th>
-											<td>
-												<input type="text" name="patreon-paywall-img-url" value="<?php echo esc_attr( get_option('patreon-paywall-img-url', '') ); ?>" class="large-text" />
-											</td>
-                                        </tr>
-
-                                        <tr valign="top">
-											<th scope="row">
 												<strong>Enable 'Login with Patreon' Button in User Profile</strong></th>
 											<td>
 												<input type="checkbox" name="patreon-enable-connect-with-patreon-in-userprofile" value="1"<?php checked( get_option('patreon-enable-connect-with-patreon-in-userprofile', false) ); ?> />
