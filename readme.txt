@@ -7,45 +7,81 @@ Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Serve patron-only posts - and give ad-free experiences - directly on your website.
+Serve patron-only posts - directly on your WordPress website.
 
 == Description ==
 
-When a patron pledges, they can then head over to www.yourwordpresssite.com and click your “Connect with Patreon” button to let the site know they are a patron. When you create content on WordPress you will be given the option to limit it to only paying patrons.
+When a patron pledges, they can then head over to www.yourwordpresssite.com and click your â€œUnlock with Patreonâ€ button to let the site know they are a patron. When you create content on WordPress you will be given the option to limit it to only paying patrons.
 
-This plugin is maintained by Patreon and will cover the basic use cases of patronage on WordPress. Looking for additional features? Extend with premium inter-operable WordPress plugins that others have developed, also found in this directory.
+This plugin is maintained by Patreon. For advanced features, you can find additional premium WordPress plugins in this directory.
 
-A few notes about the sections above:
-*   Keep your patrons engaged on your website
-*   Convert your fans to patrons by showing them how much content they’d get
-*   Publish patron-only posts with the full power of WordPress
+### FEATURES FOR CREATORS
+
+- Choose a minimum pledge amount necessary to see a particular post
+- Alternatively, set a minimum pledge amount to see all posts.
+- Set custom HTML that non-patrons see instead of the post, prompting them to become a patron
+- Easily embed patron-only content snippets in public posts using shortcodes
+
+### FEATURES FOR PATRONS
+
+- This plugin adds a â€œUnlock with Patreonâ€ button to every locked post.
+- â€œUnlock with Patreonâ€ takes care of everything: whether theyâ€™re not yet a patron, need to upgrade their pledge, or already pledging enough, weâ€™ll guide them through the process and back to your content
+
+### FEATURES FOR DEVELOPERS
+
+- Extend this free basic WordPress plugin with your own inter-operable plugins that install side by side.
+- Rapidly develop patron-only WordPress features without initial overhead
+- Immediately usable by existing Patreon creators running this plugin
+
+Learn more in our [developer portal](https://www.patreon.com/portal).
+
+### PRICING
+
+This plugin is provided by Patreon for free.
 
 == Installation ==
 
-1. Download the latest version of the plugin on this page
-2. In your Wordpress admin panel, use the option to ‘Upload Plugin’ on the ‘add new’ plugin screen, image below for reference. When you click ‘upload plugin’, select the plugins ZIP file:
-![](https://c5.patreon.com/external/platform/wordpress-install-ss.png)
-3. Activate the plugin and then click on ‘Patreon Settings’ to view the options page. It will look something like the below, copy the ‘Redirect URI‘ into the clip board and keep for the next step.
-![](https://c5.patreon.com/external/platform/wordpress-install-ss1.jpeg)
+## Install the Patreon WordPress Plugin
 
-### Creating an oAuth client on Patreon
+1. Install & activate the plugin
+2. Click on â€˜Patreon Settingsâ€™ to view the options page. It will look something like the below, copy the â€˜Redirect URIâ€˜ into the clip board and keep for the next step.
+![](https://c5.patreon.com/external/platform/wordpress-client.png)
+3. This plugin requires that you enable "pretty permalinks." (ie /page-name/ as opposed to ?pid=36). You can do this from the WordPress admin interface, visit Settings > Permalinks and choose any format aside from "Plain."
 
-1. Ensure you are logged into Patreon, using your creator account. When it comes to testing this out you will want to have two Patreon accounts, one that acts as a patron and one being the content creator. The oAuth client needs to be created on your content creating account.
+## Generate API Credentials on Patreon.com
+
+1. Ensure you are logged into Patreon, using your creator account. When it comes to testing this out you will want to have two Patreon accounts, one that acts as a patron and one being the content creator. The OAuth client needs to be created on your content creating account.
 2. Visit the [oAuth client page here](https://www.patreon.com/portal/registration/register-clients) and click "Create Client", fill out the form and add in an image URL for the icon that will appear to users when they are connecting to your website.
-3. Note the field for ‘Redirect URI‘, this should still be in your clipboard from the previous steps – if not copy/paste it exactly as it appears on the options page.
-4. Click the ‘Create Client’ button, and you should now see the new client in the list.
+3. Note the field for â€˜Redirect URIâ€˜, this should still be in your clipboard from the previous steps â€“ if not copy/paste it exactly as it appears on the WordPress admin Patreon Settings page.
+4. Click the â€˜Create Clientâ€™ button, and you should now see the new client in the list.
 5. Click the downward facing caret on the right side to expose additional information about the client
 6. You should see something like this
-![](https://uiux.me/wp-content/uploads/2017/06/wordpress-install-ss4.png)
-The keys in the image are completely fake, doctored specifically for this screenshot.
+![](https://c5.patreon.com/external/platform/wordpress-install-ss5.png)
+(The keys in the image are fake, doctored for this screenshot.)
 
-### Finishing up
-1. Copy and paste the Client ID and Client Secret from this page into the matching fields on the ‘Patreon Settings’ page.
-2. Copy the Client ID from the top of this page and paste into the Creator ID field.
-3. Hit ‘Update Settings’
-4. Then go to wordpress ‘Settings’ -> ‘Permalinks’ and hit ‘Save’. This will ensure your rewrite rules are flushed.
+## Paste Your Credentials into WordPress
+
+1. Copy and paste the Client ID and Client Secret from this page into the matching fields on the â€˜Patreon Settingsâ€™ page.
+2. Copy the Client ID, Client Secret, Access Token, and Refresh Token from the top of this page into the WordPress admin Patreon Settings page.
+3. Hit â€˜Update Settingsâ€™ at the bottom of the page.
+4. IMPORTANT FINAL STEP: In your WordPress admin â€˜Settingsâ€™ -> â€˜Permalinksâ€™ section, click â€˜Saveâ€™. This ensures your rewrite rules are flushed.
 
 You should now be up and running with the Patreon WordPress plugin!
+
+## Protecting Posts
+
+When editing a post (or a custom post type) you will see a meta box in the right column titled â€˜Patreon Levelâ€™.
+
+This box contains a text field that lets you specify a minimum contribution level in dollars. This could be $1 or $1.40 or even $10000. This is entirely up to you.
+
+![](https://c5.patreon.com/external/platform/wordpress_protecting_posts_pages.png)
+
+It defaults to $0 even if left empty.
+
+## Protecting Videos
+
+It is  difficult to protect videos due the intensive bandwidth requirements of hosting video  and having to rely on third parties such as Youtube or Vimeo. Youtube allows you to set videos to â€˜privateâ€™ but Vimeo offers extra controls by only allowing videos to be played on specific domains. Visit this guide to [protecting your video content with Vimeo](https://help.vimeo.com/hc/en-us/articles/224817847-Privacy-settings-overview).
+
 
 == Changelog ==
 
