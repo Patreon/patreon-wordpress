@@ -27,14 +27,22 @@ class Patreon_API {
 	}
 
 	private function __get_json($suffix) {
-		$api_endpoint = "https://api.patreon.com/oauth2/api/" . $suffix;
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL, $api_endpoint);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		$authorization_header = "Authorization: Bearer " . $this->access_token;
-		curl_setopt($ch, CURLOPT_HTTPHEADER, array($authorization_header));
 		
-		return json_decode(curl_exec($ch), true);
+		$api_endpoint = "http://api.patreon.com/oauth2/api/" . $suffix;
+	
+		$headers = array(
+			'Authorization' => 'Bearer ' . $this->access_token,
+		);
+		
+		$api_request = array(
+			'headers' => $headers,
+			'method'  => 'GET',
+		);
+		
+		$response = wp_remote_request( $api_endpoint, $api_request );
+
+		return json_decode($response['body'], true);
+
 	}
 
 }
