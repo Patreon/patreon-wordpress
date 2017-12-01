@@ -28,7 +28,6 @@ class Patreon_Options {
         register_setting( 'patreon-options', 'patreon-client-secret' );
         register_setting( 'patreon-options', 'patreon-creators-access-token' );
         register_setting( 'patreon-options', 'patreon-creators-refresh-token' );
-        register_setting( 'patreon-options', 'patreon-creator-id' );
         register_setting( 'patreon-options', 'patreon-fetch-creator-id' );
         register_setting( 'patreon-options', 'patreon-paywall-img-url' );
         register_setting( 'patreon-options', 'patreon-paywall-blocked-img-url' );
@@ -153,42 +152,7 @@ class Patreon_Options {
                             <!-- .postbox -->
 
                         </div>
-                        <!-- .meta-box-sortables .ui-sortable -->
-
-
-
-                        <div class="meta-box-sortables ui-sortable">
-
-                            <div class="postbox">
-
-                                <div class="handlediv" title="Click to toggle"><br></div>
-                                <!-- Toggle -->
-
-                                <h2 class="hndle"><span>Creator Settings</span></h2>
-
-                                <div class="inside">
-
-                                    <p>Get your Creator ID <a href="https://www.patreon.com/dashboard/widgets" target="_blank">here</a>, in the url for the button you can find your creator ID.</p>
-                                    <p><em>https://www.patreon.com/bePatron?u=<strong>XXXXXXXXXX</strong></em></p>
-
-                                    <table class="widefat">
-                                        <tr valign="top">
-											<th scope="row">
-												<strong>Creator ID</strong>
-											</th>
-											<td>
-												<input type="text" name="patreon-creator-id" value="<?php echo esc_attr( get_option('patreon-creator-id', '') ); ?>" class="large-text" />
-											</td>
-                                        </tr>
-                                    </table>
-
-                                </div>
-                                <!-- .inside -->
-
-                            </div>
-                            <!-- .postbox -->
-
-                        </div>
+						
                         <!-- .meta-box-sortables .ui-sortable -->
 
 
