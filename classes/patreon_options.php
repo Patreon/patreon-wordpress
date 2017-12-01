@@ -307,7 +307,7 @@ class Patreon_Options {
                                     <p><strong>DOCUMENTATION</strong> <br>Technical documentation and code examples available @ <a href="https://patreon.com/apps/wordpress" target="_blank">https://patreon.com/apps/wordpress</a></p>
                                 </div>
                                 <!-- .inside -->
-
+ 
                             </div>
                             <!-- .postbox -->
 
