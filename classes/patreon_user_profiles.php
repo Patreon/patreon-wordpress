@@ -17,22 +17,6 @@ class Patreon_User_Profiles {
 
 	function patreon_user_profile_fields( $user ) {
 
-		if(get_option('patreon-enable-connect-with-patreon-in-userprofile', false)) {
-
-			?>
-
-			<h3>Connect with Patreon</h3>
-
-			<?php echo do_shortcode('[patreon_register_button]'); ?>
-
-			<p>You need to ensure this wordpress account shares the same email address as your Patreon account.</p>
-
-			<br>
-
-			<?php
-
-		}
-
 		if(current_user_can('manage_options')) {
 
 			?>
