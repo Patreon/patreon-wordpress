@@ -34,7 +34,6 @@ class Patreon_Options {
         register_setting( 'patreon-options', 'patreon-rewrite-rules-flushed' );
         register_setting( 'patreon-options', 'patreon-enable-register-with-patreon' );
         register_setting( 'patreon-options', 'patreon-enable-login-with-patreon' );
-        register_setting( 'patreon-options', 'patreon-enable-connect-with-patreon-in-userprofile' );
         register_setting( 'patreon-options', 'patreon-enable-allow-admins-login-with-patreon' );
         register_setting( 'patreon-options', 'patreon-enable-redirect-to-page-after-login' );
         register_setting( 'patreon-options', 'patreon-enable-redirect-to-page-id' );
@@ -208,14 +207,6 @@ class Patreon_Options {
 
                                         <tr valign="top">
 											<th scope="row">
-												<strong>Enable 'Login with Patreon' Button in User Profile</strong></th>
-											<td>
-												<input type="checkbox" name="patreon-enable-connect-with-patreon-in-userprofile" value="1"<?php checked( get_option('patreon-enable-connect-with-patreon-in-userprofile', false) ); ?> />
-											</td>
-                                        </tr>
-
-                                        <tr valign="top">
-											<th scope="row">
 												<strong>Enable 'Login with Patreon' Button on Register Page</strong>
 											</th>
 											<td>
@@ -307,7 +298,7 @@ class Patreon_Options {
                                     <p><strong>DOCUMENTATION</strong> <br>Technical documentation and code examples available @ <a href="https://patreon.com/apps/wordpress" target="_blank">https://patreon.com/apps/wordpress</a></p>
                                 </div>
                                 <!-- .inside -->
- 
+
                             </div>
                             <!-- .postbox -->
 
