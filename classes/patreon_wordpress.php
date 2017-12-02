@@ -15,7 +15,6 @@ class Patreon_Wordpress {
 	private static $Patreon_Options;
 	private static $Patron_Metabox;
 	private static $Patreon_User_Profiles;
-	private static $Patreon_Shortcodes;
 
 	function __construct() {
 
@@ -27,14 +26,12 @@ class Patreon_Wordpress {
 		include 'patreon_options.php';
 		include 'patreon_metabox.php';
 		include 'patreon_user_profiles.php';
-		include 'patreon_shortcodes.php';
 
 		self::$Patreon_Routing = new Patreon_Routing;
 		self::$Patreon_Frontend = new Patreon_Frontend;
 		self::$Patreon_Options = new Patreon_Options;
 		self::$Patron_Metabox = new Patron_Metabox;
 		self::$Patreon_User_Profiles = new Patreon_User_Profiles;
-		self::$Patreon_Shortcodes = new Patreon_Shortcodes;
 
 		add_action('wp_head', array($this, 'updatePatreonUser') );
 		add_action('init', array($this, 'checkPatreonCreatorID'));
