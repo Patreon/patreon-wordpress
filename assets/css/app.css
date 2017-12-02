@@ -26,7 +26,7 @@
 .patreon-locked-content-message{
 	display:block;
 	width:100%;
-	font-size:150%;
+	font-size:125%;
 	margin :10px 0px 10px 0px;
 	clear:both; 
 	padding-bottom: 20px;
@@ -58,41 +58,32 @@
 
 .patreon-responsive-button-wrapper{
 	display:inline-table!important; /* some themes override this. hence important */
-	width : 260px;
+	width : 240px;
 	height: 50px;
 	vertical-align:middle;
 	text-align:center;
 	background-color:#F96854!important;
-	box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
 }
 .patreon-responsive-button-wrapper:hover{
-	background-color:#ff6b57!important;
-	border-bottom: 1px solid #000000;
+	background-color:#FA7664!important;
 	
 }
 .patreon-responsive-button{
 	display:table-cell!important; /* some themes override this. hence important */
 	vertical-align:middle;
 	text-align:center;
-	padding: 5px;
-	height : 100%;
+	padding: 0px;
+	height : auto;
 	text-wrap:nowrap;
 	
 	/* below code taken from earlier button */
 	border: 0;
 	box-shadow: none!important;
 	color:#fff!important;
-    -webkit-border-radius: 2px;
-    border-radius: 2px; 
 	cursor: pointer;
     font-size: 14px;
     font-weight: 800;
-    line-height: 1;
     text-shadow: none;
-    -webkit-transition: background 0.2s;
-    transition: background 0.2s;
     text-decoration: none!important;
     text-align: center;
     text-transform: uppercase;
