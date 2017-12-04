@@ -343,8 +343,12 @@ class Patreon_Frontend {
 		return '<div class="patreon-responsive-button-wrapper"><div class="patreon-responsive-button"><img class="patreon_logo" src="'.PATREON_PLUGIN_ASSETS.'/img/patreon-logomark-on-coral.svg" alt=""> '.$label.'</div></div>';
 		
 	}
-	public static function MakeUniversalFlowLink($pledge_level,$state=false,$client_id = false) {
+	public static function MakeUniversalFlowLink($pledge_level,$state=false,$client_id = false,$post=false) {
 		
+		if(!isset($post))
+		{
+			global $post;
+		}
 		if(!$client_id)
 		{
 			$client_id = get_option('patreon-client-id', false);
@@ -362,6 +366,7 @@ class Patreon_Frontend {
 			
 			if($post)
 			{
+				
 				$final_redirect = get_permalink($post->ID);
 			}
 			
