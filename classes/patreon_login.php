@@ -67,27 +67,23 @@ class Patreon_Login {
 			$expiration = get_user_meta($user->ID,'patreon_token_expires_in',true);
 			$minted = get_user_meta($user->ID,'patreon_token_minted',true);
 			
-			if($minted!='')
-			{
+			if($minted!='') {
 				// We have value. get secs to use them in comparison.
 
 				$minted = explode(' ',$minted);
 				// Cast to integer
 				$minted = (int) $minted[1];
 				
-				if((int)microtime(true) >= ($minted+$expiration))
-				{
-					// This token is expired. Nuke it.
+				if((int)microtime(true) >= ($minted+$expiration)) {
 					
+					// This token is expired. Nuke it.
 					delete_user_meta($user->ID,'patreon_access_token');
-			
 				}
 		
 			}
-			else
-			{
-				// No minted value. Even if there may be no access token created and saved, still nuke it.
+			else {
 				
+				// No minted value. Even if there may be no access token created and saved, still nuke it.
 				delete_user_meta($user->ID,'patreon_access_token');
 				
 			}
