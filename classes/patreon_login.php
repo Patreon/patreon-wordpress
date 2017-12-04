@@ -244,24 +244,6 @@ class Patreon_Login {
 				exit;				
 			
 		}
-		
-		// Below code is probably dormant. #REVISIT
-
-		if($login_with_patreon) {
-
-			if($redirect == false || is_null($redirect) ) {
-
-				wp_redirect(home_url());
-				exit;
-			}
-
-			wp_redirect( $redirect);
-			exit;
-
-		} else {
-			wp_redirect( wp_login_url().'?patreon_msg=login_with_patreon', '301' );
-			exit;
-		}
 
 	}
 
@@ -272,7 +254,7 @@ class Patreon_Login {
             'orderby'   => 'login',
             'order'     => 'ASC',
         );
-
+ 
 	    $danger_users = get_users($args);
 
 	    $danger_user_list = array();
