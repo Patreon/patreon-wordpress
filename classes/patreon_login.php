@@ -105,7 +105,7 @@ class Patreon_Login {
 		
 		// Check if user is logged in to wp:
 		
-		// Logged in user. We just link him up and be done.
+		// Logged in user. We just link the user up and be done.
 		if(is_user_logged_in()) {
 			
 			$user = wp_get_current_user();
