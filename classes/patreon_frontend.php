@@ -337,6 +337,10 @@ class Patreon_Frontend {
 
 		return apply_filters('ptrn/patron_button', '<a href="'.$href.'">'.$paywall_img.'</a>',$min_cents);		
 		
+	}	
+	public static function patreonMakeUniversalButtonImage($label) {
+		return '<div class="patreon-responsive-button-wrapper"><div class="patreon-responsive-button"><img class="patreon_logo" src="'.PATREON_PLUGIN_ASSETS.'/img/patreon-logomark-on-coral.svg" alt=""> '.$label.'</div></div>';
+		
 	}
 	public static function MakeUniversalFlowLink($pledge_level,$state=false,$client_id = false) {
 		
