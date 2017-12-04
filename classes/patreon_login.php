@@ -103,7 +103,7 @@ class Patreon_Login {
 		
 		$danger_user_list = Patreon_Login::getDangerUserList();
 		
-		// Chec if user is logged in to wp:
+		// Check if user is logged in to wp:
 		
 		// Logged in user. We just link him up and be done.
 		if(is_user_logged_in()) {
