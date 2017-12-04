@@ -338,7 +338,8 @@ class Patreon_Frontend {
 		return apply_filters('ptrn/patron_button', '<a href="'.$href.'">'.$button.'</a>',$min_cents);		
 		
 	}
-	public static function patreonMakeUniversalButtonImage($label) {
+	public static function patreonMakeUniversalButtonImage($label)
+	{
 		return '<div class="patreon-responsive-button-wrapper"><div class="patreon-responsive-button"><img class="patreon_logo" src="'.PATREON_PLUGIN_ASSETS.'/img/patreon-logomark-on-coral.svg" alt=""> '.$label.'</div></div>';
 		
 	}
@@ -629,6 +630,8 @@ class Patreon_Frontend {
 		return apply_filters('ptrn/valid_patron_final_footer',$post_footer,'valid_patron',$patreon_level,$user_patronage);		
 		
 	}
+	
+
 
 }
 
