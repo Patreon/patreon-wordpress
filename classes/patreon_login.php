@@ -137,16 +137,14 @@ class Patreon_Login {
 	
 		$patreon_linked_accounts = $wpdb->get_results($prepared_sql,ARRAY_A);
 		
-		if(count($patreon_linked_accounts)>0)
-		{
+		if(count($patreon_linked_accounts)>0) {
 			////////////////////////////////////////////////
 			// We have linked users. Get the last login dates for each. The reason we did it by taking ids and iterating them is to avoid querying both patreon ids and login dates at the same time and having to use a self join query on wp_usermeta
 			////////////////////////////////////////////////
 			
 			$sort_logins = array();
 			
-			foreach($patreon_linked_accounts as $key => $value)
-			{
+			foreach($patreon_linked_accounts as $key => $value) {
 				
 				$last_logged_in = get_user_meta($patreon_linked_accounts[$key]['user_id'],'patreon_last_logged_in',true);
 		
@@ -187,8 +185,7 @@ class Patreon_Login {
 				}
 
 			}
-			else
-			{
+			else {
 				wp_redirect( wp_login_url().'?patreon_message=login_with_patreon_disabled', '301' );
 				exit;
 				
