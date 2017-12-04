@@ -128,10 +128,9 @@ class Patreon_Login {
 		
 		$prepared_sql = $wpdb->prepare(
 		
-						"SELECT * FROM ".$wpdb->usermeta." WHERE meta_key = 'patreon_user_id' AND meta_value = %s",
-						
-						array($patreon_user_id)
-			  
+			"SELECT * FROM ".$wpdb->usermeta." WHERE meta_key = 'patreon_user_id' AND meta_value = %s",
+			
+			array($patreon_user_id)
 		);
 		
 		// Now get the result : 
