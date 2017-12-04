@@ -138,7 +138,7 @@ class Patreon_Frontend {
 		
 
 	}
-	function getLabelOverUniversalButton($patreon_level) {
+	public static function getLabelOverUniversalButton($patreon_level) {
 
 		$label = PATREON_TEXT_OVER_BUTTON_1;
 		
@@ -204,12 +204,12 @@ class Patreon_Frontend {
 		return $messages . apply_filters('ptrn/label_text_over_universal_button',$label,'valid_patron',$user_logged_into_patreon,$is_patron,$patreon_level,$creator_full_name);
 		
 	}
-	function showPatreonMessages() {
+	public static function showPatreonMessages() {
 
 		echo self::processPatreonMessages();
 		
 	}
-	function processPatreonMessages() {
+	public static function processPatreonMessages() {
 
 		if(isset($_REQUEST['patreon_message']))
 		{
@@ -219,7 +219,7 @@ class Patreon_Frontend {
 		return '';
 		
 	}
-	function getLabelUnderUniversalButton($patreon_level,$state =false,$post=false) {
+	public static function getLabelUnderUniversalButton($patreon_level,$state =false,$post=false) {
 		
 		if(!$post)
 		{
@@ -284,7 +284,7 @@ class Patreon_Frontend {
 		return apply_filters('ptrn/label_text_under_universal_button',$label,'fail_case',$user_logged_into_patreon,$is_patron,$patreon_level,$state,$user_patronage);
 		
 	}
-	function patreonMakeUniversalButton($min_cents=false,$state=false,$post=false,$client_id=false) {
+	public static function patreonMakeUniversalButton($min_cents=false,$state=false,$post=false,$client_id=false) {
 		
 		// This very customizable function takes numerous parameters to customize universal flow links and creates the desired link
 
@@ -338,7 +338,7 @@ class Patreon_Frontend {
 		return apply_filters('ptrn/patron_button', '<a href="'.$href.'">'.$paywall_img.'</a>',$min_cents);		
 		
 	}
-	function MakeUniversalFlowLink($pledge_level,$state=false,$client_id = false) {
+	public static function MakeUniversalFlowLink($pledge_level,$state=false,$client_id = false) {
 		
 		if(!$client_id)
 		{
@@ -382,7 +382,7 @@ class Patreon_Frontend {
 		return apply_filters('ptrn/patron_link', $href);			
 		
 	}
-	function patreonMakeUniversalButtonLabel() {
+	public static function patreonMakeUniversalButtonLabel() {
 		
 		// Default label:
 		
@@ -398,7 +398,7 @@ class Patreon_Frontend {
 		
 		
 	}
-	function isUserLoggedInPatreon() {
+	public static function isUserLoggedInPatreon() {
 		 
 		$user_logged_into_patreon = false;
 		
@@ -421,7 +421,7 @@ class Patreon_Frontend {
 		}		
 		return $user_logged_into_patreon;
 	}
-	function patreonMakeLoginLink($client_id=false,$state=false,$post=false) {
+	public static function patreonMakeLoginLink($client_id=false,$state=false,$post=false) {
 		
 		if(!$post)
 		{
@@ -468,7 +468,7 @@ class Patreon_Frontend {
 	
 		return apply_filters('ptrn/login_link', $href);
 	}
-	function patreonMakeLoginButton($client_id=false) {
+	public static function patreonMakeLoginButton($client_id=false) {
 		
 		if(!$client_id)
 		{
@@ -504,7 +504,7 @@ class Patreon_Frontend {
 		return apply_filters('ptrn/login_button', '<a href="'.$href.'" class="ptrn-login" data-ptrn_nonce="' . wp_create_nonce( 'patreon-nonce' ).'"><div class="patreon-responsive-button-wrapper"><div class="patreon-responsive-button"><img class="patreon_logo" src="'.PATREON_PLUGIN_ASSETS.'/img/patreon-logomark-on-coral.svg" alt=""> '.$login_label.'</div></div></a>', $href);
 
 	}
-	function protectContentFromUsers($content) {
+	public static function protectContentFromUsers($content) {
 
 		global $post;
 
