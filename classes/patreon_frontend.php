@@ -514,7 +514,6 @@ class Patreon_Frontend {
 
 		$post_types = get_post_types(array('public'=>true),'names');
 	
-			
 		if(in_array(get_post_type(),$post_types)) {
 
 			// Dont protect page post type
@@ -548,25 +547,20 @@ class Patreon_Frontend {
 			
 			// If we are at this point, then this post is protected. 
 			
-			if(current_user_can('manage_options')) {
-				// Here we need to put a notification to admins so they will know they can see the content because they are admin_login_with_patreon_disabled
-				
-				$admin_notification = 
-									'<div class="patreon-valid-patron-message">'.
-											apply_filters('ptrn/admin_bypass_filter_message', PATREON_ADMIN_BYPASSES_FILTER_MESSAGE, $patreon_level).
-									'</div>';
-				
-				return $content . $admin_notification;
-			}	
-			
 			// Below define can be defined in any plugin to bypass core locking function and use a custom one from plugin
 			// It is independent of the plugin load order since it checks if it is defined.
 			// It can be defined by any plugin until right before the_content filter is run.
-			
-			if(defined('PATREON_BYPASS_FILTERING')) {
+	
+			if(apply_filters('ptrn/bypass_filtering',defined('PATREON_BYPASS_FILTERING'))) {
                 return $content;
-            }			
-			
+            }
+			 
+			if(current_user_can('manage_options')) {
+				// Here we need to put a notification to admins so they will know they can see the content because they are admin_login_with_patreon_disabled
+				
+				return $content . self::MakeAdminPostFooter($patreon_level);
+			}	
+				
 			// Passed checks. If post level is not 0, override patreon level and hence site locking value with post's. This will allow Creators to lock entire site and then set a different value for individual posts for access. Ie, site locking is $5, but one particular post can be $10, and it will require $10 to see. 
 			
 			if($post_level!=0)
@@ -608,22 +602,8 @@ class Patreon_Frontend {
 		}
 		
 		// If we are here, it means post is protected, user is patron, patronage is valid. Slap the post footer:
-		// Get patreon creator url:
 		
-		$creator_profile_url = get_option('patreon-creator-url', false);
-
-		$post_footer = str_replace('%%pledgelevel%%',$patreon_level,  apply_filters('ptrn/valid_patron_footer_text',PATREON_VALID_PATRON_POST_FOOTER_TEXT,$patreon_level,$user_patronage));
-		
-		$post_footer = apply_filters('ptrn/valid_patron_processed_message',str_replace('%%creatorprofileurl%%',apply_filters('ptrn/valid_patron_creator_profile_url','<a href="'.$creator_profile_url.'">Patreon</a>',$creator_profile_url),$post_footer),$patreon_level,$user_patronage);
-		
-		$post_footer = 
-		'<div class="patreon-valid-patron-message">'.
-			$post_footer.
-		'</div>';
-		
-		$content .= apply_filters('ptrn/valid_patron_final_footer',$post_footer,'valid_patron',$patreon_level,$user_patronage);
-
-		return $content;
+		return $content .self::MakeValidPatronFooter($patreon_level, $user_patronage);
 
 	}
 	public static function MakeAdminPostFooter($patreon_level) {
