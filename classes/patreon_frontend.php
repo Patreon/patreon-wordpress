@@ -345,7 +345,7 @@ class Patreon_Frontend {
 	}
 	public static function MakeUniversalFlowLink($pledge_level,$state=false,$client_id = false,$post=false) {
 		
-		if(!isset($post))
+		if(!$post)
 		{
 			global $post;
 		}
@@ -356,7 +356,7 @@ class Patreon_Frontend {
 		
 		// If we werent given any state vars to send, initialize the array
 		if(!$state)
-		{
+		{ 
 			$state=array();
 		
 			// Get the address of the current page, and save it as final redirect uri.		
@@ -379,7 +379,7 @@ class Patreon_Frontend {
 			$state['final_redirect_uri'] = $final_redirect;			
 			
 		}		
-		
+
 		// Add the patreon nonce that was set via init function to vars.
 		$state['patreon_nonce']=$_COOKIE['patreon_nonce'];
 		
