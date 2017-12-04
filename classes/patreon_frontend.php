@@ -626,7 +626,29 @@ class Patreon_Frontend {
 		return $content;
 
 	}
+	public static function MakeAdminPostFooter($patreon_level) {
+		return '<div class="patreon-valid-patron-message">'.
+			apply_filters('ptrn/admin_bypass_filter_message', PATREON_ADMIN_BYPASSES_FILTER_MESSAGE, $patreon_level).
+		'</div>';
+		
+	}
+	public static function MakeValidPatronFooter($patreon_level, $user_patronage) {
+		// Get patreon creator url:
+		
+		$creator_profile_url = get_option('patreon-creator-url', false);
 
+		$post_footer = str_replace('%%pledgelevel%%',$patreon_level,  apply_filters('ptrn/valid_patron_footer_text',PATREON_VALID_PATRON_POST_FOOTER_TEXT,$patreon_level,$user_patronage));
+		
+		$post_footer = apply_filters('ptrn/valid_patron_processed_message',str_replace('%%creatorprofileurl%%',apply_filters('ptrn/valid_patron_creator_profile_url','<a href="'.$creator_profile_url.'">Patreon</a>',$creator_profile_url),$post_footer),$patreon_level,$user_patronage);
+		
+		$post_footer = 
+		'<div class="patreon-valid-patron-message">'.
+			$post_footer.
+		'</div>';
+		
+		return apply_filters('ptrn/valid_patron_final_footer',$post_footer,'valid_patron',$patreon_level,$user_patronage);		
+		
+	}
 
 }
 
