@@ -52,12 +52,10 @@ class Patreon_Login {
 
 	public static function checkTokenExpiration($user_id=false) {
 
-		if($user_id)
-		{
+		if($user_id) {
 			$user = get_user_by('ID',$user_id);
 		}
-		else
-		{
+		else {
 			$user = wp_get_current_user();
 		}
 
