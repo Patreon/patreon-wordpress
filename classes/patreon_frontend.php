@@ -297,7 +297,7 @@ class Patreon_Frontend {
 				
 		// If no post object given, 
 		
-		$send_pledge_level=0;
+		$send_pledge_level=1;
 		
 		if($min_cents)
 		{
@@ -333,11 +333,11 @@ class Patreon_Frontend {
 			
 		$label_text = self::patreonMakeUniversalButtonLabel();
 		
-        $paywall_img = '<div class="patreon-responsive-button-wrapper"><div class="patreon-responsive-button"><img class="patreon_logo" src="'.PATREON_PLUGIN_ASSETS.'/img/patreon-logomark-on-coral.svg" alt=""> '.$label_text.'</div></div>';
-
-		return apply_filters('ptrn/patron_button', '<a href="'.$href.'">'.$paywall_img.'</a>',$min_cents);		
+		$button = self::patreonMakeUniversalButtonImage($label_text);
 		
-	}	
+		return apply_filters('ptrn/patron_button', '<a href="'.$href.'">'.$button.'</a>',$min_cents);		
+		
+	}
 	public static function patreonMakeUniversalButtonImage($label) {
 		return '<div class="patreon-responsive-button-wrapper"><div class="patreon-responsive-button"><img class="patreon_logo" src="'.PATREON_PLUGIN_ASSETS.'/img/patreon-logomark-on-coral.svg" alt=""> '.$label.'</div></div>';
 		
