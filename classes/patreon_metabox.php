@@ -9,10 +9,8 @@ if ( ! defined( 'WPINC' ) ) {
 class Patron_Metabox {
 
 	function __construct() {
-
 		add_action( 'add_meta_boxes', array($this, 'patreon_plugin_meta_boxes') );
 		add_action( 'save_post', array($this, 'patreon_plugin_save_post_class_meta'), 10, 2 );
-
 	}
 
 	function patreon_plugin_meta_boxes($post_type) {
@@ -25,7 +23,7 @@ class Patron_Metabox {
 	    	);
 
 	    if (in_array($post_type,$exclude) == false && in_array($post_type, $post_types)) {
-		
+			
 			add_meta_box(
 				'patreon-level',      // Unique ID
 				esc_html__( 'Patreon Level', 'Patreon Contribution Requirement' ),
@@ -35,11 +33,9 @@ class Patron_Metabox {
 				'default'
 			);
 		}
-
 	}
 
 	function patreon_plugin_meta_box( $object, $box ) { 
-			
 			
 		$label = 'Add a minimum Patreon contribution required to access this content.  (Makes entire post patron only)';
 		$readonly = '';
@@ -92,10 +88,7 @@ class Patron_Metabox {
 		}
 
 		$patreon_level = get_post_meta( $post_id, 'patreon-level', true );
-
 	}
-
-
 }
 
 
