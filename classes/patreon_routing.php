@@ -4,7 +4,7 @@
 if ( ! defined( 'WPINC' ) ) {
 	die;
 }
- 
+
 class Patreon_Routing {
 
 	function __construct() {
