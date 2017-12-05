@@ -8,19 +8,16 @@ if ( ! defined( 'WPINC' ) ) {
 
 class Patreon_Options {
 
-
     function __construct() {
-
         if ( is_admin() ){
             add_action('admin_menu', array($this, 'patreon_plugin_setup') );
             add_action('admin_init', array($this, 'patreon_plugin_register_settings') );
             add_action('admin_notices', array($this, 'patreon_plugin_login_warning') );
         }
-
     }
 
     function patreon_plugin_setup(){
-        add_menu_page( 'Patreon Settings', 'Patreon Settings', 'manage_options', 'patreon-plugin', array($this, 'patreon_plugin_setup_page'), 'dashicons-admin-network' );
+        add_menu_page( 'Patreon Settings', 'Patreon Settings', 'manage_options', 'patreon-plugin', array($this, 'patreon_plugin_setup_page'), PATREON_PLUGIN_ASSETS.'/img/Patreon WordPress.png' );
     }
 
     function patreon_plugin_register_settings() { // whitelist options
