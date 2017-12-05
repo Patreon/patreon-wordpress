@@ -68,7 +68,6 @@ class Patreon_Routing {
 	
 			if(array_key_exists( 'code', $wp->query_vars )) {
 				
-
 				// Get state vars if they exist
 	
 				if($wp->query_vars['state']!='') {
@@ -86,13 +85,12 @@ class Patreon_Routing {
 				if($state['final_redirect_uri']!='') {
 					$redirect = $state['final_redirect_uri'];
 				}		
-			
 				
 				$redirect = apply_filters('ptrn/redirect', $redirect);		
 	
 				if($state['patreon_nonce'] != $_COOKIE['patreon_nonce']) {
+					
 					// Nonces do not match. Abort, show message.
-				
 					$redirect = add_query_arg( 'patreon_message', 'patreon_nonces_dont_match', $redirect);
 					
 					wp_redirect( $redirect );
