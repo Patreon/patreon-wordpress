@@ -9,7 +9,6 @@ if ( ! defined( 'WPINC' ) ) {
 class Patreon_Login {
 
 	public static function updateExistingUser($user_id, $user_response, $tokens) {
-
 		/* update user meta data with patreon data */
 		update_user_meta($user_id, 'patreon_refresh_token', $tokens['refresh_token']);
 		update_user_meta($user_id, 'patreon_access_token', $tokens['access_token']);
@@ -21,7 +20,6 @@ class Patreon_Login {
 		update_user_meta($user_id, 'user_lastname', $user_response['data']['attributes']['last_name']);
 		update_user_meta($user_id, 'patreon_token_minted', microtime());
 		update_user_meta($user_id, 'patreon_token_expires_in', $tokens['expires_in']);
-
 	}
 
 	public static function updateLoggedInUserForStrictoAuth($user_response, $tokens, $redirect = false) {
@@ -38,7 +36,6 @@ class Patreon_Login {
 			wp_redirect($redirect);
 			exit;				
 		}
-
 	}
 
 	public static function checkTokenExpiration($user_id=false) {
@@ -75,12 +72,8 @@ class Patreon_Login {
 				
 				// No minted value. Even if there may be no access token created and saved, still nuke it.
 				delete_user_meta($user->ID,'patreon_access_token');
-				
 			}
-	
 		}
-
-
 	}
 
 	public static function createOrLogInUserFromPatreon($user_response, $tokens, $redirect = false) {
@@ -103,7 +96,6 @@ class Patreon_Login {
 			self::updateExistingUser($user->ID, $user_response, $tokens);
 			wp_redirect($redirect);
 			exit;		
-
 		}
 		
 		////////////////////////////////////////////////
@@ -178,9 +170,7 @@ class Patreon_Login {
 			else {
 				wp_redirect( wp_login_url().'?patreon_message=login_with_patreon_disabled', '301' );
 				exit;
-				
 			}
-				
 		}
 		
 		// We are here, meaning that user was not logged in, and there were no linked accounts. This means we will create a new user.
@@ -215,10 +205,8 @@ class Patreon_Login {
 				
 				$redirect = add_query_arg( 'patreon_message', 'patreon_could_not_create_wp_account', $redirect);
 				wp_redirect( $redirect );
-				exit;			
-				
+				exit;	
 			}
-
 		}
 		else {
 				/* We created this patreon user before. Update and log in.
@@ -231,10 +219,8 @@ class Patreon_Login {
 				/* update user meta data with patreon data */
 				self::updateExistingUser($user->ID, $user_response, $tokens);	
 				wp_redirect( $redirect );
-				exit;				
-			
+				exit;	
 		}
-
 	}
 
 	public static function getDangerUserList() {
