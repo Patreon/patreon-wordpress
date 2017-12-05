@@ -39,14 +39,6 @@ class Patreon_Login {
 			exit;				
 		}
 
-		if($redirect == false || is_null($redirect) ) {
-			wp_redirect(home_url());
-			exit;
-		} else {
-			wp_redirect( $redirect );
-			exit;
-		}
-
 	}
 
 	public static function checkTokenExpiration($user_id=false) {
@@ -58,8 +50,7 @@ class Patreon_Login {
 			$user = wp_get_current_user();
 		}
 
-		if(!$user OR 0 == $user->ID) {
-		} else {
+		if($user AND 0 != $user->ID) {
 			
 			// Valid user is logged in. Check the token:
 			
