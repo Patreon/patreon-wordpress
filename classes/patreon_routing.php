@@ -71,8 +71,7 @@ class Patreon_Routing {
 
 				// Get state vars if they exist
 	
-				if($wp->query_vars['state']!='')
-				{
+				if($wp->query_vars['state']!='') {
 					$state = unserialize(base64_decode($wp->query_vars['state']));
 				}
 
@@ -84,16 +83,14 @@ class Patreon_Routing {
 							
 				// Check if final_redirect exists in state vars - if so, override redirect:
 	
-				if($state['final_redirect_uri']!='')
-				{
+				if($state['final_redirect_uri']!='') {
 					$redirect = $state['final_redirect_uri'];
 				}		
 			
 				
 				$redirect = apply_filters('ptrn/redirect', $redirect);		
 	
-				if($state['patreon_nonce'] != $_COOKIE['patreon_nonce'])
-				{
+				if($state['patreon_nonce'] != $_COOKIE['patreon_nonce']) {
 					// Nonces do not match. Abort, show message.
 				
 					$redirect = add_query_arg( 'patreon_message', 'patreon_nonces_dont_match', $redirect);
@@ -135,7 +132,6 @@ class Patreon_Routing {
 								
 						$user = Patreon_Login::createOrLogInUserFromPatreon($user_response, $tokens, $redirect);
 					}
-					
 
 					//shouldn't get here
 					$redirect = add_query_arg( 'patreon_message', 'patreon_weird_redirection_at_login', $redirect);
@@ -144,18 +140,14 @@ class Patreon_Routing {
 					exit;
 
 				}
-
-
 			} else {
 
 				wp_redirect( home_url() );
 				exit;
 
 			}
-
 		}
 	}
-
 }
 
 
