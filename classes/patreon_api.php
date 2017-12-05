@@ -26,8 +26,8 @@ class Patreon_API {
 		return $this->__get_json("current_user/campaigns?include=rewards,creator,goals");
 	}
 
-	private function __get_json($suffix) {
-		
+	private function __get_json($suffix) {		
+	
 		$api_endpoint = "http://api.patreon.com/oauth2/api/" . $suffix;
 	
 		$headers = array(
@@ -42,7 +42,6 @@ class Patreon_API {
 		$response = wp_remote_request( $api_endpoint, $api_request );
 
 		return json_decode($response['body'], true);
-
 	}
 
 }
