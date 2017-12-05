@@ -29,7 +29,6 @@ class Patreon_Login {
 		$user = wp_get_current_user();
 
 		if(0 == $user->ID) {
-			
 			$redirect = add_query_arg( 'patreon_message', 'patreon_cant_login_strict_oauth', $redirect);
 			wp_redirect($redirect);
 			exit;			
