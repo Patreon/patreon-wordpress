@@ -37,8 +37,8 @@ class Patreon_OAuth {
 		$api_endpoint = "https://api.patreon.com/oauth2/token";
 	
 		$api_request = array(
-		'method' => 'POST',
-		'body' => $params,
+			'method' => 'POST',
+			'body' => $params,
 		);
 
 		$response = wp_remote_post( $api_endpoint, $api_request );
