@@ -7,7 +7,7 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 class Patreon_Options {
-
+	
     function __construct() {
         if ( is_admin() ){
             add_action('admin_menu', array($this, 'patreon_plugin_setup') );
@@ -52,7 +52,6 @@ class Patreon_Options {
                  <p>Please make sure all your Admins/Editors have Patreon accounts with the correct email addresses. For a list of your <a href="'.$anchor_url.'">admins and editors click here</a></p>
              </div>';
         }
-
     }
 
     function fetch_creator_id() {
@@ -64,7 +63,6 @@ class Patreon_Options {
                 update_option( 'patreon-creator-id', $creator_id );
             }
         }
-
     }
 
     function patreon_plugin_setup_page(){
@@ -90,7 +88,7 @@ class Patreon_Options {
         <div class="wrap">
 
             <div id="icon-options-general" class="icon32"></div>
-            <h1>Patreon Wordpress Settings</h1>
+			<h1>Patreon Wordpress Settings</h1>
 
             <div id="poststuff">
 
@@ -320,11 +318,7 @@ class Patreon_Options {
 
         </form>
 		<?php
-
-
     }
-
-
 }
 
 ?>
