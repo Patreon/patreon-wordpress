@@ -42,8 +42,7 @@ class Patreon_Login {
 
 		if($user_id) {
 			$user = get_user_by('ID',$user_id);
-		}
-		else {
+		} else {
 			$user = wp_get_current_user();
 		}
 
@@ -67,8 +66,7 @@ class Patreon_Login {
 					delete_user_meta($user->ID,'patreon_access_token');
 				}
 		
-			}
-			else {
+			} else {
 				
 				// No minted value. Even if there may be no access token created and saved, still nuke it.
 				delete_user_meta($user->ID,'patreon_access_token');
@@ -207,8 +205,7 @@ class Patreon_Login {
 				wp_redirect( $redirect );
 				exit;	
 			}
-		}
-		else {
+		} else {
 				/* We created this patreon user before. Update and log in.
 			
 				/* update user meta data with patreon data */
