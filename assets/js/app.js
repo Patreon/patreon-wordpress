@@ -1,2 +1,0 @@
-function getPatreonNonce(n){return(n=new RegExp('(?:^|;\\s*)'+(''+n).replace(/[-[\]{}()*+?.,\\^$|#\s]/g,'\\$&')+'=([^;]*)').exec(document.cookie))&&n[1];}
-jQuery(document).ready(function() {jQuery('body').on('click', '.ptrn-login', function(e) {e.preventDefault();window.location = jQuery(this).attr('href')+'&state='+getPatreonNonce('ptrn_nonce');});});

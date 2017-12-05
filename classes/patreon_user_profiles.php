@@ -17,40 +17,9 @@ class Patreon_User_Profiles {
 
 	function patreon_user_profile_fields( $user ) {
 
-		if(get_option('patreon-enable-connect-with-patreon-in-userprofile', false)) {
-
-			?>
-
-			<h3>Connect with Patreon</h3>
-
-			<?php echo do_shortcode('[patreon_register_button]'); ?>
-
-			<p>You need to ensure this wordpress account shares the same email address as your Patreon account.</p>
-
-			<br>
-
-			<?php
-
-		}
-
 		if(current_user_can('manage_options')) {
 
 			?>
-
-			<br>
-
-			<h3><?php _e("Patreon Exception", "blank"); ?></h3>
-
-			<p>Enabling this option allows the user to view ALL patreon protected content</p>
-
-			<table class="form-table">
-				<tr>
-					<th><label for="patreon_user_exception">Enable Patreon Exception "Golden Ticket"</label></th>
-					<td>
-						<input type="checkbox" id="patreon_user_exception" name="patreon_user_exception" value="1"<?php checked( get_the_author_meta( 'patreon_user_exception', $user->ID ) ); ?> />
-					</td>
-				</tr>
-			</table>
 
 			<br>
 
@@ -93,15 +62,6 @@ class Patreon_User_Profiles {
 
 		if ( !current_user_can( 'edit_user', $user_id ) ) {
 			return false;
-		}
-
-		if( current_user_can('manage_options')) {
-			if(isset($_POST['patreon_user_exception'])) {
-				update_user_meta( $user_id, 'patreon_user_exception', true );
-			} else {
-				update_user_meta( $user_id, 'patreon_user_exception', false );
-			}
-
 		}
 
 		// if ( is_email( $_POST['patreon_email'] ) ) {

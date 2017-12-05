@@ -1,43 +1,141 @@
-.ptrn-button{display:block;margin-bottom:30px!important;border: none!important;}
-.ptrn-button img {width: 272px; height:42px;}
-.patreon-msg {-webkit-border-radius: 6px;-moz-border-radius: 6px;-ms-border-radius: 6px;-o-border-radius: 6px;border-radius: 6px;padding:8px;margin-bottom:20px!important;display:block;border:1px solid #E6461A;background-color:#484848;color:#ffffff;}
-
-.ptrn-branding {color:#fff;background-color:#F96854;}
-
-.ptrn-branded-button {
-	box-shadow: none!important;
-	color:#fff!important;
-	background-color:#F96854;
-	border: 0;
-    -webkit-border-radius: 2px;
-    border-radius: 2px;
-    -webkit-box-shadow: none;
-    box-shadow: none;
-    color: #fff;
-    cursor: pointer;
-    font-size: 14px;
-    font-size: 0.875rem;
-    font-weight: 800;
-    line-height: 1;
-    padding: 1em 2em;
-    text-shadow: none;
-    -webkit-transition: background 0.2s;
-    transition: background 0.2s;
-    text-decoration: none!important;
-    margin-bottom: 1rem;
-    display: block;
-    width: 260px;
-    text-align: center;
-    text-transform: uppercase;
+.patreon_message {
+	-webkit-border-radius: 6px;
+	-moz-border-radius: 6px;
+	-ms-border-radius: 6px;
+	-o-border-radius: 6px;
+	border-radius: 6px;
+	padding:8px;
+	margin-bottom:20px !important;
+	display:block;
+	border:1px solid #E6461A;
+	background-color:#484848;color:#ffffff;
 }
-.ptrn-branded-button .logo {
-	width:20px;
-	color:#fff!important;
-	vertical-align: middle;
-    margin-right: 0.5rem;
-    box-shadow: none!important;
+
+.ptrn-branding {
+	color:#fff;
+	background-color:#F96854;
 }
 
 #login .ptrn-branded-button {
-    width:auto;
+	width:auto;
+}
+
+/* New stuff */
+
+.patreon-locked-content-message {
+	display:block;
+	width:100%;
+	font-size:100%;
+	margin :10px 0px 10px 0px;
+	clear:both; 
+	padding-bottom: 20px;
+	margin-bottom: 20px;
+	border-bottom : 1px solid #f0f0f0;
+
+}
+.patreon-be-patron-button {
+	display:inline-block;
+	width:auto;
+	margin:5px;
+}
+.patreon-login-refresh-button {
+	display:inline-block;
+	width:auto;
+	margin:5px;
+}
+
+/* A responsive wrapper */
+	.patreon-campaign-banner {
+	max-width: 1200px;
+	width :100%;
+	display:block;
+	text-align:left;
+}
+
+.patreon-responsive-button-wrapper {
+	display:inline-table !important; /* some themes override this. hence important */
+	width : 240px;
+	height: 50px;
+	vertical-align:middle;
+	text-align:center;
+	background-color:#F96854 !important;
+}
+.patreon-responsive-button-wrapper:hover{
+	background-color:#FA7664 !important;
+}
+.patreon-responsive-button {
+	display:table-cell !important; /* some themes override this. hence important */
+	vertical-align:middle;
+	text-align:center;
+	padding: 0px;
+	height : auto;
+	text-wrap:nowrap;
+
+	/* below code taken from earlier button */
+	border: 0;
+	box-shadow: none !important;
+	color:#fff !important;
+	cursor: pointer;
+	font-size: 14px;
+	font-weight: 800;
+	text-shadow: none;
+	text-decoration: none !important;
+	text-align: center;
+	text-transform: uppercase;
+}
+
+.patreon-responsive-button img {
+
+	display:inline-block !important; /* some themes override this. hence important */
+
+	/* below code taken from earlier button */
+	width:20px;
+	color:#fff !important;
+	vertical-align: middle;
+	margin-right: 10px;
+	box-shadow: none !important;	
+
+}
+
+.patreon-patron-button-wrapper {
+	display:inline-block;
+	width:100%;
+	margin:5px;
+}
+
+.patreon-login-button-wrapper {
+	display:inline-block;
+	max-width : 265px;
+	width:100%;
+	margin:5px;
+	font-weight:bold;
+
+}
+
+.patreon-text-over-button {
+	display:inline-block;
+	width:100%;
+	margin-bottom:20px;
+	font-size: 100%; 
+
+}
+
+.patreon-text-under-button {
+	display:inline-block;
+	width:100%;
+	margin-bottom:20px;
+	margin-top:20px;
+	font-size: 100%;
+
+}
+
+.patreon-valid-patron-message {
+	display:block;
+	width:100%;
+	clear:both; 
+	padding-bottom: 25px;
+	padding-top: 25px;
+	margin-top: 25px;
+	border-top : 1px solid #f0f0f0;
+
 }

@@ -33,13 +33,18 @@ class Patreon_OAuth {
 	}
 
 	private function __update_token($params) {
+		
 		$api_endpoint = "https://api.patreon.com/oauth2/token";
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL, $api_endpoint);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_POST, 1);
-		curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($params));
-		return json_decode(curl_exec($ch), true);
+	
+		$api_request = array(
+			'method' => 'POST',
+			'body' => $params,
+		);
+
+		$response = wp_remote_post( $api_endpoint, $api_request );
+	
+		return json_decode($response['body'], true);
+
 	}
 }
 
