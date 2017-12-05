@@ -134,8 +134,7 @@ class Patreon_Wordpress {
 				
 				$creator_id = self::getPatreonCreatorID();
 			}
-			if(isset($creator_id))
-			{
+			if(isset($creator_id)) {
 				// Creator id acquired. Update.
 				
 				update_option( 'patreon-creator-id', $creator_id );
@@ -147,8 +146,7 @@ class Patreon_Wordpress {
 		
 		// Check if creator url doesnt exist. 
 		
-		if(!get_option('patreon-creator-url', false) OR get_option('patreon-creator-url', false)=='')
-		{	
+		if(!get_option('patreon-creator-url', false) OR get_option('patreon-creator-url', false)=='') {	
 			// Making sure access credentials are there to avoid fruitlessly contacting the api:
 			
 			if(get_option('patreon-client-id', false) 
@@ -160,8 +158,7 @@ class Patreon_Wordpress {
 				
 				$creator_url = self::getPatreonCreatorURL();
 			}
-			if(isset($creator_url))
-			{
+			if(isset($creator_url)) {
 				// Creator id acquired. Update.
 				
 				update_option( 'patreon-creator-url', $creator_url );
@@ -169,13 +166,11 @@ class Patreon_Wordpress {
 		}
 		
 	}
-	
 	public static function checkPatreonCreatorName() {
 		
 		// This function checks and saves creator's full name, name and surname. These are used in post locking interface
 		
-		if(!get_option('patreon-creator-full-name', false) OR get_option('patreon-creator-full-name', false)=='')
-		{
+		if(!get_option('patreon-creator-full-name', false) OR get_option('patreon-creator-full-name', false)=='') {
 			// Making sure access credentials are there to avoid fruitlessly contacting the api:
 			
 			if(get_option('patreon-client-id', false) && get_option('patreon-client-secret', false) && get_option('patreon-creators-access-token', false)) {
@@ -184,26 +179,22 @@ class Patreon_Wordpress {
 				
 				$creator_info = self::getPatreonCreatorInfo();
 			}
-			if(isset($creator_info['included'][0]['attributes']['full_name']))
-			{
+			if(isset($creator_info['included'][0]['attributes']['full_name'])) {
 				// Creator id acquired. Update.
 				
 				update_option( 'patreon-creator-full-name', $creator_info['included'][0]['attributes']['full_name'] );
 			}
-			if(isset($creator_info['included'][0]['attributes']['first_name']))
-			{
+			if(isset($creator_info['included'][0]['attributes']['first_name'])) {
 				// Creator id acquired. Update.
 				
 				update_option( 'patreon-creator-first-name', $creator_info['included'][0]['attributes']['first_name'] );
 			}
-			if(isset($creator_info['included'][0]['attributes']['last_name']))
-			{
+			if(isset($creator_info['included'][0]['attributes']['last_name'])) {
 				// Creator id acquired. Update.
 				
 				update_option( 'patreon-creator-last-name', $creator_info['included'][0]['attributes']['last_name'] );
 			}
 		}
-		
 	}
 	
 	public static function getPatreonCreatorInfo() {
@@ -262,8 +253,7 @@ class Patreon_Wordpress {
 
 		$creator_info = self::getPatreonCreatorInfo();
 
-		if(isset($creator_info['included'][0]['attributes']['url']))
-		{
+		if(isset($creator_info['included'][0]['attributes']['url'])) {
 			return $creator_info['included'][0]['attributes']['url'];
 		}
 
@@ -338,8 +328,7 @@ class Patreon_Wordpress {
 		$user_response = self::getPatreonUser($user);
 		
 		// If no user exists, the patronage cannot have been declined.
-		if(!$user_response)
-		{
+		if(!$user_response) {
 			return false;
 		}
 		
