@@ -121,8 +121,7 @@ class Patreon_Wordpress {
 		
 		// Check if creator id doesnt exist. Account for the case in which creator id was saved as empty by the Creator
 		
-		if(!get_option('patreon-creator-id', false) OR get_option('patreon-creator-id', false)=='')
-		{	
+		if(!get_option('patreon-creator-id', false) OR get_option('patreon-creator-id', false)=='') {	
 			// Making sure access credentials are there to avoid fruitlessly contacting the api:
 			
 			if(get_option('patreon-client-id', false) 
@@ -140,7 +139,6 @@ class Patreon_Wordpress {
 				update_option( 'patreon-creator-id', $creator_id );
 			}
 		}
-		
 	}
 	public static function checkPatreonCreatorURL() {
 		
@@ -320,8 +318,7 @@ class Patreon_Wordpress {
 	
 	public static function checkDeclinedPatronage($user) {
 		
-		if(!$user)
-		{
+		if(!$user) {
 			$user = wp_get_current_user();
 		}
 
