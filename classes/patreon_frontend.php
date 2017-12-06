@@ -18,15 +18,6 @@ class Patreon_Frontend {
 		add_action( 'wp_enqueue_scripts', array($this,'patreonEnqueueJs') );		
 		add_action( 'login_form', array($this, 'showPatreonMessages' ) );
 
-		if(get_option('patreon-enable-register-with-patreon', false)) {
-			add_action( 'register_form', array($this, 'showPatreonButton' ) );
-			add_action( 'woocommerce_register_form_end', array($this, 'showPatreonButton') );
-		}
-		if(get_option('patreon-enable-login-with-patreon', false)) {
-			add_action( 'login_form', array($this, 'showPatreonButton' ) );
-			add_action( 'woocommerce_login_form_end', array($this, 'showPatreonButton' ) );
-		}
-
 		add_filter( 'the_content', array($this, 'protectContentFromUsers'), PHP_INT_MAX );
 
 		self::$messages_map = array(
@@ -44,24 +35,6 @@ class Patreon_Frontend {
 	
 	}
 
-	public function showPatreonButton() {
-
-		global $wp;
-
-		$client_id = get_option('patreon-client-id', false);
-
-		$login_with_patreon = get_option('patreon-enable-login-with-patreon', false);
-		$admins_editors_login_with_patreon = get_option('patreon-enable-allow-admins-login-with-patreon', false);
-
-		if($client_id == false) {
-			return '';
-		}
-
-		$href = self::patreonMakeLoginLink($client_id);
-		
-		echo '<div class="patreon-login-refresh-button">'.self::patreonMakeLoginButton().'</div>';
-	
-	}
 	function patreonEnqueueJs() {
 		wp_register_script( 'patreon-wordpress-js', PATREON_PLUGIN_ASSETS.'/js/app.js', array( 'jquery' ) );
 		wp_enqueue_script( 'patreon-wordpress-js', PATREON_PLUGIN_ASSETS.'/js/app.js', false );
