@@ -195,7 +195,7 @@ class Patreon_Options {
                                         </tr>
                                         <tr valign="top">
 											<th scope="row" colspan="2">
-												<strong>Custom Call to Action Banner</strong> <br>Instead of default text, you can show a custom Call to Action Notification and Banner (ie, "Be our Patron to see this content!") to your visitors. You can use HTML too. Leave empty to disable.<br /><br />
+												<strong>Custom Call to Action Banner</strong> <br>You can show a custom Call to Action Notification and Banner (ie, "Be our Patron to see this content!") to your visitors. You can use HTML too. Leave empty to disable.<br /><br />
 												<?php wp_editor(get_option('patreon-custom-universal-banner'),'patreon_custom_universal_banner',array('textarea_name'=>'patreon-custom-universal-banner','textarea_rows'=>5)); ?>
 											</th>
                                         </tr>
