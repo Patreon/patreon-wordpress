@@ -18,6 +18,7 @@ class Patreon_Login {
 		update_user_meta($user_id, 'patreon_created', $user_response['data']['attributes']['created']);
 		update_user_meta($user_id, 'user_firstname', $user_response['data']['attributes']['first_name']);
 		update_user_meta($user_id, 'user_lastname', $user_response['data']['attributes']['last_name']);
+		update_user_meta($user_id, 'user_full_name', $user_response['data']['attributes']['full_name']);
 		update_user_meta($user_id, 'patreon_token_minted', microtime());
 		update_user_meta($user_id, 'patreon_token_expires_in', $tokens['expires_in']);
 	}
