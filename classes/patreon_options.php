@@ -152,7 +152,7 @@ class Patreon_Options {
 											<th scope="row">
 												<strong>Enable strict oAuth</strong>
 												<br>
-												<div class="patreon-options-info">If on, the plugin will only connect users who are already logged into your WordPress website. If off, new accounts will be created automatically for users who are logging in for the first time via Patreon.</div>
+												<div class="patreon-options-info">If on, the plugin will only connect users who are already logged into your WordPress website. If off, new accounts will be created automatically for users who are logging in for the first time via Patreon. Recommended: off</div>
 											</th>
 											<td>
 												<input type="checkbox" name="patreon-enable-strict-oauth" value="1"<?php checked( get_option('patreon-enable-strict-oauth', false) ); ?> />
@@ -187,16 +187,8 @@ class Patreon_Options {
 
                                         <tr valign="top">
 											<th scope="row">
-												<strong>Enable 'Login with Patreon' Button on Register Page</strong>
-											</th>
-											<td>
-												<input type="checkbox" name="patreon-enable-register-with-patreon" value="1"<?php checked( get_option('patreon-enable-register-with-patreon', false) ); ?> />
-											</td>
-                                        </tr>
-
-                                        <tr valign="top">
-											<th scope="row">
 												<strong>Enable Login with Patreon</strong>
+												<div class="patreon-options-info">If on, users will be able to login to your website via Patreon and view patron only posts. If off, no one will be able to login to your website via Patreon and post locking will be disabled. Recommended: on</div>
 											</th>
 											<td>
 												<input type="checkbox" name="patreon-enable-login-with-patreon" value="1"<?php checked( get_option('patreon-enable-login-with-patreon', true) ); ?> />
@@ -207,6 +199,7 @@ class Patreon_Options {
                                         <tr valign="top">
 											<th scope="row">
 												<strong>Allow Admins/Editors to 'Login with Patreon' Button</strong>
+												<div class="patreon-options-info">If on, admins and editors will be able to login to your website login via Patreon. If off, only non admin/editor users will be able to login to your website via Patreon. Recommended: on</div>
 											</th>
 											<td>
 												<input type="checkbox" name="patreon-enable-allow-admins-login-with-patreon" value="1"<?php checked( get_option('patreon-enable-allow-admins-login-with-patreon', false) ); ?> />
@@ -217,6 +210,7 @@ class Patreon_Options {
                                         <tr valign="top">
 											<th scope="row">
 												<strong>After Login/Register redirect user to specific page</strong>
+												<div class="patreon-options-info">This allows you to redirect users to a fixed page when they login via Patreon, like a 'Thanks for your support' page. If off, users are automatically redirected to the locked post they wanted to view. Recommended: off</div>
 											</th>
 											<td>
 												<input type="checkbox" name="patreon-enable-redirect-to-page-after-login" value="1"<?php checked( get_option('patreon-enable-redirect-to-page-after-login', false) ); ?> />
