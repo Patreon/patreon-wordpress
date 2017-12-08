@@ -207,34 +207,6 @@ class Patreon_Options {
                                         </tr>
                                         <?php } ?>
 
-                                        <tr valign="top">
-											<th scope="row">
-												<strong>After Login/Register redirect user to specific page</strong>
-												<div class="patreon-options-info">This allows you to redirect users to a fixed page when they login via Patreon, like a 'Thanks for your support' page. If off, users are automatically redirected to the locked post they wanted to view. Recommended: off</div>
-											</th>
-											<td>
-												<input type="checkbox" name="patreon-enable-redirect-to-page-after-login" value="1"<?php checked( get_option('patreon-enable-redirect-to-page-after-login', false) ); ?> />
-											</td>
-                                        </tr>
-
-                                        <?php if(get_option('patreon-enable-redirect-to-page-after-login', false)) { ?>
-                                        <tr valign="top">
-											<th scope="row">
-												<strong>Page to redirect user to after Login/Register</strong>
-											</th>
-											<td>
-												<select name="patreon-enable-redirect-to-page-id">
-													<?php foreach($all_pages as $page) {
-
-														$selected = ( $page->ID == get_option('patreon-enable-redirect-to-page-id', false) ? 'selected="selected"' : '' );
-														echo '<option value="'.$page->ID.'" '.$selected.'>'.$page->post_title.'</option>';
-
-													} ?>
-												</select>
-											</td>
-                                        </tr>
-                                        <?php } ?>
-
                                     </table>
 
                                 </div>
