@@ -16,6 +16,7 @@ class Patreon_Frontend {
 		add_action( 'login_enqueue_scripts', array($this,'patreonEnqueueJs'), 1 );
 		add_action( 'wp_enqueue_scripts', array($this,'patreonEnqueueCss') );
 		add_action( 'wp_enqueue_scripts', array($this,'patreonEnqueueJs') );		
+		add_action( 'admin_enqueue_scripts', array($this,'patreonEnqueueAdminCss') );		
 		add_action( 'login_form', array($this, 'showPatreonMessages' ) );
 
 		add_filter( 'the_content', array($this, 'protectContentFromUsers'), PHP_INT_MAX );
@@ -36,8 +37,12 @@ class Patreon_Frontend {
 	}
 
 	function patreonEnqueueJs() {
-		wp_register_script( 'patreon-wordpress-js', PATREON_PLUGIN_ASSETS.'/js/app.js', array( 'jquery' ) );
-		wp_enqueue_script( 'patreon-wordpress-js', PATREON_PLUGIN_ASSETS.'/js/app.js', false );
+		// wp_register_script( 'patreon-wordpress-js', PATREON_PLUGIN_ASSETS.'/js/app.js', array( 'jquery' ) );
+		// wp_enqueue_script( 'patreon-wordpress-js', PATREON_PLUGIN_ASSETS.'/js/app.js', false );
+	}
+	function patreonEnqueueAdminCss() {
+		wp_register_style( 'patreon-wordpress-admin-css', PATREON_PLUGIN_ASSETS.'/css/admin.css', false );
+		wp_enqueue_style('patreon-wordpress-admin-css', PATREON_PLUGIN_ASSETS.'/css/admin.css' );
 	}
 	function patreonEnqueueCss() {
 		wp_register_style( 'patreon-wordpress-css', PATREON_PLUGIN_ASSETS.'/css/app.css', false );
