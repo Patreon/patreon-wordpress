@@ -12,7 +12,6 @@ class Patreon_Options {
         if ( is_admin() ){
             add_action('admin_menu', array($this, 'patreon_plugin_setup') );
             add_action('admin_init', array($this, 'patreon_plugin_register_settings') );
-            add_action('admin_notices', array($this, 'patreon_plugin_login_warning') );
         }
     }
 
@@ -38,20 +37,6 @@ class Patreon_Options {
         register_setting( 'patreon-options', 'patreon-enable-strict-oauth' );
         register_setting( 'patreon-options', 'patreon-lock-entire-site' );
         register_setting( 'patreon-options', 'patreon-custom-universal-banner' );
-    }
-
-    function patreon_plugin_login_warning() {
-
-        $patreon_login = get_option('patreon-enable-login-with-patreon', true);
-        $patreon_admin_login = get_option('patreon-enable-allow-admins-login-with-patreon', false);
-
-        $anchor_url = site_url().'/wp-admin/admin.php?page=patreon-plugin#danger-users';
-
-        if($patreon_login && $patreon_admin_login) {
-            echo '<br><div class="notice notice-warning is-dismissible">
-                 <p>Please make sure all your Admins/Editors have Patreon accounts with the correct email addresses. For a list of your <a href="'.$anchor_url.'">admins and editors click here</a></p>
-             </div>';
-        }
     }
 
     function fetch_creator_id() {
@@ -167,7 +152,7 @@ class Patreon_Options {
 											<th scope="row">
 												<strong>Enable strict oAuth</strong>
 												<br>
-												(Only connects users logged into WordPress)
+												<div class="patreon-options-info">If on, the plugin will only connect users who are already logged into your WordPress website. If off, new accounts will be created automatically for users who are logging in for the first time via Patreon.</div>
 											</th>
 											<td>
 												<input type="checkbox" name="patreon-enable-strict-oauth" value="1"<?php checked( get_option('patreon-enable-strict-oauth', false) ); ?> />
