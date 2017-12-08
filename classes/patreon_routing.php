@@ -75,10 +75,6 @@ class Patreon_Routing {
 				}
 
 				$redirect = false;
-				
-				if(get_option('patreon-enable-redirect-to-page-after-login', false)) {
-					$redirect = get_option('patreon-enable-redirect-to-page-id', get_option('page_on_front') );
-				}
 							
 				// Check if final_redirect exists in state vars - if so, override redirect:
 	
