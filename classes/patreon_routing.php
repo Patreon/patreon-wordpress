@@ -108,8 +108,18 @@ class Patreon_Routing {
 
 				if(array_key_exists('error', $tokens)) {
 
-					/* redirect to homepage because of some error #HANDLE_ERROR */
-					$redirect = add_query_arg( 'patreon_message', 'patreon_cant_login_api_error', $redirect);
+					if($tokens['error']=='invalid_client') {
+						// Credentials are wrong. Redirect with an informative message
+						$redirect = add_query_arg( 'patreon_message', 'patreon_cant_login_api_error_credentials', $redirect);
+						
+					}
+					else {
+						// Some other error from api. Append the message from Patreon too.
+						$redirect = add_query_arg( 'patreon_message', 'patreon_cant_login_api_error', $redirect);
+						$redirect = add_query_arg( 'patreon_error', $tokens['error'], $redirect);
+						
+					}
+						
 					wp_redirect( $redirect );
 					exit;
 
