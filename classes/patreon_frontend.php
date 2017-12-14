@@ -177,10 +177,15 @@ class Patreon_Frontend {
 		
 	}
 	public static function processPatreonMessages() {
+		
+		$patreon_error = '';
+		if(isset($_REQUEST['patreon_error'])) {
+			// If any specific error message is sent from Patreon, prepare it
+			$patreon_error = ' - Patreon returned: '.$_REQUEST['patreon_error'];
+		}
 
-		if(isset($_REQUEST['patreon_message']))
-		{
-			return '<p class="patreon_message">'.apply_filters('ptrn/error_message',self::$messages_map[$_REQUEST['patreon_message']]).'</p>';
+		if(isset($_REQUEST['patreon_message'])) {
+			return '<p class="patreon_message">'.apply_filters('ptrn/error_message',self::$messages_map[$_REQUEST['patreon_message']].$patreon_error).'</p>';
 		}
 		
 		return '';
