@@ -20,7 +20,10 @@ class Patron_Metabox {
 	    $exclude = array(
 	    	'attachment',
 	    	'page'
-	    	);
+	    );
+		
+		// Enables 3rd party plugins to modify the post types excluded from locking
+		$exclude = apply_filters('ptrn/filter_excluded_posts_metabox',$exclude);
 
 	    if (in_array($post_type,$exclude) == false && in_array($post_type, $post_types)) {
 			
