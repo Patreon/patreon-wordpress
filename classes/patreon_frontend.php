@@ -26,6 +26,7 @@ class Patreon_Frontend {
 			'login_with_wordpress' => PATREON_LOGIN_WITH_WORDPRESS_NOW,		
 			'patreon_nonces_dont_match' => PATREON_CANT_LOGIN_NONCES_DONT_MATCH,		
 			'patreon_cant_login_api_error' => PATREON_CANT_LOGIN_DUE_TO_API_ERROR,		
+			'patreon_cant_login_api_error_credentials' => PATREON_CANT_LOGIN_DUE_TO_API_ERROR_CHECK_CREDENTIALS,		
 			'patreon_weird_redirection_at_login' => PATREON_WEIRD_REDIRECTION_AT_LOGIN,		
 			'patreon_could_not_create_wp_account' => PATREON_COULDNT_CREATE_WP_ACCOUNT,		
 			'patreon_api_credentials_missing' => PATREON_API_CREDENTIALS_MISSING,		
@@ -474,8 +475,14 @@ class Patreon_Frontend {
 	
 		if(in_array(get_post_type(),$post_types)) {
 
-			// Dont protect page post type
-			if(get_post_type()=='page') {
+			$exclude = array(
+				'page'
+			);
+			
+			// Enables 3rd party plugins to modify the post types excluded from locking
+			$exclude = apply_filters('ptrn/filter_excluded_posts',$exclude);
+
+			if (in_array(get_post_type(),$exclude)) {
 				return $content;
 			}
 			
@@ -527,6 +534,7 @@ class Patreon_Frontend {
 			$user = wp_get_current_user();
 			
 			$user_patronage = Patreon_Wordpress::getUserPatronage();
+	
 			
 			$declined = Patreon_Wordpress::checkDeclinedPatronage($user);
 			
