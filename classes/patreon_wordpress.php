@@ -40,6 +40,7 @@ class Patreon_Wordpress {
 		add_action('init', 'Patreon_Login::checkTokenExpiration');
 		add_action('mod_rewrite_rules',  array($this, 'addPatreonRewriteRules'));
 		add_action('init',  array($this, 'servePatronOnlyImage'));
+		add_action('save_post',  array($this, 'parseImagesInPatronOnlyPost'));
 
 	}
 	
@@ -389,8 +390,50 @@ class Patreon_Wordpress {
 		RewriteRule ^".$upload_dir."(.*)$ index.php?patreon_action=serve_patron_only_image&patron_only_image=$1 [QSA,L]
 		# END Patreon WordPress\n
 		";
-
+		
     	return $rules.$append;
+	}
+	function parseImagesInPatronOnlyPost($post_id) {
+		
+		// Parses post content and saves images in db marked as patron only
+			 
+		$post_level = get_post_meta( $post_id, 'patreon-level', true );
+		
+		// get post meta returns empty if no value is found. If so, set the value to 0.
+		
+		if($post_level == '') {
+			$post_level = 0;				
+		}
+
+		// Check if both post level and site lock level are set to 0 or nonexistent. If so return normal content.
+		
+		if($post_level == 0 
+			&& (!get_option('patreon-lock-entire-site',false)
+				|| get_option('patreon-lock-entire-site',false)==0)
+		) {
+			return;
+		}
+		
+		// If we are at this point, then this post is protected. Parse images.
+		
+		// Get only post content
+		
+		$post_content = get_post_field('post_content', $post_id);
+		
+		$dom = new domDocument;
+		$dom->loadHTML($post_content);
+		$dom->preserveWhiteSpace = false;
+		$imgs  = $dom->getElementsByTagName("img");
+		$links = array();
+		for($i = 0; $i < $imgs->length; $i++) {
+			
+		   $image = basename($imgs->item($i)->getAttribute("src"));
+		   
+		   // Save the image into db:
+		   
+		   update_post_meta($post_id,'patreon_protected_image',$image);
+		}
+
 	}
 	function servePatronOnlyImage($image=false) {
 
