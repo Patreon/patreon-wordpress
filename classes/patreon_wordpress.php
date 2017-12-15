@@ -39,6 +39,7 @@ class Patreon_Wordpress {
 		add_action('init', array($this, 'checkPatreonCreatorName'));
 		add_action('init', 'Patreon_Login::checkTokenExpiration');
 		add_action('mod_rewrite_rules',  array($this, 'addPatreonRewriteRules'));
+		add_action('init',  array($this, 'servePatronOnlyImage'));
 
 	}
 	
@@ -390,6 +391,41 @@ class Patreon_Wordpress {
 		";
 
     	return $rules.$append;
+	}
+	function servePatronOnlyImage($image=false) {
+
+		if(!(isset($_REQUEST['patreon_action']) AND $_REQUEST['patreon_action'] == 'serve_patron_only_image')) {
+			return;			
+		}
+		
+		if((!isset($image) OR !$image) AND isset($_REQUEST['patron_only_image'])) {
+			$image = $_REQUEST['patron_only_image'];
+		}
+		
+		$upload_locations = wp_upload_dir();
+
+		// We want the base upload location so we can account for any changes to date based subfolders in case there are
+
+		$upload_dir = wp_make_link_relative($upload_locations['basedir']);
+		
+		// Construct full path to the image:
+		
+		$file = $upload_dir.$image;
+		
+		$mime = wp_check_filetype($file);
+	
+		if( false === $mime[ 'type' ] && function_exists( 'mime_content_type' ) )
+			$mime[ 'type' ] = mime_content_type( $file );
+		if( $mime[ 'type' ] )
+			$mimetype = $mime[ 'type' ];
+		else
+			$mimetype = 'image/' . substr( $file, strrpos( $file, '.' ) + 1 );
+		header( 'Content-Type: ' . $mimetype ); // always send this
+		if ( false === strpos( $_SERVER['SERVER_SOFTWARE'], 'Microsoft-IIS' ) )
+			header( 'Content-Length: ' . filesize( $file ) );
+		
+		readfile( $file );
+		exit; 
 	}
 
 }
