@@ -38,6 +38,7 @@ class Patreon_Wordpress {
 		add_action('init', array($this, 'checkPatreonCreatorURL'));
 		add_action('init', array($this, 'checkPatreonCreatorName'));
 		add_action('init', 'Patreon_Login::checkTokenExpiration');
+		add_action('mod_rewrite_rules',  array($this, 'addPatreonRewriteRules'));
 
 	}
 	
@@ -370,6 +371,25 @@ class Patreon_Wordpress {
 
 		return false;
 
+	}
+	function addPatreonRewriteRules($rules) {
+
+		$upload_locations = wp_upload_dir();
+
+		// We want the base upload location so we can account for any changes to date based subfolders in case there are
+
+		$upload_dir = substr(wp_make_link_relative($upload_locations['baseurl']),1);
+
+		$append = "
+		\n # BEGIN Patreon WordPress Image Protection
+		RewriteEngine On
+		RewriteBase /		
+		RewriteCond %{REQUEST_FILENAME} (\.png|\.jpg|\.gif|\.jpeg|\.bmp)
+		RewriteRule ^".$upload_dir."(.*)$ index.php?patreon_action=serve_patron_only_image&patron_only_image=$1 [QSA,L]
+		# END Patreon WordPress\n
+		";
+
+    	return $rules.$append;
 	}
 
 }
