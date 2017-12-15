@@ -427,6 +427,34 @@ class Patreon_Wordpress {
 		readfile( $file );
 		exit; 
 	}
+	function readAndServeImage($image) {
+
+		$upload_locations = wp_upload_dir();
+
+		// We want the base upload location so we can account for any changes to date based subfolders in case there are
+
+		$upload_dir = wp_make_link_relative($upload_locations['basedir']);
+		
+		// Construct full path to the image:
+		
+		$file = $upload_locations['path'].'/'.$image;
+
+		$mime = wp_check_filetype($file);
+	
+		if( false === $mime[ 'type' ] && function_exists( 'mime_content_type' ) )
+			$mime[ 'type' ] = mime_content_type( $file );
+		if( $mime[ 'type' ] )
+			$mimetype = $mime[ 'type' ];
+		else
+			$mimetype = 'image/' . substr( $file, strrpos( $file, '.' ) + 1 );
+		header( 'Content-Type: ' . $mimetype ); // always send this
+		if ( false === strpos( $_SERVER['SERVER_SOFTWARE'], 'Microsoft-IIS' ) )
+			header( 'Content-Length: ' . filesize( $file ) );
+		
+		readfile( $file );
+		exit; 		
+		
+	}
 
 }
 
