@@ -394,38 +394,44 @@ class Patreon_Wordpress {
 	}
 	function servePatronOnlyImage($image=false) {
 
-		if(!(isset($_REQUEST['patreon_action']) AND $_REQUEST['patreon_action'] == 'serve_patron_only_image')) {
-			return;			
-		}
-		
 		if((!isset($image) OR !$image) AND isset($_REQUEST['patron_only_image'])) {
 			$image = $_REQUEST['patron_only_image'];
 		}
-		
-		$upload_locations = wp_upload_dir();
 
-		// We want the base upload location so we can account for any changes to date based subfolders in case there are
+		if(!(isset($_REQUEST['patreon_action']) AND $_REQUEST['patreon_action'] == 'serve_patron_only_image')) {
+			$this->readAndServeImage(basename($image));		
+		}
 
-		$upload_dir = wp_make_link_relative($upload_locations['basedir']);
+		// Below define can be defined in any plugin to bypass core locking function and use a custom one from plugin
+		// It is independent of the plugin load order since it checks if it is defined.
+		// It can be defined by any plugin until right before the_content filter is run.
+
+		if(apply_filters('ptrn/bypass_image_filtering',defined('PATREON_BYPASS_IMAGE_FILTERING'))) {
+			$this->readAndServeImage(basename($image));
+		}
 		
-		// Construct full path to the image:
+		// Check if the image is protected:
+		global $wpdb;
+
+		$protect_check = $wpdb->get_var( $wpdb->prepare("SELECT meta_value FROM $wpdb->postmeta WHERE meta_key = %s AND meta_value = %s LIMIT 1" , array('patreon_protected_image',basename($image))) );
 		
-		$file = $upload_dir.$image;
+		if($protect_check != basename($image)) {
+			
+			// No match. Just serve image
+			$this->readAndServeImage(basename($image));
+		}
 		
-		$mime = wp_check_filetype($file);
-	
-		if( false === $mime[ 'type' ] && function_exists( 'mime_content_type' ) )
-			$mime[ 'type' ] = mime_content_type( $file );
-		if( $mime[ 'type' ] )
-			$mimetype = $mime[ 'type' ];
-		else
-			$mimetype = 'image/' . substr( $file, strrpos( $file, '.' ) + 1 );
-		header( 'Content-Type: ' . $mimetype ); // always send this
-		if ( false === strpos( $_SERVER['SERVER_SOFTWARE'], 'Microsoft-IIS' ) )
-			header( 'Content-Length: ' . filesize( $file ) );
+		// We are here, meaning we have a match. From this point we have to go into pledge checks
 		
-		readfile( $file );
-		exit; 
+		echo 'This is a patron only image!';
+		
+		wp_die();
+		
+		////////////////////// INSERT PLEDGE CHECKS HERE ///////////////////
+		
+		// At this point pledge checks are valid, and patron can see the image. Serve it:
+		
+		
 	}
 	function readAndServeImage($image) {
 
