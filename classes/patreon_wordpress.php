@@ -435,48 +435,92 @@ class Patreon_Wordpress {
 		}
 
 	}
-	function servePatronOnlyImage($image=false) {
+	public static function servePatronOnlyImage($image=false) {
 
 		if((!isset($image) OR !$image) AND isset($_REQUEST['patron_only_image'])) {
 			$image = $_REQUEST['patron_only_image'];
 		}
+		if(!$image OR $image=='') {
+			// This is not a rewritten image request. Exit.
+			return;
+		}
 
 		if(!(isset($_REQUEST['patreon_action']) AND $_REQUEST['patreon_action'] == 'serve_patron_only_image')) {
-			$this->readAndServeImage(basename($image));		
+			Patreon_Wordpress::readAndServeImage(basename($image));		
 		}
+		
+		if(current_user_can('manage_options')) {
+			Patreon_Wordpress::readAndServeImage(basename($image));	
+		}			
 
 		// Below define can be defined in any plugin to bypass core locking function and use a custom one from plugin
 		// It is independent of the plugin load order since it checks if it is defined.
 		// It can be defined by any plugin until right before the_content filter is run.
 
 		if(apply_filters('ptrn/bypass_image_filtering',defined('PATREON_BYPASS_IMAGE_FILTERING'))) {
-			$this->readAndServeImage(basename($image));
+			Patreon_Wordpress::readAndServeImage(basename($image));
 		}
 		
 		// Check if the image is protected:
 		global $wpdb;
 
-		$protect_check = $wpdb->get_var( $wpdb->prepare("SELECT meta_value FROM $wpdb->postmeta WHERE meta_key = %s AND meta_value = %s LIMIT 1" , array('patreon_protected_image',basename($image))) );
-		
-		if($protect_check != basename($image)) {
-			
+		$protect_check = $wpdb->get_results( $wpdb->prepare("SELECT post_id, meta_value FROM $wpdb->postmeta WHERE meta_key = %s AND meta_value = %s LIMIT 1" , array('patreon_protected_image',basename($image))),ARRAY_A );
+
+		if(!isset($protect_check[0]['meta_value'])) {
 			// No match. Just serve image
-			$this->readAndServeImage(basename($image));
+			Patreon_Wordpress::readAndServeImage(basename($image));
 		}
 		
 		// We are here, meaning we have a match. From this point we have to go into pledge checks
 		
-		echo 'This is a patron only image!';
+		// Check if we have a post id
 		
-		wp_die();
+		if(isset($protect_check[0]['post_id']) AND is_numeric($protect_check[0]['post_id'])) {
+			
+			// This is an image attached to a post. Try to get post's pledge level to decide what level to use
+			
+			// First check if entire site is locked, get the level for locking.
+			
+			$patreon_level = get_option('patreon-lock-entire-site',false);
+			
+			// Check if specific level is given for this post:
+			
+			$post_level = get_post_meta( $protect_check[0]['post_id'], 'patreon-level', true );
+			
+			// If post level is not returned empty string, then override site locking level
+			
+			if($post_level != '') {
+				$patreon_level = $post_level;			
+			}
+			
+			// If we didnt get any level for this post, and yet the image needs to be protected, set the pledge level to 1
+			if(!($patreon_level > 0)) {
+				
+				$patreon_level = 1;
+			}
+
+		}
+			
+		$user_patronage = Patreon_Wordpress::getUserPatronage();
 		
-		////////////////////// INSERT PLEDGE CHECKS HERE ///////////////////
+		$user = wp_get_current_user();
+		
+		$declined = Patreon_Wordpress::checkDeclinedPatronage($user);
+			
+		if($user_patronage == false 
+			|| $user_patronage < ($patreon_level*100)
+			|| $declined
+		) {
+		
+			echo Patreon_Frontend::displayPatreonCampaignBanner($patreon_level);
+			exit;
+		}
 		
 		// At this point pledge checks are valid, and patron can see the image. Serve it:
-		
+		Patreon_Wordpress::readAndServeImage(basename($image));
 		
 	}
-	function readAndServeImage($image) {
+	public static function readAndServeImage($image) {
 
 		$upload_locations = wp_upload_dir();
 
@@ -490,16 +534,21 @@ class Patreon_Wordpress {
 
 		$mime = wp_check_filetype($file);
 	
-		if( false === $mime[ 'type' ] && function_exists( 'mime_content_type' ) )
+		if( false === $mime[ 'type' ] && function_exists( 'mime_content_type' ) ) {
 			$mime[ 'type' ] = mime_content_type( $file );
-		if( $mime[ 'type' ] )
+		}
+			
+		if( $mime[ 'type' ] ) {
 			$mimetype = $mime[ 'type' ];
-		else
+		}
+		else {
 			$mimetype = 'image/' . substr( $file, strrpos( $file, '.' ) + 1 );
+		}
 		header( 'Content-Type: ' . $mimetype ); // always send this
-		if ( false === strpos( $_SERVER['SERVER_SOFTWARE'], 'Microsoft-IIS' ) )
+		if ( false === strpos( $_SERVER['SERVER_SOFTWARE'], 'Microsoft-IIS' ) ) {
 			header( 'Content-Length: ' . filesize( $file ) );
-		
+		}
+			
 		readfile( $file );
 		exit; 		
 		
