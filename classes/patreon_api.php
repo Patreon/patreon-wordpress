@@ -27,8 +27,8 @@ class Patreon_API {
 	}
 
 	private function __get_json($suffix) {		
-	
-		$api_endpoint = "http://api.patreon.com/oauth2/api/" . $suffix;
+
+		$api_endpoint = "https://api.patreon.com/oauth2/api/" . $suffix;
 	
 		$headers = array(
 			'Authorization' => 'Bearer ' . $this->access_token,
@@ -38,7 +38,6 @@ class Patreon_API {
 			'headers' => $headers,
 			'method'  => 'GET',
 		);
-		
 		$response = wp_remote_request( $api_endpoint, $api_request );
 
 		return json_decode($response['body'], true);
