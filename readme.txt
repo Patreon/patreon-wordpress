@@ -1,5 +1,5 @@
 === Plugin Name ===
-Contributors: wordpressorg@patreon.com
+Contributors: wordpressorg@patreon.com, codebard
 Tags: patreon, membership, members
 Requires at least: 4.0
 Tested up to: 4.8
