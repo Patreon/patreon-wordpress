@@ -1,9 +1,9 @@
 === Plugin Name ===
-Contributors: wordpressorg@patreon.com
+Contributors: wordpressorg@patreon.com, codebard
 Tags: patreon, membership, members
 Requires at least: 4.0
-Tested up to: 4.8
-Stable tag: 1.0.0
+Tested up to: 4.9.1
+Stable tag: 1.0.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -84,6 +84,10 @@ It is  difficult to protect videos due the intensive bandwidth requirements of h
 
 
 == Changelog ==
+
+= 1.0.1 =
+* API endpoint protocol fix - http to https
+* Added !important to button width and height to prevent themes from overriding them
 
 = 1.0 =
 * Plugin launched.
