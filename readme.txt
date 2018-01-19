@@ -20,7 +20,6 @@ This plugin is maintained by Patreon. For advanced features, you can find additi
 - Choose a minimum pledge amount necessary to see a particular post
 - Alternatively, set a minimum pledge amount to see all posts.
 - Set custom HTML that non-patrons see instead of the post, prompting them to become a patron
-- Easily embed patron-only content snippets in public posts using shortcodes
 
 ### FEATURES FOR PATRONS
 
