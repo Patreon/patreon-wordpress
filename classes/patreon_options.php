@@ -240,7 +240,7 @@ class Patreon_Options {
 									<p>Patreon Wordpress developed by Patreon</p>
 
                                     <p><strong>SUPPORT &amp; TECHNICAL HELP</strong> <br>
-                                    We actively support this plugin on our  <a href="https://www.patreondevelopers.com/c/patreon-wordpress-plugin-support" target="_blank">Patreon Wordpress Support Forum</a>.</p>
+                                    We actively support this plugin on our <a href="https://www.patreondevelopers.com/c/patreon-wordpress-plugin-support" target="_blank">Patreon Wordpress Support Forum</a>.</p>
                                     <p><strong>DOCUMENTATION</strong> <br>Technical documentation and code examples available @ <a href="https://patreon.com/apps/wordpress" target="_blank">https://patreon.com/apps/wordpress</a></p>
                                 </div>
                                 <!-- .inside -->
