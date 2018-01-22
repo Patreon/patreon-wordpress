@@ -13,7 +13,7 @@ Author URI: https://patreon.com
 if ( ! defined( 'WPINC' ) ) {
 	die;
 }
-
+// Commit to see if worktree works
 define("PATREON_PLUGIN_URL", plugin_dir_url( __FILE__ ) );
 define("PATREON_PLUGIN_ASSETS", plugin_dir_url( __FILE__ ).'/assets' );
 define("PATREON_TEXT_CONNECT", 'Connect with Patreon' );
