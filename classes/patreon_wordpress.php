@@ -26,21 +26,23 @@ class Patreon_Wordpress {
 		include 'patreon_options.php';
 		include 'patreon_metabox.php';
 		include 'patreon_user_profiles.php';
+		include 'patreon_protect.php';
 
 		self::$Patreon_Routing = new Patreon_Routing;
 		self::$Patreon_Frontend = new Patreon_Frontend;
 		self::$Patreon_Options = new Patreon_Options;
 		self::$Patron_Metabox = new Patron_Metabox;
 		self::$Patreon_User_Profiles = new Patreon_User_Profiles;
+		self::$Patreon_Protect = new Patreon_Protect;
 
 		add_action('wp_head', array($this, 'updatePatreonUser') );
 		add_action('init', array($this, 'checkPatreonCreatorID'));
 		add_action('init', array($this, 'checkPatreonCreatorURL'));
 		add_action('init', array($this, 'checkPatreonCreatorName'));
 		add_action('init', 'Patreon_Login::checkTokenExpiration');
+		add_action('admin_enqueue_scripts', array($this, 'enqueueAdminScripts'));
 
 	}
-	
 	static function getPatreonUser($user) {
 
 		/* get user meta data and query patreon api */
@@ -66,7 +68,6 @@ class Patreon_Wordpress {
 		return false;
 
 	}
-	
 	static function updatePatreonUser() {
 
 		/* check if current user is loggedin, get ID */
@@ -116,7 +117,6 @@ class Patreon_Wordpress {
 		}
 
 	}
-	
 	public static function checkPatreonCreatorID() {
 		
 		// Check if creator id doesnt exist. Account for the case in which creator id was saved as empty by the Creator
@@ -194,7 +194,6 @@ class Patreon_Wordpress {
 			}
 		}
 	}
-	
 	public static function getPatreonCreatorInfo() {
 	
 		$api_client = new Patreon_API(get_option('patreon-creators-access-token', false));
@@ -234,7 +233,6 @@ class Patreon_Wordpress {
 		
 		return $user_response;
 	}
-	
 	public static function getPatreonCreatorID() {
 
 		$creator_info = self::getPatreonCreatorInfo();
@@ -258,7 +256,6 @@ class Patreon_Wordpress {
         return false;
 
 	}
-	
 	public static function getUserPatronage() {
 
 		if(is_user_logged_in() == false) {
@@ -307,7 +304,6 @@ class Patreon_Wordpress {
 		return false;
 
 	}
-	
 	public static function getUserPatronageDuration($pledge) {
 
 		$user_response = self::getPatreonUser($user);
@@ -315,7 +311,6 @@ class Patreon_Wordpress {
 		$patronage_age = 0;
 
 	}
-	
 	public static function checkDeclinedPatronage($user) {
 		
 		if(!$user) {
@@ -347,7 +342,6 @@ class Patreon_Wordpress {
 		}
 		return false;
 	}
-	
 	public static function getUserPatronageLevel($pledge) {
 
 		$patronage_level = 0;
@@ -359,7 +353,6 @@ class Patreon_Wordpress {
 		return $patronage_level;
 
 	}
-	
 	public static function isPatron() {
 
 		$user_patronage = self::getUserPatronage();
@@ -371,7 +364,14 @@ class Patreon_Wordpress {
 		return false;
 
 	}
+		
+	public static function enqueueAdminScripts() {
 
+		wp_enqueue_script( 'patreon-admin-js', PATREON_PLUGIN_ASSETS .'/js/admin.js', array('jquery'), '1.0', true );
+		wp_enqueue_style('embed', PATREON_PLUGIN_ASSETS .'/css/editor.css',array(), '0.1','screen' );
+
+	}
+	
 }
 
 ?>
