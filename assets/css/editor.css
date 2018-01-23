@@ -1,0 +1,20 @@
+@charset "UTF-8";
+/* CSS Document */
+/* tinymce likes to add mce-i- to the beginning of the class */
+/* see dashicons (https://developer.wordpress.org/resource/dashicons/#format-image) for more dashicons */
+
+.mce-i-embed_sideByside:before, .mce-i-embed_stacked:before {
+    display: inline-block;
+    -webkit-font-smoothing: antialiased;
+    font: normal 16px/1 'dashicons';
+    vertical-align: top;
+}
+
+.mce-i-embed_sideByside:before{
+	content: "\f135";
+	
+}
+
+.mce-i-embed_stacked:before {
+	content: "\f134";
+}
