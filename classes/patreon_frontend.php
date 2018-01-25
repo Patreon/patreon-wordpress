@@ -476,7 +476,6 @@ class Patreon_Frontend {
 		if(in_array(get_post_type(),$post_types)) {
 
 			$exclude = array(
-				'page'
 			);
 			
 			// Enables 3rd party plugins to modify the post types excluded from locking
