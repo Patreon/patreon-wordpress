@@ -18,8 +18,6 @@ class Patron_Metabox {
 		$post_types = get_post_types(array('public'=>true),'names');
 
 	    $exclude = array(
-	    	'attachment',
-	    	'page'
 	    );
 		
 		// Enables 3rd party plugins to modify the post types excluded from locking
