@@ -592,7 +592,32 @@ class Patreon_Frontend {
 		return apply_filters('ptrn/valid_patron_final_footer',$post_footer,'valid_patron',$patreon_level,$user_patronage);		
 		
 	}
-	
+
+	public function showPatreonLoginButton() {
+
+		$log_in_img = PATREON_PLUGIN_ASSETS . '/img/log-in-with-patreon-wide@2x.png';
+
+		$client_id = get_option('patreon-client-id', false);
+
+		if($client_id == false) {
+			return '';
+		}
+
+		/* inline styles - prevent themes from overriding */
+		echo '
+		<style type="text/css">
+			.ptrn-button{display:block;margin-bottom:20px!important;}
+			.ptrn-button img {width: 272px; height:42px;}
+			.patreon-msg {-webkit-border-radius: 6px;-moz-border-radius: 6px;-ms-border-radius: 6px;-o-border-radius: 6px;border-radius: 6px;padding:8px;margin-bottom:20px!important;display:block;border:1px solid #E6461A;background-color:#484848;color:#ffffff;}
+		</style>';
+
+		if(isset($_REQUEST['patreon-msg']) && $_REQUEST['patreon-msg'] == 'login_with_patreon') {
+			echo '<p class="patreon-msg">You can now login with your wordpress username/password.</p>';
+		} else {
+			echo apply_filters('ptrn/login_button', '<a href="'.self::patreonMakeLoginLink($client_id).'" class="ptrn-button"><img src="'.$log_in_img.'" width="272" height="42" /></a>');
+		}
+
+	}	
 
 
 }
