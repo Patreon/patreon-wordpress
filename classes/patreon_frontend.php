@@ -18,8 +18,9 @@ class Patreon_Frontend {
 		add_action( 'wp_enqueue_scripts', array($this,'patreonEnqueueJs') );		
 		add_action( 'admin_enqueue_scripts', array($this,'patreonEnqueueAdminCss') );		
 		add_action( 'login_form', array($this, 'showPatreonMessages' ) );
-
+		add_action( 'login_form', array($this, 'showPatreonLoginButton' ) );
 		add_filter( 'the_content', array($this, 'protectContentFromUsers'), PHP_INT_MAX );
+		add_shortcode( 'patreon_login_button',array( $this,'LoginButtonShortcode' ));
 
 		self::$messages_map = array(
 			'patreon_cant_login_strict_oauth' => PATREON_CANT_LOGIN_STRICT_OAUTH,		
