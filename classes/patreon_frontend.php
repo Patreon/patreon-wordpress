@@ -619,6 +619,13 @@ class Patreon_Frontend {
 
 	}	
 
+	public static function LoginButtonShortcode($args) {
+		
+		if(!is_user_logged_in()) {
+			Patreon_Frontend::showPatreonLoginButton();
+		}
+		
+	}
 
 }
 
