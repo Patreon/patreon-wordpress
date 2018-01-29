@@ -15,6 +15,8 @@ When a patron pledges, they can then head over to www.yourwordpresssite.com and 
 
 This plugin is maintained by Patreon. For advanced features, you can find additional premium WordPress plugins in this directory.
 
+Read an in-depth review of this free plugin and how to <a href="https://www.elegantthemes.com/blog/tips-tricks/how-to-create-a-patreon-membership-site-on-wordpress" target="_blank">combine Patreon and WordPress part of your membership business</a> on Elegant Themes
+
 ### FEATURES FOR CREATORS
 
 - Choose a minimum pledge amount necessary to see a particular post
