@@ -562,12 +562,13 @@ class Patreon_Frontend {
 				
 				
 			}
+			
+			// If we are here, it means post is protected, user is patron, patronage is valid. Slap the post footer:
+			
+			return $content .self::MakeValidPatronFooter($patreon_level, $user_patronage);
 
 		}
 		
-		// If we are here, it means post is protected, user is patron, patronage is valid. Slap the post footer:
-		
-		return $content .self::MakeValidPatronFooter($patreon_level, $user_patronage);
 
 	}
 	public static function MakeAdminPostFooter($patreon_level) {
