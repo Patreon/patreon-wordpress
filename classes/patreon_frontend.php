@@ -290,7 +290,12 @@ class Patreon_Frontend {
 		
 		$state['final_redirect_uri'] = $final_redirect;
 		
-		$href = self::MakeUniversalFlowLink($send_pledge_level,$state,$client_id);
+		// $href = self::MakeUniversalFlowLink($send_pledge_level,$state,$client_id);
+		
+		// We changed the above universal flow link maker to a function which will create cache-able links
+		// Some of the vars in current function which the earlier function used may not be needed now - clean up later #REVISIT
+		
+		$href = self::patreonMakeCacheableFlowLink($post);
 			
 		$label_text = self::patreonMakeUniversalButtonLabel();
 		
