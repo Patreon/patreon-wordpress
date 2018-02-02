@@ -47,6 +47,8 @@ class Patreon_Routing {
 
 	function query_vars($public_query_vars) {
 		array_push($public_query_vars, 'patreon-oauth');
+		array_push($public_query_vars, 'patreon-flow');
+		array_push($public_query_vars, 'patreon-unlock-post');
 		array_push($public_query_vars, 'code');
 		array_push($public_query_vars, 'state');
 		array_push($public_query_vars, 'patreon-redirect');
