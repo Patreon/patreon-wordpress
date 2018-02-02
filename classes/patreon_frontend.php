@@ -220,8 +220,10 @@ class Patreon_Frontend {
 		}
 		
 		$state['final_redirect_uri'] = $final_redirect;	
-
-		$refresh_link = '<a href="'.self::MakeUniversalFlowLink($patreon_level*100,$state).'">Refresh</a>';		
+		// 	$refresh_link = '<a href="'.self::MakeUniversalFlowLink($patreon_level*100,$state).'">Refresh</a>';		
+		
+		// Old flow link maker was replaced to a cache-able flow link function. Some vars may be unneeded in current function (this), clean up later #REVISIT
+		$refresh_link = '<a href="'.self::patreonMakeCacheableFlowLink($post).'">Refresh</a>';		
 		
 		if(!$user_logged_into_patreon) {
 			// Patron logged in and patron, but we are still showing the banner. This means pledge level is not enough.
