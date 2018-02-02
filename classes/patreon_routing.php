@@ -38,6 +38,7 @@ class Patreon_Routing {
 
 		$rules = array(
 			'patreon-authorization\/?$' => 'index.php?patreon-oauth=true',
+			'patreon-flow\/?$' => 'index.php?patreon-flow=true',
 		);
 
 		$wp_rewrite->rules = $rules + (array)$wp_rewrite->rules;
