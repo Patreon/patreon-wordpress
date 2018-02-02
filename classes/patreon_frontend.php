@@ -299,6 +299,25 @@ class Patreon_Frontend {
 		return apply_filters('ptrn/patron_button', '<a href="'.$href.'">'.$button.'</a>',$min_cents);		
 		
 	}
+	public static function patreonMakeCacheableFlowLink($post=false) {
+		
+		if(!$post) {
+			global $post;
+		}
+		
+		$unlock_post_id = '';
+		
+		if(isset($post) AND isset($post->ID)) {
+			
+			$unlock_post_id = $post->ID;
+			
+		}
+		
+		$flow_link = site_url().'/patreon-flow/?patreon-unlock-post='.$unlock_post_id;
+		
+		return $flow_link;
+		
+	}
 	public static function patreonMakeUniversalButtonImage($label) {
 		return '<div class="patreon-responsive-button-wrapper"><div class="patreon-responsive-button"><img class="patreon_logo" src="'.PATREON_PLUGIN_ASSETS.'/img/patreon-logomark-on-coral.svg" alt=""> '.$label.'</div></div>';
 		
