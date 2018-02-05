@@ -339,7 +339,7 @@ class Patreon_Frontend {
 		}	
 		
 		// If we werent given any state vars to send, initialize the array
-		if(!$state) { 
+		if(!$state) {
 		
 			$state=array();
 		
@@ -588,13 +588,16 @@ class Patreon_Frontend {
 				
 				
 			}
+			
+			// If we are here, it means post is protected, user is patron, patronage is valid. Slap the post footer:
+			
+			return $content .self::MakeValidPatronFooter($patreon_level, $user_patronage);
 
 		}
 		
-		// If we are here, it means post is protected, user is patron, patronage is valid. Slap the post footer:
+		// Return content in all other cases
+		return $content;
 		
-		return $content .self::MakeValidPatronFooter($patreon_level, $user_patronage);
-
 	}
 	public static function MakeAdminPostFooter($patreon_level) {
 		return '<div class="patreon-valid-patron-message">'.
@@ -619,8 +622,7 @@ class Patreon_Frontend {
 		return apply_filters('ptrn/valid_patron_final_footer',$post_footer,'valid_patron',$patreon_level,$user_patronage);		
 		
 	}
-
-	public function showPatreonLoginButton() {
+	public static function showPatreonLoginButton() {
 
 		$log_in_img = PATREON_PLUGIN_ASSETS . '/img/log-in-with-patreon-wide@2x.png';
 
@@ -644,8 +646,7 @@ class Patreon_Frontend {
 			echo apply_filters('ptrn/login_button', '<a href="'.self::patreonMakeLoginLink($client_id).'" class="ptrn-button"><img src="'.$log_in_img.'" width="272" height="42" /></a>');
 		}
 
-	}	
-
+	}
 	public static function LoginButtonShortcode($args) {
 		
 		if(!is_user_logged_in()) {
