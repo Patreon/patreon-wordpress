@@ -306,6 +306,17 @@ class Patreon_Frontend {
 		return apply_filters('ptrn/patron_button', '<a href="'.$href.'">'.$button.'</a>',$min_cents);		
 		
 	}
+	public static function patreonMakeCacheableLoginLink() {
+		
+		global $wp;
+		
+		$current_url = home_url( $wp->request );
+		
+		$flow_link = site_url().'/patreon-flow/?patreon-login=yes&patreon-final-redirect='.urlencode($current_url);
+		
+		return $flow_link;
+		
+	}
 	public static function patreonMakeCacheableFlowLink($post=false) {
 		
 		if(!$post) {
@@ -427,10 +438,11 @@ class Patreon_Frontend {
 		$redirect_uri = site_url().'/patreon-authorization/';
 			
 		// If we werent given any state vars to send, initialize the array
-		
+
 		if(!$state) {
+			
 			$state=array();
-		
+			
 			// Get the address of the current page, and save it as final redirect uri.		
 			// Start with home url for redirect. If post is valid, get permalink. 
 			
@@ -455,7 +467,7 @@ class Patreon_Frontend {
 		
 		$redirect_uri = site_url().'/patreon-authorization/';
 
-		$href = 'https://www.patreon.com/oauth2/authorize?response_type=code&client_id='.$client_id.'&redirect_uri='.$redirect_uri.'&state='.base64_encode(serialize($state));
+		$href = 'https://www.patreon.com/oauth2/authorize?response_type=code&client_id='.$client_id.'&redirect_uri='.$redirect_uri.'&state='.urlencode(base64_encode(serialize($state)));
 	
 		return apply_filters('ptrn/login_link', $href);
 	}
@@ -489,7 +501,7 @@ class Patreon_Frontend {
 			
 		}
 		
-		$href = self::patreonMakeLoginLink($client_id);
+		$href = self::patreonMakeCacheableLoginLink($client_id);
 
 		return apply_filters('ptrn/login_button', '<a href="'.$href.'" class="ptrn-login" data-ptrn_nonce="' . wp_create_nonce( 'patreon-nonce' ).'"><div class="patreon-responsive-button-wrapper"><div class="patreon-responsive-button"><img class="patreon_logo" src="'.PATREON_PLUGIN_ASSETS.'/img/patreon-logomark-on-coral.svg" alt=""> '.$login_label.'</div></div></a>', $href);
 
@@ -597,6 +609,7 @@ class Patreon_Frontend {
 		
 		// Return content in all other cases
 		return $content;
+		
 	}
 	public static function MakeAdminPostFooter($patreon_level) {
 		return '<div class="patreon-valid-patron-message">'.
@@ -630,26 +643,28 @@ class Patreon_Frontend {
 		if($client_id == false) {
 			return '';
 		}
-
+		$button = '';
 		/* inline styles - prevent themes from overriding */
-		echo '
+		$button .= '
 		<style type="text/css">
-			.ptrn-button{display:block;margin-bottom:20px!important;}
+			.ptrn-button{display:block !important;;margin-top:20px !important;margin-bottom:20px !important;}
 			.ptrn-button img {width: 272px; height:42px;}
 			.patreon-msg {-webkit-border-radius: 6px;-moz-border-radius: 6px;-ms-border-radius: 6px;-o-border-radius: 6px;border-radius: 6px;padding:8px;margin-bottom:20px!important;display:block;border:1px solid #E6461A;background-color:#484848;color:#ffffff;}
 		</style>';
-
+		
 		if(isset($_REQUEST['patreon-msg']) && $_REQUEST['patreon-msg'] == 'login_with_patreon') {
-			echo '<p class="patreon-msg">You can now login with your wordpress username/password.</p>';
+			$button .= '<p class="patreon-msg">You can now login with your WordPress username/password.</p>';
 		} else {
-			echo apply_filters('ptrn/login_button', '<a href="'.self::patreonMakeLoginLink($client_id).'" class="ptrn-button"><img src="'.$log_in_img.'" width="272" height="42" /></a>');
+			$button .= apply_filters('ptrn/login_button', '<a href="'.self::patreonMakeCacheableLoginLink($client_id).'" class="ptrn-button"><img src="'.$log_in_img.'" width="272" height="42" /></a>');
 		}
+		
+		return $button;
 
 	}
 	public static function LoginButtonShortcode($args) {
 		
 		if(!is_user_logged_in()) {
-			Patreon_Frontend::showPatreonLoginButton();
+			return Patreon_Frontend::showPatreonLoginButton();
 		}
 		
 	}
