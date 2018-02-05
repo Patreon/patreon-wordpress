@@ -4,7 +4,7 @@
 Plugin Name: Patreon Wordpress
 Plugin URI: https://www.patreon.com/apps/wordpress
 Description: Patron-only content, directly on your website.
-Version: 1.0.1
+Version: 1.0.2
 Author: Patreon <platform@patreon.com>
 Author URI: https://patreon.com
 */

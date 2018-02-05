@@ -3,7 +3,7 @@ Contributors: wordpressorg@patreon.com, codebard
 Tags: patreon, membership, members
 Requires at least: 4.0
 Tested up to: 4.9.1
-Stable tag: 1.0.1
+Stable tag: 1.0.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -85,6 +85,17 @@ It is  difficult to protect videos due the intensive bandwidth requirements of h
 
 
 == Changelog ==
+
+= 1.0.2 =
+* Page protection added
+* New logic to make cacheable unlock links
+* New logic to make cacheable login links
+* Login button shortcode added
+* State var urlencoded when going to Patreon and urlencoded when back
+* Button width fix
+* Login button now appears in login form
+* User creation logic now uses Patreon-supplied names for WP display name/
+* Support link updated in plugin admin
 
 = 1.0.1 =
 * API endpoint protocol fix - http to https
