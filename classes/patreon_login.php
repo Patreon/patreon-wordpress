@@ -16,9 +16,6 @@ class Patreon_Login {
 		update_user_meta($user_id, 'patreon_user_id', $user_response['data']['id']);
 		update_user_meta($user_id, 'patreon_last_logged_in', time());
 		update_user_meta($user_id, 'patreon_created', $user_response['data']['attributes']['created']);
-		update_user_meta($user_id, 'user_firstname', $user_response['data']['attributes']['first_name']);
-		update_user_meta($user_id, 'user_lastname', $user_response['data']['attributes']['last_name']);
-		update_user_meta($user_id, 'user_full_name', $user_response['data']['attributes']['full_name']);
 		update_user_meta($user_id, 'patreon_token_minted', microtime());
 		update_user_meta($user_id, 'patreon_token_expires_in', $tokens['expires_in']);
 	}
@@ -174,6 +171,7 @@ class Patreon_Login {
 		
 		// We are here, meaning that user was not logged in, and there were no linked accounts. This means we will create a new user.
 		
+		
 		$username = 'patreon_'.$patreon_user_id;
 
 		$user = get_user_by( 'login', $username );
@@ -189,7 +187,38 @@ class Patreon_Login {
 			if($user_id) {
 
 				$user = get_user_by( 'id', $user_id );
-
+				
+				// Check and set user names:
+				
+				$display_name = $username;
+				
+				$first_name = '';
+				$last_name = '';
+				
+				if(isset($user_response['data']['attributes']['full_name'])) {
+					$display_name = $user_response['data']['attributes']['full_name'];
+				}		
+				
+				if(isset($user_response['data']['attributes']['first_name'])) {
+					update_user_meta($user_id, 'first_name', $user_response['data']['attributes']['first_name']);
+					$first_name = $user_response['data']['attributes']['first_name'];
+					// Override display name with first name if its set
+					$display_name = $user_response['data']['attributes']['first_name'];
+				}
+				
+				if(isset($user_response['data']['attributes']['last_name'])) {
+					$last_name = $user_response['data']['attributes']['last_name'];					
+				}
+				
+				$args = array(
+					'ID'           => $user_id,
+					'display_name' => $display_name,
+					'first_name' => $first_name,
+					'last_name' => $last_name,
+				);
+				
+				wp_update_user( $args );
+				
 				wp_set_current_user( $user->ID, $user->data->user_login );
 				wp_set_auth_cookie( $user->ID );
 				do_action( 'wp_login', $user->data->user_login, $user );
