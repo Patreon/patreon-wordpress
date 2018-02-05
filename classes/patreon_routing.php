@@ -49,6 +49,8 @@ class Patreon_Routing {
 		array_push($public_query_vars, 'patreon-oauth');
 		array_push($public_query_vars, 'patreon-flow');
 		array_push($public_query_vars, 'patreon-unlock-post');
+		array_push($public_query_vars, 'patreon-login');
+		array_push($public_query_vars, 'patreon-final-redirect');
 		array_push($public_query_vars, 'code');
 		array_push($public_query_vars, 'state');
 		array_push($public_query_vars, 'patreon-redirect');
@@ -69,6 +71,27 @@ class Patreon_Routing {
 
 		if (strpos($_SERVER['REQUEST_URI'],'/patreon-flow/')!==false) {
 			
+			if(array_key_exists( 'patreon-login', $wp->query_vars )) {
+				
+				// Login intent. 
+				
+				$final_redirect = home_url();
+				
+				if(isset($wp->query_vars['patreon-final-redirect'])) {
+					
+					$final_redirect = $wp->query_vars['patreon-final-redirect'];
+				}
+				
+				$state = array(
+					'final_redirect_uri' => $final_redirect,
+				);
+			
+				$login_url = Patreon_Frontend::patreonMakeLoginLink(false,$state);
+
+				wp_redirect($login_url);
+				exit;
+				
+			}
 			if(array_key_exists( 'patreon-unlock-post', $wp->query_vars )) {
 				
 				// First slap the noindex header so search engines wont index this page:
@@ -155,7 +178,6 @@ class Patreon_Routing {
 					$send_pledge_level = $patreon_level * 100;
 					
 					$flow_link = Patreon_Frontend::MakeUniversalFlowLink($send_pledge_level,$state,$client_id);				
-					
 					wp_redirect($flow_link);
 					exit;
 				}
