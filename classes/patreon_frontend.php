@@ -220,8 +220,10 @@ class Patreon_Frontend {
 		}
 		
 		$state['final_redirect_uri'] = $final_redirect;	
-
-		$refresh_link = '<a href="'.self::MakeUniversalFlowLink($patreon_level*100,$state).'">Refresh</a>';		
+		// 	$refresh_link = '<a href="'.self::MakeUniversalFlowLink($patreon_level*100,$state).'">Refresh</a>';		
+		
+		// Old flow link maker was replaced to a cache-able flow link function. Some vars may be unneeded in current function (this), clean up later #REVISIT
+		$refresh_link = '<a href="'.self::patreonMakeCacheableFlowLink($post).'">Refresh</a>';		
 		
 		if(!$user_logged_into_patreon) {
 			// Patron logged in and patron, but we are still showing the banner. This means pledge level is not enough.
@@ -290,13 +292,37 @@ class Patreon_Frontend {
 		
 		$state['final_redirect_uri'] = $final_redirect;
 		
-		$href = self::MakeUniversalFlowLink($send_pledge_level,$state,$client_id);
+		// $href = self::MakeUniversalFlowLink($send_pledge_level,$state,$client_id);
+		
+		// We changed the above universal flow link maker to a function which will create cache-able links
+		// Some of the vars in current function which the earlier function used may not be needed now - clean up later #REVISIT
+		
+		$href = self::patreonMakeCacheableFlowLink($post);
 			
 		$label_text = self::patreonMakeUniversalButtonLabel();
 		
 		$button = self::patreonMakeUniversalButtonImage($label_text);
 		
 		return apply_filters('ptrn/patron_button', '<a href="'.$href.'">'.$button.'</a>',$min_cents);		
+		
+	}
+	public static function patreonMakeCacheableFlowLink($post=false) {
+		
+		if(!$post) {
+			global $post;
+		}
+		
+		$unlock_post_id = '';
+		
+		if(isset($post) AND isset($post->ID)) {
+			
+			$unlock_post_id = $post->ID;
+			
+		}
+		
+		$flow_link = site_url().'/patreon-flow/?patreon-unlock-post='.$unlock_post_id;
+		
+		return $flow_link;
 		
 	}
 	public static function patreonMakeUniversalButtonImage($label) {
@@ -313,7 +339,7 @@ class Patreon_Frontend {
 		}	
 		
 		// If we werent given any state vars to send, initialize the array
-		if(!$state) { 
+		if(!$state) {
 		
 			$state=array();
 		
@@ -342,7 +368,7 @@ class Patreon_Frontend {
 		
 		$redirect_uri = site_url().'/patreon-authorization/';
 		
-		$href = 'https://www.patreon.com/oauth2/become-patron?response_type=code&min_cents='.$pledge_level.'&client_id='.$client_id.'&redirect_uri='.$redirect_uri.'&state='.base64_encode(serialize($state));
+		$href = 'https://www.patreon.com/oauth2/become-patron?response_type=code&min_cents='.$pledge_level.'&client_id='.$client_id.'&redirect_uri='.$redirect_uri.'&state='.urlencode(base64_encode(serialize($state)));
 
 		// 3rd party dev goodie! Apply custom filters so they can manipulate the url:
 		
@@ -571,7 +597,6 @@ class Patreon_Frontend {
 		
 		// Return content in all other cases
 		return $content;
-
 	}
 	public static function MakeAdminPostFooter($patreon_level) {
 		return '<div class="patreon-valid-patron-message">'.
@@ -596,8 +621,7 @@ class Patreon_Frontend {
 		return apply_filters('ptrn/valid_patron_final_footer',$post_footer,'valid_patron',$patreon_level,$user_patronage);		
 		
 	}
-
-	public function showPatreonLoginButton() {
+	public static function showPatreonLoginButton() {
 
 		$log_in_img = PATREON_PLUGIN_ASSETS . '/img/log-in-with-patreon-wide@2x.png';
 
@@ -621,8 +645,7 @@ class Patreon_Frontend {
 			echo apply_filters('ptrn/login_button', '<a href="'.self::patreonMakeLoginLink($client_id).'" class="ptrn-button"><img src="'.$log_in_img.'" width="272" height="42" /></a>');
 		}
 
-	}	
-
+	}
 	public static function LoginButtonShortcode($args) {
 		
 		if(!is_user_logged_in()) {
