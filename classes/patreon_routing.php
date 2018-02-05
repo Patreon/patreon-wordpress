@@ -70,6 +70,13 @@ class Patreon_Routing {
 		if (strpos($_SERVER['REQUEST_URI'],'/patreon-flow/')!==false) {
 			
 			if(array_key_exists( 'patreon-unlock-post', $wp->query_vars )) {
+				
+				// First slap the noindex header so search engines wont index this page:
+				header ('X-Robots-Tag: noindex, nofollow');
+				 
+				// Make sure browsers dont cache this
+				header ('cache-control: no-cache, must-revalidate, max-age=0');
+				
 				// We have a login/flow request, Get the post id
 				
 				if(isset($wp->query_vars['patreon-unlock-post'])) {
@@ -79,7 +86,7 @@ class Patreon_Routing {
 					$patreon_level = get_option('patreon-lock-entire-site',false);
 					
 					// Account for any value the creator can put into this option, and also the default false					
-					if(!$patreon_level OR $patreon_level == 0 OR $patreon_level == '') {
+					if(!$patreon_level OR $patreon_level == '') {
 						$patreon_level = 0;
 					}
 					
@@ -132,7 +139,7 @@ class Patreon_Routing {
 					if(!$client_id) {
 						// No client id, no point in being here. Make it go with an error.
 						
-						$final_redirect = add_query_arg( 'patreon_message', 'patreon_cant_login_api_error_credentials', home_url());
+						$final_redirect = add_query_arg( 'patreon_message', 'patreon_cant_login_api_error_credentials', $final_redirect);
 						
 						wp_redirect( $final_redirect);
 						exit;	
