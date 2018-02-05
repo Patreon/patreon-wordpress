@@ -597,7 +597,6 @@ class Patreon_Frontend {
 		
 		// Return content in all other cases
 		return $content;
-		
 	}
 	public static function MakeAdminPostFooter($patreon_level) {
 		return '<div class="patreon-valid-patron-message">'.
