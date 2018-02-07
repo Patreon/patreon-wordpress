@@ -23,6 +23,10 @@ Read an in-depth review of this free plugin and how to <a href="https://www.eleg
 - Alternatively, set a minimum pledge amount to see all posts.
 - Set custom HTML that non-patrons see instead of the post, prompting them to become a patron
 
+*<b>You can post entirely independently on your WordPress site from your Patreon page.*</b> There is no need for WordPress and Patreon posts to correspond to one another in content or in locked status. The choice is up to you as a creator.
+
+Got ideas? Suggest them to the developer community on our <a href="https://www.patreondevelopers.com/t/wordpress-plugin-feature-ideas/215">Patreon WordPress Ideas Thread</a>
+
 ### FEATURES FOR PATRONS
 
 - This plugin adds a “Unlock with Patreon” button to every locked post.
