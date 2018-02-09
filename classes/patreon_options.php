@@ -236,7 +236,7 @@ class Patreon_Options {
 
                                 <h2 class="hndle">About Patreon Wordpress</h2>
 
-                                <div class="inside">
+                               <div class="inside">
 									<p>Patreon Wordpress developed by Patreon</p>
 
                                     <p><strong>SUPPORT &amp; TECHNICAL HELP</strong> <br>

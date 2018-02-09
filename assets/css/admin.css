@@ -3,3 +3,15 @@
 	width : 100%;
 	display:block;
 }
+
+#patreon_attachment_patreon_level_form{
+	display:inline-block;
+	width : 100%;
+	text-align:center;
+	margin: 10px;
+	font-weight: bold;
+}
+#patreon_attachment_patreon_level{
+	
+	width : 60px;
+}
