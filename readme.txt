@@ -3,7 +3,7 @@ Contributors: wordpressorg@patreon.com, codebard
 Tags: patreon, membership, members
 Requires at least: 4.0
 Tested up to: 4.9.1
-Stable tag: 1.0.1
+Stable tag: 1.0.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -15,11 +15,17 @@ When a patron pledges, they can then head over to www.yourwordpresssite.com and 
 
 This plugin is maintained by Patreon. For advanced features, you can find additional premium WordPress plugins in this directory.
 
+Read an in-depth review of this free plugin and how to <a href="https://www.elegantthemes.com/blog/tips-tricks/how-to-create-a-patreon-membership-site-on-wordpress" target="_blank">combine Patreon and WordPress part of your membership business</a> on Elegant Themes
+
 ### FEATURES FOR CREATORS
 
 - Choose a minimum pledge amount necessary to see a particular post
 - Alternatively, set a minimum pledge amount to see all posts.
 - Set custom HTML that non-patrons see instead of the post, prompting them to become a patron
+
+*<b>You can post entirely independently on your WordPress site from your Patreon page.*</b> There is no need for WordPress and Patreon posts to correspond to one another in content or in locked status. The choice is up to you as a creator.
+
+Got ideas? Suggest them to the developer community on our <a href="https://www.patreondevelopers.com/t/wordpress-plugin-feature-ideas/215">Patreon WordPress Ideas Thread</a>
 
 ### FEATURES FOR PATRONS
 
@@ -83,6 +89,17 @@ It is  difficult to protect videos due the intensive bandwidth requirements of h
 
 
 == Changelog ==
+
+= 1.0.2 =
+* Page protection added
+* New logic to make cacheable unlock links
+* New logic to make cacheable login links
+* Login button shortcode added
+* State var urlencoded when going to Patreon and urlencoded when back
+* Button width fix
+* Login button now appears in login form
+* User creation logic now uses Patreon-supplied names for WP display name/
+* Support link updated in plugin admin
 
 = 1.0.1 =
 * API endpoint protocol fix - http to https

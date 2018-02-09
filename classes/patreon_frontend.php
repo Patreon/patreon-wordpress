@@ -18,8 +18,9 @@ class Patreon_Frontend {
 		add_action( 'wp_enqueue_scripts', array($this,'patreonEnqueueJs') );		
 		add_action( 'admin_enqueue_scripts', array($this,'patreonEnqueueAdminCss') );		
 		add_action( 'login_form', array($this, 'showPatreonMessages' ) );
-
+		add_action( 'login_form', array($this, 'displayPatreonLoginButtonInLoginForm' ) );
 		add_filter( 'the_content', array($this, 'protectContentFromUsers'), PHP_INT_MAX );
+		add_shortcode( 'patreon_login_button',array( $this,'LoginButtonShortcode' ));
 
 		self::$messages_map = array(
 			'patreon_cant_login_strict_oauth' => PATREON_CANT_LOGIN_STRICT_OAUTH,		
@@ -219,8 +220,10 @@ class Patreon_Frontend {
 		}
 		
 		$state['final_redirect_uri'] = $final_redirect;	
-
-		$refresh_link = '<a href="'.self::MakeUniversalFlowLink($patreon_level*100,$state).'">Refresh</a>';		
+		// 	$refresh_link = '<a href="'.self::MakeUniversalFlowLink($patreon_level*100,$state).'">Refresh</a>';		
+		
+		// Old flow link maker was replaced to a cache-able flow link function. Some vars may be unneeded in current function (this), clean up later #REVISIT
+		$refresh_link = '<a href="'.self::patreonMakeCacheableFlowLink($post).'">Refresh</a>';		
 		
 		if(!$user_logged_into_patreon) {
 			// Patron logged in and patron, but we are still showing the banner. This means pledge level is not enough.
@@ -289,13 +292,48 @@ class Patreon_Frontend {
 		
 		$state['final_redirect_uri'] = $final_redirect;
 		
-		$href = self::MakeUniversalFlowLink($send_pledge_level,$state,$client_id);
+		// $href = self::MakeUniversalFlowLink($send_pledge_level,$state,$client_id);
+		
+		// We changed the above universal flow link maker to a function which will create cache-able links
+		// Some of the vars in current function which the earlier function used may not be needed now - clean up later #REVISIT
+		
+		$href = self::patreonMakeCacheableFlowLink($post);
 			
 		$label_text = self::patreonMakeUniversalButtonLabel();
 		
 		$button = self::patreonMakeUniversalButtonImage($label_text);
 		
 		return apply_filters('ptrn/patron_button', '<a href="'.$href.'">'.$button.'</a>',$min_cents);		
+		
+	}
+	public static function patreonMakeCacheableLoginLink() {
+		
+		global $wp;
+		
+		$current_url = home_url( $wp->request );
+		
+		$flow_link = site_url().'/patreon-flow/?patreon-login=yes&patreon-final-redirect='.urlencode($current_url);
+		
+		return $flow_link;
+		
+	}
+	public static function patreonMakeCacheableFlowLink($post=false) {
+		
+		if(!$post) {
+			global $post;
+		}
+		
+		$unlock_post_id = '';
+		
+		if(isset($post) AND isset($post->ID)) {
+			
+			$unlock_post_id = $post->ID;
+			
+		}
+		
+		$flow_link = site_url().'/patreon-flow/?patreon-unlock-post='.$unlock_post_id;
+		
+		return $flow_link;
 		
 	}
 	public static function patreonMakeUniversalButtonImage($label) {
@@ -312,7 +350,7 @@ class Patreon_Frontend {
 		}	
 		
 		// If we werent given any state vars to send, initialize the array
-		if(!$state) { 
+		if(!$state) {
 		
 			$state=array();
 		
@@ -341,7 +379,7 @@ class Patreon_Frontend {
 		
 		$redirect_uri = site_url().'/patreon-authorization/';
 		
-		$href = 'https://www.patreon.com/oauth2/become-patron?response_type=code&min_cents='.$pledge_level.'&client_id='.$client_id.'&redirect_uri='.$redirect_uri.'&state='.base64_encode(serialize($state));
+		$href = 'https://www.patreon.com/oauth2/become-patron?response_type=code&min_cents='.$pledge_level.'&client_id='.$client_id.'&redirect_uri='.$redirect_uri.'&state='.urlencode(base64_encode(serialize($state)));
 
 		// 3rd party dev goodie! Apply custom filters so they can manipulate the url:
 		
@@ -400,10 +438,11 @@ class Patreon_Frontend {
 		$redirect_uri = site_url().'/patreon-authorization/';
 			
 		// If we werent given any state vars to send, initialize the array
-		
+
 		if(!$state) {
+			
 			$state=array();
-		
+			
 			// Get the address of the current page, and save it as final redirect uri.		
 			// Start with home url for redirect. If post is valid, get permalink. 
 			
@@ -428,7 +467,7 @@ class Patreon_Frontend {
 		
 		$redirect_uri = site_url().'/patreon-authorization/';
 
-		$href = 'https://www.patreon.com/oauth2/authorize?response_type=code&client_id='.$client_id.'&redirect_uri='.$redirect_uri.'&state='.base64_encode(serialize($state));
+		$href = 'https://www.patreon.com/oauth2/authorize?response_type=code&client_id='.$client_id.'&redirect_uri='.$redirect_uri.'&state='.urlencode(base64_encode(serialize($state)));
 	
 		return apply_filters('ptrn/login_link', $href);
 	}
@@ -462,7 +501,7 @@ class Patreon_Frontend {
 			
 		}
 		
-		$href = self::patreonMakeLoginLink($client_id);
+		$href = self::patreonMakeCacheableLoginLink($client_id);
 
 		return apply_filters('ptrn/login_button', '<a href="'.$href.'" class="ptrn-login" data-ptrn_nonce="' . wp_create_nonce( 'patreon-nonce' ).'"><div class="patreon-responsive-button-wrapper"><div class="patreon-responsive-button"><img class="patreon_logo" src="'.PATREON_PLUGIN_ASSETS.'/img/patreon-logomark-on-coral.svg" alt=""> '.$login_label.'</div></div></a>', $href);
 
@@ -476,7 +515,6 @@ class Patreon_Frontend {
 		if(in_array(get_post_type(),$post_types)) {
 
 			$exclude = array(
-				'page'
 			);
 			
 			// Enables 3rd party plugins to modify the post types excluded from locking
@@ -562,13 +600,16 @@ class Patreon_Frontend {
 				
 				
 			}
+			
+			// If we are here, it means post is protected, user is patron, patronage is valid. Slap the post footer:
+			
+			return $content .self::MakeValidPatronFooter($patreon_level, $user_patronage);
 
 		}
 		
-		// If we are here, it means post is protected, user is patron, patronage is valid. Slap the post footer:
+		// Return content in all other cases
+		return $content;
 		
-		return $content .self::MakeValidPatronFooter($patreon_level, $user_patronage);
-
 	}
 	public static function MakeAdminPostFooter($patreon_level) {
 		return '<div class="patreon-valid-patron-message">'.
@@ -593,8 +634,44 @@ class Patreon_Frontend {
 		return apply_filters('ptrn/valid_patron_final_footer',$post_footer,'valid_patron',$patreon_level,$user_patronage);		
 		
 	}
-	
+	public static function displayPatreonLoginButtonInLoginForm() {
+		// For displaying login button in the form - wrapper
+		echo self::showPatreonLoginButton();
+	}
+	public static function showPatreonLoginButton() {
 
+		$log_in_img = PATREON_PLUGIN_ASSETS . '/img/log-in-with-patreon-wide@2x.png';
+
+		$client_id = get_option('patreon-client-id', false);
+
+		if($client_id == false) {
+			return '';
+		}
+		$button = '';
+		/* inline styles - prevent themes from overriding */
+		$button .= '
+		<style type="text/css">
+			.ptrn-button{display:block !important;;margin-top:20px !important;margin-bottom:20px !important;}
+			.ptrn-button img {width: 272px; height:42px;}
+			.patreon-msg {-webkit-border-radius: 6px;-moz-border-radius: 6px;-ms-border-radius: 6px;-o-border-radius: 6px;border-radius: 6px;padding:8px;margin-bottom:20px!important;display:block;border:1px solid #E6461A;background-color:#484848;color:#ffffff;}
+		</style>';
+
+		if(isset($_REQUEST['patreon-msg']) && $_REQUEST['patreon-msg'] == 'login_with_patreon') {
+			$button .= '<p class="patreon-msg">You can now login with your WordPress username/password.</p>';
+		} else {
+			$button .= apply_filters('ptrn/login_button', '<a href="'.self::patreonMakeCacheableLoginLink($client_id).'" class="ptrn-button"><img src="'.$log_in_img.'" width="272" height="42" /></a>');
+		}
+	
+		return $button;
+
+	}
+	public static function LoginButtonShortcode($args) {
+		
+		if(!is_user_logged_in()) {
+			return Patreon_Frontend::showPatreonLoginButton();
+		}
+		
+	}
 
 }
 
