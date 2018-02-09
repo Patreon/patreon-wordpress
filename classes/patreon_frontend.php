@@ -18,7 +18,7 @@ class Patreon_Frontend {
 		add_action( 'wp_enqueue_scripts', array($this,'patreonEnqueueJs') );		
 		add_action( 'admin_enqueue_scripts', array($this,'patreonEnqueueAdminCss') );		
 		add_action( 'login_form', array($this, 'showPatreonMessages' ) );
-		add_action( 'login_form', array($this, 'showPatreonLoginButton' ) );
+		add_action( 'login_form', array($this, 'displayPatreonLoginButtonInLoginForm' ) );
 		add_filter( 'the_content', array($this, 'protectContentFromUsers'), PHP_INT_MAX );
 		add_shortcode( 'patreon_login_button',array( $this,'LoginButtonShortcode' ));
 
@@ -634,6 +634,10 @@ class Patreon_Frontend {
 		return apply_filters('ptrn/valid_patron_final_footer',$post_footer,'valid_patron',$patreon_level,$user_patronage);		
 		
 	}
+	public static function displayPatreonLoginButtonInLoginForm() {
+		// For displaying login button in the form - wrapper
+		echo self::showPatreonLoginButton();
+	}
 	public static function showPatreonLoginButton() {
 
 		$log_in_img = PATREON_PLUGIN_ASSETS . '/img/log-in-with-patreon-wide@2x.png';
@@ -651,13 +655,13 @@ class Patreon_Frontend {
 			.ptrn-button img {width: 272px; height:42px;}
 			.patreon-msg {-webkit-border-radius: 6px;-moz-border-radius: 6px;-ms-border-radius: 6px;-o-border-radius: 6px;border-radius: 6px;padding:8px;margin-bottom:20px!important;display:block;border:1px solid #E6461A;background-color:#484848;color:#ffffff;}
 		</style>';
-		
+
 		if(isset($_REQUEST['patreon-msg']) && $_REQUEST['patreon-msg'] == 'login_with_patreon') {
 			$button .= '<p class="patreon-msg">You can now login with your WordPress username/password.</p>';
 		} else {
 			$button .= apply_filters('ptrn/login_button', '<a href="'.self::patreonMakeCacheableLoginLink($client_id).'" class="ptrn-button"><img src="'.$log_in_img.'" width="272" height="42" /></a>');
 		}
-		
+	
 		return $button;
 
 	}
