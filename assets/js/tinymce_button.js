@@ -1,5 +1,5 @@
 /* global tinymce */
-tinymce.PluginManager.add( 'tinymce_patron_only_button_plugin', function( editor ) {
+tinymce.PluginManager.add( 'tinymce_patreon_wordpress_patron_only_image_button_plugin', function( editor ) {
 	var toolbar, serializer, touchOnImage, pasteInCaption,
 		each = tinymce.each,
 		trim = tinymce.trim,
