@@ -293,7 +293,7 @@ class Patreon_Protect {
 	}
 
 	public function addTinyMCEPlugin($plugin_array) {
-		$plugin_array['tinymce_patron_only_button_plugin'] = PATREON_PLUGIN_ASSETS .'/js/tinymce_button.js';
+		$plugin_array['tinymce_patreon_wordpress_patron_only_image_button_plugin'] = PATREON_PLUGIN_ASSETS .'/js/tinymce_button.js';
 		return $plugin_array;
 	}
 
