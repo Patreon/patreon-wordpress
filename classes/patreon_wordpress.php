@@ -41,8 +41,8 @@ class Patreon_Wordpress {
 		add_action('init', array($this, 'checkPatreonCreatorName'));
 		add_action('init', 'Patreon_Login::checkTokenExpiration');
 		add_action('admin_enqueue_scripts', array($this, 'enqueueAdminScripts'));
-		add_action( 'upgrader_process_complete', 'Patreon_Wordpress::AfterUpdateActions');
-		add_action( 'admin_notices', array($this, 'AdminMessages'));
+		add_action('upgrader_process_complete', 'Patreon_Wordpress::AfterUpdateActions');
+		add_action('admin_notices', array($this, 'AdminMessages'));
 
 	}
 	static function getPatreonUser($user) {
