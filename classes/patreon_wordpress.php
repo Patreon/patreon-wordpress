@@ -364,12 +364,25 @@ class Patreon_Wordpress {
 		return false;
 
 	}
-		
 	public static function enqueueAdminScripts() {
 
 		wp_enqueue_script( 'patreon-admin-js', PATREON_PLUGIN_ASSETS .'/js/admin.js', array('jquery'), '1.0', true );
 		wp_enqueue_style('embed', PATREON_PLUGIN_ASSETS .'/css/editor.css',array(), '0.1','screen' );
 
+	}
+	public static function AfterUpdateActions($upgrader_object) {
+		// In this function we perform actions after update.
+		
+		// Check and abort if the plugin updated is not ours
+		if($upgrader_object->result['destination_name']!='patreon-connect/patreon.php') {
+			return;			
+		}
+		
+		// Now remove the flags for regular notifications:
+		
+		delete_option('patreon-mailing-list-notice-shown');
+		delete_option('patreon-rate-plugin-notice-shown');
+		
 	}
 	
 }
