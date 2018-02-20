@@ -384,6 +384,38 @@ class Patreon_Wordpress {
 		delete_option('patreon-rate-plugin-notice-shown');
 		
 	}
+	public static function AdminMessages() {
+		
+		// This function processes any message or notification to display once after updates.
+		
+		$mailing_list_notice_shown = get_option('patreon-mailing-list-notice-shown',false);
+		
+		// For testing currently set to false:
+		$mailing_list_notice_shown = false;
+		
+		if(!$mailing_list_notice_shown) {
+			?>
+				 <div class="notice notice-success is-dismissible">
+					<p>Join our mailing list to get update notices, tips & tricks for Patreon WordPress! (link to Tal's mailing list somewhere here)</p>
+				</div>
+			<?php			
+			update_option('patreon-mailing-list-notice-shown',1);
+		}
+		
+		$rate_plugin_notice_shown = get_option('patreon-rate-plugin-notice-shown',false);
+		
+		// For testing currently set to false:
+		$rate_plugin_notice_shown = false;
+		
+		if(!$rate_plugin_notice_shown) {
+			?>
+				 <div class="notice notice-info is-dismissible">
+					<p>Like Patreon WordPress? How about giving us a thumbs up at our WordPress.org <a href="https://wordpress.org/support/plugin/patreon-connect/reviews/#new-post" target="_blank">plugin page?</a></p>
+				</div>
+			<?php	
+			update_option('patreon-rate-plugin-notice-shown',1);
+		}
+	}
 	
 }
 
