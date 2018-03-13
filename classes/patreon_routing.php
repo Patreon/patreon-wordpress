@@ -49,6 +49,7 @@ class Patreon_Routing {
 		array_push($public_query_vars, 'patreon-oauth');
 		array_push($public_query_vars, 'patreon-flow');
 		array_push($public_query_vars, 'patreon-unlock-post');
+		array_push($public_query_vars, 'patreon-unlock-image');
 		array_push($public_query_vars, 'patreon-login');
 		array_push($public_query_vars, 'patreon-final-redirect');
 		array_push($public_query_vars, 'code');
@@ -64,7 +65,6 @@ class Patreon_Routing {
 			setcookie('patreon_nonce',$nonce, 0, COOKIEPATH, COOKIE_DOMAIN );
 			$_COOKIE['patreon_nonce'] = $nonce;
  		}
-
 	}
 
 	function parse_request( &$wp ) {
@@ -149,6 +149,17 @@ class Patreon_Routing {
 						$patreon_level = $post_level;
 					}
 					
+					// If this is an image unlock request, override patreon level with image's:
+					
+					if(isset($wp->query_vars['patreon-unlock-image']) AND $wp->query_vars['patreon-unlock-image']!='') {
+		
+						$patreon_level = get_post_meta( $wp->query_vars['patreon-unlock-image'], 'patreon_level', true );
+						
+						if(!$patreon_level OR $patreon_level == 0) {
+							$patreon_level = 0;
+						}
+					}
+		
 					if($patreon_level==0) {
 						// No locking level set for this content or the site. No point in locking. Redirect to post.
 						wp_redirect( $final_redirect );
