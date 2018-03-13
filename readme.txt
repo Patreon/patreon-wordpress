@@ -2,8 +2,8 @@
 Contributors: wordpressorg@patreon.com, codebard
 Tags: patreon, membership, members
 Requires at least: 4.0
-Tested up to: 4.9.1
-Stable tag: 1.0.2
+Tested up to: 4.9.4
+Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -89,6 +89,23 @@ It is  difficult to protect videos due the intensive bandwidth requirements of h
 
 
 == Changelog ==
+
+= 1.1.0 =
+* Image locking functionality added
+* Users are now able to designate a different pledge level for any image and lock them
+* Locked images wont be visible when their direct link is used - which also prevents hotlinking of these images
+* Clicking on a locked image sends user to the pledge flow at Patreon with appropriate pledge level
+* Easy to notice and use image lock icon which appears when an image is clicked in post editor while in visual mode
+* Easy to use jQuery modal pledge level interface to lock image while editing a post
+* Images can also be locked from media library by setting a pledge level
+* Plugin now blurs the original image, and adds an unlock interface to make a locked image placeholder and caches them for performance
+* Cached placeholder images are refreshed every time pledge level for an image is updated
+* Image unlock links are made cacheable to allow sites using cache to work with locked images without problems
+* Front-end jQuery code to only catch clicks on images locked for the current user and send them to pledge flow
+* Plugin now imports emails of Patreon users who has their email verified at Patreon
+* Login button added to register form
+* User agent string added to API contacting function to identify the plugin
+* Various information like user's logged in state at Patreon, pledge level and various pledge parameters of user are now cached for any given page load. This will prevent contacting API more than once during a page load and help speed up operations - especially post listings
 
 = 1.0.2 =
 * Page protection added
