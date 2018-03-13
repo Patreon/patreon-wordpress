@@ -9,17 +9,19 @@ if ( ! defined( 'WPINC' ) ) {
 class Patreon_Frontend {
 
 	public static $messages_map = array();
+	public static $current_user_logged_into_patreon = -1;
 	
 	function __construct() {
 
 		add_action( 'login_enqueue_scripts', array($this,'patreonEnqueueCss'), 10 );
-		add_action( 'login_enqueue_scripts', array($this,'patreonEnqueueJs'), 1 );
 		add_action( 'wp_enqueue_scripts', array($this,'patreonEnqueueCss') );
 		add_action( 'wp_enqueue_scripts', array($this,'patreonEnqueueJs') );		
 		add_action( 'admin_enqueue_scripts', array($this,'patreonEnqueueAdminCss') );		
 		add_action( 'login_form', array($this, 'showPatreonMessages' ) );
 		add_action( 'login_form', array($this, 'displayPatreonLoginButtonInLoginForm' ) );
-		add_filter( 'the_content', array($this, 'protectContentFromUsers'), PHP_INT_MAX );
+		add_action( 'register_form', array($this, 'showPatreonMessages' ) );
+		add_action( 'register_form', array($this, 'displayPatreonLoginButtonInLoginForm' ) );
+		add_filter( 'the_content', array($this, 'protectContentFromUsers'), PHP_INT_MAX-5 );
 		add_shortcode( 'patreon_login_button',array( $this,'LoginButtonShortcode' ));
 
 		self::$messages_map = array(
@@ -39,8 +41,8 @@ class Patreon_Frontend {
 	}
 
 	function patreonEnqueueJs() {
-		// wp_register_script( 'patreon-wordpress-js', PATREON_PLUGIN_ASSETS.'/js/app.js', array( 'jquery' ) );
-		// wp_enqueue_script( 'patreon-wordpress-js', PATREON_PLUGIN_ASSETS.'/js/app.js', false );
+		wp_register_script( 'patreon-wordpress-js', PATREON_PLUGIN_ASSETS.'/js/app.js', array( 'jquery' ) );
+		wp_enqueue_script( 'patreon-wordpress-js', PATREON_PLUGIN_ASSETS .'/js/app.js', array('jquery'), '1.0', true );
 	}
 	function patreonEnqueueAdminCss() {
 		wp_register_style( 'patreon-wordpress-admin-css', PATREON_PLUGIN_ASSETS.'/css/admin.css', false );
@@ -247,8 +249,6 @@ class Patreon_Frontend {
 				
 			$label = str_replace('%%pledgelevel%%',$patreon_level,PATREON_TEXT_UNDER_BUTTON_2);
 			return apply_filters('ptrn/label_text_under_universal_button',str_replace('%%flowlink%%',$refresh_link,$label),'pledge_not_enough',$user_logged_into_patreon,$is_patron,$patreon_level,$state,$user_patronage);			
-			
-		
 		}
 		
 		return apply_filters('ptrn/label_text_under_universal_button',$label,'fail_case',$user_logged_into_patreon,$is_patron,$patreon_level,$state,$user_patronage);
@@ -336,6 +336,23 @@ class Patreon_Frontend {
 		return $flow_link;
 		
 	}
+	public static function patreonMakeCacheableImageFlowLink($attachment_id,$post_id = false) {
+	
+		if(!$post_id) {
+			global $post;
+		}
+		
+		$unlock_post_id = $post_id;
+		
+		if(!$unlock_post_id AND (isset($post) AND isset($post->ID))) {
+			$unlock_post_id = $post->ID;
+		}
+		
+		$flow_link = site_url().'/patreon-flow/?patreon-unlock-post='.$unlock_post_id.'&patreon-unlock-image='.$attachment_id;
+		
+		return $flow_link;
+		
+	}
 	public static function patreonMakeUniversalButtonImage($label) {
 		return '<div class="patreon-responsive-button-wrapper"><div class="patreon-responsive-button"><img class="patreon_logo" src="'.PATREON_PLUGIN_ASSETS.'/img/patreon-logomark-on-coral.svg" alt=""> '.$label.'</div></div>';
 		
@@ -403,7 +420,11 @@ class Patreon_Frontend {
 		
 	}
 	public static function isUserLoggedInPatreon() {
-		 
+		
+		if(self::$current_user_logged_into_patreon != -1 ) {
+			return self::$current_user_logged_into_patreon;
+		}
+		
 		$user_logged_into_patreon = false;
 		
 		if(is_user_logged_in()) {
@@ -423,7 +444,7 @@ class Patreon_Frontend {
 			}
 			
 		}		
-		return $user_logged_into_patreon;
+		return self::$current_user_logged_into_patreon = $user_logged_into_patreon;
 	}
 	public static function patreonMakeLoginLink($client_id=false,$state=false,$post=false) {
 		
@@ -513,7 +534,7 @@ class Patreon_Frontend {
 		$post_types = get_post_types(array('public'=>true),'names');
 	
 		if(in_array(get_post_type(),$post_types)) {
-
+			
 			$exclude = array(
 			);
 			
@@ -554,12 +575,13 @@ class Patreon_Frontend {
 			// It can be defined by any plugin until right before the_content filter is run.
 	
 			if(apply_filters('ptrn/bypass_filtering',defined('PATREON_BYPASS_FILTERING'))) {
+			
                 return $content;
             }
 			 
 			if(current_user_can('manage_options')) {
 				// Here we need to put a notification to admins so they will know they can see the content because they are admin_login_with_patreon_disabled
-				
+			
 				return $content . self::MakeAdminPostFooter($patreon_level);
 			}	
 				
@@ -573,16 +595,14 @@ class Patreon_Frontend {
 			
 			$user_patronage = Patreon_Wordpress::getUserPatronage();
 	
-			
 			$declined = Patreon_Wordpress::checkDeclinedPatronage($user);
 			
 			if($user_patronage == false 
 				|| $user_patronage < ($patreon_level*100)
 				|| $declined
 			) {
-
 				// protect content from user
-			
+				
 				// Get client id
 				
 				$client_id = get_option('patreon-client-id', false);
@@ -593,11 +613,10 @@ class Patreon_Frontend {
 					
 					$content = self::displayPatreonCampaignBanner($patreon_level);
 
-					$content = apply_filters('ptrn/post_content', $content, $patreon_level, $user_patronage);				
-					
+					$content = apply_filters('ptrn/post_content', $content, $patreon_level, $user_patronage);
+
 					return $content;
 				}
-				
 				
 			}
 			
@@ -606,7 +625,7 @@ class Patreon_Frontend {
 			return $content .self::MakeValidPatronFooter($patreon_level, $user_patronage);
 
 		}
-		
+				
 		// Return content in all other cases
 		return $content;
 		
@@ -636,11 +655,11 @@ class Patreon_Frontend {
 	}
 	public static function displayPatreonLoginButtonInLoginForm() {
 		// For displaying login button in the form - wrapper
-		echo self::showPatreonLoginButton();
+		echo '<div style="display:inline-block;width : 100%; text-align: center;">'.self::showPatreonLoginButton().'</div>';
 	}
 	public static function showPatreonLoginButton() {
 
-		$log_in_img = PATREON_PLUGIN_ASSETS . '/img/log-in-with-patreon-wide@2x.png';
+		$log_in_img = PATREON_PLUGIN_ASSETS . '/img/patreon login@1x.png';
 
 		$client_id = get_option('patreon-client-id', false);
 
