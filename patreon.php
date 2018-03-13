@@ -4,7 +4,7 @@
 Plugin Name: Patreon Wordpress
 Plugin URI: https://www.patreon.com/apps/wordpress
 Description: Patron-only content, directly on your website.
-Version: 1.0.2
+Version: 1.1.0
 Author: Patreon <platform@patreon.com>
 Author URI: https://patreon.com
 */
@@ -14,9 +14,18 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
+$patreon_wp_uploads_dir = wp_upload_dir();
+$patreon_locked_image_cache_dir = $patreon_wp_uploads_dir['basedir'].'/patreon_locked_image_cache';
+
+if(!file_exists($patreon_locked_image_cache_dir)) {
+	
+	wp_mkdir_p($patreon_locked_image_cache_dir);
+}
+
 define("PATREON_PLUGIN_URL", plugin_dir_url( __FILE__ ) );
 define("PATREON_PLUGIN_ASSETS", plugin_dir_url( __FILE__ ).'assets' );
 define("PATREON_PLUGIN_ASSETS_DIR", plugin_dir_path( __FILE__ ).'assets' );
+define("PATREON_PLUGIN_LOCKED_IMAGE_CACHE_DIR", $patreon_locked_image_cache_dir);
 define("PATREON_TEXT_CONNECT", 'Connect with Patreon' );
 define("PATREON_TEXT_REFRESH", 'Refresh' );
 define("PATREON_TEXT_NOT_PATRON", 'Not a Patron?' );
@@ -47,6 +56,8 @@ define("PATREON_API_CREDENTIALS_MISSING", 'Sorry. Could not login because API cr
 define("PATREON_ADMIN_LOGIN_WITH_PATREON_DISABLED", 'Sorry. Logging in Administrators via Patreon is turned off in options. Please login with your WordPress account first' );
 define("PATREON_LOGIN_WITH_PATREON_DISABLED", 'Sorry. Logging in with Patreon is disabled in this Website. Please contact administrator.' );
 define("PATREON_ADMIN_BYPASSES_FILTER_MESSAGE", 'This content is for Patrons only, it\'s not locked for you because you are an Administrator' );
+define("PATREON_WORDPRESS_VERSION", '1.1.0' );
+define("PATREON_WORDPRESS_PLUGIN_SLUG", plugin_basename( __FILE__ ) );
 
 
 include 'classes/patreon_wordpress.php';
