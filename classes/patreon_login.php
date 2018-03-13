@@ -182,7 +182,15 @@ class Patreon_Login {
 			
 			$random_password = wp_generate_password( 64, false );
 			
-			$user_id = wp_create_user( $username, $random_password, '' );
+			$user_email = '';
+			
+			// Import user email only if the email was verified
+
+			if($user_response['data']['attributes']['is_email_verified']) {
+				$user_email = $user_response['data']['attributes']['email'];
+			}
+			
+			$user_id = wp_create_user( $username, $random_password, $user_email );
 
 			if($user_id) {
 
