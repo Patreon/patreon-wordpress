@@ -15,6 +15,10 @@ class Patreon_Wordpress {
 	private static $Patreon_Options;
 	private static $Patron_Metabox;
 	private static $Patreon_User_Profiles;
+	public static $current_user_pledge_amount = -1;
+	public static $current_user_patronage_declined = -1;
+	public static $current_user_is_patron = -1;
+	public static $current_patreon_user = -1;
 
 	function __construct() {
 
@@ -41,12 +45,15 @@ class Patreon_Wordpress {
 		add_action('init', array($this, 'checkPatreonCreatorName'));
 		add_action('init', 'Patreon_Login::checkTokenExpiration');
 		add_action('admin_enqueue_scripts', array($this, 'enqueueAdminScripts'));
-		add_action('upgrader_process_complete', 'Patreon_Wordpress::AfterUpdateActions');
+		add_action('upgrader_process_complete', 'Patreon_Wordpress::AfterUpdateActions',10,2);
 		add_action('admin_notices', array($this, 'AdminMessages'));
 
 	}
-	static function getPatreonUser($user) {
+	public static function getPatreonUser($user) {
 
+		if(self::$current_patreon_user != -1 ) {
+			return self::$current_patreon_user;
+		}
 		/* get user meta data and query patreon api */
 		$user_meta = get_user_meta($user->ID);
 		if(isset($user_meta['patreon_access_token'][0])) {
@@ -64,11 +71,10 @@ class Patreon_Wordpress {
 			// For now we are always getting user from APi fresh:
 			$user = $api_client->fetch_user();
 	
-			return $user;
+			return self::$current_patreon_user = $user;
 		}
 
-		return false;
-
+		return self::$current_patreon_user = false;
 	}
 	static function updatePatreonUser() {
 
@@ -259,6 +265,10 @@ class Patreon_Wordpress {
 
 	}
 	public static function getUserPatronage() {
+		
+		if(self::$current_user_pledge_amount != -1 ) {
+			return self::$current_user_pledge_amount;
+		}
 
 		if(is_user_logged_in() == false) {
 			return false;
@@ -298,7 +308,7 @@ class Patreon_Wordpress {
 			do_action('ptrn/declined_since', $pledge, $pledge['attributes']['declined_since']);
 			return false;
 		}
-
+		
 		if($pledge != false) {
 			return self::getUserPatronageLevel($pledge);
 		}
@@ -315,6 +325,10 @@ class Patreon_Wordpress {
 	}
 	public static function checkDeclinedPatronage($user) {
 		
+		if(self::$current_user_patronage_declined != -1) {
+			return self::$current_user_patronage_declined;
+		}
+		
 		if(!$user) {
 			$user = wp_get_current_user();
 		}
@@ -323,7 +337,7 @@ class Patreon_Wordpress {
 		
 		// If no user exists, the patronage cannot have been declined.
 		if(!$user_response) {
-			return false;
+			return self::$current_user_patronage_declined = false;
 		}
 		
 		$creator_id = get_option('patreon-creator-id', false);
@@ -337,33 +351,41 @@ class Patreon_Wordpress {
 				}
 			}
 		}		
-			
+		
 		if(isset($pledge['attributes']['declined_since']) && !is_null($pledge['attributes']['declined_since'])) {
 			do_action('ptrn/declined_since', $pledge, $pledge['attributes']['declined_since']);
-			return true;
+			return self::$current_user_patronage_declined = true;
 		}
-		return false;
+		else {
+			return self::$current_user_patronage_declined = false;
+		}
 	}
 	public static function getUserPatronageLevel($pledge) {
-
-		$patronage_level = 0;
-
-		if(isset($pledge['attributes']['amount_cents'])) {
-			$patronage_level = $pledge['attributes']['amount_cents'];
+		
+		if(self::$current_user_pledge_amount != -1) {
+			return self::$current_user_pledge_amount;
 		}
-
-		return $patronage_level;
-
+		
+		if(isset($pledge['attributes']['amount_cents'])) {
+			return self::$current_user_pledge_amount = $pledge['attributes']['amount_cents'];
+		}
+	
+		return 0;
 	}
 	public static function isPatron() {
 
+		if(self::$current_user_is_patron != -1) {
+			return self::$current_user_is_patron;
+		}
+		
 		$user_patronage = self::getUserPatronage();
 
 		if(is_numeric($user_patronage) && $user_patronage > 0) {
-			return true;
+			self::$current_user_is_patron = true;
 		}
-
-		return false;
+		else {
+			self::$current_user_is_patron = false;
+		}
 
 	}
 	public static function enqueueAdminScripts() {
@@ -372,19 +394,49 @@ class Patreon_Wordpress {
 		wp_enqueue_style('embed', PATREON_PLUGIN_ASSETS .'/css/editor.css',array(), '0.1','screen' );
 
 	}
-	public static function AfterUpdateActions($upgrader_object) {
-		// In this function we perform actions after update.
+	public static function AfterUpdateActions($upgrader_object, $options=false) {
 		
-		// Check and abort if the plugin updated is not ours
-		if($upgrader_object->result['destination_name']!='patreon-connect/patreon.php') {
-			return;			
+		// In this function we perform actions after update.
+
+		if(!$options OR !is_array($options)) {
+			// Not an update.
+			return;
 		}
 		
-		// Now remove the flags for regular notifications:
-		
-		delete_option('patreon-mailing-list-notice-shown');
-		delete_option('patreon-rate-plugin-notice-shown');
-		
+		// Check if this plugin was updated:
+		if( $options['action'] == 'update' && $options['type'] == 'plugin') {
+			
+			if(isset( $options['plugins'] )) {
+				// Multi plugin update. Iterate:
+				// Iterate through the plugins being updated and check if ours is there
+				foreach( $options['plugins'] as $plugin ) {
+					
+					if( $plugin == PATREON_WORDPRESS_PLUGIN_SLUG ) {
+						$got_updated = true;
+					}
+				}	
+			}
+			if(isset( $options['plugin'] )) {
+				// Single plugin update
+
+				if( $options['plugin'] == PATREON_WORDPRESS_PLUGIN_SLUG ) {
+					$got_updated = true;
+				}
+			}
+
+			if($got_updated) {
+				// Yep, this plugin was updated. Do whatever necessary post-update action:
+				
+				// Flush permalinks (htaccess rules) for Apache servers to make image protection rules active
+				flush_rewrite_rules();
+				
+				// Now remove the flags for regular notifications:
+	
+				delete_option('patreon-mailing-list-notice-shown');
+				delete_option('patreon-rate-plugin-notice-shown');
+			}
+		}		
+			
 	}
 	public static function AdminMessages() {
 		
@@ -392,13 +444,10 @@ class Patreon_Wordpress {
 		
 		$mailing_list_notice_shown = get_option('patreon-mailing-list-notice-shown',false);
 		
-		// For testing currently set to false:
-		$mailing_list_notice_shown = false;
-		
 		if(!$mailing_list_notice_shown) {
 			?>
 				 <div class="notice notice-success is-dismissible">
-					<p>Join our mailing list to get update notices, tips & tricks for Patreon WordPress! (link to Tal's mailing list somewhere here)</p>
+					<p>Would you like to receive update notices, tips & tricks for Patreon WordPress? <a href="https://patreonforms.typeform.com/to/dPBVp1" target="_blank">Join our mailing list here!</a></p>
 				</div>
 			<?php			
 			update_option('patreon-mailing-list-notice-shown',1);
@@ -406,13 +455,10 @@ class Patreon_Wordpress {
 		
 		$rate_plugin_notice_shown = get_option('patreon-rate-plugin-notice-shown',false);
 		
-		// For testing currently set to false:
-		$rate_plugin_notice_shown = false;
-		
 		if(!$rate_plugin_notice_shown) {
 			?>
 				 <div class="notice notice-info is-dismissible">
-					<p>Like Patreon WordPress? How about giving us a thumbs up at our WordPress.org <a href="https://wordpress.org/support/plugin/patreon-connect/reviews/#new-post" target="_blank">plugin page?</a></p>
+					<p>Did Patreon WordPress plugin your transform membership business? Help creators like yourself find out about this plugin <a href="https://wordpress.org/support/plugin/patreon-connect/reviews/#new-post" target="_blank">by rating and giving your brutally honest thoughts!</a></p>
 				</div>
 			<?php	
 			update_option('patreon-rate-plugin-notice-shown',1);
