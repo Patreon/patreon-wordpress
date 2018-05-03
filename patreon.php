@@ -4,7 +4,7 @@
 Plugin Name: Patreon Wordpress
 Plugin URI: https://www.patreon.com/apps/wordpress
 Description: Patron-only content, directly on your website.
-Version: 1.1.0
+Version: 1.1.1
 Author: Patreon <platform@patreon.com>
 Author URI: https://patreon.com
 */
@@ -54,11 +54,13 @@ define("PATREON_WEIRD_REDIRECTION_AT_LOGIN", 'This redirect should not have happ
 define("PATREON_COULDNT_CREATE_WP_ACCOUNT", 'Sorry. Could not create a WordPress account. Please contact site administration.' );
 define("PATREON_API_CREDENTIALS_MISSING", 'Sorry. Could not login because API credentials are missing or incorrect. Please contact site administration.' );
 define("PATREON_ADMIN_LOGIN_WITH_PATREON_DISABLED", 'Sorry. Logging in Administrators via Patreon is turned off in options. Please login with your WordPress account first' );
+define("PATREON_EMAIL_EXISTS_LOGIN_WITH_WP_FIRST", 'Sorry. A WordPress user with the same email you use at Patreon exists. Please log into this site with your WordPress user first, and then log in with Patreon to link these two accounts...' );
 define("PATREON_LOGIN_WITH_PATREON_DISABLED", 'Sorry. Logging in with Patreon is disabled in this Website. Please contact administrator.' );
 define("PATREON_ADMIN_BYPASSES_FILTER_MESSAGE", 'This content is for Patrons only, it\'s not locked for you because you are an Administrator' );
-define("PATREON_WORDPRESS_VERSION", '1.1.0' );
+define("PATREON_NO_LOCKING_LEVEL_SET_FOR_THIS_POST", 'Post is already public. If you would like to lock this post, please set a pledge level for it' );
+define("PATREON_NO_POST_ID_TO_UNLOCK_POST", 'Sorry - could not get the post id for this locked post' );
+define("PATREON_WORDPRESS_VERSION", '1.1.1' );
 define("PATREON_WORDPRESS_PLUGIN_SLUG", plugin_basename( __FILE__ ) );
-
 
 include 'classes/patreon_wordpress.php';
 
