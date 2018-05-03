@@ -41,12 +41,14 @@ class Patreon_Wordpress {
 
 		add_action('wp_head', array($this, 'updatePatreonUser') );
 		add_action('init', array($this, 'checkPatreonCreatorID'));
+		add_action('init', array($this, 'checkPatreonCampaignID'));
 		add_action('init', array($this, 'checkPatreonCreatorURL'));
 		add_action('init', array($this, 'checkPatreonCreatorName'));
 		add_action('init', 'Patreon_Login::checkTokenExpiration');
 		add_action('admin_enqueue_scripts', array($this, 'enqueueAdminScripts'));
 		add_action('upgrader_process_complete', 'Patreon_Wordpress::AfterUpdateActions',10,2);
 		add_action('admin_notices', array($this, 'AdminMessages'));
+		add_action('init', array($this, 'transitionalImageOptionCheck'));
 
 	}
 	public static function getPatreonUser($user) {
@@ -170,6 +172,29 @@ class Patreon_Wordpress {
 				update_option( 'patreon-creator-url', $creator_url );
 			}
 		}
+	}
+	public static function checkPatreonCampaignID() {
+		
+		// Check if campaign id doesnt exist. 
+		
+		if(!get_option('patreon-campaign-id', false) OR get_option('patreon-campaign-id', false)=='') {
+			// Making sure access credentials are there to avoid fruitlessly contacting the api:
+			
+			if(get_option('patreon-client-id', false) 
+				&& get_option('patreon-client-secret', false) 
+				&& get_option('patreon-creators-access-token', false)
+			) {
+				
+				// Credentials are in. Go.
+				
+				$creator_url = self::getPatreonCampaignID();
+			}
+			if(isset($creator_url)) {
+				// Creator id acquired. Update.
+				
+				update_option( 'patreon-campaign-id', $creator_url );
+			}
+		}
 		
 	}
 	public static function checkPatreonCreatorName() {
@@ -262,7 +287,16 @@ class Patreon_Wordpress {
 		}
 
         return false;
+	}
+	public static function getPatreonCampaignID() {
 
+		$creator_info = self::getPatreonCreatorInfo();
+
+		if(isset($creator_info['included'][0]['id'])) {
+			return $creator_info['included'][0]['id'];
+		}
+
+        return false;
 	}
 	public static function getUserPatronage() {
 		
@@ -391,7 +425,6 @@ class Patreon_Wordpress {
 	public static function enqueueAdminScripts() {
 
 		wp_enqueue_script( 'patreon-admin-js', PATREON_PLUGIN_ASSETS .'/js/admin.js', array('jquery'), '1.0', true );
-		wp_enqueue_style('embed', PATREON_PLUGIN_ASSETS .'/css/editor.css',array(), '0.1','screen' );
 
 	}
 	public static function AfterUpdateActions($upgrader_object, $options=false) {
@@ -434,9 +467,30 @@ class Patreon_Wordpress {
 	
 				delete_option('patreon-mailing-list-notice-shown');
 				delete_option('patreon-rate-plugin-notice-shown');
+				delete_option('patreon-file-locking-feature-notice-shown');
 			}
-		}		
+		}	
+	}
+	public static function transitionalImageOptionCheck() {
+	
+		// This function is to enable a smooth transition for image locking option. It may be deleted in a few minor versions.
+		
+		// Check if transitional option is saved:
+		
+		if(!get_option('patreon-image-option-transition-done',false)) {
+		
+			// Doesnt exist.
 			
+			// Remove the htaccess rule
+			
+			Patreon_Protect::removePatreonRewriteRules();
+			
+			// This just disabled the image feature until it is 
+			
+			update_option('patreon-image-option-transition-done',true);
+			
+		}
+		
 	}
 	public static function AdminMessages() {
 		
@@ -458,10 +512,21 @@ class Patreon_Wordpress {
 		if(!$rate_plugin_notice_shown) {
 			?>
 				 <div class="notice notice-info is-dismissible">
-					<p>Did Patreon WordPress plugin your transform membership business? Help creators like yourself find out about this plugin <a href="https://wordpress.org/support/plugin/patreon-connect/reviews/#new-post" target="_blank">by rating and giving your brutally honest thoughts!</a></p>
+					<p>Did Patreon WordPress plugin transform your membership business? Help creators like yourself find out about this plugin <a href="https://wordpress.org/support/plugin/patreon-connect/reviews/#new-post" target="_blank">by rating and giving your brutally honest thoughts!</a></p>
 				</div>
 			<?php	
 			update_option('patreon-rate-plugin-notice-shown',1);
+		}
+		$file_feature_notice_shown = get_option('patreon-file-locking-feature-notice-shown',false);
+		
+		if(!$file_feature_notice_shown AND !get_option('patreon-enable-file-locking',false)) {
+			?>
+				 <div class="notice notice-info is-dismissible">
+				 <h3>The Patreon Wordpress plugin now supports image locking!</h3>
+					<p>If you were using or would like to use image locking feature that Patreon WordPress offers, now you must turn it on in your <a href="<?php echo admin_url('admin.php?page=patreon-plugin'); ?>">plugin settings</a>. Otherwise image locking feature will be disabled. <br /><br />Want to learn more about why image locking could be useful for you? <a href="https://www.patreondevelopers.com/t/how-to-use-image-locking-feature-in-patreon-wordpress-plugin/461" target="_blank">Read more about image locking here</a>.</p>
+				</div>
+			<?php	
+			update_option('patreon-file-locking-feature-notice-shown',1);
 		}
 	}
 	
