@@ -30,6 +30,9 @@ class Patreon_Routing {
 		global $wp_rewrite;
 		if(get_option('patreon-rewrite-rules-flushed', false) == false) {
 			$wp_rewrite->flush_rules();
+			// Refresh/add htaccess rules:
+			Patreon_Protect::removePatreonRewriteRules();
+			Patreon_Protect::addPatreonRewriteRules();
 			update_option( 'patreon-rewrite-rules-flushed', true );
 		}
 	}
@@ -122,6 +125,8 @@ class Patreon_Routing {
 						// If there is no post var, and entire site is not locked, no point in being here
 						if(!$post AND $patreon_level==0) {
 							// No post, no point in being here.
+
+							$final_redirect = add_query_arg( 'patreon_message', 'patreon_no_post_id_to_unlock_post', $final_redirect);							
 							wp_redirect( home_url() );
 							exit;						
 						}
@@ -149,6 +154,8 @@ class Patreon_Routing {
 						$patreon_level = $post_level;
 					}
 					
+					$link_interface_item = 'post_unlock_button';
+					
 					// If this is an image unlock request, override patreon level with image's:
 					
 					if(isset($wp->query_vars['patreon-unlock-image']) AND $wp->query_vars['patreon-unlock-image']!='') {
@@ -158,17 +165,19 @@ class Patreon_Routing {
 						if(!$patreon_level OR $patreon_level == 0) {
 							$patreon_level = 0;
 						}
+						
+						$link_interface_item = 'image_unlock_button';
 					}
 		
 					if($patreon_level==0) {
 						// No locking level set for this content or the site. No point in locking. Redirect to post.
+						$final_redirect = add_query_arg( 'patreon_message', 'patreon_no_locking_level_set_for_this_post', $final_redirect);
 						wp_redirect( $final_redirect );
 						exit;	
 					}
 					
-					if(!$client_id) {
-						$client_id = get_option('patreon-client-id', false);
-					}
+					$client_id = get_option('patreon-client-id', false);
+				
 					
 					if(!$client_id) {
 						// No client id, no point in being here. Make it go with an error.
@@ -179,16 +188,11 @@ class Patreon_Routing {
 						exit;	
 					}
 					
-					// If we werent given any state vars to send, initialize the array
-					if(!$state) {
-						$state = array();
-					}
-					
 					$state['final_redirect_uri'] = $final_redirect;	
 
 					$send_pledge_level = $patreon_level * 100;
 					
-					$flow_link = Patreon_Frontend::MakeUniversalFlowLink($send_pledge_level,$state,$client_id);				
+					$flow_link = Patreon_Frontend::MakeUniversalFlowLink($send_pledge_level,$state,$client_id,false,array('link_interface_item' => $link_interface_item));				
 					wp_redirect($flow_link);
 					exit;
 				}
