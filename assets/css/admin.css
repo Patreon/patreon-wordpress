@@ -1,38 +1,36 @@
-.patreon-options-info {
+.patreon-options-info  {
 	max-width : 800px;
 	width : 100%;
 	display:block;
 }
 
-#patreon_attachment_patreon_level_form{
+#patreon_attachment_patreon_level_form {
 	display:inline-block;
 	width : 100%;
 	text-align:left;
 	margin: 0px;
 	font-weight: bold;
 }
-#patreon_attachment_patreon_level{
-	
+
+#patreon_attachment_patreon_level {
 	width : auto;
 	padding-left: 3px;
 }
 
-.patreon_image_locking_interface_heading{
-	
+.patreon_image_locking_interface_heading {
 	font-size :150%;
 	font-weight : bold;
 	margin-left: 15px;
 	display : inline-block;
 }
 
-.thickbox-loading{
+.thickbox-loading {
 	max-width : 500px !important;
 	width : 100% !important;
 	min-height : 265px !important;
-	
-	
 }
-.patreon_image_locking_interface_content{
+
+.patreon_image_locking_interface_content {
 	background-color : #f3f3f3;
 	width :100%;
 	display:inline-table;
@@ -45,10 +43,9 @@
 	color : #737276;
 	font-weight:bold;
 	min-height:150px;
-	
 }
-.patreon_image_locking_interface_input_prefix
-{
+
+.patreon_image_locking_interface_input_prefix {
     background-color: #FFF !important;
     line-height:20px;
     height:26px;
@@ -60,11 +57,9 @@
 	border-top: 2px solid #d3d3d3 !important;
 	padding-left : 10px;
 	width : 100%;
-
 }
 
-.patreon_image_locking_interface_input_prefix INPUT
-{
+.patreon_image_locking_interface_input_prefix INPUT {
     border: 0px !important;
     background-color: #FFF;
 	height:20px;
@@ -73,22 +68,18 @@
 	width : 100%;
 }
 
-.patreon-image-locking-update-button{
-	
+.patreon-image-locking-update-button {
 	float:right;
 	margin : 15px;
 	display:inline-block;
-	
 }
 
-#patreon_attachment_patreon_level_form #TB_closeWindowButton{
-	
+#patreon_attachment_patreon_level_form #TB_closeWindowButton {
 	display:inline-block;
 	margin-top:15px;
 	margin-right:15px;
 	width: 20px;
 	height: 20px;
-	
 }
 
 .patreon_image_locking_interface_content_left{
@@ -99,6 +90,7 @@
 	padding-top : 0px;
 	vertical-align: top;
 }
+
 .patreon_image_locking_interface_content_right{
 	width : 50%;
 	text-align: left;	
@@ -108,8 +100,6 @@
 	padding-right : 20px;
 	vertical-align: top;
 }
-
-
 
 .patreon_image_locking_interface_content_message{
 	background-color : #f3f3f3;
@@ -122,7 +112,6 @@
 	box-sizing: border-box;         /* Opera/IE 8+ */
 	color : #737276;
 	font-weight:bold;
-	
 }
 
 #patreon-image-toolbar {
@@ -132,6 +121,7 @@
 	width:49px;
 	height:57px;
 }
+
 #patreon-image-lock-icon {
 	-webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
 	-moz-box-sizing: border-box;    /* Firefox, other Gecko */
@@ -145,17 +135,16 @@
 	padding-left: 1px;
 	border: 1px transparent #575c5e;
 }
+
 #patreon-image-lock-icon:hover {
-	
 	border: 1px solid #575c5e;
 	cursor:pointer;
-	
 }
+
 #patreon-image-lock-icon img {
-		position:absolute;
-		top : 2px;
-		left : 2px;
-		width :23px;
-		height: 37px;
-	
+	position:absolute;
+	top : 2px;
+	left : 2px;
+	width :23px;
+	height: 37px;
 }
