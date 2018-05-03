@@ -26,23 +26,22 @@ class Patreon_API {
 		return $this->__get_json("current_user/campaigns?include=rewards,creator,goals");
 	}
 
-	private function __get_json($suffix) {
-		
-		$api_endpoint = "http://api.patreon.com/oauth2/api/" . $suffix;
+	private function __get_json($suffix) {		
+
+		$api_endpoint = "https://api.patreon.com/oauth2/api/" . $suffix;
 	
 		$headers = array(
 			'Authorization' => 'Bearer ' . $this->access_token,
+			'User-Agent' => 'Patreon-Wordpress, version '.PATREON_WORDPRESS_VERSION.', platform '.php_uname('s').'-'.php_uname('r'),
 		);
 		
 		$api_request = array(
 			'headers' => $headers,
 			'method'  => 'GET',
 		);
-		
 		$response = wp_remote_request( $api_endpoint, $api_request );
 
 		return json_decode($response['body'], true);
-
 	}
 
 }
