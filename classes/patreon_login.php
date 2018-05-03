@@ -169,7 +169,26 @@ class Patreon_Login {
 			}
 		}
 		
-		// We are here, meaning that user was not logged in, and there were no linked accounts. This means we will create a new user.
+		// At this point lets do a check for existing email if the email is going to be imported:
+		
+		if($user_response['data']['attributes']['is_email_verified']) {
+			$check_user_email = $user_response['data']['attributes']['email'];
+		}		
+		
+		$user = get_user_by( 'email', $check_user_email );
+		
+		
+		if($user != false) {
+			// A user with same Patreon email exists. This means that we cannot create this user with this email, but also we cannot link to this account since there may be WP installs which dont do email verification - could lead to identity spoofing
+			
+			// Give a message to the user to log in with the WP account and then log in with Patreon
+			
+			wp_redirect( wp_login_url().'?patreon_message=email_exists_login_with_wp_first', '301' );
+			exit;
+			
+		}
+		
+		// We are here, meaning that user was not logged in, and there were no linked accounts, no matching email. This means we will create a new user.
 		
 		
 		$username = 'patreon_'.$patreon_user_id;
