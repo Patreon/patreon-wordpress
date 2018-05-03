@@ -3,7 +3,7 @@ Contributors: wordpressorg@patreon.com, codebard
 Tags: patreon, membership, members
 Requires at least: 4.0
 Tested up to: 4.9.4
-Stable tag: 1.1.0
+Stable tag: 1.1.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -89,6 +89,20 @@ It is  difficult to protect videos due the intensive bandwidth requirements of h
 
 
 == Changelog ==
+
+= 1.1.1 =
+
+* Option to turn image locking function on/off
+* Image locking function defaults to off
+* Nginx compatibility for image locking function
+* Protocol fix for locked images - no longer http/https confusion
+* Filterable utm parameters for login and flow links
+* More reliable way to update htaccess with image locking rules
+* Refresh htaccess rules when image feature turned on/offers
+* Locked posts are protected in RSS feeds
+* Transitional option to disable image feature on update
+* Notice about new image locking option and info for image locking feature
+* Additional messages after login/unlock flow redirection landing
 
 = 1.1.0 =
 * Image locking functionality added
