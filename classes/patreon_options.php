@@ -34,11 +34,12 @@ class Patreon_Options {
         register_setting( 'patreon-options', 'patreon-enable-redirect-to-page-after-login' );
         register_setting( 'patreon-options', 'patreon-enable-redirect-to-page-id' );
         register_setting( 'patreon-options', 'patreon-protect-default-image-patreon-level' );
+        register_setting( 'patreon-options', 'patreon-enable-file-locking');
         register_setting( 'patreon-options', 'patreon-enable-strict-oauth' );
         register_setting( 'patreon-options', 'patreon-lock-entire-site' );
         register_setting( 'patreon-options', 'patreon-custom-universal-banner' );
     }
-
+	
     function fetch_creator_id() {
 
         if(is_admin() && current_user_can('manage_options') && isset($_POST[''])) {
@@ -156,6 +157,16 @@ class Patreon_Options {
 											</th>
 											<td>
 												<input type="checkbox" name="patreon-enable-strict-oauth" value="1"<?php checked( get_option('patreon-enable-strict-oauth', false) ); ?> />
+											</td>
+                                        </tr>
+                                        <tr valign="top">
+											<th scope="row">
+												<strong>Enable image locking features</strong>
+												<br>
+												<div class="patreon-options-info">If on, you will be able to lock your images and provide patron only images anywhere in your posts like webcomics or visual content. If you aren't using image locking or having complications due to your web host infrastructure, you can keep this feature off. Recommended: on</div>
+											</th>
+											<td>
+												<input type="checkbox" name="patreon-enable-file-locking" value="1"<?php checked( get_option('patreon-enable-file-locking', false) ); ?> />
 											</td>
                                         </tr>
 										<?php
