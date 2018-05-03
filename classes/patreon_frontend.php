@@ -12,9 +12,9 @@ class Patreon_Frontend {
 	public static $current_user_logged_into_patreon = -1;
 	
 	function __construct() {
-
 		add_action( 'login_enqueue_scripts', array($this,'patreonEnqueueCss'), 10 );
 		add_action( 'wp_enqueue_scripts', array($this,'patreonEnqueueCss') );
+		add_action( 'wp_head', array($this,'patreonPrintCss') );
 		add_action( 'wp_enqueue_scripts', array($this,'patreonEnqueueJs') );		
 		add_action( 'admin_enqueue_scripts', array($this,'patreonEnqueueAdminCss') );		
 		add_action( 'login_form', array($this, 'showPatreonMessages' ) );
@@ -29,15 +29,17 @@ class Patreon_Frontend {
 			'login_with_wordpress' => PATREON_LOGIN_WITH_WORDPRESS_NOW,		
 			'patreon_nonces_dont_match' => PATREON_CANT_LOGIN_NONCES_DONT_MATCH,		
 			'patreon_cant_login_api_error' => PATREON_CANT_LOGIN_DUE_TO_API_ERROR,		
-			'patreon_cant_login_api_error_credentials' => PATREON_CANT_LOGIN_DUE_TO_API_ERROR_CHECK_CREDENTIALS,		
+			'patreon_cant_login_api_error_credentials' => PATREON_CANT_LOGIN_DUE_TO_API_ERROR_CHECK_CREDENTIALS,
+			'patreon_no_locking_level_set_for_this_post' => PATREON_NO_LOCKING_LEVEL_SET_FOR_THIS_POST,
+			'patreon_no_post_id_to_unlock_post' => PATREON_NO_POST_ID_TO_UNLOCK_POST,
 			'patreon_weird_redirection_at_login' => PATREON_WEIRD_REDIRECTION_AT_LOGIN,		
 			'patreon_could_not_create_wp_account' => PATREON_COULDNT_CREATE_WP_ACCOUNT,		
 			'patreon_api_credentials_missing' => PATREON_API_CREDENTIALS_MISSING,		
 			'admin_login_with_patreon_disabled' => PATREON_ADMIN_LOGIN_WITH_PATREON_DISABLED,		
+			'email_exists_login_with_wp_first' => PATREON_EMAIL_EXISTS_LOGIN_WITH_WP_FIRST,		
 			'login_with_patreon_disabled' => PATREON_LOGIN_WITH_PATREON_DISABLED,		
 			'admin_bypass_filter_message' => PATREON_ADMIN_BYPASSES_FILTER_MESSAGE,				
 		);
-	
 	}
 
 	function patreonEnqueueJs() {
@@ -51,6 +53,17 @@ class Patreon_Frontend {
 	function patreonEnqueueCss() {
 		wp_register_style( 'patreon-wordpress-css', PATREON_PLUGIN_ASSETS.'/css/app.css', false );
 		wp_enqueue_style('patreon-wordpress-css', PATREON_PLUGIN_ASSETS.'/css/app.css' );
+	}
+	function patreonPrintCss() {
+		// Why we print out css direclty in header is that we want to account for any potential WP content directory location than default
+		echo '<style>';
+		echo "@font-face {
+			font-family: 'Libre Franklin Extra Bold';
+			src: url('".PATREON_PLUGIN_ASSETS."/fonts/librefranklin-extrabold-webfont.woff2') format('woff2'),
+				 url('".PATREON_PLUGIN_ASSETS."/fonts/librefranklin-extrabold-webfont.woff') format('woff');
+			font-weight: bold;
+			}";
+		echo '</style>';
 	}
 	public static function displayPatreonCampaignBanner($patreon_level = false) {
 
@@ -354,17 +367,17 @@ class Patreon_Frontend {
 		
 	}
 	public static function patreonMakeUniversalButtonImage($label) {
-		return '<div class="patreon-responsive-button-wrapper"><div class="patreon-responsive-button"><img class="patreon_logo" src="'.PATREON_PLUGIN_ASSETS.'/img/patreon-logomark-on-coral.svg" alt=""> '.$label.'</div></div>';
+		return '<div class="patreon-responsive-button-wrapper"><div class="patreon-responsive-button"><img class="patreon_logo" src="'.PATREON_PLUGIN_ASSETS.'/img/patreon-logomark-on-coral.svg" alt="'.$label.'" /> '.$label.'</div></div>';
 		
 	}
-	public static function MakeUniversalFlowLink($pledge_level,$state=false,$client_id = false,$post=false) {
+	public static function MakeUniversalFlowLink($pledge_level,$state=false,$client_id = false,$post=false, $args=false) {
 		
 		if(!$post) {
 			global $post;
 		}
 		if(!$client_id) {
 			$client_id = get_option('patreon-client-id', false);
-		}	
+		}
 		
 		// If we werent given any state vars to send, initialize the array
 		if(!$state) {
@@ -395,12 +408,26 @@ class Patreon_Frontend {
 		$state['patreon_nonce']=$_COOKIE['patreon_nonce'];
 		
 		$redirect_uri = site_url().'/patreon-authorization/';
-		
+			
 		$href = 'https://www.patreon.com/oauth2/become-patron?response_type=code&min_cents='.$pledge_level.'&client_id='.$client_id.'&redirect_uri='.$redirect_uri.'&state='.urlencode(base64_encode(serialize($state)));
 
 		// 3rd party dev goodie! Apply custom filters so they can manipulate the url:
 		
-		return apply_filters('ptrn/patron_link', $href);			
+		$href = apply_filters('ptrn/patron_link', $href);
+
+		$utm_content = 'post_unlock_button';
+		
+		if(isset($args) AND $args['link_interface_item']=='image_unlock_button') {
+			$utm_content = 'image_unlock_button';
+		}
+		
+		$filterable_utm_params = 'utm_term=&utm_content='.$utm_content;
+		
+		$filterable_utm_params = apply_filters('ptrn/utm_params_for_patron_link', $filterable_utm_params);
+		
+		$utm_params = 'utm_source='.urlencode(site_url()).'&utm_medium=patreon_wordpress_plugin&utm_campaign='.get_option('patreon-campaign-id').'&'.$filterable_utm_params;
+		
+		return $href.'&'.$utm_params;
 		
 	}
 	public static function patreonMakeUniversalButtonLabel() {
@@ -446,7 +473,7 @@ class Patreon_Frontend {
 		}		
 		return self::$current_user_logged_into_patreon = $user_logged_into_patreon;
 	}
-	public static function patreonMakeLoginLink($client_id=false,$state=false,$post=false) {
+	public static function patreonMakeLoginLink($client_id=false,$state=false,$post=false,$args=false) {
 		
 		if(!$post) {
 			global $post;
@@ -490,7 +517,15 @@ class Patreon_Frontend {
 
 		$href = 'https://www.patreon.com/oauth2/authorize?response_type=code&client_id='.$client_id.'&redirect_uri='.$redirect_uri.'&state='.urlencode(base64_encode(serialize($state)));
 	
-		return apply_filters('ptrn/login_link', $href);
+		$href = apply_filters('ptrn/login_link', $href);
+		
+		$filterable_utm_params = 'utm_term=&utm_content=login_button';
+		
+		$filterable_utm_params = apply_filters('ptrn/utm_params_for_login_link', $filterable_utm_params);
+		
+		$utm_params = 'utm_source='.urlencode(site_url()).'&utm_medium=patreon_wordpress_plugin&utm_campaign='.get_option('patreon-campaign-id').'&'.$filterable_utm_params;
+		
+		return $href.'&'.$utm_params;
 	}
 	public static function patreonMakeLoginButton($client_id=false) {
 		
@@ -530,7 +565,12 @@ class Patreon_Frontend {
 	public static function protectContentFromUsers($content) {
 
 		global $post;
-
+		
+		// Just bail out if this is not the main query for content
+		if (!is_main_query()) {
+			return $content;
+		}
+		
 		$post_types = get_post_types(array('public'=>true),'names');
 	
 		if(in_array(get_post_type(),$post_types)) {
