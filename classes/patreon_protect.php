@@ -6,17 +6,24 @@ if( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 class Patreon_Protect {
 
 	function __construct() {
-		add_filter('attachment_fields_to_edit', array($this, 'GalleryItemSavePatreonEdit'), 10, 2 );
-		add_filter('attachment_fields_to_save', array($this, 'GalleryItemSavePatreonLevel'), 10, 2 );
-		add_filter('the_content', array($this, 'ParseContentForProtectedImages'), PHP_INT_MAX-4);
-		add_action('mod_rewrite_rules',  array($this, 'addPatreonRewriteRules'));
+		
+		// If image feature was not turned on before, or turned off, we skip activating image protection functions:
+
+		if(get_option('patreon-enable-file-locking', false)) {
+			
+			add_filter('attachment_fields_to_edit', array($this, 'GalleryItemSavePatreonEdit'), 10, 2 );
+			add_filter('attachment_fields_to_save', array($this, 'GalleryItemSavePatreonLevel'), 10, 2 );
+			add_filter('the_content', array($this, 'ParseContentForProtectedImages'), PHP_INT_MAX-4);
+			add_action("wp_ajax_patreon_save_attachment_patreon_level", array( $this, "saveAttachmentLevel") );
+			add_action("wp_ajax_patreon_make_attachment_pledge_editor", array( $this, "makeAttachmentPledgeEditor") );
+			add_action('wp_ajax_nopriv_patreon_catch_image_click', 'Patreon_Protect::CatchImageClick' );
+			add_action('wp_ajax_patreon_catch_image_click', 'Patreon_Protect::CatchImageClick' );
+			add_action('admin_footer', 'Patreon_Protect::addImageToolbar' );
+			add_action('admin_head', 'Patreon_Protect::addCustomCSSinAdmin' );
+			
+		}
+		// Only image-reader is left always on for backward compatibility in case a user already has images linked directly - it can be put into the conditional block above in later versios 
 		add_action('plugins_loaded',  array($this, 'servePatronOnlyImage') );
-		add_action("wp_ajax_patreon_save_attachment_patreon_level", array( $this, "saveAttachmentLevel") );
-		add_action("wp_ajax_patreon_make_attachment_pledge_editor", array( $this, "makeAttachmentPledgeEditor") );
-		add_action( 'wp_ajax_nopriv_patreon_catch_image_click', 'Patreon_Protect::CatchImageClick' );
-		add_action( 'wp_ajax_patreon_catch_image_click', 'Patreon_Protect::CatchImageClick' );
-		add_action( 'admin_footer', 'Patreon_Protect::addImageToolbar' );
-		add_action( 'admin_head', 'Patreon_Protect::addCustomCSSinAdmin' );
 	}
 
 	function GalleryItemSavePatreonEdit( $form_fields, $post ) {
@@ -49,7 +56,6 @@ class Patreon_Protect {
 		return $post;
 	}
 
-
 	public static function getMimeType($file) {
 		$mime = wp_check_filetype($file);
 		if( false === $mime[ 'type' ] && function_exists( 'mime_content_type' ) )
@@ -74,28 +80,54 @@ class Patreon_Protect {
 
 		$upload_dir_paths = wp_upload_dir();
 
-		if ( false !== strpos( $attachment_url, $upload_dir_paths['baseurl'] ) ) {
+		$protocol_snipped_baseurl = str_replace('https://','',$upload_dir_paths['baseurl']);
+		$protocol_snipped_baseurl = str_replace('http://','',$protocol_snipped_baseurl);
+		
+		$protocol_snipped_attachment_url = str_replace('https://','',$attachment_url);
+		$protocol_snipped_attachment_url = str_replace('http://','',$protocol_snipped_attachment_url);
 
-			$attachment_url = preg_replace( '/-\d+x\d+(?=\.(jpg|jpeg|png|gif)$)/i', '', $attachment_url );
-			$attachment_url = str_replace( $upload_dir_paths['baseurl'] . '/', '', $attachment_url );
+		if ( false !== strpos( $protocol_snipped_attachment_url, $protocol_snipped_baseurl ) ) {
 
-
+			$search_attachment_url = preg_replace( '/-\d+x\d+(?=\.(jpg|jpeg|png|gif)$)/i', '', $attachment_url );
+			$search_attachment_url = str_replace( $upload_dir_paths['baseurl'] . '/', '', $search_attachment_url );
+	
 			$cache_key = 'thumb_attachment_id_url_'.md5($attachment_url);
 			$attachment_id = get_transient( $cache_key );
-			if ( false === $attachment_id ) {
-				$attachment_id = $wpdb->get_var( $wpdb->prepare( "SELECT wposts.ID FROM $wpdb->posts wposts, $wpdb->postmeta wpostmeta WHERE wposts.ID = wpostmeta.post_id AND wpostmeta.meta_key = '_wp_attached_file' AND wpostmeta.meta_value = '%s' AND wposts.post_type = 'attachment'", $attachment_url ) );
+
+			if ( false == $attachment_id OR $attachment_id = '' ) {
+				$attachment_id = $wpdb->get_var( $wpdb->prepare( "SELECT wposts.ID FROM $wpdb->posts wposts, $wpdb->postmeta wpostmeta WHERE wposts.ID = wpostmeta.post_id AND wpostmeta.meta_key = '_wp_attached_file' AND wpostmeta.meta_value = '%s' AND wposts.post_type = 'attachment'", $search_attachment_url ) );
 				set_transient( $cache_key, $attachment_id, 60);
 			}
 
-		}
+			// If attachment is still false, try finding the attachment only through the bare image file
+	
+			if ( false == $attachment_id OR $attachment_id = '') {
+				
+				$search_attachment_url = preg_replace( '/-\d+x\d+(?=\.(jpg|jpeg|png|gif)$)/i', '', $protocol_snipped_attachment_url );
+				$search_attachment_url = str_replace( $protocol_snipped_baseurl . '/', '', $search_attachment_url );		
 
-		return $attachment_id;
+				$attachment_id = $wpdb->get_var( $wpdb->prepare( "SELECT wposts.ID FROM $wpdb->posts wposts, $wpdb->postmeta wpostmeta WHERE wposts.ID = wpostmeta.post_id AND wpostmeta.meta_key = '_wp_attached_file' AND wpostmeta.meta_value = '%s' AND wposts.post_type = 'attachment'", $search_attachment_url ) );
+				set_transient( $cache_key, $attachment_id, 60);
+			}			
+					
+			return $attachment_id;
+		}
+		
+		return false;
+		
 	}
 	public static function readAndServeImage($image) {
 		
-		$file = ABSPATH.str_replace(site_url().'/','',$image);
+		// Remove site url from requested image url - force http case
 		
+		$image = str_replace(trailingslashit(site_url('','http')),'',$image);
+		
+		// Remove site url from requested image url - force https case
+		
+		$image = str_replace(trailingslashit(site_url('','https')),'',$image);
 
+		$file = wp_normalize_path(trailingslashit(ABSPATH).$image);
+		
 		$mime = wp_check_filetype($file);
 	
 		if( false === $mime[ 'type' ] && function_exists( 'mime_content_type' ) ) {
@@ -108,14 +140,14 @@ class Patreon_Protect {
 		else {
 			$mimetype = 'image/' . substr( $file, strrpos( $file, '.' ) + 1 );
 		}
+
 		header( 'Content-Type: ' . $mimetype ); // always send this
 		if ( false === strpos( $_SERVER['SERVER_SOFTWARE'], 'Microsoft-IIS' ) ) {
 			header( 'Content-Length: ' . filesize( $file ) );
 		}
 			
 		readfile( $file );
-		
-		
+		exit;
 	}
 	public static function servePatronOnlyImage($image=false) {
 
@@ -127,18 +159,18 @@ class Patreon_Protect {
 			// This is not a rewritten image request. Exit.
 			return;
 		}
- 
+
 		if(!(isset($_REQUEST['patreon_action']) AND $_REQUEST['patreon_action'] == 'serve_patron_only_image')) {
 			return;	
 		}
-	
+
 		$upload_locations = wp_upload_dir();
 
 		// We want the base upload location so we can account for any changes to date based subfolders in case there are
 
 		$upload_dir = substr(wp_make_link_relative($upload_locations['baseurl']),1);	
 
-		$image = get_site_url().'/'. $upload_dir . $image;
+		$image = get_site_url().'/'. $upload_dir .'/'. $image;
 		
 		if(current_user_can('manage_options')) {
 			Patreon_Protect::readAndServeImage($image);	
@@ -151,18 +183,19 @@ class Patreon_Protect {
 		if(apply_filters('ptrn/bypass_image_filtering',defined('PATREON_BYPASS_IMAGE_FILTERING'))) {
 			Patreon_Protect::readAndServeImage($image);
 		}
-		
+	
 		// Check if the image is protected:
-		
+
 		$attachment_id = attachment_url_to_postid($image);
-		
+	
 		// attachment_url_to_postid returns 0 if it cant find the attachment post id
 		
 		if($attachment_id == 0) {
 			// Couldnt determine attachment post id. Try to get id from thumbnail
 			$attachment_id = Patreon_Protect::getAttachmentIDfromThumbnailURL($image);
+	
 			//No go. Have to get out and serve the image normally
-			if($attachment_id == 0) {
+			if($attachment_id == 0 OR !$attachment_id) {
 				Patreon_Protect::readAndServeImage($image);
 			}
 		}
@@ -532,25 +565,46 @@ class Patreon_Protect {
 			
 		imagedestroy($image);
 	}
-	function addPatreonRewriteRules($rules) {
-
+	public static function addPatreonRewriteRules() {
+			
+		// File locking not enabled. Return
+		if(get_option('patreon-enable-file-locking', false) == false) {
+			return;
+		}
+		
+		$htaccess = file_get_contents(ABSPATH.'.htaccess');
+		
 		$upload_locations = wp_upload_dir();
 
 		// We want the base upload location so we can account for any changes to date based subfolders in case there are
 
 		$upload_dir = substr(wp_make_link_relative($upload_locations['baseurl']),1);
 
-		$append = "
-		\n # BEGIN Patreon WordPress Image Protection
-		RewriteEngine On
-		RewriteBase /		
-		RewriteCond %{REQUEST_FILENAME} (\.png|\.jpg|\.gif|\.jpeg|\.bmp)
-		RewriteCond %{HTTP_REFERER} !/wp-admin/ [NC]
-		RewriteRule ^".$upload_dir."(.*)$ index.php?patreon_action=serve_patron_only_image&patron_only_image=$1 [QSA,L]
-		# END Patreon WordPress\n
-		";
+		$append = PHP_EOL."# BEGIN Patreon WordPress Image Protection
+RewriteEngine On
+RewriteBase /		
+RewriteCond %{REQUEST_FILENAME} (\.png|\.jpg|\.gif|\.jpeg|\.bmp)
+RewriteCond %{HTTP_REFERER} !^wp-admin [NC]
+RewriteRule ^".$upload_dir."/(.*)$ index.php?patreon_action=serve_patron_only_image&patron_only_image=$1 [QSA,L]
+# END Patreon WordPress".PHP_EOL;
 		
-    	return $rules.$append;
+    	file_put_contents(ABSPATH.'.htaccess',$htaccess.$append);
+	}
+	public static function removePatreonRewriteRules() {
+		
+		$htaccess = file_get_contents(ABSPATH.'.htaccess');
+		
+		$start_marker = '# BEGIN Patreon WordPress Image Protection';
+		$end_marker = '# END Patreon WordPress';
+		
+		$start = strpos($htaccess,$start_marker);
+		
+		$end = strpos($htaccess,$end_marker);
+		
+		$snipped = preg_replace('/'.PHP_EOL.$start_marker.'.+?'.$end_marker.PHP_EOL.'/is','',$htaccess);
+		
+		file_put_contents(ABSPATH.'.htaccess',$snipped);
+		
 	}
 	public function saveAttachmentLevel($attachment_id=false) {
 		
@@ -721,6 +775,7 @@ class Patreon_Protect {
 	}
 	public static function addImageToolbar() {
 		// Adds the hidden floating image toolbar
+		
 		?>
 		
 		<div id="patreon-image-toolbar">
