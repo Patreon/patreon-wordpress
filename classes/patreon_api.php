@@ -104,6 +104,9 @@ class Patreon_API {
 		return json_decode($response['body'], true);
 	}
 
-}
+	public function check_api_v2() {
+		// Transitional function - checks if api v2 can be contacted with existing credentials and returns the result
 
-?>
+		return $this->__get_json("campaigns?include=rewards,creator,goals",true);
+	}
+}
