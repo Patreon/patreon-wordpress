@@ -71,6 +71,13 @@ class Patreon_API {
 	}
 
 	public function fetch_campaign() {
+		
+		// Below conditional and different endpoint can be deprecated to only use v2 api after transition period
+		if($v2 OR get_option('patreon-can-use-api-v2',false)=='yes') {
+		
+			return $this->__get_json("campaigns?include=rewards,creator,goals");
+		}
+
 		return $this->__get_json("current_user/campaigns?include=rewards,creator,goals");
 	}
 
