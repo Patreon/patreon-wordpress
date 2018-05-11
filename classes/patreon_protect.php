@@ -25,7 +25,6 @@ class Patreon_Protect {
 		// Only image-reader is left always on for backward compatibility in case a user already has images linked directly - it can be put into the conditional block above in later versios 
 		add_action('plugins_loaded',  array($this, 'servePatronOnlyImage') );
 	}
-
 	function GalleryItemSavePatreonEdit( $form_fields, $post ) {
 
 		$form_fields['patreon_level'] = array(
@@ -37,7 +36,6 @@ class Patreon_Protect {
 
 		return $form_fields;
 	}
-
 	function GalleryItemSavePatreonLevel( $post, $attachment ) {
 
 		if( isset($attachment['patreon_level']) ) {
@@ -55,7 +53,6 @@ class Patreon_Protect {
 
 		return $post;
 	}
-
 	public static function getMimeType($file) {
 		$mime = wp_check_filetype($file);
 		if( false === $mime[ 'type' ] && function_exists( 'mime_content_type' ) )
@@ -69,7 +66,6 @@ class Patreon_Protect {
 
 		return $mimetype;
 	}
-
 	public static function getAttachmentIDfromThumbnailURL( $attachment_url = '' ) {
 
 		global $wpdb;
@@ -215,7 +211,7 @@ class Patreon_Protect {
 		// We are here, then we have a nonzero pledge level. Protect the image.
 		
 		$user_patronage = Patreon_Wordpress::getUserPatronage();
-		
+
 		$user = wp_get_current_user();
 		
 		$declined = Patreon_Wordpress::checkDeclinedPatronage($user);
@@ -807,7 +803,7 @@ RewriteRule ^".$upload_dir."/(.*)$ index.php?patreon_action=serve_patron_only_im
 		if(!$patreon_level) {
 			return 0;
 		}
-		
+
 		if($patron_pledge == false 
 			|| $patron_pledge == 0 
 			|| $patron_pledge < ($patreon_level*100)
