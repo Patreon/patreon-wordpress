@@ -42,6 +42,16 @@ class Patreon_API {
 	}
 	
 	public function fetch_campaign_and_patrons() {
+	
+		// Below conditional and different endpoint can be deprecated to only use v2 api after transition period
+		if($v2 OR get_option('patreon-can-use-api-v2',false)=='yes') {
+			// New call to campaigns doesnt return pledges in v2 api - currently this function is not used anywhere in plugin. If 3rd party devs are using it, it will need to be looked into
+			
+			// Requires having gotten permission for pledge scope during auth if used for a normal user instead of the creator
+
+			return $this->__get_json("campaigns?include=rewards,creator,goals,pledges");
+		}		
+
 		return $this->__get_json("current_user/campaigns?include=rewards,creator,goals,pledges");
 	}
 		
