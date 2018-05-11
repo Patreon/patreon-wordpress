@@ -28,6 +28,7 @@ class Patreon_Options {
         register_setting( 'patreon-options', 'patreon-paywall-img-url' );
         register_setting( 'patreon-options', 'patreon-paywall-blocked-img-url' );
         register_setting( 'patreon-options', 'patreon-rewrite-rules-flushed' );
+        register_setting( 'patreon-options', 'patreon-can-use-api-v2' );
         register_setting( 'patreon-options', 'patreon-enable-register-with-patreon' );
         register_setting( 'patreon-options', 'patreon-enable-login-with-patreon' );
         register_setting( 'patreon-options', 'patreon-enable-allow-admins-login-with-patreon' );
@@ -63,7 +64,7 @@ class Patreon_Options {
         $all_pages = get_pages($args);
 
         $danger_user_list = Patreon_Login::getDangerUserList();
-
+		
         ?>
 
        <form method="post" action="options.php">
@@ -163,7 +164,7 @@ class Patreon_Options {
 											<th scope="row">
 												<strong>Enable image locking features</strong>
 												<br>
-												<div class="patreon-options-info">If on, you will be able to lock your images and provide patron only images anywhere in your posts like webcomics or visual content. If you aren't using image locking or having complications due to your web host infrastructure, you can keep this feature off. Recommended: on</div>
+												<div class="patreon-options-info">If on, you will be able to lock your images and provide patron only images anywhere in your posts like webcomics or visual content. If you aren't using image locking or having complications due to your web host infrastructure, you can keep this feature off. Whenever you turn this feature on or off, you should visit 'Permalinks' settings in your WordPress site and save your permalinks just once by clicking 'Save'. Otherwise your images may appear broken.</div>
 											</th>
 											<td>
 												<input type="checkbox" name="patreon-enable-file-locking" value="1"<?php checked( get_option('patreon-enable-file-locking', false) ); ?> />
