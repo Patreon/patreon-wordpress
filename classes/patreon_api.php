@@ -81,9 +81,14 @@ class Patreon_API {
 		return $this->__get_json("current_user/campaigns?include=rewards,creator,goals");
 	}
 
-	private function __get_json($suffix) {		
+	private function __get_json($suffix,$v2=false) {		
 
 		$api_endpoint = "https://api.patreon.com/oauth2/api/" . $suffix;
+
+		if($v2 OR get_option('patreon-can-use-api-v2',false)=='yes') {
+
+			$api_endpoint = "https://www.patreon.com/api/oauth2/v2/" . $suffix;	
+		}
 	
 		$headers = array(
 			'Authorization' => 'Bearer ' . $this->access_token,
