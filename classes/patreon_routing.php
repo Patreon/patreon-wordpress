@@ -192,7 +192,8 @@ class Patreon_Routing {
 
 					$send_pledge_level = $patreon_level * 100;
 					
-					$flow_link = Patreon_Frontend::MakeUniversalFlowLink($send_pledge_level,$state,$client_id,false,array('link_interface_item' => $link_interface_item));				
+					$flow_link = Patreon_Frontend::MakeUniversalFlowLink($send_pledge_level,$state,$client_id,false,array('link_interface_item' => $link_interface_item));
+				
 					wp_redirect($flow_link);
 					exit;
 				}
