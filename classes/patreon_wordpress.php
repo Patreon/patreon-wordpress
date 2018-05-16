@@ -380,11 +380,25 @@ class Patreon_Wordpress {
 		return false;
 
 	}
-	public static function getUserPatronageDuration($pledge) {
+	public static function getUserPatronageDuration($user=false) {
+
+		if(self::$current_user_patronage_duration != -1) {
+			return self::$current_user_patronage_duration;
+		}
+		
+		if(!$user) {
+			$user = wp_get_current_user();
+		}
+		
+		$pledge_days = false;
 
 		$user_response = self::getPatreonUser($user);
+		
+		if(isset($user_response['included'][0]['attributes']['pledge_relationship_start'])) {
+			$pledge_days = floor((time()-strtotime($user_response['included'][0]['attributes']['pledge_relationship_start']))/60/60/24);
+		}
 
-		$patronage_age = 0;
+		return $pledge_days;
 
 	}
 	public static function checkDeclinedPatronage($user) {
