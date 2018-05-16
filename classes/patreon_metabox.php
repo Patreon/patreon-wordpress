@@ -54,6 +54,40 @@ class Patron_Metabox {
 		</p>
 
 		<?php
+		
+		$label = 'Pledge days (optional) - how many days should a patron be pledging from above level to be allowed to see the content )';
+		$readonly = '';
+		
+		if(!get_option('patreon-creator-id', false)) {
+			$label = 'Post locking won\'t work without Creator ID. Please confirm you have it <a href="'.admin_url("?page=patreon-plugin").'">here</a>';
+			$readonly = " readonly";
+		}
+
+		?>
+		<p>
+			<label for="patreon-level-days"><?php _e( $label, '1' ); ?></label>
+			<br><br>
+			<strong></strong><input type="text" id="patreon-level-days" name="patreon-level-days" value="<?php echo get_post_meta( $object->ID, 'patreon-level-days', true ); ?>" <?php echo $readonly ?>>
+		</p>
+
+		<?php
+		
+		$label = 'Total patronage (optional) - any patron above total lifetime patronage $ value entered below can see this content';
+		$readonly = '';
+		
+		if(!get_option('patreon-creator-id', false)) {
+			$label = 'Post locking won\'t work without Creator ID. Please confirm you have it <a href="'.admin_url("?page=patreon-plugin").'">here</a>';
+			$readonly = " readonly";
+		}
+
+		?>
+		<p>
+			<label for="patreon-total-patronage-level"><?php _e( $label, '1' ); ?></label>
+			<br><br>
+			<strong>&#36; </strong><input type="text" id="patreon-total-patronage-level" name="patreon-total-patronage-level" value="<?php echo get_post_meta( $object->ID, 'patreon-total-patronage-level', true ); ?>" <?php echo $readonly ?>>
+		</p>
+
+		<?php
 	}
 
 	function patreon_plugin_save_post_class_meta( $post_id, $post ) {
