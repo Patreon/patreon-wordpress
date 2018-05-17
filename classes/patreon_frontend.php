@@ -633,12 +633,43 @@ class Patreon_Frontend {
 			$user = wp_get_current_user();
 			
 			$user_patronage = Patreon_Wordpress::getUserPatronage();
+			$user_patronage_duration = Patreon_Wordpress::getUserPatronageDuration();
+			
+			$user_lifetime_patronage = Patreon_Wordpress::get_user_lifetime_patronage();
+	
 	
 			$declined = Patreon_Wordpress::checkDeclinedPatronage($user);
+		
+			// Check if specific patronage days is given for this post:
 			
-			if($user_patronage == false 
+			$post_level_days = get_post_meta( $post->ID, 'patreon-level-days', true );
+			
+			// Check if specific total patronage is given for this post:
+			
+			$post_total_patronage_level = get_post_meta( $post->ID, 'patreon-total-patronage-level', true );
+			
+			$show_content = false;
+		
+			if($post_total_patronage_level !='' AND $post_total_patronage_level > 0) {
+				// Total patronage set if user has lifetime patronage over this level, we let him see the content
+				
+				if($user_lifetime_patronage >= $post_total_patronage_level * 100) {
+					$show_content = true;
+				}
+			}
+			
+			if($post_level_days !='' AND $post_level_days > 0) {
+				// Post level days set. If user has pledge total over post level days X post level, we show content
+				
+				if($user_lifetime_patronage >= ($post_level_days * $post_level * 100)) {
+					$show_content = true;
+				}
+			}
+			
+			if(($user_patronage == false
 				|| $user_patronage < ($patreon_level*100)
-				|| $declined
+				|| $declined)
+				AND !$show_content
 			) {
 				// protect content from user
 				
