@@ -51,6 +51,7 @@ class Patreon_Wordpress {
 		add_action('upgrader_process_complete', 'Patreon_Wordpress::AfterUpdateActions',10,2);
 		add_action('admin_notices', array($this, 'AdminMessages'));
 		add_action('init', array($this, 'transitionalImageOptionCheck'));
+		add_action('admin_init', array($this, 'add_privacy_policy_section'),20);
 
 	}
 	public static function getPatreonUser($user) {
@@ -525,6 +526,11 @@ class Patreon_Wordpress {
 			update_option('patreon-image-option-transition-done',true);
 			
 		}
+		
+	}
+	public static function add_privacy_policy_section() {
+
+		wp_add_privacy_policy_content('Patreon WordPress',PATREON_PRIVACY_POLICY_ADDENDUM);
 		
 	}
 	public static function AdminMessages() {
