@@ -53,9 +53,9 @@ class Patron_Metabox {
 			<strong>&#36; </strong><input type="text" id="patreon-level" name="patreon-level" value="<?php echo get_post_meta( $object->ID, 'patreon-level', true ); ?>" <?php echo $readonly ?>>
 		</p>
 
-		<?php
+				<?php	
 		
-		$label = 'Pledge days (optional) - how many days should a patron be pledging from above level to be allowed to see the content )';
+		$label = 'Active patrons only (optional) - if on, only patrons active at and before this post\'s publishing date will be able to see this content )';
 		$readonly = '';
 		
 		if(!get_option('patreon-creator-id', false)) {
@@ -65,9 +65,9 @@ class Patron_Metabox {
 
 		?>
 		<p>
-			<label for="patreon-level-days"><?php _e( $label, '1' ); ?></label>
+			<label for="patreon-active-patrons-only"><?php _e( $label, '1' ); ?></label>
 			<br><br>
-			<strong></strong><input type="text" id="patreon-level-days" name="patreon-level-days" value="<?php echo get_post_meta( $object->ID, 'patreon-level-days', true ); ?>" <?php echo $readonly ?>>
+			<input type="checkbox" name="patreon-active-patrons-only" value="1" <?php checked( get_post_meta( $object->ID, 'patreon-active-patrons-only', true ),true,true ); ?> <?php echo $readonly ?> /> Yes
 		</p>
 
 		<?php
