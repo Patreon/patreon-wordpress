@@ -22,6 +22,7 @@ class Patreon_Wordpress {
 	public static $current_member_details = -1;
 	public static $current_user_patronage_duration = -1;
 	public static $current_user_lifetime_patronage = -1;
+	public static $current_user_pledge_relationship_start = -1;
 
 	function __construct() {
 
