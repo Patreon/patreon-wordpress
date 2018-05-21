@@ -601,8 +601,8 @@ class Patreon_Frontend {
 			// Check if both post level and site lock level are set to 0 or nonexistent. If so return normal content.
 			
 			if($post_level == 0 
-				&& (!get_option('patreon-lock-entire-site',false)
-					|| get_option('patreon-lock-entire-site',false)==0)
+				&& (!$patreon_level
+					|| $patreon_level==0)
 			) {
 				return $content;
 			}
@@ -629,48 +629,54 @@ class Patreon_Frontend {
 			if($post_level!=0) {
 				$patreon_level = $post_level;
 			}
-			
+			 
 			$user = wp_get_current_user();
-			
+
+			$user_pledge_relationship_start = Patreon_Wordpress::get_user_pledge_relationship_start();
+		
 			$user_patronage = Patreon_Wordpress::getUserPatronage();
-			$user_patronage_duration = Patreon_Wordpress::getUserPatronageDuration();
-			
 			$user_lifetime_patronage = Patreon_Wordpress::get_user_lifetime_patronage();
-	
 	
 			$declined = Patreon_Wordpress::checkDeclinedPatronage($user);
 		
-			// Check if specific patronage days is given for this post:
+			// Check if post was set for active patrons only
 			
-			$post_level_days = get_post_meta( $post->ID, 'patreon-level-days', true );
+			$patreon_active_patrons_only = get_post_meta( $post->ID, 'patreon-active-patrons-only', true );
 			
 			// Check if specific total patronage is given for this post:
 			
 			$post_total_patronage_level = get_post_meta( $post->ID, 'patreon-total-patronage-level', true );
-			
-			$show_content = false;
+		
+			$hide_content = true;
+		
+			if( !($user_patronage == false
+				|| $user_patronage < ($patreon_level*100)
+				|| $declined) ) {
+					
+				$hide_content = false;
+				
+
+				// Seems valid patron. Lets see if active patron option was set and the user fulfills it
+				
+				if($patreon_active_patrons_only=='1'
+				AND $user_pledge_relationship_start >= strtotime(get_the_date('',$post->ID))) {
+					
+					$hide_content = true;
+					
+				}
+			}			
 		
 			if($post_total_patronage_level !='' AND $post_total_patronage_level > 0) {
 				// Total patronage set if user has lifetime patronage over this level, we let him see the content
 				
 				if($user_lifetime_patronage >= $post_total_patronage_level * 100) {
-					$show_content = true;
+					$hide_content = false;
 				}
 			}
 			
-			if($post_level_days !='' AND $post_level_days > 0) {
-				// Post level days set. If user has pledge total over post level days X post level, we show content
+			
+			if( $hide_content ) {
 				
-				if($user_lifetime_patronage >= ($post_level_days * $post_level * 100)) {
-					$show_content = true;
-				}
-			}
-			
-			if(($user_patronage == false
-				|| $user_patronage < ($patreon_level*100)
-				|| $declined)
-				AND !$show_content
-			) {
 				// protect content from user
 				
 				// Get client id
