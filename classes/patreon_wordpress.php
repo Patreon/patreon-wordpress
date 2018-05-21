@@ -403,6 +403,23 @@ class Patreon_Wordpress {
 		return $pledge_days;
 
 	}
+	public static function get_user_pledge_relationship_start($user=false) {
+
+		if(self::$current_user_pledge_relationship_start != -1) {
+			return self::$current_user_pledge_relationship_start;
+		}
+		
+		if(!$user) {
+			$user = wp_get_current_user();
+		}
+		
+		$pledge_days = false;
+
+		$user_response = self::getPatreonUser($user);
+		
+		return strtotime($user_response['included'][0]['attributes']['pledge_relationship_start']);
+		
+	}
 	public static function get_user_lifetime_patronage($user=false) {
 
 		if(self::$current_user_lifetime_patronage != -1) {
