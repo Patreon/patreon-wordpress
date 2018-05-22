@@ -635,6 +635,7 @@ class Patreon_Frontend {
 			$user_pledge_relationship_start = Patreon_Wordpress::get_user_pledge_relationship_start();
 		
 			$user_patronage = Patreon_Wordpress::getUserPatronage();
+			
 			$user_lifetime_patronage = Patreon_Wordpress::get_user_lifetime_patronage();
 	
 			$declined = Patreon_Wordpress::checkDeclinedPatronage($user);
@@ -655,22 +656,32 @@ class Patreon_Frontend {
 					
 				$hide_content = false;
 				
-
-				// Seems valid patron. Lets see if active patron option was set and the user fulfills it
+				// Disable below logic if v2 is not being used:
 				
-				if($patreon_active_patrons_only=='1'
-				AND $user_pledge_relationship_start >= strtotime(get_the_date('',$post->ID))) {
+				if(get_option('patreon-can-use-api-v2',false)=='yes') {
+
+					// Seems valid patron. Lets see if active patron option was set and the user fulfills it
 					
-					$hide_content = true;
-					
+					if($patreon_active_patrons_only=='1'
+					AND $user_pledge_relationship_start >= strtotime(get_the_date('',$post->ID))) {
+						
+						$hide_content = true;
+						
+					}	
+						
 				}
 			}			
 		
-			if($post_total_patronage_level !='' AND $post_total_patronage_level > 0) {
-				// Total patronage set if user has lifetime patronage over this level, we let him see the content
-				
-				if($user_lifetime_patronage >= $post_total_patronage_level * 100) {
-					$hide_content = false;
+			// Disable below logic if v2 is not being used:
+
+			if(get_option('patreon-can-use-api-v2',false)=='yes') {
+
+				if($post_total_patronage_level !='' AND $post_total_patronage_level > 0) {
+					// Total patronage set if user has lifetime patronage over this level, we let him see the content
+	
+					if($user_lifetime_patronage >= $post_total_patronage_level * 100) {
+						$hide_content = false;
+					}
 				}
 			}
 			
