@@ -61,11 +61,11 @@ define("PATREON_NO_LOCKING_LEVEL_SET_FOR_THIS_POST", 'Post is already public. If
 define("PATREON_NO_POST_ID_TO_UNLOCK_POST", 'Sorry - could not get the post id for this locked post' );
 define("PATREON_WORDPRESS_VERSION", '1.1.1' );
 define("PATREON_WORDPRESS_PLUGIN_SLUG", plugin_basename( __FILE__ ) );
-define("PATREON_PRIVACY_POLICY_ADDENDUM", '<h2>Patreon features in this website</h2>In order to enable you to use this website with Patreon services, we save certain functionally important Patreon information about you in this website. 
+define("PATREON_PRIVACY_POLICY_ADDENDUM", '<h2>Patreon features in this website</h2>In order to enable you to use this website with Patreon services, we save certain functionally important Patreon information about you in this website if you log in with Patreon.
 <br /><br />
 These include your Patreon user id, Patreon username, your first, last names and your vanity name. Additionally, the id of your campaign at Patreon and your campaign\'s Patreon URL are also saved.
 <br /><br />
-If you request that your data be deleted from this website, this data will also be deleted and Patreon functionality will not work. You would need to register on this website and log in with Patreon again in order to re-populate this data and have Patreon functionality working again.');
+If you request that your data be deleted from this website, this data will also be deleted and Patreon functionality will not work. You would need to register on this website and log in to this website with Patreon again in order to re-populate this data and have Patreon functionality working again.');
 
 include 'classes/patreon_wordpress.php';
 
