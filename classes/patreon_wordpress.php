@@ -569,8 +569,17 @@ class Patreon_Wordpress {
 			<?php	
 			update_option('patreon-file-locking-feature-notice-shown',1);
 		}
+		$gdpr_notice_shown = get_option('patreon-gdpr-notice-shown',false);
+		
+		if(!$gdpr_notice_shown AND !get_option('patreon-gdpr-notice-shown',false)) {
+			?>
+				 <div class="notice notice-info is-dismissible">
+				 <h3>GDPR compliance with Patreon WordPress</h3>
+					<p>Please visit <a href="<?php echo admin_url('tools.php?wp-privacy-policy-guide=1#wp-privacy-policy-guide-patreon-wordpress'); ?>">the new WordPress privacy policy recommendation page</a> and copy & paste the section related to Patreon WordPress to your privacy policy page.</p>
+				</div>
+			<?php	
+			update_option('patreon-gdpr-notice-shown',1);
+		}
 	}
 	
 }
-
-?>

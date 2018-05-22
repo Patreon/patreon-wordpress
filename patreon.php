@@ -70,5 +70,3 @@ If you request that your data be deleted from this website, this data will also 
 include 'classes/patreon_wordpress.php';
 
 $Patreon_Wordpress = new Patreon_Wordpress;
-
-?>
