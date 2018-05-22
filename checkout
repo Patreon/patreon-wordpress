@@ -1,0 +1,4 @@
+BRANCH=$1
+git checkout $BRANCH
+chown -R pat:pat *
+chown -R root:root .git
