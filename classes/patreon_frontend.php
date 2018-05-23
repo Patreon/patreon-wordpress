@@ -643,14 +643,17 @@ class Patreon_Frontend {
 			$user_lifetime_patronage = Patreon_Wordpress::get_user_lifetime_patronage();
 	
 			$declined = Patreon_Wordpress::checkDeclinedPatronage($user);
-		
-			// Check if post was set for active patrons only
-			
-			$patreon_active_patrons_only = get_post_meta( $post->ID, 'patreon-active-patrons-only', true );
-			
-			// Check if specific total patronage is given for this post:
-			
-			$post_total_patronage_level = get_post_meta( $post->ID, 'patreon-total-patronage-level', true );
+
+			if(get_option('patreon-can-use-api-v2',false)=='yes') {				
+				// Check if post was set for active patrons only
+				
+				$patreon_active_patrons_only = get_post_meta( $post->ID, 'patreon-active-patrons-only', true );
+				
+				// Check if specific total patronage is given for this post:
+				
+				$post_total_patronage_level = get_post_meta( $post->ID, 'patreon-total-patronage-level', true );
+				
+			}
 		
 			$hide_content = true;
 		

@@ -2,8 +2,8 @@
 Contributors: wordpressorg@patreon.com, codebard
 Tags: patreon, membership, members
 Requires at least: 4.0
-Tested up to: 4.9.4
-Stable tag: 1.1.1
+Tested up to: 4.9.6
+Stable tag: 1.1.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -89,6 +89,21 @@ It is  difficult to protect videos due the intensive bandwidth requirements of h
 
 
 == Changelog ==
+
+= 1.1.2 =
+
+* Functionality for using Patreon API v2 added
+* API class uses v2 if v2 credentials are saved in settings-overview
+* Content drip locking options added to post interface when API v2 is being used
+* Content drip locking logic added to protectContentFromUsers function for when API v2 is being used
+* Now can easily switch in between API v1 and API v2 by just changing API credentials in settings-overview
+* Code to handle any connection errors added to API class
+* Connection errors are now shown in frontend so users wont get confused
+* GDPR privacy policy addendum via using WP 4.9.6's new privacy policy helper page
+* GDPR admin notice and plugin settings page infobox added
+* Links to GDPR tutorial at Patreon Zendesk added
+* readfile in image protection functions replaced with echo file_get_contents to make protected images load faster
+* Undefined var notice fixes for API v2 functions
 
 = 1.1.1 =
 
