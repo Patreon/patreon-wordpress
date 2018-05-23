@@ -624,13 +624,12 @@ class Patreon_Wordpress {
 			<?php	
 			update_option('patreon-file-locking-feature-notice-shown',1);
 		}
-		$gdpr_notice_shown = get_option('patreon-gdpr-notice-shown',false);
-		
-		if(!$gdpr_notice_shown AND !get_option('patreon-gdpr-notice-shown',false)) {
+			
+		if(!get_option('patreon-gdpr-notice-shown',false)) {
 			?>
 				 <div class="notice notice-info is-dismissible">
-				 <h3>GDPR compliance with Patreon WordPress</h3>
-					<p>Please visit <a href="<?php echo admin_url('tools.php?wp-privacy-policy-guide=1#wp-privacy-policy-guide-patreon-wordpress'); ?>">the new WordPress privacy policy recommendation page</a> and copy & paste the section related to Patreon WordPress to your privacy policy page.</p>
+				 <h3>Making your site GDPR compliant with Patreon WordPress</h3>
+					<p>Please visit <a href="<?php echo admin_url('tools.php?wp-privacy-policy-guide=1#wp-privacy-policy-guide-patreon-wordpress'); ?>">the new WordPress privacy policy recommendation page</a> and copy & paste the section related to Patreon WordPress to your privacy policy page.<br><br>You can read our easy tutorial for GDPR compliance with Patreon WordPress <a href="https://patreon.zendesk.com/hc/en-us/articles/360004198011" target="_blank">by visiting our GDPR help page</a></p>
 				</div>
 			<?php	
 			update_option('patreon-gdpr-notice-shown',1);

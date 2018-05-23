@@ -127,7 +127,38 @@ class Patron_Metabox {
 
 		}
 
-		$patreon_level = get_post_meta( $post_id, 'patreon-level', true );
+		// Handles active patrons only toggle
+		if(isset( $_POST['patreon-active-patrons-only']) && $_POST['patreon-active-patrons-only'] != '') {
+			update_post_meta( $post_id, 'patreon-active-patrons-only', 1 );
+		} else {
+			delete_post_meta( $post_id, 'patreon-active-patrons-only' );
+		}
+		
+		// Handles lifetime patronage value
+		if(isset( $_POST['patreon-total-patronage-level']) && is_numeric($_POST['patreon-total-patronage-level'])) {
+			$new_patreon_lifetime_patronage_level = $_POST['patreon-total-patronage-level'];
+		} else {
+			$new_patreon_lifetime_patronage_level = 0;
+		}
+
+		$patreon_lifetime_patronage_level = get_post_meta( $post_id, 'patreon-total-patronage-level', true );
+
+		if ( $new_patreon_lifetime_patronage_level && '' == $patreon_lifetime_patronage_level ) {
+
+			add_post_meta( $post_id, 'patreon-total-patronage-level', $new_patreon_lifetime_patronage_level, true );
+
+		} else if ( ($new_patreon_lifetime_patronage_level || $new_patreon_lifetime_patronage_level == 0 || $new_patreon_lifetime_patronage_level == '0') && $new_patreon_lifetime_patronage_level != $patreon_lifetime_patronage_level ) {
+
+			update_post_meta( $post_id, 'patreon-total-patronage-level', $new_patreon_lifetime_patronage_level );
+
+		} else if ( '' == $new_patreon_lifetime_patronage_level && $patreon_level ) {
+
+			delete_post_meta( $post_id, 'patreon-total-patronage-level', $patreon_lifetime_patronage_level );
+
+		}
+		
+		$patreon_lifetime_patronage_level = get_post_meta( $post_id, 'patreon-total-patronage-level', true );
+		
 	}
 }
 

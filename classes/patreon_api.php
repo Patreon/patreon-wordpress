@@ -41,7 +41,7 @@ class Patreon_API {
 		return $this->__get_json("current_user");
 	}
 	
-	public function fetch_campaign_and_patrons() {
+	public function fetch_campaign_and_patrons($v2=false) {
 	
 		// Below conditional and different endpoint can be deprecated to only use v2 api after transition period
 		if($v2 OR get_option('patreon-can-use-api-v2',false)=='yes') {
@@ -55,7 +55,7 @@ class Patreon_API {
 		return $this->__get_json("current_user/campaigns?include=rewards,creator,goals,pledges");
 	}
 		
-	public function fetch_creator_info() {
+	public function fetch_creator_info($v2=false) {
 	
 		// Below conditional and different endpoint can be deprecated to only use v2 api after transition period
 		if($v2 OR get_option('patreon-can-use-api-v2',false)=='yes') {
@@ -70,7 +70,7 @@ class Patreon_API {
 		return $this->__get_json("current_user/campaigns?include=creator");
 	}
 
-	public function fetch_campaign() {
+	public function fetch_campaign($v2=false) {
 		
 		// Below conditional and different endpoint can be deprecated to only use v2 api after transition period
 		if($v2 OR get_option('patreon-can-use-api-v2',false)=='yes') {
@@ -83,11 +83,11 @@ class Patreon_API {
 
 	private function __get_json($suffix,$v2=false) {		
 
-		$api_endpoint = "https://api.1patreon.com/oauth2/api/" . $suffix;
+		$api_endpoint = "https://api.patreon.com/oauth2/api/" . $suffix;
 
 		if($v2 OR get_option('patreon-can-use-api-v2',false)=='yes') {
 
-			$api_endpoint = "https://www.1patreon.com/api/oauth2/v2/" . $suffix;	
+			$api_endpoint = "https://www.patreon.com/api/oauth2/v2/" . $suffix;	
 		}
 	
 		$headers = array(

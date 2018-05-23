@@ -142,7 +142,7 @@ class Patreon_Protect {
 			header( 'Content-Length: ' . filesize( $file ) );
 		}
 			
-		readfile( $file );
+		echo file_get_contents( $file );
 		exit;
 	}
 	public static function servePatronOnlyImage($image=false) {
@@ -301,7 +301,7 @@ class Patreon_Protect {
 		
 			header('Content-Type: '.$mime_type);
 			// Readfile to avoid higher memory usage. Can be modified to echo file_get_contents for small files in future
-			readfile(PATREON_PLUGIN_LOCKED_IMAGE_CACHE_DIR.'/'.$cached_filename);
+			echo file_get_contents(PATREON_PLUGIN_LOCKED_IMAGE_CACHE_DIR.'/'.$cached_filename);
 			exit;
 			
 		}	
@@ -557,7 +557,7 @@ class Patreon_Protect {
 		}
 		
 		// Readfile below for lower memory usage. Can be changed to echo file_get_contents for small images in future
-		readfile(PATREON_PLUGIN_LOCKED_IMAGE_CACHE_DIR.'/'.$cached_filename);
+		echo file_get_contents(PATREON_PLUGIN_LOCKED_IMAGE_CACHE_DIR.'/'.$cached_filename);
 			
 		imagedestroy($image);
 	}
