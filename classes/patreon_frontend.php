@@ -204,6 +204,10 @@ class Patreon_Frontend {
 			return '<p class="patreon_message">'.apply_filters('ptrn/error_message',self::$messages_map[$_REQUEST['patreon_message']].$patreon_error).'</p>';
 		}
 		
+		if(isset($GLOBALS['patreon_notice'])) {
+			return '<p class="patreon_message">'.apply_filters('ptrn/patreon_notice',$GLOBALS['patreon_notice']).'</p>';
+		}
+		
 		return '';
 		
 	}
