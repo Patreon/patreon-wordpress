@@ -411,8 +411,16 @@ class Patreon_Frontend {
 		$state['patreon_nonce']=$_COOKIE['patreon_nonce'];
 		
 		$redirect_uri = site_url().'/patreon-authorization/';
+		
+		$v2_params = '';
+
+		if(get_option('patreon-can-use-api-v2',false)=='yes') {		
 			
-		$href = 'https://www.patreon.com/oauth2/become-patron?response_type=code&min_cents='.$pledge_level.'&client_id='.$client_id.'&scope=identity%20identity[email]&redirect_uri='.$redirect_uri.'&state='.urlencode(base64_encode(serialize($state)));
+			$v2_params = '&scope=identity%20identity[email]';
+			
+		}
+
+		$href = 'https://www.patreon.com/oauth2/become-patron?response_type=code&min_cents='.$pledge_level.'&client_id='.$client_id.$v2_params.'&redirect_uri='.$redirect_uri.'&state='.urlencode(base64_encode(serialize($state)));
 
 		// 3rd party dev goodie! Apply custom filters so they can manipulate the url:
 		
@@ -518,7 +526,15 @@ class Patreon_Frontend {
 		
 		$redirect_uri = site_url().'/patreon-authorization/';
 
-		$href = 'https://www.patreon.com/oauth2/authorize?response_type=code&client_id='.$client_id.'&redirect_uri='.$redirect_uri.'&scope=identity%20identity[email]%20identity.memberships&state='.urlencode(base64_encode(serialize($state)));
+		$v2_params = '';
+
+		if(get_option('patreon-can-use-api-v2',false)=='yes') {		
+			
+			$v2_params = '&scope=identity%20identity[email]%20identity.memberships';
+			
+		}
+		
+		$href = 'https://www.patreon.com/oauth2/authorize?response_type=code&client_id='.$client_id.'&redirect_uri='.$redirect_uri.$v2_params.'&state='.urlencode(base64_encode(serialize($state)));
 	
 		$href = apply_filters('ptrn/login_link', $href);
 		
