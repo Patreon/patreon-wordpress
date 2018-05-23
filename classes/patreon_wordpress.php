@@ -20,6 +20,9 @@ class Patreon_Wordpress {
 	public static $current_user_is_patron = -1;
 	public static $current_patreon_user = -1;
 	public static $current_member_details = -1;
+	public static $current_user_patronage_duration = -1;
+	public static $current_user_lifetime_patronage = -1;
+	public static $current_user_pledge_relationship_start = -1;
 
 	function __construct() {
 
@@ -380,11 +383,63 @@ class Patreon_Wordpress {
 		return false;
 
 	}
-	public static function getUserPatronageDuration($pledge) {
+	public static function getUserPatronageDuration($user=false) {
+
+		if(self::$current_user_patronage_duration != -1) {
+			return self::$current_user_patronage_duration;
+		}
+		
+		if(!$user) {
+			$user = wp_get_current_user();
+		}
+		
+		$pledge_days = false;
+
+		$user_response = self::getPatreonUser($user);
+		
+		if(isset($user_response['included'][0]['attributes']['pledge_relationship_start'])) {
+			$pledge_days = floor((time()-strtotime($user_response['included'][0]['attributes']['pledge_relationship_start']))/60/60/24);
+		}
+
+		return $pledge_days;
+
+	}
+	public static function get_user_pledge_relationship_start($user=false) {
+
+		if(self::$current_user_pledge_relationship_start != -1) {
+			return self::$current_user_pledge_relationship_start;
+		}
+		
+		if(!$user) {
+			$user = wp_get_current_user();
+		}
+		
+		$pledge_days = false;
+
+		$user_response = self::getPatreonUser($user);
+		
+		return strtotime($user_response['included'][0]['attributes']['pledge_relationship_start']);
+		
+	}
+	public static function get_user_lifetime_patronage($user=false) {
+
+		if(self::$current_user_lifetime_patronage != -1) {
+			return self::$current_user_lifetime_patronage;
+		}
+		
+		if(!$user) {
+			$user = wp_get_current_user();
+		}
+		
+		$lifetime_patronage = false;
 
 		$user_response = self::getPatreonUser($user);
 
-		$patronage_age = 0;
+		if(isset($user_response['included'][0]['attributes']['lifetime_support_cents'])) {
+			$lifetime_patronage = $user_response['included'][0]['attributes']['lifetime_support_cents'];
+		}
+
+		return $lifetime_patronage;
 
 	}
 	public static function checkDeclinedPatronage($user) {

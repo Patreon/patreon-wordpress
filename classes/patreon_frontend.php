@@ -601,8 +601,8 @@ class Patreon_Frontend {
 			// Check if both post level and site lock level are set to 0 or nonexistent. If so return normal content.
 			
 			if($post_level == 0 
-				&& (!get_option('patreon-lock-entire-site',false)
-					|| get_option('patreon-lock-entire-site',false)==0)
+				&& (!$patreon_level
+					|| $patreon_level==0)
 			) {
 				return $content;
 			}
@@ -629,17 +629,65 @@ class Patreon_Frontend {
 			if($post_level!=0) {
 				$patreon_level = $post_level;
 			}
-			
+			 
 			$user = wp_get_current_user();
-			
+
+			$user_pledge_relationship_start = Patreon_Wordpress::get_user_pledge_relationship_start();
+		
 			$user_patronage = Patreon_Wordpress::getUserPatronage();
+			
+			$user_lifetime_patronage = Patreon_Wordpress::get_user_lifetime_patronage();
 	
 			$declined = Patreon_Wordpress::checkDeclinedPatronage($user);
+		
+			// Check if post was set for active patrons only
 			
-			if($user_patronage == false 
+			$patreon_active_patrons_only = get_post_meta( $post->ID, 'patreon-active-patrons-only', true );
+			
+			// Check if specific total patronage is given for this post:
+			
+			$post_total_patronage_level = get_post_meta( $post->ID, 'patreon-total-patronage-level', true );
+		
+			$hide_content = true;
+		
+			if( !($user_patronage == false
 				|| $user_patronage < ($patreon_level*100)
-				|| $declined
-			) {
+				|| $declined) ) {
+					
+				$hide_content = false;
+				
+				// Disable below logic if v2 is not being used:
+				
+				if(get_option('patreon-can-use-api-v2',false)=='yes') {
+
+					// Seems valid patron. Lets see if active patron option was set and the user fulfills it
+					
+					if($patreon_active_patrons_only=='1'
+					AND $user_pledge_relationship_start >= strtotime(get_the_date('',$post->ID))) {
+						
+						$hide_content = true;
+						
+					}	
+						
+				}
+			}			
+		
+			// Disable below logic if v2 is not being used:
+
+			if(get_option('patreon-can-use-api-v2',false)=='yes') {
+
+				if($post_total_patronage_level !='' AND $post_total_patronage_level > 0) {
+					// Total patronage set if user has lifetime patronage over this level, we let him see the content
+	
+					if($user_lifetime_patronage >= $post_total_patronage_level * 100) {
+						$hide_content = false;
+					}
+				}
+			}
+			
+			
+			if( $hide_content ) {
+				
 				// protect content from user
 				
 				// Get client id
