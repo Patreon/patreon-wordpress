@@ -54,6 +54,7 @@ class Patreon_Wordpress {
 		add_action('upgrader_process_complete', 'Patreon_Wordpress::AfterUpdateActions',10,2);
 		add_action('admin_notices', array($this, 'AdminMessages'));
 		add_action('init', array($this, 'transitionalImageOptionCheck'));
+		add_action('admin_init', array($this, 'add_privacy_policy_section'),20);
 
 	}
 	public static function getPatreonUser($user) {
@@ -582,6 +583,11 @@ class Patreon_Wordpress {
 		}
 		
 	}
+	public static function add_privacy_policy_section() {
+
+		wp_add_privacy_policy_content('Patreon WordPress',PATREON_PRIVACY_POLICY_ADDENDUM);
+		
+	}
 	public static function AdminMessages() {
 		
 		// This function processes any message or notification to display once after updates.
@@ -618,8 +624,17 @@ class Patreon_Wordpress {
 			<?php	
 			update_option('patreon-file-locking-feature-notice-shown',1);
 		}
+		$gdpr_notice_shown = get_option('patreon-gdpr-notice-shown',false);
+		
+		if(!$gdpr_notice_shown AND !get_option('patreon-gdpr-notice-shown',false)) {
+			?>
+				 <div class="notice notice-info is-dismissible">
+				 <h3>GDPR compliance with Patreon WordPress</h3>
+					<p>Please visit <a href="<?php echo admin_url('tools.php?wp-privacy-policy-guide=1#wp-privacy-policy-guide-patreon-wordpress'); ?>">the new WordPress privacy policy recommendation page</a> and copy & paste the section related to Patreon WordPress to your privacy policy page.</p>
+				</div>
+			<?php	
+			update_option('patreon-gdpr-notice-shown',1);
+		}
 	}
 	
 }
-
-?>

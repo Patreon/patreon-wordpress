@@ -258,6 +258,21 @@ class Patreon_Options {
 								<!-- .inside -->
 
                             </div>
+							
+                            <!-- .postbox -->
+                            <div class="postbox">
+
+                                <div class="handlediv" title="Click to toggle"><br></div>
+                                <!-- Toggle -->
+
+                                <h2 class="hndle">GDPR compliance</h2>
+
+                               <div class="inside">
+									<p>Please visit <a href="<?php echo admin_url('tools.php?wp-privacy-policy-guide=1#wp-privacy-policy-guide-patreon-wordpress'); ?>">the new WordPress privacy policy recommendation page</a> and copy & paste the section related to Patreon WordPress to your privacy policy page.</p>
+                                </div>
+								<!-- .inside -->
+
+                            </div>
                             <!-- .postbox -->
 
                         </div>
