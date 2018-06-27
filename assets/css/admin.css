@@ -46,11 +46,11 @@
 }
 
 .patreon_image_locking_interface_input_prefix {
-    background-color: #FFF !important;
-    line-height: 20px;
-    height: 26px;
-    padding: 2px;
-    font-size:14px;
+	background-color: #FFF !important;
+	line-height: 20px;
+	height: 26px;
+	padding: 2px;
+	font-size:14px;
 	color: #000000;
 	display: inline-block;
 	border: 1px solid #ececec !important;
@@ -60,8 +60,8 @@
 }
 
 .patreon_image_locking_interface_input_prefix INPUT {
-    border: 0px !important;
-    background-color: #FFF;
+	border: 0px !important;
+	background-color: #FFF;
 	height:20px;
 	outline: none !important;
 	box-shadow: none !important;
@@ -116,8 +116,8 @@
 
 #patreon-image-toolbar {
 	display: hidden;
-    color: #0F0;
-    font-weight: bold;
+	color: #0F0;
+	font-weight: bold;
 	width: 49px;
 	height: 57px;
 }
