@@ -55,7 +55,6 @@ class Patreon_User_Profiles {
 			<?php
 
 		}
-
 	}
 
 	function save_patreon_user_profile_fields( $user_id ) {
@@ -75,8 +74,6 @@ class Patreon_User_Profiles {
 		// update_user_meta( $user_id, 'user_firstname', $_POST['province'] );
 		// update_user_meta( $user_id, 'user_lastname', $_POST['postalcode'] );
 	}
-
-
 
 	function prevent_email_change( $errors, $update, $user ) {
 
