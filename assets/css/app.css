@@ -4,72 +4,72 @@
 	-ms-border-radius: 6px;
 	-o-border-radius: 6px;
 	border-radius: 6px;
-	padding:8px;
+	padding: 8px;
 	margin-bottom:20px !important;
-	display:block;
-	border:1px solid #E6461A;
-	background-color:#484848;color:#ffffff;
+	display: block;
+	border: 1px solid #E6461A;
+	background-color: #484848;color:#ffffff;
 }
 
 .ptrn-branding {
-	color:#fff;
-	background-color:#F96854;
+	color: #fff;
+	background-color: #F96854;
 }
 
 #login .ptrn-branded-button {
-	width:auto;
+	width: auto;
 }
 
 /* New stuff */
 
 .patreon-locked-content-message {
-	display:block;
-	width:100%;
-	font-size:100%;
-	margin :10px 0px 10px 0px;
-	clear:both; 
+	display: block;
+	width: 100%;
+	font-size: 100%;
+	margin: 10px 0px 10px 0px;
+	clear: both; 
 	padding-bottom: 20px;
 	margin-bottom: 20px;
-	border-bottom : 1px solid #f0f0f0;
+	border-bottom: 1px solid #f0f0f0;
 
 }
 .patreon-be-patron-button {
-	display:inline-block;
-	width:auto;
-	margin:5px;
+	display: inline-block;
+	width: auto;
+	margin: 5px;
 }
 .patreon-login-refresh-button {
-	display:inline-block;
-	width:auto;
-	margin:5px;
+	display: inline-block;
+	width: auto;
+	margin: 5px;
 }
 
 /* A responsive wrapper */
 .patreon-campaign-banner {
 	max-width: 1200px;
-	width :100%;
-	display:block;
-	text-align:left;
+	width: 100%;
+	display: block;
+	text-align: left;
 }
 
 .patreon-responsive-button-wrapper {
-	display:inline-table !important; /* some themes override this. hence important */
-	width : 240px !important; /* some themes override this. hence important */
+	display: inline-table !important; /* some themes override this. hence important */
+	width: 240px !important; /* some themes override this. hence important */
 	height: 50px !important; /* some themes override this. hence important */
-	vertical-align:middle;
-	text-align:center;
-	background-color:#F96854 !important;
+	vertical-align: middle;
+	text-align: center;
+	background-color: #F96854 !important;
 }
 .patreon-responsive-button-wrapper:hover{
-	background-color:#FA7664 !important;
+	background-color: #FA7664 !important;
 }
 .patreon-responsive-button {
-	display:table-cell !important; /* some themes override this. hence important */
-	vertical-align:middle;
-	text-align:center;
+	display: table-cell !important; /* some themes override this. hence important */
+	vertical-align: middle;
+	text-align: center;
 	padding: 0px;
-	height : auto;
-	text-wrap:nowrap;
+	height: auto;
+	text-wrap: nowrap;
 
 	/* below code taken from earlier button */
 	border: 0;
@@ -82,7 +82,7 @@
 	text-decoration: none !important;
 	text-align: center;
 	text-transform: uppercase;
-	font-family : 'Libre Franklin Extra Bold',Helvetica, Arial;
+	font-family: 'Libre Franklin Extra Bold',Helvetica, Arial;
 }
 
 .patreon-responsive-button img {
@@ -90,8 +90,8 @@
 	display:inline-block !important; /* some themes override this. hence important */
 
 	/* below code taken from earlier button */
-	width:20px;
-	color:#fff !important;
+	width: 20px;
+	color: #fff !important;
 	vertical-align: middle;
 	margin-right: 10px;
 	box-shadow: none !important;	
@@ -99,45 +99,45 @@
 }
 
 .patreon-patron-button-wrapper {
-	display:inline-block;
-	width:100%;
-	margin:5px;
+	display: inline-block;
+	width: 100%;
+	margin: 5px;
 }
 
 .patreon-login-button-wrapper {
-	display:inline-block;
+	display: inline-block;
 	max-width : 265px;
-	width:100%;
-	margin:5px;
-	font-weight:bold;
+	width: 100%;
+	margin: 5px;
+	font-weight: bold;
 
 }
 
 .patreon-text-over-button {
-	display:inline-block;
-	width:100%;
-	margin-bottom:20px;
+	display: inline-block;
+	width: 100%;
+	margin-bottom: 20px;
 	font-size: 100%; 
 
 }
 
 .patreon-text-under-button {
-	display:inline-block;
-	width:100%;
-	margin-bottom:20px;
-	margin-top:20px;
+	display: inline-block;
+	width: 100%;
+	margin-bottom: 20px;
+	margin-top: 20px;
 	font-size: 100%;
 
 }
 
 .patreon-valid-patron-message {
-	display:block;
-	width:100%;
-	clear:both; 
+	display: block;
+	width: 100%;
+	clear: both; 
 	padding-bottom: 25px;
 	padding-top: 25px;
 	margin-top: 25px;
-	border-top : 1px solid #f0f0f0;
+	border-top: 1px solid #f0f0f0;
 
 }
 
