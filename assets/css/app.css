@@ -45,7 +45,7 @@
 }
 
 /* A responsive wrapper */
-	.patreon-campaign-banner {
+.patreon-campaign-banner {
 	max-width: 1200px;
 	width :100%;
 	display:block;
@@ -54,8 +54,8 @@
 
 .patreon-responsive-button-wrapper {
 	display:inline-table !important; /* some themes override this. hence important */
-	width : 240px;
-	height: 50px;
+	width : 240px !important; /* some themes override this. hence important */
+	height: 50px !important; /* some themes override this. hence important */
 	vertical-align:middle;
 	text-align:center;
 	background-color:#F96854 !important;
@@ -82,6 +82,7 @@
 	text-decoration: none !important;
 	text-align: center;
 	text-transform: uppercase;
+	font-family : 'Libre Franklin Extra Bold',Helvetica, Arial;
 }
 
 .patreon-responsive-button img {
@@ -139,3 +140,4 @@
 	border-top : 1px solid #f0f0f0;
 
 }
+
