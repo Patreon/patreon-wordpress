@@ -31,7 +31,6 @@
 	padding-bottom: 20px;
 	margin-bottom: 20px;
 	border-bottom: 1px solid #f0f0f0;
-
 }
 .patreon-be-patron-button {
 	display: inline-block;
@@ -86,7 +85,6 @@
 }
 
 .patreon-responsive-button img {
-
 	display:inline-block !important; /* some themes override this. hence important */
 
 	/* below code taken from earlier button */
@@ -94,8 +92,7 @@
 	color: #fff !important;
 	vertical-align: middle;
 	margin-right: 10px;
-	box-shadow: none !important;	
-
+	box-shadow: none !important;
 }
 
 .patreon-patron-button-wrapper {
@@ -110,7 +107,6 @@
 	width: 100%;
 	margin: 5px;
 	font-weight: bold;
-
 }
 
 .patreon-text-over-button {
@@ -118,7 +114,6 @@
 	width: 100%;
 	margin-bottom: 20px;
 	font-size: 100%; 
-
 }
 
 .patreon-text-under-button {
@@ -127,7 +122,6 @@
 	margin-bottom: 20px;
 	margin-top: 20px;
 	font-size: 100%;
-
 }
 
 .patreon-valid-patron-message {
@@ -138,6 +132,4 @@
 	padding-top: 25px;
 	margin-top: 25px;
 	border-top: 1px solid #f0f0f0;
-
 }
-
