@@ -2,8 +2,8 @@
 Contributors: wordpressorg@patreon.com, codebard
 Tags: patreon, membership, members
 Requires at least: 4.0
-Tested up to: 4.8
-Stable tag: 1.0.0
+Tested up to: 4.9.6
+Stable tag: 1.1.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -15,12 +15,17 @@ When a patron pledges, they can then head over to www.yourwordpresssite.com and 
 
 This plugin is maintained by Patreon. For advanced features, you can find additional premium WordPress plugins in this directory.
 
+Read an in-depth review of this free plugin and how to <a href="https://www.elegantthemes.com/blog/tips-tricks/how-to-create-a-patreon-membership-site-on-wordpress" target="_blank">combine Patreon and WordPress part of your membership business</a> on Elegant Themes
+
 ### FEATURES FOR CREATORS
 
 - Choose a minimum pledge amount necessary to see a particular post
 - Alternatively, set a minimum pledge amount to see all posts.
 - Set custom HTML that non-patrons see instead of the post, prompting them to become a patron
-- Easily embed patron-only content snippets in public posts using shortcodes
+
+*<b>You can post entirely independently on your WordPress site from your Patreon page.*</b> There is no need for WordPress and Patreon posts to correspond to one another in content or in locked status. The choice is up to you as a creator.
+
+Got ideas? Suggest them to the developer community on our <a href="https://www.patreondevelopers.com/t/wordpress-plugin-feature-ideas/215">Patreon WordPress Ideas Thread</a>
 
 ### FEATURES FOR PATRONS
 
@@ -84,6 +89,67 @@ It is  difficult to protect videos due the intensive bandwidth requirements of h
 
 
 == Changelog ==
+
+= 1.1.2 =
+
+* Functionality for using Patreon API v2 added
+* API class uses v2 if v2 credentials are saved in settings-overview
+* Content drip locking options added to post interface when API v2 is being used
+* Content drip locking logic added to protectContentFromUsers function for when API v2 is being used
+* Now can easily switch in between API v1 and API v2 by just changing API credentials in settings-overview
+* Code to handle any connection errors added to API class
+* Connection errors are now shown in frontend so users wont get confused
+* GDPR privacy policy addendum via using WP 4.9.6's new privacy policy helper page
+* GDPR admin notice and plugin settings page infobox added
+* Links to GDPR tutorial at Patreon Zendesk added
+* readfile in image protection functions replaced with echo file_get_contents to make protected images load faster
+* Undefined var notice fixes for API v2 functions
+
+= 1.1.1 =
+
+* Option to turn image locking function on/off
+* Image locking function defaults to off
+* Nginx compatibility for image locking function
+* Protocol fix for locked images - no longer http/https confusion
+* Filterable utm parameters for login and flow links
+* More reliable way to update htaccess with image locking rules
+* Refresh htaccess rules when image feature turned on/offers
+* Locked posts are protected in RSS feeds
+* Transitional option to disable image feature on update
+* Notice about new image locking option and info for image locking feature
+* Additional messages after login/unlock flow redirection landing
+
+= 1.1.0 =
+* Image locking functionality added
+* Users are now able to designate a different pledge level for any image and lock them
+* Locked images wont be visible when their direct link is used - which also prevents hotlinking of these images
+* Clicking on a locked image sends user to the pledge flow at Patreon with appropriate pledge level
+* Easy to notice and use image lock icon which appears when an image is clicked in post editor while in visual mode
+* Easy to use jQuery modal pledge level interface to lock image while editing a post
+* Images can also be locked from media library by setting a pledge level
+* Plugin now blurs the original image, and adds an unlock interface to make a locked image placeholder and caches them for performance
+* Cached placeholder images are refreshed every time pledge level for an image is updated
+* Image unlock links are made cacheable to allow sites using cache to work with locked images without problems
+* Front-end jQuery code to only catch clicks on images locked for the current user and send them to pledge flow
+* Plugin now imports emails of Patreon users who has their email verified at Patreon
+* Login button added to register form
+* User agent string added to API contacting function to identify the plugin
+* Various information like user's logged in state at Patreon, pledge level and various pledge parameters of user are now cached for any given page load. This will prevent contacting API more than once during a page load and help speed up operations - especially post listings
+
+= 1.0.2 =
+* Page protection added
+* New logic to make cacheable unlock links
+* New logic to make cacheable login links
+* Login button shortcode added
+* State var urlencoded when going to Patreon and urlencoded when back
+* Button width fix
+* Login button now appears in login form
+* User creation logic now uses Patreon-supplied names for WP display name/
+* Support link updated in plugin admin
+
+= 1.0.1 =
+* API endpoint protocol fix - http to https
+* Added !important to button width and height to prevent themes from overriding them
 
 = 1.0 =
 * Plugin launched.
