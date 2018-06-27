@@ -9,14 +9,14 @@ if ( ! defined( 'WPINC' ) ) {
 class Patreon_Options {
 	
     function __construct() {
-        if ( is_admin() ){
-            add_action('admin_menu', array($this, 'patreon_plugin_setup') );
-            add_action('admin_init', array($this, 'patreon_plugin_register_settings') );
+        if( is_admin() ) {
+            add_action( 'admin_menu', array( $this, 'patreon_plugin_setup' ) );
+            add_action( 'admin_init', array( $this, 'patreon_plugin_register_settings' ) );
         }
     }
 
     function patreon_plugin_setup(){
-        add_menu_page( 'Patreon Settings', 'Patreon Settings', 'manage_options', 'patreon-plugin', array($this, 'patreon_plugin_setup_page'), PATREON_PLUGIN_ASSETS.'/img/Patreon WordPress.png' );
+        add_menu_page( 'Patreon Settings', 'Patreon Settings', 'manage_options', 'patreon-plugin', array( $this, 'patreon_plugin_setup_page' ), PATREON_PLUGIN_ASSETS . '/img/Patreon WordPress.png' );
     }
 
     function patreon_plugin_register_settings() { // whitelist options
@@ -43,10 +43,11 @@ class Patreon_Options {
 	
     function fetch_creator_id() {
 
-        if(is_admin() && current_user_can('manage_options') && isset($_POST[''])) {
+        if( is_admin() && current_user_can( 'manage_options' ) && isset( $_POST[''] )) {
+			
             $creator_id = Patreon_Wordpress::getPatreonCreatorID();
-
-            if($creator_id != false) {
+			
+            if( $creator_id != false ) {
                 update_option( 'patreon-creator-id', $creator_id );
             }
         }
@@ -55,13 +56,13 @@ class Patreon_Options {
     function patreon_plugin_setup_page(){
 
         $args = array(
-                'post_type'=>'page',
-                'post_status'=>'publish',
-                'posts_per_page'=>-1,
-                'sort_order'=>'asc',
-                'orderby'=>'title'
-            );
-        $all_pages = get_pages($args);
+                'post_type'      => 'page',
+                'post_status'    => 'publish',
+                'posts_per_page' => -1,
+                'sort_order'     => 'asc',
+                'orderby'        => 'title'
+        );
+        $all_pages = get_pages( $args );
 
         $danger_user_list = Patreon_Login::getDangerUserList();
 		
@@ -88,10 +89,10 @@ class Patreon_Options {
 
                             <div class="postbox">
 
-                                <div class="handlediv" title="Click to toggle"><br></div>
+                                <div class="handlediv" title="Click to toggle"><br /></div>
                                 <!-- Toggle -->
 
-                                <h2 class="hndle"><span>API Settings</span></h2>
+                                <h2 class="handle"><span>API Settings</span></h2>
 
                                 <div class="inside">
 
@@ -101,26 +102,26 @@ class Patreon_Options {
 
                                         <tr valign="top">
 											<th scope="row"><strong>Redirect URI</strong></th>
-											<td><input type="text" value="<?php echo site_url().'/patreon-authorization/'; ?>" disabled class="large-text" /></td>
+											<td><input type="text" value="<?php echo site_url() . '/patreon-authorization/'; ?>" disabled class="large-text" /></td>
                                         </tr>
 
                                         <tr valign="top">
 											<th scope="row"><strong>Client ID</strong></th>
-											<td><input type="text" name="patreon-client-id" value="<?php echo esc_attr( get_option('patreon-client-id', '') ); ?>" class="large-text" /></td>
+											<td><input type="text" name="patreon-client-id" value="<?php echo esc_attr( get_option( 'patreon-client-id', '' ) ); ?>" class="large-text" /></td>
                                         </tr>
 
                                         <tr valign="top">
 											<th scope="row"><strong>Client Secret</strong></th>
-											<td><input type="text" name="patreon-client-secret" value="<?php echo esc_attr( get_option('patreon-client-secret', '') ); ?>" class="large-text" /></td>
+											<td><input type="text" name="patreon-client-secret" value="<?php echo esc_attr( get_option( 'patreon-client-secret', '' ) ); ?>" class="large-text" /></td>
                                         </tr>
                                         <tr valign="top">
 											<th scope="row"><strong>Creator's Access Token</strong></th>
-											<td><input type="text" name="patreon-creators-access-token" value="<?php echo esc_attr( get_option('patreon-creators-access-token', '') ); ?>" class="large-text" /></td>
+											<td><input type="text" name="patreon-creators-access-token" value="<?php echo esc_attr( get_option( 'patreon-creators-access-token', '' ) ); ?>" class="large-text" /></td>
                                         </tr>
 
                                         <tr valign="top">
 											<th scope="row"><strong>Creator's Refresh Token</strong></th>
-											<td><input type="text" name="patreon-creators-refresh-token" value="<?php echo esc_attr( get_option('patreon-creators-refresh-token', '') ); ?>" class="large-text" /></td>
+											<td><input type="text" name="patreon-creators-refresh-token" value="<?php echo esc_attr( get_option( 'patreon-creators-refresh-token', '' ) ); ?>" class="large-text" /></td>
                                         </tr>
 
                                     </table>
@@ -141,10 +142,10 @@ class Patreon_Options {
 
                             <div class="postbox">
 
-                                <div class="handlediv" title="Click to toggle"><br></div>
+                                <div class="handlediv" title="Click to toggle"><br /></div>
                                 <!-- Toggle -->
 
-                                <h2 class="hndle"><span>Patreon Wordpress Options</span></h2>
+                                <h2 class="handle"><span>Patreon Wordpress Options</span></h2>
 
                                 <div class="inside">
 
@@ -157,7 +158,7 @@ class Patreon_Options {
 												<div class="patreon-options-info">If on, the plugin will only connect users who are already logged into your WordPress website. If off, new accounts will be created automatically for users who are logging in for the first time via Patreon. Recommended: off</div>
 											</th>
 											<td>
-												<input type="checkbox" name="patreon-enable-strict-oauth" value="1"<?php checked( get_option('patreon-enable-strict-oauth', false) ); ?> />
+												<input type="checkbox" name="patreon-enable-strict-oauth" value="1"<?php checked( get_option( 'patreon-enable-strict-oauth', false ) ); ?> />
 											</td>
                                         </tr>
                                         <tr valign="top">
@@ -167,16 +168,16 @@ class Patreon_Options {
 												<div class="patreon-options-info">If on, you will be able to lock your images and provide patron only images anywhere in your posts like webcomics or visual content. If you aren't using image locking or having complications due to your web host infrastructure, you can keep this feature off. Whenever you turn this feature on or off, you should visit 'Permalinks' settings in your WordPress site and save your permalinks just once by clicking 'Save'. Otherwise your images may appear broken.</div>
 											</th>
 											<td>
-												<input type="checkbox" name="patreon-enable-file-locking" value="1"<?php checked( get_option('patreon-enable-file-locking', false) ); ?> />
+												<input type="checkbox" name="patreon-enable-file-locking" value="1"<?php checked( get_option( 'patreon-enable-file-locking', false ) ); ?> />
 											</td>
                                         </tr>
 										<?php
 										
 											$site_locking_info = '(Only Patrons at and over this pledge level will be able to see Posts)';
-											$readonly = '';
-											if(!get_option('patreon-creator-id', false))
+											$readonly 		   = '';
+											if( ! get_option( 'patreon-creator-id', false ) )
 											{
-												$site_locking_info = 'Post locking won\'t work without Creator ID. Please confirm you have it <a href="'.admin_url("?page=patreon-plugin").'">here</a>';
+												$site_locking_info = 'Post locking won\'t work without Creator ID. Please confirm you have it <a href="'.admin_url( "?page=patreon-plugin" ).'">here</a>';
 												$readonly = " readonly";
 											}
 											?>										
@@ -187,13 +188,13 @@ class Patreon_Options {
 												<?php echo $site_locking_info ?>
 											</th>
 											<td>
-												$<input type="text" name="patreon-lock-entire-site" value="<?php echo get_option('patreon-lock-entire-site'); ?>" <?php echo $readonly ?>/>
+												$<input type="text" name="patreon-lock-entire-site" value="<?php echo get_option( 'patreon-lock-entire-site' ); ?>" <?php echo $readonly ?>/>
 											</td>
                                         </tr>
                                         <tr valign="top">
 											<th scope="row" colspan="2">
 												<strong>Custom Call to Action Banner</strong> <br>You can show a custom Call to Action Notification and Banner (ie, "Be our Patron to see this content!") to your visitors. You can use HTML too. Leave empty to disable.<br /><br />
-												<?php wp_editor(get_option('patreon-custom-universal-banner'),'patreon_custom_universal_banner',array('textarea_name'=>'patreon-custom-universal-banner','textarea_rows'=>5)); ?>
+												<?php wp_editor( get_option( 'patreon-custom-universal-banner' ),'patreon_custom_universal_banner',array( 'textarea_name' =>'patreon-custom-universal-banner', 'textarea_rows' => 5 ) ); ?>
 											</th>
                                         </tr>
 
@@ -203,18 +204,18 @@ class Patreon_Options {
 												<div class="patreon-options-info">If on, users will be able to login to your website via Patreon and view patron only posts. If off, no one will be able to login to your website via Patreon and post locking will be disabled. Recommended: on</div>
 											</th>
 											<td>
-												<input type="checkbox" name="patreon-enable-login-with-patreon" value="1"<?php checked( get_option('patreon-enable-login-with-patreon', true) ); ?> />
+												<input type="checkbox" name="patreon-enable-login-with-patreon" value="1"<?php checked( get_option( 'patreon-enable-login-with-patreon', true ) ); ?> />
 											</td>
                                         </tr>
 
-                                        <?php if(get_option('patreon-enable-login-with-patreon', true)) { ?>
+                                        <?php if( get_option( 'patreon-enable-login-with-patreon', true ) ) { ?>
                                         <tr valign="top">
 											<th scope="row">
 												<strong>Allow Admins/Editors to 'Login with Patreon' Button</strong>
 												<div class="patreon-options-info">If on, admins and editors will be able to login to your website login via Patreon. If off, only non admin/editor users will be able to login to your website via Patreon. Recommended: on</div>
 											</th>
 											<td>
-												<input type="checkbox" name="patreon-enable-allow-admins-login-with-patreon" value="1"<?php checked( get_option('patreon-enable-allow-admins-login-with-patreon', false) ); ?> />
+												<input type="checkbox" name="patreon-enable-allow-admins-login-with-patreon" value="1"<?php checked( get_option( 'patreon-enable-allow-admins-login-with-patreon', false ) ); ?> />
 											</td>
                                         </tr>
                                         <?php } ?>
@@ -289,7 +290,7 @@ class Patreon_Options {
             </div>
             <!-- #poststuff -->
 
-             <?php submit_button('Update Settings', 'primary', 'submit', false); ?>
+             <?php submit_button( 'Update Settings', 'primary', 'submit', false ); ?>
 
         </div> <!-- .wrap -->
 
@@ -298,5 +299,3 @@ class Patreon_Options {
 		<?php
     }
 }
-
-?>
