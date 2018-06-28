@@ -65,7 +65,7 @@ class Patreon_Options {
         $all_pages = get_pages( $args );
 
         $danger_user_list = Patreon_Login::getDangerUserList();
-		
+
         ?>
 
        <form method="post" action="options.php">
