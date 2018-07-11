@@ -751,9 +751,18 @@ class Patreon_Frontend {
             }
 			 
 			if ( current_user_can( 'manage_options' ) ) {
-				// Here we need to put a notification to admins so they will know they can see the content because they are admin_login_with_patreon_disabled
+				// Here we need to put a notification to admins so they will know they can see the content because they are logged in with an admin account
 			
 				return $content . self::MakeAdminPostFooter( $patreon_level );
+			}
+
+			$patreon_user = Patreon_Wordpress::getPatreonUser(wp_get_current_user());
+			$creator_id   = get_option( 'patreon-creator-id', false );
+			
+			if ( $patreon_user['data']['id'] == $creator_id ) {
+				// Here we need to put a notification to creators so they will know they can see the content because they are logged in with creator account
+			
+				return $content . self::make_creator_post_footer( $patreon_level );
 			}	
 				
 			// Passed checks. If post level is not 0, override patreon level and hence site locking value with post's. This will allow Creators to lock entire site and then set a different value for individual posts for access. Ie, site locking is $5, but one particular post can be $10, and it will require $10 to see. 
@@ -843,6 +852,12 @@ class Patreon_Frontend {
 	public static function MakeAdminPostFooter( $patreon_level ) {
 		return '<div class="patreon-valid-patron-message">' . 
 			apply_filters( 'ptrn/admin_bypass_filter_message', PATREON_ADMIN_BYPASSES_FILTER_MESSAGE, $patreon_level ) .
+		 '</div>';
+		
+	}
+	public static function make_creator_post_footer( $patreon_level ) {
+		return '<div class="patreon-valid-patron-message">' . 
+			apply_filters( 'ptrn/creator_bypass_filter_message', PATREON_CREATOR_BYPASSES_FILTER_MESSAGE, $patreon_level ) .
 		 '</div>';
 		
 	}
