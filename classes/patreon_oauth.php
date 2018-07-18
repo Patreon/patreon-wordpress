@@ -9,7 +9,7 @@ class Patreon_OAuth {
 	private $client_secret;
 
 	public function __construct() {
-		$this->client_id 	 = get_option( 'patreon-client-id', false );
+		$this->client_id     = get_option( 'patreon-client-id', false );
 		$this->client_secret = get_option( 'patreon-client-secret', false );
 	}
 
@@ -35,10 +35,15 @@ class Patreon_OAuth {
 	private function __update_token( $params ) {
 		
 		$api_endpoint = "https://api.patreon.com/oauth2/token";
+		
+		$headers = array(
+			'User-Agent' => 'Patreon-Wordpress, version ' . PATREON_WORDPRESS_VERSION . ', platform ' . php_uname('s') . '-' . php_uname( 'r' ),
+		);		
 	
 		$api_request = array(
 			'method' => 'POST',
 			'body'   => $params,
+			'headers' => $headers,
 		);
 
 		$response = wp_remote_post( $api_endpoint, $api_request );
