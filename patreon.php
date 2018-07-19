@@ -56,6 +56,7 @@ define( "PATREON_ADMIN_LOGIN_WITH_PATREON_DISABLED", 'Sorry. Logging in Administ
 define( "PATREON_EMAIL_EXISTS_LOGIN_WITH_WP_FIRST", 'Sorry. A WordPress user with the same email you use at Patreon exists. Please log into this site with your WordPress user first, and then log in with Patreon to link these two accounts...' );
 define( "PATREON_LOGIN_WITH_PATREON_DISABLED", 'Sorry. Logging in with Patreon is disabled in this Website. Please contact administrator.' );
 define( "PATREON_ADMIN_BYPASSES_FILTER_MESSAGE", 'This content is for Patrons only, it\'s not locked for you because you are an Administrator' );
+define( "PATREON_CREATOR_BYPASSES_FILTER_MESSAGE", 'This content is for Patrons only, it\'s not locked for you because you are logged in as the Patreon creator' );
 define( "PATREON_NO_LOCKING_LEVEL_SET_FOR_THIS_POST", 'Post is already public. If you would like to lock this post, please set a pledge level for it' );
 define( "PATREON_NO_POST_ID_TO_UNLOCK_POST", 'Sorry - could not get the post id for this locked post' );
 define( "PATREON_WORDPRESS_VERSION", '1.1.3' );
