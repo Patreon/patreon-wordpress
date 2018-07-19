@@ -57,8 +57,10 @@ class Patreon_Frontend {
 		
 	}
 	function patreonEnqueueCss() {
+		
 		wp_register_style( 'patreon-wordpress-css', PATREON_PLUGIN_ASSETS.'/css/app.css', false );
 		wp_enqueue_style('patreon-wordpress-css', PATREON_PLUGIN_ASSETS.'/css/app.css' );
+		
 	}
 	function patreonPrintCss() {
 		
