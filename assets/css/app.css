@@ -1,10 +1,12 @@
+/* Various properties are stressed with !important because themes are overriding them */
+
 .patreon_message {
 	-webkit-border-radius: 6px;
 	-moz-border-radius: 6px;
 	-ms-border-radius: 6px;
 	-o-border-radius: 6px;
 	border-radius: 6px;
-	padding: 8px;
+	padding: 8px !important;
 	margin-bottom:20px !important;
 	display: block;
 	border: 1px solid #E6461A;
@@ -69,7 +71,6 @@
 	padding: 0px;
 	height: auto;
 	text-wrap: nowrap;
-
 	/* below code taken from earlier button */
 	border: 0;
 	box-shadow: none !important;
@@ -86,9 +87,9 @@
 
 .patreon-responsive-button img {
 	display:inline-block !important; /* some themes override this. hence important */
-
-	/* below code taken from earlier button */
-	width: 20px;
+	/* below code taken from earlier button */	
+	/* Themes override the below - therefore !important */
+	width: 20px !important;
 	color: #fff !important;
 	vertical-align: middle;
 	margin-right: 10px;
