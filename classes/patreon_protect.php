@@ -385,14 +385,14 @@ class Patreon_Protect {
 		}
 
 		$size = array(
-						'sm' => array( 
-							'w' => intval( $width / 4 ),
-							'h' => intval( $height / 4 )
-						),
-					   'md' => array(
-							'w' => intval( $width / 2 ),
-							'h' => intval( $height / 2 )
-						)
+			'sm' => array( 
+				'w' => intval( $width / 4 ),
+				'h' => intval( $height / 4 )
+			),
+		   'md' => array(
+				'w' => intval( $width / 2 ),
+				'h' => intval( $height / 2 )
+			)
 		);                       
 
 		/* Scale by 25% and apply Gaussian blur */
