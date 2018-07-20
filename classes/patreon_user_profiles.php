@@ -8,16 +8,19 @@ if ( ! defined( 'WPINC' ) ) {
 class Patreon_User_Profiles {
 
 	function __construct() {
+		
 		add_action( 'show_user_profile', array( $this, 'patreon_user_profile_fields' ) );
 		add_action( 'edit_user_profile', array( $this, 'patreon_user_profile_fields' ) );
 		add_action( 'personal_options_update', array( $this, 'save_patreon_user_profile_fields' ) );
 		add_action( 'edit_user_profile_update', array( $this, 'save_patreon_user_profile_fields' ) );
 		add_action( 'user_profile_update_errors', array( $this, 'prevent_email_change'), 10, 3 );
+		
 	}
 
 	function patreon_user_profile_fields( $user ) {
 
 		if( current_user_can( 'manage_options' ) ) {
+			
 			?>
 
 			<br />
@@ -54,6 +57,7 @@ class Patreon_User_Profiles {
 			<?php
 
 		}
+		
 	}
 
 	function save_patreon_user_profile_fields( $user_id ) {
@@ -72,6 +76,7 @@ class Patreon_User_Profiles {
 		// update_user_meta( $user_id, 'patreon_created', $_POST['patreon_created'] );
 		// update_user_meta( $user_id, 'user_firstname', $_POST['province'] );
 		// update_user_meta( $user_id, 'user_lastname', $_POST['postalcode'] );
+		
 	}
 
 	function prevent_email_change( $errors, $update, $user ) {
@@ -80,5 +85,7 @@ class Patreon_User_Profiles {
 
 		if( $user->user_email != $old->user_email   && ( ! current_user_can( 'create_users' ) ) )
 			$user->user_email = $old->user_email;
+		
 	}
+	
 }

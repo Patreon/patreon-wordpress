@@ -1,7 +1,9 @@
 <?php
 
 
-if( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+if( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly
+}
 
 class Patreon_API {
 
@@ -33,12 +35,15 @@ class Patreon_API {
 			if ( $api_return['included'][0]['attributes']['last_charge_status'] != 'Paid' ) {
 				
 				$api_return['included'][0]['attributes']['declined_since'] = $api_return['included'][0]['attributes']['last_charge_date'];
+				
 			}
 
 			return $api_return;
+			
 		}		
 
 		return $this->__get_json("current_user");
+		
 	}
 	
 	public function fetch_campaign_and_patrons ($v2 = false ) {
@@ -51,9 +56,11 @@ class Patreon_API {
 			// Requires having gotten permission for pledge scope during auth if used for a normal user instead of the creator
 
 			return $this->__get_json( "campaigns?include=rewards,creator,goals,pledges" );
+			
 		}		
 
 		return $this->__get_json( "current_user/campaigns?include=rewards,creator,goals,pledges" );
+		
 	}
 		
 	public function fetch_creator_info( $v2 = false ) {
@@ -67,20 +74,22 @@ class Patreon_API {
 			$api_return['included'][0]['id'] = $api_return['data'][0]['id'];
 
 			return $api_return;
+			
 		}		
 
 		return $this->__get_json( "current_user/campaigns?include=creator" );
+		
 	}
 
 	public function fetch_campaign( $v2 = false ) {
 		
 		// Below conditional and different endpoint can be deprecated to only use v2 api after transition period
 		if ( $v2 OR get_option( 'patreon-can-use-api-v2', false ) == 'yes' ) {
-		
 			return $this->__get_json( "campaigns?include=rewards,creator,goals" );
 		}
 
 		return $this->__get_json( "current_user/campaigns?include=rewards,creator,goals" );
+		
 	}
 
 	private function __get_json( $suffix, $v2 = false ) {		
@@ -88,7 +97,6 @@ class Patreon_API {
 		$api_endpoint = "https://api.patreon.com/oauth2/api/" . $suffix;
 
 		if ( $v2 OR get_option( 'patreon-can-use-api-v2', false ) == 'yes' ) {
-
 			$api_endpoint = "https://www.patreon.com/api/oauth2/v2/" . $suffix;	
 		}
 	
@@ -104,18 +112,21 @@ class Patreon_API {
 
 		$response = wp_remote_request( $api_endpoint, $api_request );
 		$result   = $response;
+		
 		if ( is_wp_error( $response ) ) {
 			
 			$result                    = array( 'error' => $response->get_error_message() );
 			$GLOBALS['patreon_notice'] = $response->get_error_message();
 			return $result;
+			
 		}
+		
 		return json_decode( $response['body'], true );
+		
 	}
 
 	public function check_api_v2() {
 		// Transitional function - checks if api v2 can be contacted with existing credentials and returns the result
-
 		return $this->__get_json( "campaigns?include=rewards,creator,goals", true );
 	}
 }

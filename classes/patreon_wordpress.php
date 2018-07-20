@@ -62,9 +62,12 @@ class Patreon_Wordpress {
 		if ( self::$current_patreon_user != -1 ) {
 			return self::$current_patreon_user;
 		}
+		
 		/* get user meta data and query patreon api */
 		$user_meta = get_user_meta( $user->ID );
+		
 		if ( isset( $user_meta['patreon_access_token'][0] ) ) {
+			
 			$api_client = new Patreon_API( $user_meta['patreon_access_token'][0] );
 
 			// Below is a code that caches user object for 60 seconds. This can be commented out depending on the response from Infrastructure team about contacting api to check for user on every page load
@@ -81,9 +84,11 @@ class Patreon_Wordpress {
 			$user = $api_client->fetch_user();
 
 			return self::$current_patreon_user = $user;
+			
 		}
 
 		return self::$current_patreon_user = false;
+		
 	}
 	static function updatePatreonUser() {
 
@@ -104,7 +109,9 @@ class Patreon_Wordpress {
 		if ( isset( $user_response['errors'] ) && is_array( $user_response['errors'] ) ) {
 
 			foreach ( $user_response['errors'] as $error ) {
+				
 				if( $error['code'] == 1 ) {
+					
 					/* refresh users token if error 1 */
 
 					$refresh_token = get_user_meta($user->ID, 'patreon_refresh_token', true);
@@ -116,7 +123,9 @@ class Patreon_Wordpress {
 					update_user_meta($user->ID, 'patreon_access_token', $tokens['access_token']);
 
 					$user_response = self::getPatreonUser($user);
+					
 				}
+				
 			}
 
 		}
@@ -126,11 +135,13 @@ class Patreon_Wordpress {
 		}
 
 		if ( isset( $user_response['data'] ) ) {
+			
 			/* all the details you want to update on wordpress user account */
 			update_user_meta( $user->ID, 'patreon_user', $user_response['data']['attributes']['vanity'] );
 			update_user_meta( $user->ID, 'patreon_created', $user_response['data']['attributes']['created'] );
 			update_user_meta( $user->ID, 'user_firstname', $user_response['data']['attributes']['first_name'] );
 			update_user_meta( $user->ID, 'user_lastname', $user_response['data']['attributes']['last_name'] );
+			
 		}
 
 	}
@@ -138,7 +149,8 @@ class Patreon_Wordpress {
 	
 		// Check if creator id doesnt exist. Account for the case in which creator id was saved as empty by the Creator
 
-		if ( ! get_option( 'patreon-creator-id', false ) OR get_option( 'patreon-creator-id', false )== '' ) {	
+		if ( ! get_option( 'patreon-creator-id', false ) OR get_option( 'patreon-creator-id', false )== '' ) {
+		
 			// Making sure access credentials are there to avoid fruitlessly contacting the api:
 
 			if ( get_option( 'patreon-client-id', false ) 
@@ -149,19 +161,22 @@ class Patreon_Wordpress {
 				// Credentials are in. Go.
 				
 				$creator_id = self::getPatreonCreatorID();
+				
 			}
 			if ( isset( $creator_id ) ) {
 				// Creator id acquired. Update.
-				
 				update_option( 'patreon-creator-id', $creator_id );
 			}
+			
 		}
+		
 	}
 	public static function checkv2APIAccess() {
 		
 		// Check if we can contact API v2 with the creator access token we have. Account for the case in which creator id was saved as empty by the Creator
 		
 		if ( ! get_option('patreon-can-use-api-v2', false ) ) {	
+		
 			// Making sure access credentials are there to avoid fruitlessly contacting the api:
 			
 			if ( get_option( 'patreon-client-id', false ) 
@@ -176,21 +191,26 @@ class Patreon_Wordpress {
 				$api_response = $api_client->check_api_v2();
 		
 			}
+			
 			$can_use = 'no';
+			
 			if ( $api_response['data'][0]['type']=='campaign' ) {
-				
 				// Got a valid result. Update.
 				$can_use = 'yes';
 			}
 			
 			update_option( 'patreon-can-use-api-v2', $can_use );
+			
 		}
+		
 	}
 	public static function checkPatreonCreatorURL() {
 		
 		// Check if creator url doesnt exist. 
 		$creator_url = self::getPatreonCreatorURL();
-		if ( ! get_option( 'patreon-creator-url', false ) OR get_option( 'patreon-creator-url', false ) == '' ) {	
+		
+		if ( ! get_option( 'patreon-creator-url', false ) OR get_option( 'patreon-creator-url', false ) == '' ) {
+			
 			// Making sure access credentials are there to avoid fruitlessly contacting the api:
 			
 			if ( get_option( 'patreon-client-id', false ) 
@@ -199,21 +219,25 @@ class Patreon_Wordpress {
 			) {
 				
 				// Credentials are in. Go.
-				
 				$creator_url = self::getPatreonCreatorURL();
+				
 			}
 			if ( isset( $creator_url ) ) {
-				// Creator id acquired. Update.
 				
+				// Creator id acquired. Update.				
 				update_option( 'patreon-creator-url', $creator_url );
+				
 			}
+			
 		}
+		
 	}
 	public static function checkPatreonCampaignID() {
 		
 		// Check if campaign id doesnt exist. 
 	
 		if ( ! get_option( 'patreon-campaign-id', false ) OR get_option( 'patreon-campaign-id', false ) == '' ) {
+			
 			// Making sure access credentials are there to avoid fruitlessly contacting the api:
 						
 			if ( get_option( 'patreon-client-id', false ) 
@@ -222,38 +246,50 @@ class Patreon_Wordpress {
 			) {
 	
 				// Credentials are in. Go.
-				
 				$campaign_id = self::getPatreonCampaignID();
+				
 			}
 			if ( isset( $campaign_id ) ) {
-				// Creator id acquired. Update.
 				
+				// Creator id acquired. Update.
 				update_option( 'patreon-campaign-id', $campaign_id );
+				
 			}
+			
 		}
+		
 	}
 	public static function checkPatreonCreatorName() {
 		
 		// This function checks and saves creator's full name, name and surname. These are used in post locking interface
 		
 		if ( ! get_option( 'patreon-creator-full-name', false ) OR get_option( 'patreon-creator-full-name', false ) == '' ) {
+			
 			// Making sure access credentials are there to avoid fruitlessly contacting the api:
 			
 			if ( get_option('patreon-client-id', false )  && get_option( 'patreon-client-secret', false ) && get_option('patreon-creators-access-token', false ) ) {
+				
 				// Credentials are in. Go.
 				$creator_info = self::getPatreonCreatorInfo();
+				
 			}
 			if ( isset( $creator_info['included'][0]['attributes']['full_name'] ) ) {
+				
 				// Creator id acquired. Update.
 				update_option( 'patreon-creator-full-name', $creator_info['included'][0]['attributes']['full_name'] );
+				
 			}
 			if ( isset( $creator_info['included'][0]['attributes']['first_name'] ) ) {
+				
 				// Creator id acquired. Update.
 				update_option( 'patreon-creator-first-name', $creator_info['included'][0]['attributes']['first_name'] );
+				
 			}
 			if ( isset( $creator_info['included'][0]['attributes']['last_name'] ) ) {
+				
 				// Creator id acquired. Update.
 				update_option( 'patreon-creator-last-name', $creator_info['included'][0]['attributes']['last_name'] );
+				
 			}
 		}
 	}
@@ -269,10 +305,10 @@ class Patreon_Wordpress {
         if( isset( $user_response['errors'] ) && is_array( $user_response['errors'] ) ) {
 
 			foreach( $user_response['errors'] as $error ) {
+				
 				if ( $error['code'] == 1 ) {
 
 					/* refresh creators token if error 1 */
-
 					$refresh_token = get_option( 'patreon-creators-refresh-token', false );
 
 					if( $refresh_token == false ) {
@@ -283,16 +319,22 @@ class Patreon_Wordpress {
 					$tokens       = $oauth_client->refresh_token( $refresh_token, site_url() . '/patreon-authorization/' );
 
 					if( isset( $tokens['refresh_token'] ) && isset( $tokens['access_token'] ) ) {
+						
 						update_option( 'patreon-creators-refresh-token', $tokens['refresh_token'] );
 						update_option( 'patreon-creators-access-token', $tokens['access_token'] );
+						
 					}
 
 					$user_response = $api_client->fetch_creator_info();
+					
 				}
+				
 			}
+			
 		}
 		
 		return $user_response;
+		
 	}
 	public static function getPatreonCreatorID() {
 
@@ -314,6 +356,7 @@ class Patreon_Wordpress {
 		}
 
         return false;
+		
 	}
 	public static function getPatreonCampaignID() {
 
@@ -324,6 +367,7 @@ class Patreon_Wordpress {
 		}
 
         return false;
+		
 	}
 	public static function getUserPatronage() {
 		
@@ -336,6 +380,7 @@ class Patreon_Wordpress {
 		}
 
 		$user = wp_get_current_user();
+		
 		if ( $user == false ) {
 			return false;
 		}
@@ -356,12 +401,16 @@ class Patreon_Wordpress {
 
 		$pledge = false;
 		if ( array_key_exists( 'included', $user_response ) ) {
+			
 			foreach ( $user_response['included'] as $obj ) {
+				
 				if ( $obj["type"] == "pledge" && $obj["relationships"]["creator"]["data"]["id"] == $creator_id ) {
 					$pledge = $obj;
 					break;
 				}
+				
 			}
+			
 		}
 		
 		if ( isset( $pledge['attributes']['declined_since'])  && ! is_null( $pledge['attributes']['declined_since'] ) ) {
@@ -391,7 +440,9 @@ class Patreon_Wordpress {
 		$user_response = self::getPatreonUser( $user );
 		
 		if ( isset( $user_response['included'][0]['attributes']['pledge_relationship_start'] ) ) {
+			
 			$pledge_days = floor( ( time() - strtotime( $user_response['included'][0]['attributes']['pledge_relationship_start'] ) ) / 60 / 60 / 24 );
+			
 		}
 
 		return $pledge_days;
@@ -454,17 +505,23 @@ class Patreon_Wordpress {
 
 		$pledge = false;
 		if ( array_key_exists( 'included', $user_response ) ) {
+			
 			foreach ( $user_response['included'] as $obj ) {
+				
 				if ( $obj["type"] == "pledge" && $obj["relationships"]["creator"]["data"]["id"] == $creator_id ) {
 					$pledge = $obj;
 					break;
 				}
+				
 			}
+			
 		}		
 	
 		if ( isset( $pledge['attributes']['declined_since']) && ! is_null( $pledge['attributes']['declined_since'] ) ) {
+			
 			do_action( 'ptrn/declined_since', $pledge, $pledge['attributes']['declined_since'] );
 			return self::$current_user_patronage_declined = true;
+			
 		}
 		else {
 			return self::$current_user_patronage_declined = false;
@@ -481,6 +538,7 @@ class Patreon_Wordpress {
 		}
 	
 		return 0;
+		
 	}
 	public static function isPatron() {
 
@@ -499,7 +557,7 @@ class Patreon_Wordpress {
 
 	}
 	public static function enqueueAdminScripts() {
-
+		
 		wp_enqueue_script( 'patreon-admin-js', PATREON_PLUGIN_ASSETS . '/js/admin.js', array( 'jquery' ), '1.0', true );
 
 	}
@@ -516,6 +574,7 @@ class Patreon_Wordpress {
 		if ( $options['action'] == 'update' && $options['type'] == 'plugin' ) {
 			
 			if( isset( $options['plugins'] ) ) {
+				
 				// Multi plugin update. Iterate:
 				// Iterate through the plugins being updated and check if ours is there
 				foreach( $options['plugins'] as $plugin ) {
@@ -523,17 +582,21 @@ class Patreon_Wordpress {
 					if( $plugin == PATREON_WORDPRESS_PLUGIN_SLUG ) {
 						$got_updated = true;
 					}
-				}	
+					
+				}
+				
 			}
 			if( isset( $options['plugin'] ) ) {
+				
 				// Single plugin update
-
 				if( $options['plugin'] == PATREON_WORDPRESS_PLUGIN_SLUG ) {
 					$got_updated = true;
 				}
+				
 			}
 
 			if( $got_updated ) {
+				
 				// Yep, this plugin was updated. Do whatever necessary post-update action:
 				
 				// Flush permalinks (htaccess rules) for Apache servers to make image protection rules active
@@ -544,13 +607,16 @@ class Patreon_Wordpress {
 				delete_option( 'patreon-mailing-list-notice-shown' );
 				delete_option( 'patreon-rate-plugin-notice-shown' );
 				delete_option( 'patreon-file-locking-feature-notice-shown' );
+				
 			}
 
 			// Transitional code to fix creator id pulling bug - campaign id was being pulled instead. Can be removed in 1-2 versions
 			
 			delete_option( 'patreon-creator-id' );
 			delete_option( 'patreon-campaign-id' );
-		}	
+			
+		}
+		
 	}
 	public static function transitionalImageOptionCheck() {
 	
@@ -585,27 +651,35 @@ class Patreon_Wordpress {
 		$mailing_list_notice_shown = get_option( 'patreon-mailing-list-notice-shown', false );
 		
 		if( ! $mailing_list_notice_shown ) {
+			
 			?>
 				 <div class="notice notice-success is-dismissible">
 					<p>Would you like to receive update notices, tips & tricks for Patreon WordPress? <a href="https://patreonforms.typeform.com/to/dPBVp1" target="_blank">Join our mailing list here!</a></p>
 				</div>
-			<?php			
+			<?php	
+			
 			update_option('patreon-mailing-list-notice-shown',1);
+			
 		}
 		
 		$rate_plugin_notice_shown = get_option('patreon-rate-plugin-notice-shown',false);
 		
 		if( ! $rate_plugin_notice_shown ) {
+			
 			?>
 				 <div class="notice notice-info is-dismissible">
 					<p>Did Patreon WordPress plugin transform your membership business? Help creators like yourself find out about this plugin <a href="https://wordpress.org/support/plugin/patreon-connect/reviews/#new-post" target="_blank">by rating and giving your brutally honest thoughts!</a></p>
 				</div>
 			<?php	
+			
 			update_option( 'patreon-rate-plugin-notice-shown', 1 );
+			
 		}
+		
 		$file_feature_notice_shown = get_option( 'patreon-file-locking-feature-notice-shown', false );
 		
 		if( ! $file_feature_notice_shown AND ! get_option( 'patreon-enable-file-locking', false ) ) {
+			
 			?>
 				 <div class="notice notice-info is-dismissible">
 				 <h3>The Patreon Wordpress plugin now supports image locking!</h3>
@@ -613,17 +687,22 @@ class Patreon_Wordpress {
 				</div>
 			<?php	
 			update_option( 'patreon-file-locking-feature-notice-shown', 1 );
+			
 		}
 			
 		if( ! get_option( 'patreon-gdpr-notice-shown', false ) ) {
+			
 			?>
 				 <div class="notice notice-info is-dismissible">
 				 <h3>Making your site GDPR compliant with Patreon WordPress</h3>
 					<p>Please visit <a href="<?php echo admin_url('tools.php?wp-privacy-policy-guide=1#wp-privacy-policy-guide-patreon-wordpress'); ?>">the new WordPress privacy policy recommendation page</a> and copy & paste the section related to Patreon WordPress to your privacy policy page.<br><br>You can read our easy tutorial for GDPR compliance with Patreon WordPress <a href="https://patreon.zendesk.com/hc/en-us/articles/360004198011" target="_blank">by visiting our GDPR help page</a></p>
 				</div>
 			<?php	
+			
 			update_option( 'patreon-gdpr-notice-shown', 1 );
+			
 		}
+		
 	}
 	
 }

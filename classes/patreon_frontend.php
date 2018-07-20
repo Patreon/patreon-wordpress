@@ -638,11 +638,9 @@ class Patreon_Frontend {
 			if ( get_option( 'patreon-can-use-api-v2', false ) == 'yes' ) {
 			
 				// Check if post was set for active patrons only
-				
 				$patreon_active_patrons_only = get_post_meta( $post->ID, 'patreon-active-patrons-only', true );
 				
 				// Check if specific total patronage is given for this post:
-				
 				$post_total_patronage_level = get_post_meta( $post->ID, 'patreon-total-patronage-level', true );
 				
 			}
@@ -666,7 +664,7 @@ class Patreon_Frontend {
 						
 						$hide_content = true;
 						
-					}	
+					}
 				}
 			}			
 		
@@ -680,9 +678,10 @@ class Patreon_Frontend {
 					if ( $user_lifetime_patronage >= $post_total_patronage_level * 100 ) {
 						$hide_content = false;
 					}
+					
 				}
+				
 			}
-			
 			
 			if ( $hide_content ) {
 				
@@ -706,7 +705,7 @@ class Patreon_Frontend {
 		}
 				
 		// Return content in all other cases
-		return false;		
+		return false;
 		
 	}
 	public static function protectContentFromUsers( $content ) {
