@@ -53,7 +53,15 @@ class Patreon_OAuth {
 
 		$response = wp_remote_post( $api_endpoint, $api_request );
 
-		return json_decode( $response['body'], true );
+		$response_decoded = json_decode($response['body'], true );
+		
+		if(is_array($response_decoded)) {
+			return $response_decoded;
+		}
+		
+		echo $response['body'];
+		wp_die();
 
 	}
+	
 }
