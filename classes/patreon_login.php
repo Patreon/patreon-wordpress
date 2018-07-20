@@ -2,7 +2,7 @@
 
 
 // If this file is called directly, abort.
-if ( ! defined( 'WPINC' ) ) {
+if ( !defined( 'WPINC' ) ) {
 	die;
 }
 
@@ -306,7 +306,7 @@ class Patreon_Login {
 
 	    $danger_user_list = array();
 
-	    if ( ! empty( $danger_users ) ) {
+	    if ( !empty( $danger_users ) ) {
 
 	        foreach( $danger_users as $danger_user ) {
 	            $danger_user_list[$danger_user->data->user_login] = $danger_user;

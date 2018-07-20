@@ -1,8 +1,7 @@
 <?php
 
-
 // If this file is called directly, abort.
-if ( ! defined( 'WPINC' ) ) {
+if ( !defined( 'WPINC' ) ) {
 	die;
 }
 
@@ -149,7 +148,7 @@ class Patreon_Wordpress {
 	
 		// Check if creator id doesnt exist. Account for the case in which creator id was saved as empty by the Creator
 
-		if ( ! get_option( 'patreon-creator-id', false ) OR get_option( 'patreon-creator-id', false )== '' ) {
+		if ( !get_option( 'patreon-creator-id', false ) OR get_option( 'patreon-creator-id', false )== '' ) {
 		
 			// Making sure access credentials are there to avoid fruitlessly contacting the api:
 
@@ -175,7 +174,7 @@ class Patreon_Wordpress {
 		
 		// Check if we can contact API v2 with the creator access token we have. Account for the case in which creator id was saved as empty by the Creator
 		
-		if ( ! get_option('patreon-can-use-api-v2', false ) ) {	
+		if ( !get_option('patreon-can-use-api-v2', false ) ) {	
 		
 			// Making sure access credentials are there to avoid fruitlessly contacting the api:
 			
@@ -209,7 +208,7 @@ class Patreon_Wordpress {
 		// Check if creator url doesnt exist. 
 		$creator_url = self::getPatreonCreatorURL();
 		
-		if ( ! get_option( 'patreon-creator-url', false ) OR get_option( 'patreon-creator-url', false ) == '' ) {
+		if ( !get_option( 'patreon-creator-url', false ) OR get_option( 'patreon-creator-url', false ) == '' ) {
 			
 			// Making sure access credentials are there to avoid fruitlessly contacting the api:
 			
@@ -236,7 +235,7 @@ class Patreon_Wordpress {
 		
 		// Check if campaign id doesnt exist. 
 	
-		if ( ! get_option( 'patreon-campaign-id', false ) OR get_option( 'patreon-campaign-id', false ) == '' ) {
+		if ( !get_option( 'patreon-campaign-id', false ) OR get_option( 'patreon-campaign-id', false ) == '' ) {
 			
 			// Making sure access credentials are there to avoid fruitlessly contacting the api:
 						
@@ -263,7 +262,7 @@ class Patreon_Wordpress {
 		
 		// This function checks and saves creator's full name, name and surname. These are used in post locking interface
 		
-		if ( ! get_option( 'patreon-creator-full-name', false ) OR get_option( 'patreon-creator-full-name', false ) == '' ) {
+		if ( !get_option( 'patreon-creator-full-name', false ) OR get_option( 'patreon-creator-full-name', false ) == '' ) {
 			
 			// Making sure access credentials are there to avoid fruitlessly contacting the api:
 			
@@ -413,7 +412,7 @@ class Patreon_Wordpress {
 			
 		}
 		
-		if ( isset( $pledge['attributes']['declined_since'])  && ! is_null( $pledge['attributes']['declined_since'] ) ) {
+		if ( isset( $pledge['attributes']['declined_since'])  && !is_null( $pledge['attributes']['declined_since'] ) ) {
 			do_action('ptrn/declined_since', $pledge, $pledge['attributes']['declined_since']);
 			return false;
 		}
@@ -431,7 +430,7 @@ class Patreon_Wordpress {
 			return self::$current_user_patronage_duration;
 		}
 		
-		if ( ! $user ) {
+		if ( !$user ) {
 			$user = wp_get_current_user();
 		}
 		
@@ -454,7 +453,7 @@ class Patreon_Wordpress {
 			return self::$current_user_pledge_relationship_start;
 		}
 		
-		if ( ! $user ) {
+		if ( !$user ) {
 			$user = wp_get_current_user();
 		}
 		
@@ -470,7 +469,7 @@ class Patreon_Wordpress {
 			return self::$current_user_lifetime_patronage;
 		}
 		
-		if ( ! $user ) {
+		if ( !$user ) {
 			$user = wp_get_current_user();
 		}
 		
@@ -490,14 +489,14 @@ class Patreon_Wordpress {
 			return self::$current_user_patronage_declined;
 		}
 		
-		if ( ! $user ) {
+		if ( !$user ) {
 			$user = wp_get_current_user();
 		}
 
 		$user_response = self::getPatreonUser( $user );
 
 		// If no user exists, the patronage cannot have been declined.
-		if ( ! $user_response ) {
+		if ( !$user_response ) {
 			return self::$current_user_patronage_declined = false;
 		}
 
@@ -517,7 +516,7 @@ class Patreon_Wordpress {
 			
 		}		
 	
-		if ( isset( $pledge['attributes']['declined_since']) && ! is_null( $pledge['attributes']['declined_since'] ) ) {
+		if ( isset( $pledge['attributes']['declined_since']) && !is_null( $pledge['attributes']['declined_since'] ) ) {
 			
 			do_action( 'ptrn/declined_since', $pledge, $pledge['attributes']['declined_since'] );
 			return self::$current_user_patronage_declined = true;
@@ -565,7 +564,7 @@ class Patreon_Wordpress {
 		
 		// In this function we perform actions after update.
 
-		if ( ! $options OR ! is_array( $options ) ) {
+		if ( !$options OR !is_array( $options ) ) {
 			// Not an update.
 			return;
 		}
@@ -624,7 +623,7 @@ class Patreon_Wordpress {
 		
 		// Check if transitional option is saved:
 		
-		if( ! get_option( 'patreon-image-option-transition-done',false ) ) {
+		if( !get_option( 'patreon-image-option-transition-done',false ) ) {
 		
 			// Doesnt exist.
 			
@@ -650,7 +649,7 @@ class Patreon_Wordpress {
 		
 		$mailing_list_notice_shown = get_option( 'patreon-mailing-list-notice-shown', false );
 		
-		if( ! $mailing_list_notice_shown ) {
+		if( !$mailing_list_notice_shown ) {
 			
 			?>
 				 <div class="notice notice-success is-dismissible">
@@ -664,7 +663,7 @@ class Patreon_Wordpress {
 		
 		$rate_plugin_notice_shown = get_option('patreon-rate-plugin-notice-shown',false);
 		
-		if( ! $rate_plugin_notice_shown ) {
+		if( !$rate_plugin_notice_shown ) {
 			
 			?>
 				 <div class="notice notice-info is-dismissible">
@@ -678,7 +677,7 @@ class Patreon_Wordpress {
 		
 		$file_feature_notice_shown = get_option( 'patreon-file-locking-feature-notice-shown', false );
 		
-		if( ! $file_feature_notice_shown AND ! get_option( 'patreon-enable-file-locking', false ) ) {
+		if( !$file_feature_notice_shown AND !get_option( 'patreon-enable-file-locking', false ) ) {
 			
 			?>
 				 <div class="notice notice-info is-dismissible">
@@ -690,7 +689,7 @@ class Patreon_Wordpress {
 			
 		}
 			
-		if( ! get_option( 'patreon-gdpr-notice-shown', false ) ) {
+		if( !get_option( 'patreon-gdpr-notice-shown', false ) ) {
 			
 			?>
 				 <div class="notice notice-info is-dismissible">

@@ -2,7 +2,7 @@
 
 
 // If this file is called directly, abort.
-if ( ! defined( 'WPINC' ) ) {
+if ( !defined( 'WPINC' ) ) {
 	die;
 }
 
@@ -45,7 +45,7 @@ class Patron_Metabox {
 		$label    = 'Add a minimum Patreon contribution required to access this content.  (Makes entire post patron only)';
 		$readonly = '';
 		
-		if ( ! get_option( 'patreon-creator-id', false ) ) {
+		if ( !get_option( 'patreon-creator-id', false ) ) {
 			
 			$label    = 'Post locking won\'t work without Creator ID. Please confirm you have it <a href="'.admin_url( "?page=patreon-plugin ").'">here</a>';
 			$readonly = " readonly";
@@ -68,7 +68,7 @@ class Patron_Metabox {
 			$label    = 'Active patrons only (optional) - if on, only patrons active at and before this post\'s publishing date will be able to see this content )';
 			$readonly = '';
 			
-			if ( ! get_option( 'patreon-creator-id', false ) ) {
+			if ( !get_option( 'patreon-creator-id', false ) ) {
 				
 				$label    = 'Post locking won\'t work without Creator ID. Please confirm you have it <a href="'.admin_url( "?page=patreon-plugin" ).'">here</a>';
 				$readonly = " readonly";
@@ -87,7 +87,7 @@ class Patron_Metabox {
 			$label    = 'Total patronage (optional) - any patron above total lifetime patronage $ value entered below can see this content';
 			$readonly = '';
 			
-			if ( ! get_option( 'patreon-creator-id', false ) ) {
+			if ( !get_option( 'patreon-creator-id', false ) ) {
 				
 				$label    = 'Post locking won\'t work without Creator ID. Please confirm you have it <a href="'.admin_url("?page=patreon-plugin").'">here</a>';
 				$readonly = " readonly";
@@ -109,12 +109,12 @@ class Patron_Metabox {
 
 	function patreon_plugin_save_post_class_meta( $post_id, $post ) {
 
-		if ( ! isset( $_POST['patreon_metabox_nonce'] ) || ! wp_verify_nonce( $_POST['patreon_metabox_nonce'], basename( __FILE__ ) ) )
+		if ( !isset( $_POST['patreon_metabox_nonce'] ) || !wp_verify_nonce( $_POST['patreon_metabox_nonce'], basename( __FILE__ ) ) )
 			return $post_id;
 
 		$post_type = get_post_type_object( $post->post_type );
 
-		if ( ! current_user_can( $post_type->cap->edit_post, $post_id ) ) {
+		if ( !current_user_can( $post_type->cap->edit_post, $post_id ) ) {
 			return $post_id;
 		}
 		

@@ -1,7 +1,7 @@
 <?php
 
 // If this file is called directly, abort.
-if ( ! defined( 'WPINC' ) ) {
+if ( !defined( 'WPINC' ) ) {
 	die;
 }
 
@@ -129,7 +129,7 @@ class Patreon_Routing {
 					$patreon_level = get_option( 'patreon-lock-entire-site', false );
 					
 					// Account for any value the creator can put into this option, and also the default false					
-					if( ! $patreon_level OR $patreon_level == '' ) {
+					if( !$patreon_level OR $patreon_level == '' ) {
 						$patreon_level = 0;
 					}
 					
@@ -140,7 +140,7 @@ class Patreon_Routing {
 						$post = get_post( $wp->query_vars['patreon-unlock-post'] );
 						
 						// If there is no post var, and entire site is not locked, no point in being here
-						if( ! $post AND $patreon_level == 0 ) {
+						if( !$post AND $patreon_level == 0 ) {
 							// No post, no point in being here.
 
 							$final_redirect = add_query_arg( 'patreon_message', 'patreon_no_post_id_to_unlock_post', $final_redirect );							
@@ -181,7 +181,7 @@ class Patreon_Routing {
 		
 						$patreon_level = get_post_meta( $wp->query_vars['patreon-unlock-image'], 'patreon_level', true );
 						
-						if( ! $patreon_level OR $patreon_level == 0) {
+						if( !$patreon_level OR $patreon_level == 0) {
 							$patreon_level = 0;
 						}
 						
@@ -200,7 +200,7 @@ class Patreon_Routing {
 					
 					$client_id = get_option( 'patreon-client-id', false );
 				
-					if( ! $client_id ) {
+					if( !$client_id ) {
 						
 						// No client id, no point in being here. Make it go with an error.
 						

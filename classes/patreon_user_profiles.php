@@ -1,7 +1,7 @@
 <?php
 
 // If this file is called directly, abort.
-if ( ! defined( 'WPINC' ) ) {
+if ( !defined( 'WPINC' ) ) {
 	die;
 }
 
@@ -62,7 +62,7 @@ class Patreon_User_Profiles {
 
 	function save_patreon_user_profile_fields( $user_id ) {
 
-		if ( ! current_user_can( 'edit_user', $user_id ) ) {
+		if ( !current_user_can( 'edit_user', $user_id ) ) {
 			return false;
 		}
 
@@ -83,7 +83,7 @@ class Patreon_User_Profiles {
 
 		$old = get_user_by( 'id', $user->ID );
 
-		if( $user->user_email != $old->user_email   && ( ! current_user_can( 'create_users' ) ) )
+		if( $user->user_email != $old->user_email   && ( !current_user_can( 'create_users' ) ) )
 			$user->user_email = $old->user_email;
 		
 	}

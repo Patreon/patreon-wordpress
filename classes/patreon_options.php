@@ -1,8 +1,7 @@
 <?php
 
-
 // If this file is called directly, abort.
-if ( ! defined( 'WPINC' ) ) {
+if ( !defined( 'WPINC' ) ) {
     die;
 }
 
@@ -186,7 +185,7 @@ class Patreon_Options {
 										
 											$site_locking_info = '(Only Patrons at and over this pledge level will be able to see Posts)';
 											$readonly 		   = '';
-											if( ! get_option( 'patreon-creator-id', false ) )
+											if( !get_option( 'patreon-creator-id', false ) )
 											{
 												$site_locking_info = 'Post locking won\'t work without Creator ID. Please confirm you have it <a href="'.admin_url( "?page=patreon-plugin" ).'">here</a>';
 												$readonly = " readonly";

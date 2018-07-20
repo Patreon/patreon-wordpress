@@ -1,7 +1,6 @@
 <?php
 
-
-if( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+if( !defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 class Patreon_OAuth {
 

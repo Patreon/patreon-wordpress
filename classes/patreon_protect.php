@@ -1,7 +1,6 @@
 <?php
 
-
-if ( ! defined( 'ABSPATH' ) ) {
+if ( !defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
@@ -161,16 +160,16 @@ class Patreon_Protect {
 	}
 	public static function servePatronOnlyImage( $image=false ) {
 
-		if ( ( ! isset( $image ) OR ! $image ) AND isset( $_REQUEST['patron_only_image'] ) ) {
+		if ( ( !isset( $image ) OR !$image ) AND isset( $_REQUEST['patron_only_image'] ) ) {
 			$image = $_REQUEST['patron_only_image'];
 		}
 		
-		if ( ! $image OR $image == '') {
+		if ( !$image OR $image == '') {
 			// This is not a rewritten image request. Exit.
 			return;
 		}
 
-		if ( ! ( isset( $_REQUEST['patreon_action'] ) AND $_REQUEST['patreon_action'] == 'serve_patron_only_image' ) ) {
+		if ( !( isset( $_REQUEST['patreon_action'] ) AND $_REQUEST['patreon_action'] == 'serve_patron_only_image' ) ) {
 			return;	
 		}
 
@@ -206,7 +205,7 @@ class Patreon_Protect {
 			$attachment_id = Patreon_Protect::getAttachmentIDfromThumbnailURL( $image );
 	
 			//No go. Have to get out and serve the image normally
-			if ( $attachment_id == 0 OR ! $attachment_id ) {
+			if ( $attachment_id == 0 OR !$attachment_id ) {
 				Patreon_Protect::readAndServeImage( $image );
 			}
 			
@@ -215,7 +214,7 @@ class Patreon_Protect {
 		$patreon_level = get_post_meta( $attachment_id, 'patreon_level', true );
 		
 		// If no specific level is found for this image, it is not set. Then set the level to 0.
-		if ( ! $patreon_level ) {
+		if ( !$patreon_level ) {
 			$patreon_level = 0;
 		}
 		
@@ -269,7 +268,7 @@ class Patreon_Protect {
 		
 		// Check if GDlib is installed
 		
-		if ( ! ( extension_loaded( 'gd' ) AND function_exists( 'gd_info' ) ) ) {
+		if ( !( extension_loaded( 'gd' ) AND function_exists( 'gd_info' ) ) ) {
 			
 			// Not installed we have to serve a static image:
 			header( 'Content-Type: image/png' );
@@ -306,7 +305,7 @@ class Patreon_Protect {
 			}
 			
 		}
-		if ( ! isset( $cached_filename ) ) {
+		if ( !isset( $cached_filename ) ) {
 			
 			// The file was not matched in lower sizes. Then treat it as the original image
 			$cached_filename    = $attachment_id;
@@ -464,7 +463,7 @@ class Patreon_Protect {
 		
 		$place_at_y  = $half_height - $lock_height - 10;
 		
-		if ( ! isset( $hide_text ) ) {
+		if ( !isset( $hide_text ) ) {
 			
 			// If the width is larger than the dimension set for scaling, then use width to fit the text, and use a percentage:
 
@@ -491,7 +490,7 @@ class Patreon_Protect {
 		imagecopy( $image, $lock_icon, ceil( $width / 2 ) - ceil( $lock_width / 2 ), $place_at_y, 0, 0, $lock_width, $lock_height );
 		
 		// Dont show text if too small
-		if ( ! isset( $hide_text ) ) {
+		if ( !isset( $hide_text ) ) {
 		
 			// Determine font dimension:
 			
@@ -530,7 +529,7 @@ class Patreon_Protect {
 		}
 
 		// Arrange unlock button :
-		if ( ! isset( $hide_button ) ) {
+		if ( !isset( $hide_button ) ) {
 			
 			$rectangle_width = apply_filters( 'ptrn/locked_image_interface_button_width', 130, $patreon_level, $attachment_id, $image, $width, $height);
 			$rectangle_height = $rectangle_width / 130 * 32;
@@ -634,7 +633,7 @@ RewriteRule ^" . $upload_dir . "/(.*)$ index.php?patreon_action=serve_patron_onl
 	}
 	public function saveAttachmentLevel( $attachment_id = false ) {
 		
-		if ( ! ( is_admin() AND current_user_can( 'manage_options' ) ) ) {
+		if ( !( is_admin() AND current_user_can( 'manage_options' ) ) ) {
 			return;
 		}
 		
@@ -681,7 +680,7 @@ RewriteRule ^" . $upload_dir . "/(.*)$ index.php?patreon_action=serve_patron_onl
 	}
 	public function makeAttachmentPledgeEditor( $attachment_id = false ) {
 
-		if ( ! ( is_admin() AND current_user_can( 'manage_options' ) ) ) {
+		if ( !( is_admin() AND current_user_can( 'manage_options' ) ) ) {
 			return;
 		}
 	
@@ -689,7 +688,7 @@ RewriteRule ^" . $upload_dir . "/(.*)$ index.php?patreon_action=serve_patron_onl
 			$attachment_id = $_REQUEST['patreon_attachment_id'];
 		}
 		
-		if ( ! $attachment_id OR $attachment_id == '' ) {
+		if ( !$attachment_id OR $attachment_id == '' ) {
 			// This is not a rewritten image request. Exit.
 			return;
 		}		
@@ -718,7 +717,7 @@ RewriteRule ^" . $upload_dir . "/(.*)$ index.php?patreon_action=serve_patron_onl
 		
 		global $post;
 		
-		if ( ! is_singular() OR is_admin() ) {
+		if ( !is_singular() OR is_admin() ) {
 			// Currently we only support single post/page/custom posts
 			return $content;			
 		}
@@ -825,7 +824,7 @@ RewriteRule ^" . $upload_dir . "/(.*)$ index.php?patreon_action=serve_patron_onl
 	public static function checkPatronPledgeForImage( $attachment_id, $user = false ) {
 	
 		// Checks a user's pledges against an image pledge level
-		if ( ! $user ) {
+		if ( !$user ) {
 			$user = wp_get_current_user();
 		}
 
@@ -841,7 +840,7 @@ RewriteRule ^" . $upload_dir . "/(.*)$ index.php?patreon_action=serve_patron_onl
 		$patreon_level = get_post_meta( $attachment_id, 'patreon_level', true );
 		
 		// If no specific level is found for this image, it is not set. Then set the level to 0.
-		if ( ! $patreon_level ) {
+		if ( !$patreon_level ) {
 			return 0;
 		}
 

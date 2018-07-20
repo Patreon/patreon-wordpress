@@ -2,7 +2,7 @@
 
 
 // If this file is called directly, abort.
-if ( ! defined( 'WPINC' ) ) {
+if ( !defined( 'WPINC' ) ) {
 	die;
 }
 
@@ -140,7 +140,7 @@ class Patreon_Frontend {
 		$is_patron                = Patreon_Wordpress::isPatron();
 		$messages                 = self::processPatreonMessages();
 		
-		if ( ! $user_logged_into_patreon ) {
+		if ( !$user_logged_into_patreon ) {
 			
 			// Patron logged in and patron, but we are still showing the banner. This means pledge level is not enough.
 			
@@ -157,7 +157,7 @@ class Patreon_Frontend {
 			return $messages . apply_filters( 'ptrn/label_text_over_universal_button', PATREON_TEXT_OVER_BUTTON_3, 'declined', $user_logged_into_patreon, $is_patron, $patreon_level);			
 		
 		}
-		if ( ! $is_patron ) {
+		if ( !$is_patron ) {
 			
 			// User logged in and not patron
 			return $messages . apply_filters( 'ptrn/label_text_over_universal_button', str_replace( '%%pledgelevel%%',$patreon_level, PATREON_TEXT_OVER_BUTTON_1 ), 'not_a_patron', $user_logged_into_patreon, $is_patron,$patreon_level );
@@ -174,7 +174,7 @@ class Patreon_Frontend {
 			// Get creator full name:
 			$creator_full_name = get_option( 'patreon-creator-full-name', false );
 			
-			if ( ! $creator_full_name OR $creator_full_name == '' ) {
+			if ( !$creator_full_name OR $creator_full_name == '' ) {
 				$creator_full_name = 'this creator';
 			}
 			
@@ -220,7 +220,7 @@ class Patreon_Frontend {
 	}
 	public static function getLabelUnderUniversalButton( $patreon_level, $state = false, $post = false ) {
 		
-		if ( ! $post ) {
+		if ( !$post ) {
 			global $post;
 		}
 		
@@ -229,7 +229,7 @@ class Patreon_Frontend {
 		$is_patron                = Patreon_Wordpress::isPatron();
 		
 		// If we werent given any state vars to send, initialize the array
-		if ( ! $state ) {
+		if ( !$state ) {
 			$state = array();
 		}
 
@@ -248,14 +248,14 @@ class Patreon_Frontend {
 		// Old flow link maker was replaced to a cache-able flow link function. Some vars may be unneeded in current function (this), clean up later #REVISIT
 		$refresh_link = '<a href="' . self::patreonMakeCacheableFlowLink($post) . '">Refresh</a>';		
 		
-		if ( ! $user_logged_into_patreon ) {
+		if ( !$user_logged_into_patreon ) {
 			
 			// Patron logged in and patron, but we are still showing the banner. This means pledge level is not enough.
 			return apply_filters( 'ptrn/label_text_under_universal_button', PATREON_TEXT_UNDER_BUTTON_1, 'user_not_logged_in', $user_logged_into_patreon, $is_patron, $patreon_level, $state);
 		
 		}
 		
-		if ( ! $is_patron ) {
+		if ( !$is_patron ) {
 			
 			// Patron logged in and not patron
 			$label = str_replace( '%%pledgelevel%%', $patreon_level, PATREON_TEXT_UNDER_BUTTON_2 );
@@ -281,7 +281,7 @@ class Patreon_Frontend {
 
 		// If no post is given, get the active post:
 		
-		if ( ! $post ) {
+		if ( !$post ) {
 			global $post;
 		}
 				
@@ -293,12 +293,12 @@ class Patreon_Frontend {
 			$send_pledge_level = $min_cents * 100;;
 		}
 		
-		if ( ! $client_id ) {
+		if ( !$client_id ) {
 			$client_id = get_option( 'patreon-client-id', false );
 		}
 		
 		// If we werent given any state vars to send, initialize the array
-		if ( ! $state ) {
+		if ( !$state ) {
 			$state = array();
 		}
 
@@ -336,7 +336,7 @@ class Patreon_Frontend {
 	}
 	public static function patreonMakeCacheableFlowLink( $post = false ) {
 		
-		if ( ! $post ) {
+		if ( !$post ) {
 			global $post;
 		}
 		
@@ -353,13 +353,13 @@ class Patreon_Frontend {
 	}
 	public static function patreonMakeCacheableImageFlowLink( $attachment_id, $post_id = false ) {
 	
-		if ( ! $post_id ) {
+		if ( !$post_id ) {
 			global $post;
 		}
 		
 		$unlock_post_id = $post_id;
 		
-		if ( ! $unlock_post_id AND ( isset( $post ) AND isset( $post->ID ) ) ) {
+		if ( !$unlock_post_id AND ( isset( $post ) AND isset( $post->ID ) ) ) {
 			$unlock_post_id = $post->ID;
 		}
 		
@@ -375,15 +375,15 @@ class Patreon_Frontend {
 	public static function MakeUniversalFlowLink( $pledge_level, $state=false, $client_id = false, $post=false, $args=false )
 	{
 		
-		if ( ! $post ) {
+		if ( !$post ) {
 			global $post;
 		}
-		if ( ! $client_id ) {
+		if ( !$client_id ) {
 			$client_id = get_option( 'patreon-client-id', false );
 		}
 		
 		// If we werent given any state vars to send, initialize the array
-		if ( ! $state ) {
+		if ( !$state ) {
 		
 			$state = array();
 		
@@ -476,11 +476,11 @@ class Patreon_Frontend {
 	}
 	public static function patreonMakeLoginLink( $client_id=false, $state=false, $post=false, $args=false ) {
 		
-		if ( ! $post ) {
+		if ( !$post ) {
 			global $post;
 		}
 		
-		if ( ! $client_id ) {
+		if ( !$client_id ) {
 			$client_id = get_option( 'patreon-client-id', false );
 		}
 		
@@ -488,7 +488,7 @@ class Patreon_Frontend {
 			
 		// If we werent given any state vars to send, initialize the array
 
-		if ( ! $state ) {
+		if ( !$state ) {
 			
 			$state = array();
 			
@@ -529,7 +529,7 @@ class Patreon_Frontend {
 	}
 	public static function patreonMakeLoginButton( $client_id = false ) {
 		
-		if ( ! $client_id ) {
+		if ( !$client_id ) {
 			$client_id = get_option( 'patreon-client-id', false );
 		}
 		
@@ -562,12 +562,12 @@ class Patreon_Frontend {
 	}
 	public static function lock_this_post( $post = false ) {
 		
-		if ( ! $post ) {
+		if ( !$post ) {
 			global $post;
 		}
 		
 		// Just bail out if this is not the main query for content
-		if ( ! is_main_query() ) {
+		if ( !is_main_query() ) {
 			return false;
 		}		
 		
@@ -602,7 +602,7 @@ class Patreon_Frontend {
 			// Check if both post level and site lock level are set to 0 or nonexistent. If so return normal content.
 			
 			if( $post_level == 0 
-				&& ( ! $patreon_level
+				&& ( !$patreon_level
 					|| $patreon_level == 0 )
 			) {
 				return false;
@@ -647,7 +647,7 @@ class Patreon_Frontend {
 		
 			$hide_content = true;
 		
-			if ( ! ( $user_patronage == false
+			if ( !( $user_patronage == false
 				|| $user_patronage < ( $patreon_level * 100 )
 				|| $declined ) ) {
 					
@@ -713,7 +713,7 @@ class Patreon_Frontend {
 		global $post;
 		
 		// Just bail out if this is not the main query for content
-		if ( ! is_main_query() ) {
+		if ( !is_main_query() ) {
 			return $content;
 		}
 		
@@ -748,7 +748,7 @@ class Patreon_Frontend {
 			// Check if both post level and site lock level are set to 0 or nonexistent. If so return normal content.
 			
 			if ( $post_level == 0 
-				&& ( ! $patreon_level
+				&& ( !$patreon_level
 					|| $patreon_level == 0 )
 			) {
 				return $content;
@@ -793,7 +793,7 @@ class Patreon_Frontend {
 		
 			$hide_content = true;
 		
-			if ( ! ( $user_patronage == false
+			if ( !( $user_patronage == false
 				|| $user_patronage < ( $patreon_level * 100 )
 				|| $declined ) ) {
 					
@@ -912,7 +912,7 @@ class Patreon_Frontend {
 	}
 	public static function LoginButtonShortcode( $args ) {
 		
-		if ( ! is_user_logged_in() ) {
+		if ( !is_user_logged_in() ) {
 			return Patreon_Frontend::showPatreonLoginButton();
 		}
 		
