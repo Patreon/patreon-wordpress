@@ -2,13 +2,14 @@
 
 
 // If this file is called directly, abort.
-if ( ! defined( 'WPINC' ) ) {
+if ( !defined( 'WPINC' ) ) {
 	die;
 }
 
 class Patreon_Login {
 
 	public static function updateExistingUser( $user_id, $user_response, $tokens ) {
+		
 		/* update user meta data with patreon data */
 		update_user_meta($user_id, 'patreon_refresh_token', $tokens['refresh_token']);
 		update_user_meta($user_id, 'patreon_access_token', $tokens['access_token']);
@@ -18,6 +19,7 @@ class Patreon_Login {
 		update_user_meta($user_id, 'patreon_created', $user_response['data']['attributes']['created']);
 		update_user_meta($user_id, 'patreon_token_minted', microtime());
 		update_user_meta($user_id, 'patreon_token_expires_in', $tokens['expires_in']);
+		
 	}
 
 	public static function updateLoggedInUserForStrictoAuth( $user_response, $tokens, $redirect = false ) {
@@ -25,15 +27,20 @@ class Patreon_Login {
 		$user = wp_get_current_user();
 
 		if ( $user->ID == 0 ) {
+			
 			$redirect = add_query_arg( 'patreon_message', 'patreon_cant_login_strict_oauth', $redirect );
 			wp_redirect( $redirect );
-			exit;			
+			exit;
+			
 		} else {
+			
 			/* update user meta data with patreon data */
 			self::updateExistingUser( $user->ID, $user_response, $tokens );
 			wp_redirect( $redirect );
-			exit;				
+			exit;	
+			
 		}
+		
 	}
 
 	public static function checkTokenExpiration( $user_id = false ) {
@@ -68,8 +75,11 @@ class Patreon_Login {
 				
 				// No minted value. Even if there may be no access token created and saved, still nuke it.
 				delete_user_meta( $user->ID, 'patreon_access_token' );
+				
 			}
+			
 		}
+		
 	}
 
 	public static function createOrLogInUserFromPatreon($user_response, $tokens, $redirect = false) {
@@ -89,7 +99,8 @@ class Patreon_Login {
 						
 			self::updateExistingUser( $user->ID, $user_response, $tokens );
 			wp_redirect( $redirect );
-			exit;		
+			exit;
+						
 		}
 		
 		////////////////////////////////////////////////
@@ -103,7 +114,6 @@ class Patreon_Login {
 		global $wpdb;
 		
 		$prepared_sql = $wpdb->prepare(
-		
 			"SELECT * FROM " . $wpdb->usermeta . " WHERE meta_key = 'patreon_user_id' AND meta_value = %s",
 			array( $patreon_user_id )
 		);
@@ -113,6 +123,7 @@ class Patreon_Login {
 		$patreon_linked_accounts = $wpdb->get_results( $prepared_sql, ARRAY_A );
 		
 		if ( count( $patreon_linked_accounts ) > 0 ) {
+			
 			////////////////////////////////////////////////
 			// We have linked users. Get the last login dates for each. The reason we did it by taking ids and iterating them is to avoid querying both patreon ids and login dates at the same time and having to use a self join query on wp_usermeta
 			////////////////////////////////////////////////
@@ -157,13 +168,17 @@ class Patreon_Login {
 					self::updateExistingUser( $user->ID, $user_response, $tokens );
 					wp_redirect( $redirect );
 					exit;
+					
 				}
 
 			}
 			else {
+				
 				wp_redirect( wp_login_url() . '?patreon_message=login_with_patreon_disabled', '301' );
 				exit;
+				
 			}
+			
 		}
 		
 		// At this point lets do a check for existing email if the email is going to be imported:
@@ -174,8 +189,8 @@ class Patreon_Login {
 		
 		$user = get_user_by( 'email', $check_user_email );
 		
-		
 		if ( $user != false ) {
+			
 			// A user with same Patreon email exists. This means that we cannot create this user with this email, but also we cannot link to this account since there may be WP installs which dont do email verification - could lead to identity spoofing
 			
 			// Give a message to the user to log in with the WP account and then log in with Patreon
@@ -221,10 +236,13 @@ class Patreon_Login {
 				}		
 				
 				if ( isset( $user_response['data']['attributes']['first_name'] ) ) {
+					
 					update_user_meta( $user_id, 'first_name', $user_response['data']['attributes']['first_name'] );
+					
 					$first_name   = $user_response['data']['attributes']['first_name'];
 					// Override display name with first name if its set
 					$display_name = $user_response['data']['attributes']['first_name'];
+					
 				}
 				
 				if ( isset( $user_response['data']['attributes']['last_name'] ) ) {
@@ -250,13 +268,16 @@ class Patreon_Login {
 				exit;	
 
 			} else {
+				
 				/* wordpress account creation failed */
 				
 				$redirect = add_query_arg( 'patreon_message', 'patreon_could_not_create_wp_account', $redirect );
 				wp_redirect( $redirect );
 				exit;	
+				
 			}
 		} else {
+			
 				/* We created this patreon user before. Update and log in.
 			
 				/* update user meta data with patreon data */
@@ -267,8 +288,10 @@ class Patreon_Login {
 				/* update user meta data with patreon data */
 				self::updateExistingUser( $user->ID, $user_response, $tokens );	
 				wp_redirect( $redirect );
-				exit;	
+				exit;
+				
 		}
+		
 	}
 
 	public static function getDangerUserList() {
@@ -283,7 +306,7 @@ class Patreon_Login {
 
 	    $danger_user_list = array();
 
-	    if ( ! empty( $danger_users ) ) {
+	    if ( !empty( $danger_users ) ) {
 
 	        foreach( $danger_users as $danger_user ) {
 	            $danger_user_list[$danger_user->data->user_login] = $danger_user;
@@ -291,6 +314,7 @@ class Patreon_Login {
 	    }
 
 	    return $danger_user_list;
+		
 	}
 
 }

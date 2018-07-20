@@ -10,14 +10,14 @@ Author URI: https://patreon.com
 */
 
 // If this file is called directly, abort.
-if ( ! defined( 'WPINC' ) ) {
+if ( !defined( 'WPINC' ) ) {
 	die;
 }
 
 $patreon_wp_uploads_dir 		= 	wp_upload_dir();
 $patreon_locked_image_cache_dir = 	$patreon_wp_uploads_dir['basedir'].'/patreon_locked_image_cache';
 
-if( ! file_exists($patreon_locked_image_cache_dir ) ) {
+if( !file_exists($patreon_locked_image_cache_dir ) ) {
 	wp_mkdir_p( $patreon_locked_image_cache_dir );
 }
 

@@ -1,40 +1,51 @@
 <?php
 
 // If this file is called directly, abort.
-if ( ! defined( 'WPINC' ) ) {
+if ( !defined( 'WPINC' ) ) {
 	die;
 }
 
 class Patreon_Routing {
 
 	function __construct() {
+		
 		add_action( 'generate_rewrite_rules', array( $this, 'add_rewrite_rules' ) );
 		add_filter( 'query_vars', array( $this, 'query_vars' ) );
 		add_action( 'parse_request', array( $this, 'parse_request' ) );
 		add_action( 'init', array( $this, 'force_rewrite_rules' ) );
 		add_action( 'init', array( $this,'set_patreon_nonce' ), 1);
+		
 	}
 
 	public static function activate() {
+		
 		global $wp_rewrite;
 		$wp_rewrite->flush_rules();
+		
 	}
 
 	public static function deactivate() {
+		
 		remove_action( 'generate_rewrite_rules', 'add_rewrite_rules' );
 		global $wp_rewrite;
 		$wp_rewrite->flush_rules();
+		
 	}
 
 	function force_rewrite_rules() {
+		
 		global $wp_rewrite;
+		
 		if( get_option( 'patreon-rewrite-rules-flushed', false) == false ) {
+			
 			$wp_rewrite->flush_rules();
 			// Refresh/add htaccess rules:
 			Patreon_Protect::removePatreonRewriteRules();
 			Patreon_Protect::addPatreonRewriteRules();
 			update_option( 'patreon-rewrite-rules-flushed', true );
+			
 		}
+		
 	}
 
 	function add_rewrite_rules( $wp_rewrite ) {
@@ -49,6 +60,7 @@ class Patreon_Routing {
 	}
 
 	function query_vars( $public_query_vars ) {
+		
 		array_push( $public_query_vars, 'patreon-oauth' );
 		array_push( $public_query_vars, 'patreon-flow' );
 		array_push( $public_query_vars, 'patreon-unlock-post' );
@@ -59,14 +71,19 @@ class Patreon_Routing {
 		array_push( $public_query_vars, 'state' );
 		array_push( $public_query_vars, 'patreon-redirect' );
 		return $public_query_vars;
+		
 	}
 
 	function set_patreon_nonce() {
+		
 		if( isset( $_COOKIE['patreon_nonce'] ) == false ) {
+			
 			$nonce = md5( bin2hex( openssl_random_pseudo_bytes( 32 ) . md5( time() ) . openssl_random_pseudo_bytes( 32 ) ) );
 			setcookie( 'patreon_nonce', $nonce, 0, COOKIEPATH, COOKIE_DOMAIN );
 			$_COOKIE['patreon_nonce'] = $nonce;
+			
  		}
+		
 	}
 
 	function parse_request( &$wp ) {
@@ -94,6 +111,7 @@ class Patreon_Routing {
 				exit;
 				
 			}
+			
 			if( array_key_exists( 'patreon-unlock-post', $wp->query_vars ) ) {
 				
 				// First slap the noindex header so search engines wont index this page:
@@ -111,7 +129,7 @@ class Patreon_Routing {
 					$patreon_level = get_option( 'patreon-lock-entire-site', false );
 					
 					// Account for any value the creator can put into this option, and also the default false					
-					if( ! $patreon_level OR $patreon_level == '' ) {
+					if( !$patreon_level OR $patreon_level == '' ) {
 						$patreon_level = 0;
 					}
 					
@@ -122,13 +140,15 @@ class Patreon_Routing {
 						$post = get_post( $wp->query_vars['patreon-unlock-post'] );
 						
 						// If there is no post var, and entire site is not locked, no point in being here
-						if( ! $post AND $patreon_level == 0 ) {
+						if( !$post AND $patreon_level == 0 ) {
 							// No post, no point in being here.
 
 							$final_redirect = add_query_arg( 'patreon_message', 'patreon_no_post_id_to_unlock_post', $final_redirect );							
 							wp_redirect( home_url() );
-							exit;						
+							exit;
+							
 						}
+						
 					}
 					
 					// Start with home url for redirect. If post is valid, get permalink. 
@@ -161,30 +181,34 @@ class Patreon_Routing {
 		
 						$patreon_level = get_post_meta( $wp->query_vars['patreon-unlock-image'], 'patreon_level', true );
 						
-						if( ! $patreon_level OR $patreon_level == 0) {
+						if( !$patreon_level OR $patreon_level == 0) {
 							$patreon_level = 0;
 						}
 						
 						$link_interface_item = 'image_unlock_button';
+						
 					}
 		
 					if( $patreon_level == 0 ) {
+						
 						// No locking level set for this content or the site. No point in locking. Redirect to post.
 						$final_redirect = add_query_arg( 'patreon_message', 'patreon_no_locking_level_set_for_this_post', $final_redirect );
 						wp_redirect( $final_redirect );
+						
 						exit;	
 					}
 					
 					$client_id = get_option( 'patreon-client-id', false );
 				
-					
-					if( ! $client_id ) {
+					if( !$client_id ) {
+						
 						// No client id, no point in being here. Make it go with an error.
 						
 						$final_redirect = add_query_arg( 'patreon_message', 'patreon_cant_login_api_error_credentials', $final_redirect );
 						
 						wp_redirect( $final_redirect );
-						exit;	
+						exit;
+						
 					}
 					
 					$state['final_redirect_uri'] = $final_redirect;	
@@ -195,11 +219,15 @@ class Patreon_Routing {
 				
 					wp_redirect( $flow_link );
 					exit;
+					
 				}
+				
 			}
+			
 			// Catch all
 			wp_redirect( home_url() );
 			exit;
+			
 		}
 		if ( strpos( $_SERVER['REQUEST_URI'], '/patreon-authorization/' ) !== false ) {
 	
@@ -227,6 +255,7 @@ class Patreon_Routing {
 					$redirect = add_query_arg( 'patreon_message', 'patreon_nonces_dont_match', $redirect );
 					wp_redirect( $redirect );
 					exit;
+					
 				}
 				
 				if( get_option( 'patreon-client-id', false ) == false || get_option( 'patreon-client-secret', false ) == false ) {
@@ -245,11 +274,13 @@ class Patreon_Routing {
 				if( array_key_exists( 'error', $tokens ) ) {
 
 					if( $tokens['error']=='invalid_client' ) {
+						
 						// Credentials are wrong. Redirect with an informative message
 						$redirect = add_query_arg( 'patreon_message', 'patreon_cant_login_api_error_credentials', $redirect );
 						
 					}
 					else {
+						
 						// Some other error from api. Append the message from Patreon too.
 						$redirect = add_query_arg( 'patreon_message', 'patreon_cant_login_api_error', $redirect );
 						$redirect = add_query_arg( 'patreon_error', $tokens['error'], $redirect );
@@ -266,10 +297,8 @@ class Patreon_Routing {
 					$user_response = $api_client->fetch_user();
 
 					if( apply_filters( 'ptrn/force_strict_oauth', get_option( 'patreon-enable-strict-oauth', false ) ) ) {
-
 						$user = Patreon_Login::updateLoggedInUserForStrictoAuth( $user_response, $tokens, $redirect );
 					} else {
-								
 						$user = Patreon_Login::createOrLogInUserFromPatreon( $user_response, $tokens, $redirect );
 					}
 
@@ -278,11 +307,18 @@ class Patreon_Routing {
 					
 					wp_redirect( $redirect );
 					exit;
+					
 				}
+				
 			} else {
+				
 				wp_redirect( home_url() );
 				exit;
+				
 			}
+			
 		}
+		
 	}
+	
 }

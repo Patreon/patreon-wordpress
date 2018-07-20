@@ -1,25 +1,32 @@
 <?php
 
-
 // If this file is called directly, abort.
-if ( ! defined( 'WPINC' ) ) {
+if ( !defined( 'WPINC' ) ) {
     die;
 }
 
 class Patreon_Options {
 	
     function __construct() {
+		
         if( is_admin() ) {
+			
             add_action( 'admin_menu', array( $this, 'patreon_plugin_setup' ) );
             add_action( 'admin_init', array( $this, 'patreon_plugin_register_settings' ) );
+			
         }
+		
     }
 
     function patreon_plugin_setup(){
+		
         add_menu_page( 'Patreon Settings', 'Patreon Settings', 'manage_options', 'patreon-plugin', array( $this, 'patreon_plugin_setup_page' ), PATREON_PLUGIN_ASSETS . '/img/Patreon WordPress.png' );
+		
     }
 
-    function patreon_plugin_register_settings() { // whitelist options
+    function patreon_plugin_register_settings() { 
+	
+		// whitelist options
         register_setting( 'patreon-options', 'patreon-client-id' );
         register_setting( 'patreon-options', 'patreon-client-secret' );
         register_setting( 'patreon-options', 'patreon-creators-access-token' );
@@ -39,6 +46,7 @@ class Patreon_Options {
         register_setting( 'patreon-options', 'patreon-enable-strict-oauth' );
         register_setting( 'patreon-options', 'patreon-lock-entire-site' );
         register_setting( 'patreon-options', 'patreon-custom-universal-banner' );
+		
     }
 	
     function fetch_creator_id() {
@@ -50,7 +58,9 @@ class Patreon_Options {
             if( $creator_id != false ) {
                 update_option( 'patreon-creator-id', $creator_id );
             }
+			
         }
+		
     }
 
     function patreon_plugin_setup_page(){
@@ -175,7 +185,7 @@ class Patreon_Options {
 										
 											$site_locking_info = '(Only Patrons at and over this pledge level will be able to see Posts)';
 											$readonly 		   = '';
-											if( ! get_option( 'patreon-creator-id', false ) )
+											if( !get_option( 'patreon-creator-id', false ) )
 											{
 												$site_locking_info = 'Post locking won\'t work without Creator ID. Please confirm you have it <a href="'.admin_url( "?page=patreon-plugin" ).'">here</a>';
 												$readonly = " readonly";
@@ -297,5 +307,7 @@ class Patreon_Options {
 
         </form>
 		<?php
+		
     }
+	
 }
