@@ -805,7 +805,7 @@ RewriteRule ^" . $upload_dir . "/(.*)$ index.php?patreon_action=serve_patron_onl
 					background-image: url( '".PATREON_PLUGIN_ASSETS."/img/patreon-image-lock-button-for-toolbar-bg.png' );
 					background-repeat: no-repeat;
 				}
-			</style>";
+			  </style>";
 			
 	}
 	public static function addImageToolbar() {
