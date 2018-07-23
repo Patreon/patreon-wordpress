@@ -29,8 +29,7 @@ jQuery( function( $ ) {
 				success: function(response) {
 					jQuery( document ).find( '#TB_window' ).html( response );
 				}
-			});			
-			
+			});
 		})
 	}, 1000 );		
 	jQuery( document ).on( 'submit', '#patreon_attachment_patreon_level_form', function( e ) {
