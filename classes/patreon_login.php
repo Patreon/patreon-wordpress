@@ -86,9 +86,9 @@ class Patreon_Login {
 
 		global $wpdb;
 
-		$login_with_patreon 				= get_option( 'patreon-enable-login-with-patreon', true );
+		$login_with_patreon                 = get_option( 'patreon-enable-login-with-patreon', true );
 		$admins_editors_login_with_patreon  = get_option( 'patreon-enable-allow-admins-login-with-patreon', false );
-		$danger_user_list  					= Patreon_Login::getDangerUserList();
+		$danger_user_list                   = Patreon_Login::getDangerUserList();
 		
 		// Check if user is logged in to wp:
 		
