@@ -189,7 +189,10 @@ class Patreon_Routing {
 						
 					}
 		
-					if( $patreon_level == 0 ) {
+					if( $patreon_level == 0  
+						AND !( isset($GLOBALS['patreon_skip_unlock_redirect_level_check']) 
+								AND $GLOBALS['patreon_skip_unlock_redirect_level_check'] )
+					) {
 						
 						// No locking level set for this content or the site. No point in locking. Redirect to post.
 						$final_redirect = add_query_arg( 'patreon_message', 'patreon_no_locking_level_set_for_this_post', $final_redirect );
