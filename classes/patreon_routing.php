@@ -126,8 +126,7 @@ class Patreon_Routing {
 				
 				if( isset( $wp->query_vars['patreon-direct-unlock'] ) ) {
 					
-					if( !( isset($GLOBALS['patreon_skip_unlock_redirect_level_check']) 
-								AND $GLOBALS['patreon_skip_unlock_redirect_level_check'] )
+					if( !( isset($GLOBALS['patreon_enable_direct_unlocks']) AND $GLOBALS['patreon_enable_direct_unlocks'] )
 					) {
 						
 						// No locking level set for this content or the site. No point in locking. Redirect to post.
@@ -249,8 +248,8 @@ class Patreon_Routing {
 					}
 		
 					if( $patreon_level == 0  
-						AND !( isset($GLOBALS['patreon_skip_unlock_redirect_level_check']) 
-								AND $GLOBALS['patreon_skip_unlock_redirect_level_check'] )
+						AND !( isset($GLOBALS['patreon_enable_direct_unlocks']) 
+								AND $GLOBALS['patreon_enable_direct_unlocks'] )
 					) {
 						
 						// No locking level set for this content or the site. No point in locking. Redirect to post.
