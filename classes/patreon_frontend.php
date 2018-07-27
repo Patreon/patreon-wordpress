@@ -39,7 +39,8 @@ class Patreon_Frontend {
 			'admin_login_with_patreon_disabled' 		 => PATREON_ADMIN_LOGIN_WITH_PATREON_DISABLED,		
 			'email_exists_login_with_wp_first' 			 => PATREON_EMAIL_EXISTS_LOGIN_WITH_WP_FIRST,		
 			'login_with_patreon_disabled' 				 => PATREON_LOGIN_WITH_PATREON_DISABLED,		
-			'admin_bypass_filter_message' 				 => PATREON_ADMIN_BYPASSES_FILTER_MESSAGE,				
+			'admin_bypass_filter_message' 				 => PATREON_ADMIN_BYPASSES_FILTER_MESSAGE,		
+			'patreon_direct_unlocks_not_turned_on' 				 => PATREON_DIRECT_UNLOCKS_NOT_ON,
 		);
 		
 	}
