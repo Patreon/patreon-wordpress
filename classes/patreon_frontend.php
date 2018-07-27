@@ -307,10 +307,10 @@ class Patreon_Frontend {
 			unset($post);
 			
 			// Set the post to the id if it is given:
-			if ( $args['direct_unlock'] != '' ) {
-				$post = get_post( $args['direct_unlock'] );
+			if ( $args['post_id'] != '' ) {
+				$post = get_post( $args['post_id'] );
 			}
-			
+		
 		}
 		
 		$send_pledge_level = 1;
@@ -350,6 +350,7 @@ class Patreon_Frontend {
 			// If direct unlock request is given, set cacheable flow link vars.
 			$flow_link_args['direct_unlock'] = $args['direct_unlock'];
 			$flow_link_args['redirect'] = $args['redirect'];
+			$flow_link_args['post_id'] = $args['post_id'];
 			
 		}		
 			
@@ -386,9 +387,14 @@ class Patreon_Frontend {
 
 		if ( isset( $args['direct_unlock'] ) ) {
 			
+			$append_post_id = '';
 			// If direct unlock request is given, override all :
 			
-			$flow_link = site_url() . '/patreon-flow/?patreon-direct-unlock=' . $args['direct_unlock'] . '&patreon-redirect=' .  urlencode( base64_encode( $args['redirect'] ) );
+			if( isset( $args['post_id'] ) ) {
+				$append_post_id = '&patreon-post-id=' . $args['post_id'];
+			}
+			
+			$flow_link = site_url() . '/patreon-flow/?patreon-direct-unlock=' . $args['direct_unlock'] . $append_post_id . '&patreon-redirect=' .  urlencode( base64_encode( $args['redirect'] ) );
 			
 		}		
 		
@@ -416,7 +422,7 @@ class Patreon_Frontend {
 		return '<div class="patreon-responsive-button-wrapper"><div class="patreon-responsive-button"><img class="patreon_logo" src="' . PATREON_PLUGIN_ASSETS . '/img/patreon-logomark-on-coral.svg" alt="' . $label . '" /> ' . $label . '</div></div>';
 		
 	}
-	public static function MakeUniversalFlowLink( $pledge_level, $state = false, $client_id = false, $post=false, $args = false )
+	public static function MakeUniversalFlowLink( $pledge_level, $state = false, $client_id = false, $post = false, $args = false )
 	{
 		
 		if ( !$post AND !isset( $args['direct_unlock'] ) ) {
@@ -478,7 +484,7 @@ class Patreon_Frontend {
 		$filterable_utm_params = apply_filters( 'ptrn/utm_params_for_patron_link', $filterable_utm_params );
 		
 		$utm_params = 'utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=' . get_option( 'patreon-campaign-id' ) . '&' . $filterable_utm_params;
-		
+
 		return $href . '&' . $utm_params;
 		
 	}

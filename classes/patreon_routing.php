@@ -66,6 +66,7 @@ class Patreon_Routing {
 		array_push( $public_query_vars, 'patreon-unlock-post' );
 		array_push( $public_query_vars, 'patreon-unlock-image' );
 		array_push( $public_query_vars, 'patreon-direct-unlock' );
+		array_push( $public_query_vars, 'patreon-post-id' );
 		array_push( $public_query_vars, 'patreon-login' );
 		array_push( $public_query_vars, 'patreon-final-redirect' );
 		array_push( $public_query_vars, 'code' );
@@ -143,11 +144,18 @@ class Patreon_Routing {
 						
 					}
 					
+					$post = false;
+					
+					// If post id set, get the post 
+					if( isset( $wp->query_vars['patreon-post-id'] ) ) {
+						$post = get_post( $wp->query_vars['patreon-post-id'] );
+					}
+					
 					$link_interface_item         = 'direct_unlock_button';
 					$state['final_redirect_uri'] = $redirect;	
 					$send_pledge_level           = $patreon_level * 100;
-		
-					$flow_link = Patreon_Frontend::MakeUniversalFlowLink( $send_pledge_level, $state, $client_id, false, array('link_interface_item' => $link_interface_item ) );
+					
+					$flow_link = Patreon_Frontend::MakeUniversalFlowLink( $send_pledge_level, $state, $client_id, $post, array('link_interface_item' => $link_interface_item ) );
 
 					wp_redirect( $flow_link );
 					exit;
