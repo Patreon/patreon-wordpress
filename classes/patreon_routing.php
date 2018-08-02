@@ -248,8 +248,7 @@ class Patreon_Routing {
 					}
 		
 					if( $patreon_level == 0  
-						AND !( isset($GLOBALS['patreon_enable_direct_unlocks']) 
-								AND $GLOBALS['patreon_enable_direct_unlocks'] )
+						AND !( isset($GLOBALS['patreon_enable_direct_unlocks']) AND $GLOBALS['patreon_enable_direct_unlocks'] )
 					) {
 						
 						// No locking level set for this content or the site. No point in locking. Redirect to post.
