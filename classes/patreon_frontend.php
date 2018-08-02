@@ -26,21 +26,21 @@ class Patreon_Frontend {
 		add_shortcode( 'patreon_login_button', array( $this,'LoginButtonShortcode' ) );
 
 		self::$messages_map = array(
-			'patreon_cant_login_strict_oauth'			 => PATREON_CANT_LOGIN_STRICT_OAUTH,		
-			'login_with_wordpress'						 => PATREON_LOGIN_WITH_WORDPRESS_NOW,		
-			'patreon_nonces_dont_match'					 => PATREON_CANT_LOGIN_NONCES_DONT_MATCH,		
-			'patreon_cant_login_api_error'				 => PATREON_CANT_LOGIN_DUE_TO_API_ERROR,		
+			'patreon_cant_login_strict_oauth'            => PATREON_CANT_LOGIN_STRICT_OAUTH,		
+			'login_with_wordpress'                       => PATREON_LOGIN_WITH_WORDPRESS_NOW,		
+			'patreon_nonces_dont_match'                  => PATREON_CANT_LOGIN_NONCES_DONT_MATCH,		
+			'patreon_cant_login_api_error'               => PATREON_CANT_LOGIN_DUE_TO_API_ERROR,		
 			'patreon_cant_login_api_error_credentials'   => PATREON_CANT_LOGIN_DUE_TO_API_ERROR_CHECK_CREDENTIALS,
 			'patreon_no_locking_level_set_for_this_post' => PATREON_NO_LOCKING_LEVEL_SET_FOR_THIS_POST,
-			'patreon_no_post_id_to_unlock_post'			 => PATREON_NO_POST_ID_TO_UNLOCK_POST,
-			'patreon_weird_redirection_at_login'	     => PATREON_WEIRD_REDIRECTION_AT_LOGIN,		
-			'patreon_could_not_create_wp_account' 		 => PATREON_COULDNT_CREATE_WP_ACCOUNT,		
-			'patreon_api_credentials_missing' 			 => PATREON_API_CREDENTIALS_MISSING,		
-			'admin_login_with_patreon_disabled' 		 => PATREON_ADMIN_LOGIN_WITH_PATREON_DISABLED,		
-			'email_exists_login_with_wp_first' 			 => PATREON_EMAIL_EXISTS_LOGIN_WITH_WP_FIRST,		
-			'login_with_patreon_disabled' 				 => PATREON_LOGIN_WITH_PATREON_DISABLED,		
-			'admin_bypass_filter_message' 				 => PATREON_ADMIN_BYPASSES_FILTER_MESSAGE,		
-			'patreon_direct_unlocks_not_turned_on' 				 => PATREON_DIRECT_UNLOCKS_NOT_ON,
+			'patreon_no_post_id_to_unlock_post'          => PATREON_NO_POST_ID_TO_UNLOCK_POST,
+			'patreon_weird_redirection_at_login'         => PATREON_WEIRD_REDIRECTION_AT_LOGIN,		
+			'patreon_could_not_create_wp_account'        => PATREON_COULDNT_CREATE_WP_ACCOUNT,		
+			'patreon_api_credentials_missing'            => PATREON_API_CREDENTIALS_MISSING,		
+			'admin_login_with_patreon_disabled'          => PATREON_ADMIN_LOGIN_WITH_PATREON_DISABLED,		
+			'email_exists_login_with_wp_first'           => PATREON_EMAIL_EXISTS_LOGIN_WITH_WP_FIRST,		
+			'login_with_patreon_disabled'                => PATREON_LOGIN_WITH_PATREON_DISABLED,		
+			'admin_bypass_filter_message'                => PATREON_ADMIN_BYPASSES_FILTER_MESSAGE,		
+			'patreon_direct_unlocks_not_turned_on'       => PATREON_DIRECT_UNLOCKS_NOT_ON,
 		);
 		
 	}
