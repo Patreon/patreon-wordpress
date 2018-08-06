@@ -67,6 +67,8 @@ These include your Patreon user id, Patreon username, your first, last names and
 <br /><br />
 If you request that your data be deleted from this website, this data will also be deleted and Patreon functionality will not work. You would need to register on this website and log in to this website with Patreon again in order to re-populate this data and have Patreon functionality working again.' );
 
+define( "PATREON_DIRECT_UNLOCKS_NOT_ON", 'In order to use this feature, direct unlocks need to be turned on. Please refer to <a href="https://www.patreon.com/apps/wordpress">the developer documentation</a>. ' );
+
 include 'classes/patreon_wordpress.php';
 
 $Patreon_Wordpress = new Patreon_Wordpress;

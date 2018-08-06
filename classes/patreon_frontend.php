@@ -26,20 +26,21 @@ class Patreon_Frontend {
 		add_shortcode( 'patreon_login_button', array( $this,'LoginButtonShortcode' ) );
 
 		self::$messages_map = array(
-			'patreon_cant_login_strict_oauth'			 => PATREON_CANT_LOGIN_STRICT_OAUTH,		
-			'login_with_wordpress'						 => PATREON_LOGIN_WITH_WORDPRESS_NOW,		
-			'patreon_nonces_dont_match'					 => PATREON_CANT_LOGIN_NONCES_DONT_MATCH,		
-			'patreon_cant_login_api_error'				 => PATREON_CANT_LOGIN_DUE_TO_API_ERROR,		
+			'patreon_cant_login_strict_oauth'            => PATREON_CANT_LOGIN_STRICT_OAUTH,		
+			'login_with_wordpress'                       => PATREON_LOGIN_WITH_WORDPRESS_NOW,		
+			'patreon_nonces_dont_match'                  => PATREON_CANT_LOGIN_NONCES_DONT_MATCH,		
+			'patreon_cant_login_api_error'               => PATREON_CANT_LOGIN_DUE_TO_API_ERROR,		
 			'patreon_cant_login_api_error_credentials'   => PATREON_CANT_LOGIN_DUE_TO_API_ERROR_CHECK_CREDENTIALS,
 			'patreon_no_locking_level_set_for_this_post' => PATREON_NO_LOCKING_LEVEL_SET_FOR_THIS_POST,
-			'patreon_no_post_id_to_unlock_post'			 => PATREON_NO_POST_ID_TO_UNLOCK_POST,
-			'patreon_weird_redirection_at_login'	     => PATREON_WEIRD_REDIRECTION_AT_LOGIN,		
-			'patreon_could_not_create_wp_account' 		 => PATREON_COULDNT_CREATE_WP_ACCOUNT,		
-			'patreon_api_credentials_missing' 			 => PATREON_API_CREDENTIALS_MISSING,		
-			'admin_login_with_patreon_disabled' 		 => PATREON_ADMIN_LOGIN_WITH_PATREON_DISABLED,		
-			'email_exists_login_with_wp_first' 			 => PATREON_EMAIL_EXISTS_LOGIN_WITH_WP_FIRST,		
-			'login_with_patreon_disabled' 				 => PATREON_LOGIN_WITH_PATREON_DISABLED,		
-			'admin_bypass_filter_message' 				 => PATREON_ADMIN_BYPASSES_FILTER_MESSAGE,				
+			'patreon_no_post_id_to_unlock_post'          => PATREON_NO_POST_ID_TO_UNLOCK_POST,
+			'patreon_weird_redirection_at_login'         => PATREON_WEIRD_REDIRECTION_AT_LOGIN,		
+			'patreon_could_not_create_wp_account'        => PATREON_COULDNT_CREATE_WP_ACCOUNT,		
+			'patreon_api_credentials_missing'            => PATREON_API_CREDENTIALS_MISSING,		
+			'admin_login_with_patreon_disabled'          => PATREON_ADMIN_LOGIN_WITH_PATREON_DISABLED,		
+			'email_exists_login_with_wp_first'           => PATREON_EMAIL_EXISTS_LOGIN_WITH_WP_FIRST,		
+			'login_with_patreon_disabled'                => PATREON_LOGIN_WITH_PATREON_DISABLED,		
+			'admin_bypass_filter_message'                => PATREON_ADMIN_BYPASSES_FILTER_MESSAGE,		
+			'patreon_direct_unlocks_not_turned_on'       => PATREON_DIRECT_UNLOCKS_NOT_ON,
 		);
 		
 	}
@@ -74,10 +75,14 @@ class Patreon_Frontend {
 		echo '</style>';
 		
 	}
-	public static function displayPatreonCampaignBanner( $patreon_level = false ) {
+	public static function displayPatreonCampaignBanner( $patreon_level = false, $args = false ) {
 
 		global $wp;
 		global $post;
+		
+		if ( !$args OR !is_array( $args ) ) {
+			$args = array();
+		}
 
 		$login_with_patreon = get_option( 'patreon-enable-login-with-patreon', false );
 		$client_id 			= get_option( 'patreon-client-id', false );
@@ -103,7 +108,18 @@ class Patreon_Frontend {
 			// Wrap message and buttons in divs for responsive interface mechanics
 			
 			$contribution_required = apply_filters( 'ptrn/final_state_main_banner_message', '<div class="patreon-locked-content-message">' . $contribution_required . '</div>', $patreon_level, $post );
-			$universal_button	   = self::patreonMakeUniversalButton( $patreon_level );
+			
+			$button_vars = array();
+			
+			if ( isset( $args['direct_unlock'] ) ) {
+				
+				// This is a direct unlock intent that does not seek to particularly unlock a post. It can be anything. Set the relevant vars for universal button function:
+				$button_args['direct_unlock'] = $args['direct_unlock'];
+				$button_args['redirect'] = $args['redirect'];
+				
+			}
+			
+			$universal_button	   = self::patreonMakeUniversalButton( $patreon_level, false, false, false, $button_args );
 			$universal_button 	   = apply_filters( 'ptrn/final_state_universal_button', '<div class="patreon-universal-button">' . $universal_button . '</div>', $patreon_level, $post );
 			
 			$text_over_universal_button  = apply_filters( 'ptrn/final_state_label_over_universal_button', self::getLabelOverUniversalButton( $patreon_level ), $patreon_level, $post );
@@ -275,7 +291,7 @@ class Patreon_Frontend {
 		return apply_filters( 'ptrn/label_text_under_universal_button', $label, 'fail_case', $user_logged_into_patreon, $is_patron, $patreon_level, $state, $user_patronage );
 		
 	}
-	public static function patreonMakeUniversalButton( $min_cents = false, $state = false, $post = false, $client_id = false ) {
+	public static function patreonMakeUniversalButton( $min_cents = false, $state = false, $post = false, $client_id = false, $args = false ) {
 		
 		// This very customizable function takes numerous parameters to customize universal flow links and creates the desired link
 
@@ -284,8 +300,19 @@ class Patreon_Frontend {
 		if ( !$post ) {
 			global $post;
 		}
-				
-		// If no post object given, 
+		
+		// If it is a direct unlock request, unset the post
+						
+		if ( isset( $args['direct_unlock'] ) ) {
+			
+			unset($post);
+			
+			// Set the post to the id if it is given:
+			if ( $args['post_id'] != '' ) {
+				$post = get_post( $args['post_id'] );
+			}
+		
+		}
 		
 		$send_pledge_level = 1;
 		
@@ -318,7 +345,18 @@ class Patreon_Frontend {
 		// We changed the above universal flow link maker to a function which will create cache-able links
 		// Some of the vars in current function which the earlier function used may not be needed now - clean up later #REVISIT
 		
-		$href       = self::patreonMakeCacheableFlowLink( $post );
+						
+		if ( isset( $args['direct_unlock'] ) ) {
+			
+			// If direct unlock request is given, set cacheable flow link vars.
+			$flow_link_args['direct_unlock'] = $args['direct_unlock'];
+			$flow_link_args['redirect'] = $args['redirect'];
+			$flow_link_args['post_id'] = $args['post_id'];
+			
+		}		
+			
+		$href       = self::patreonMakeCacheableFlowLink( $post, $flow_link_args );
+		
 		$label_text = self::patreonMakeUniversalButtonLabel();
 		$button     = self::patreonMakeUniversalButtonImage( $label_text );
 		
@@ -334,7 +372,7 @@ class Patreon_Frontend {
 		return $flow_link;
 		
 	}
-	public static function patreonMakeCacheableFlowLink( $post = false ) {
+	public static function patreonMakeCacheableFlowLink( $post = false, $args = false ) {
 		
 		if ( !$post ) {
 			global $post;
@@ -347,6 +385,19 @@ class Patreon_Frontend {
 		}
 		
 		$flow_link = site_url() . '/patreon-flow/?patreon-unlock-post=' . $unlock_post_id;
+
+		if ( isset( $args['direct_unlock'] ) ) {
+			
+			$append_post_id = '';
+			// If direct unlock request is given, override all :
+			
+			if( isset( $args['post_id'] ) ) {
+				$append_post_id = '&patreon-post-id=' . $args['post_id'];
+			}
+			
+			$flow_link = site_url() . '/patreon-flow/?patreon-direct-unlock=' . $args['direct_unlock'] . $append_post_id . '&patreon-redirect=' .  urlencode( base64_encode( $args['redirect'] ) );
+			
+		}		
 		
 		return $flow_link;
 		
@@ -372,12 +423,13 @@ class Patreon_Frontend {
 		return '<div class="patreon-responsive-button-wrapper"><div class="patreon-responsive-button"><img class="patreon_logo" src="' . PATREON_PLUGIN_ASSETS . '/img/patreon-logomark-on-coral.svg" alt="' . $label . '" /> ' . $label . '</div></div>';
 		
 	}
-	public static function MakeUniversalFlowLink( $pledge_level, $state=false, $client_id = false, $post=false, $args=false )
+	public static function MakeUniversalFlowLink( $pledge_level, $state = false, $client_id = false, $post = false, $args = false )
 	{
 		
-		if ( !$post ) {
+		if ( !$post AND !isset( $args['direct_unlock'] ) ) {
 			global $post;
 		}
+		
 		if ( !$client_id ) {
 			$client_id = get_option( 'patreon-client-id', false );
 		}
@@ -404,7 +456,7 @@ class Patreon_Frontend {
 			$state['final_redirect_uri'] = $final_redirect;			
 			
 		}		
-
+		
 		// Add the patreon nonce that was set via init function to vars.
 		$state['patreon_nonce'] = $_COOKIE['patreon_nonce'];
 		$redirect_uri           = site_url() . '/patreon-authorization/';
@@ -425,11 +477,15 @@ class Patreon_Frontend {
 			$utm_content = 'image_unlock_button';
 		}
 		
+		if ( isset( $args ) AND $args['link_interface_item'] == 'direct_unlock_button' ) {
+			$utm_content = 'direct_unlock_button';
+		}
+		
 		$filterable_utm_params = 'utm_term=&utm_content=' . $utm_content;
 		$filterable_utm_params = apply_filters( 'ptrn/utm_params_for_patron_link', $filterable_utm_params );
 		
 		$utm_params = 'utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=' . get_option( 'patreon-campaign-id' ) . '&' . $filterable_utm_params;
-		
+
 		return $href . '&' . $utm_params;
 		
 	}
