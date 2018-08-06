@@ -66,6 +66,8 @@ define( "PATREON_PRIVACY_POLICY_ADDENDUM", '<h2>Patreon features in this website
 These include your Patreon user id, Patreon username, your first, last names and your vanity name. Additionally, the id of your campaign at Patreon and your campaign\'s Patreon URL are also saved.
 <br /><br />
 If you request that your data be deleted from this website, this data will also be deleted and Patreon functionality will not work. You would need to register on this website and log in to this website with Patreon again in order to re-populate this data and have Patreon functionality working again.' );
+define( "PATREON_NO_CODE_RECEIVED_FROM_PATREON", "Sorry -  No authorization code received from Patreon." );
+define( "PATREON_NO_FLOW_ACTION_PROVIDED", "Nothing to do since no Patreon action was requested." );
 
 include 'classes/patreon_wordpress.php';
 

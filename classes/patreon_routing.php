@@ -109,7 +109,7 @@ class Patreon_Routing {
 
 				wp_redirect( $login_url );
 				exit;
-				
+			
 			}
 			
 			if( array_key_exists( 'patreon-unlock-post', $wp->query_vars ) ) {
@@ -225,7 +225,8 @@ class Patreon_Routing {
 			}
 			
 			// Catch all
-			wp_redirect( home_url() );
+			$redirect = add_query_arg( 'patreon_message', 'no_patreon_action_provided_for_flow', wp_login_url() );
+			wp_redirect( $redirect );
 			exit;
 			
 		}
@@ -312,7 +313,8 @@ class Patreon_Routing {
 				
 			} else {
 				
-				wp_redirect( home_url() );
+				$redirect = add_query_arg( 'patreon_message', 'no_code_receved_from_patreon', wp_login_url() );
+				wp_redirect( $redirect );
 				exit;
 				
 			}
