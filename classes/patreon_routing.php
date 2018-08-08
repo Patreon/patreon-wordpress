@@ -104,6 +104,15 @@ class Patreon_Routing {
 				$state = array(
 					'final_redirect_uri' => $final_redirect,
 				);
+				
+				// Below filter vars and the following filter allows plugin devs to acquire/filter info about Patron/user + content before going to Patreon flow
+				
+				$filter_args = array(
+					'state' => $state,
+					'user' => wp_get_current_user(),
+				);
+				
+				apply_filters( 'patreon_filter_vars_before_patreon_login', $filter_args );				
 			
 				$login_url = Patreon_Frontend::patreonMakeLoginLink( false, $state );
 
@@ -215,6 +224,20 @@ class Patreon_Routing {
 
 					$send_pledge_level = $patreon_level * 100;
 					
+					// Below filter vars and the following filter allows plugin devs to acquire/filter info about Patron/user + content before going to Patreon flow
+					
+					$filter_args = array(
+						'link_interface_item' => $link_interface_item, 
+						'post' => $post,
+						'post_level' => $post_level,
+						'patreon_level' => $patreon_level,
+						'state' => $state,
+						'state' => $state,
+						'user' => wp_get_current_user(),
+					);
+					
+					apply_filters( 'patreon_filter_vars_before_universal_flow', $filter_args );
+					
 					$flow_link = Patreon_Frontend::MakeUniversalFlowLink( $send_pledge_level, $state, $client_id, false, array('link_interface_item' => $link_interface_item ) );
 				
 					wp_redirect( $flow_link );
@@ -295,7 +318,7 @@ class Patreon_Routing {
 					$api_client = new Patreon_API( $tokens['access_token'] );
 					
 					$user_response = $api_client->fetch_user();
-
+					
 					if( apply_filters( 'ptrn/force_strict_oauth', get_option( 'patreon-enable-strict-oauth', false ) ) ) {
 						$user = Patreon_Login::updateLoggedInUserForStrictoAuth( $user_response, $tokens, $redirect );
 					} else {
