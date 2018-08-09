@@ -112,7 +112,7 @@ class Patreon_Routing {
 					'user' => wp_get_current_user(),
 				);
 				
-				apply_filters( 'patreon_filter_vars_before_patreon_login', $filter_args );				
+				do_action( 'patreon_do_action_before_patreon_login', $filter_args );				
 			
 				$login_url = Patreon_Frontend::patreonMakeLoginLink( false, $state );
 
@@ -236,7 +236,7 @@ class Patreon_Routing {
 						'user' => wp_get_current_user(),
 					);
 					
-					apply_filters( 'patreon_filter_vars_before_universal_flow', $filter_args );
+					do_action( 'patreon_do_action_before_universal_flow', $filter_args );
 					
 					$flow_link = Patreon_Frontend::MakeUniversalFlowLink( $send_pledge_level, $state, $client_id, false, array('link_interface_item' => $link_interface_item ) );
 				
