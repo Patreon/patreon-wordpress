@@ -206,7 +206,6 @@ class Patreon_Wordpress {
 	public static function checkPatreonCreatorURL() {
 		
 		// Check if creator url doesnt exist. 
-		$creator_url = self::getPatreonCreatorURL();
 		
 		if ( !get_option( 'patreon-creator-url', false ) OR get_option( 'patreon-creator-url', false ) == '' ) {
 			
