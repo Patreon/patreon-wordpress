@@ -45,7 +45,7 @@ class Patreon_Wordpress {
 		add_action( 'wp_head', array( $this, 'updatePatreonUser' ) );
 		add_action( 'init', array( $this, 'checkPatreonCreatorID' ) );
 		add_action( 'admin_init', array( $this, 'check_api_auth_status' ), 20 );
-		add_action( 'admin_init', array( $this, 'checkv2APIAccess' ) );
+		// add_action( 'admin_init', array( $this, 'checkv2APIAccess' ) );
 		add_action( 'init', array( $this, 'checkPatreonCampaignID' ) );
 		add_action( 'init', array( $this, 'checkPatreonCreatorURL' ) );
 		add_action( 'init', array( $this, 'checkPatreonCreatorName' ) );
@@ -146,11 +146,11 @@ class Patreon_Wordpress {
 
 	}
 	public static function checkPatreonCreatorID() {
-	
+
 		// Check if creator id doesnt exist. Account for the case in which creator id was saved as empty by the Creator
 
 		if ( !get_option( 'patreon-creator-id', false ) OR get_option( 'patreon-creator-id', false )== '' ) {
-		
+
 			// Making sure access credentials are there to avoid fruitlessly contacting the api:
 
 			if ( get_option( 'patreon-client-id', false ) 
@@ -187,7 +187,7 @@ class Patreon_Wordpress {
 			$api_client = new Patreon_API( get_option( 'patreon-creators-access-token' , false ) );
 			
 			$api_response = $api_client->check_api_access();
-			
+
 			if ( isset( $api_response['errors'][0]['status'] ) AND $api_response['errors'][0]['status'] == '401' ) {
 				
 				// Got 401, something is wrong with the set of client details. Try re-fetching creator info to force refresh of creator's access token if it is expired:
@@ -203,6 +203,7 @@ class Patreon_Wordpress {
 				// Failure - queue a message to site owner
 				if ( isset( $api_response['errors'][0]['status'] ) AND $api_response['errors'][0]['status'] == '401' ) {
 					update_option( 'patreon-warning-check-api-credentials', 'yes' );
+					return;
 				}
 			}
 			
@@ -213,10 +214,10 @@ class Patreon_Wordpress {
 		
 	}
 	public static function checkv2APIAccess() {
-		
+
 		// Check if we can contact API v2 with the creator access token we have. Account for the case in which creator id was saved as empty by the Creator
 
-		if ( !get_option('patreon-can-use-api-v2', false ) ) {	
+		if ( !get_option('patreon-can-use-api-v2', false ) ) {
 		
 			// Making sure access credentials are there to avoid fruitlessly contacting the api:
 			
@@ -235,7 +236,7 @@ class Patreon_Wordpress {
 			
 			$can_use = 'no';
 			
-			if ( $api_response['data'][0]['type']=='campaign' ) {
+			if ( $api_response['data'][0]['type'] == 'campaign' ) {
 				// Got a valid result. Update.
 				$can_use = 'yes';
 			}
@@ -247,8 +248,7 @@ class Patreon_Wordpress {
 	}
 	public static function checkPatreonCreatorURL() {
 		
-		// Check if creator url doesnt exist. 
-		$creator_url = self::getPatreonCreatorURL();
+		// Check if creator url doesnt exist.
 		
 		if ( !get_option( 'patreon-creator-url', false ) OR get_option( 'patreon-creator-url', false ) == '' ) {
 			
@@ -309,7 +309,7 @@ class Patreon_Wordpress {
 			// Making sure access credentials are there to avoid fruitlessly contacting the api:
 			
 			if ( get_option('patreon-client-id', false )  && get_option( 'patreon-client-secret', false ) && get_option('patreon-creators-access-token', false ) ) {
-				
+
 				// Credentials are in. Go.
 				$creator_info = self::getPatreonCreatorInfo();
 				
@@ -335,7 +335,7 @@ class Patreon_Wordpress {
 		}
 	}
 	public static function getPatreonCreatorInfo() {
-	
+
 		$api_client    = new Patreon_API( get_option( 'patreon-creators-access-token' , false ) );
         $user_response = $api_client->fetch_creator_info();
 
@@ -358,10 +358,7 @@ class Patreon_Wordpress {
 
 					$oauth_client = new Patreon_Oauth;
 					$tokens       = $oauth_client->refresh_token( $refresh_token, site_url() . '/patreon-authorization/' );
-echo '<pre>';
-print_r($tokens);
-echo '</pre>';
-wp_die();
+
 					if( isset( $tokens['refresh_token'] ) && isset( $tokens['access_token'] ) ) {
 						
 						update_option( 'patreon-creators-refresh-token', $tokens['refresh_token'] );
@@ -733,7 +730,7 @@ wp_die();
 			update_option( 'patreon-file-locking-feature-notice-shown', 1 );
 			
 		}
-			
+		
 		if( !get_option( 'patreon-gdpr-notice-shown', false ) ) {
 			
 			?>
@@ -744,6 +741,17 @@ wp_die();
 			<?php	
 			
 			update_option( 'patreon-gdpr-notice-shown', 1 );
+			
+		}
+		
+		if( get_option( 'patreon-warning-check-api-credentials', false ) == 'yes' ) {
+			
+			?>
+				 <div class="notice notice-error">
+				 <h3>Please check your Patreon API credentials</h3>
+					<p>Patreon WordPress was not able to successfully authenticate with Patreon. It's possible that your access credentials are incorrect or expired. Please visit <a href="https://www.patreon.com/portal/registration/register-clients" target="_blank">your Patreon app credentials page</a> and make sure non-expired, correct credentials are saved into <a href="<?php echo admin_url('?page=patreon-plugin'); ?>">your plugin settings</a></p>
+				</div>
+			<?php
 			
 		}
 		

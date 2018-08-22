@@ -99,7 +99,7 @@ class Patreon_API {
 		if ( $v2 OR get_option( 'patreon-can-use-api-v2', false ) == 'yes' ) {
 			$api_endpoint = "https://www.patreon.com/api/oauth2/v2/" . $suffix;	
 		}
-	
+
 		$headers = array(
 			'Authorization' => 'Bearer ' . $this->access_token,
 			'User-Agent' => 'Patreon-Wordpress, version ' . PATREON_WORDPRESS_VERSION . ', platform ' . php_uname('s') . '-' . php_uname( 'r' ),
@@ -132,7 +132,7 @@ class Patreon_API {
 	
 	public function check_api_access() {
 		// Checks if api can be contacted with existing credentials and returns the result
-		return $this->__get_json( "current_user/campaigns?include=creator", true );
+		return $this->__get_json( "current_user/campaigns?include=rewards,creator,goals,pledges" );
 	}
 	
 }
