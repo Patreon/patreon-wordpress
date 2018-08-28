@@ -306,24 +306,9 @@ class Patreon_Wordpress {
 				
 				if ( $error['code'] == 1 ) {
 
-					/* refresh creators token if error 1 */
-					$refresh_token = get_option( 'patreon-creators-refresh-token', false );
-
-					if( $refresh_token == false ) {
-						return false;
+					if(self::refresh_creator_access_token()) {
+						return $api_client->fetch_creator_info();
 					}
-
-					$oauth_client = new Patreon_Oauth;
-					$tokens       = $oauth_client->refresh_token( $refresh_token, site_url() . '/patreon-authorization/' );
-
-					if( isset( $tokens['refresh_token'] ) && isset( $tokens['access_token'] ) ) {
-						
-						update_option( 'patreon-creators-refresh-token', $tokens['refresh_token'] );
-						update_option( 'patreon-creators-access-token', $tokens['access_token'] );
-						
-					}
-
-					$user_response = $api_client->fetch_creator_info();
 					
 				}
 				
@@ -331,8 +316,28 @@ class Patreon_Wordpress {
 			
 		}
 		
-		return $user_response;
+		return false;
 		
+	}
+	public static function refresh_creator_access_token() {
+		/* refresh creators token if error 1 */
+		$refresh_token = get_option( 'patreon-creators-refresh-token', false );
+
+		if( $refresh_token == false ) {
+			return false;
+		}
+
+		$oauth_client = new Patreon_Oauth;
+		$tokens       = $oauth_client->refresh_token( $refresh_token, site_url() . '/patreon-authorization/' );
+
+		if( isset( $tokens['refresh_token'] ) && isset( $tokens['access_token'] ) ) {
+			
+			update_option( 'patreon-creators-refresh-token', $tokens['refresh_token'] );
+			update_option( 'patreon-creators-access-token', $tokens['access_token'] );
+			return true;
+		}		
+		
+		return false;
 	}
 	public static function getPatreonCreatorID() {
 
