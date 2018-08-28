@@ -44,7 +44,6 @@ class Patreon_Wordpress {
 
 		add_action( 'wp_head', array( $this, 'updatePatreonUser' ) );
 		add_action( 'init', array( $this, 'checkPatreonCreatorID' ) );
-		add_action( 'admin_init', array( $this, 'check_api_auth_status' ), 20 );
 		// add_action( 'admin_init', array( $this, 'checkv2APIAccess' ) );
 		add_action( 'init', array( $this, 'checkPatreonCampaignID' ) );
 		add_action( 'init', array( $this, 'checkPatreonCreatorURL' ) );
@@ -167,48 +166,6 @@ class Patreon_Wordpress {
 				// Creator id acquired. Update.
 				update_option( 'patreon-creator-id', $creator_id );
 			}
-			
-		}
-		
-	}
-	public static function check_api_auth_status() {
-		
-		// Check if we can contact API with the creator access token we have. Account for the case in which creator id was saved as empty by the Creator
-		
-		// Making sure access credentials are there to avoid fruitlessly contacting the api:
-		
-		if ( get_option( 'patreon-client-id', false ) 
-			&& get_option( 'patreon-client-secret', false ) 
-			&& get_option( 'patreon-creators-access-token', false )
-		) {
-			
-			// Credentials are in. Go.
-			
-			$api_client = new Patreon_API( get_option( 'patreon-creators-access-token' , false ) );
-			
-			$api_response = $api_client->check_api_access();
-
-			if ( isset( $api_response['errors'][0]['status'] ) AND $api_response['errors'][0]['status'] == '401' ) {
-				
-				// Got 401, something is wrong with the set of client details. Try re-fetching creator info to force refresh of creator's access token if it is expired:
-				
-				$creator_info = self::getPatreonCreatorInfo();
-				
-				// Try again
-				
-				$api_client = new Patreon_API( get_option( 'patreon-creators-access-token' , false ) );
-			
-				$api_response = $api_client->check_api_access();
-				
-				// Failure - queue a message to site owner
-				if ( isset( $api_response['errors'][0]['status'] ) AND $api_response['errors'][0]['status'] == '401' ) {
-					update_option( 'patreon-warning-check-api-credentials', 'yes' );
-					return;
-				}
-			}
-			
-			// No auth error. Delete the warning option if it existed
-			delete_option( 'patreon-warning-check-api-credentials' );
 			
 		}
 		

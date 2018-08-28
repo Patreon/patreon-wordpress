@@ -130,9 +130,4 @@ class Patreon_API {
 		return $this->__get_json( "campaigns?include=rewards,creator,goals", true );
 	}
 	
-	public function check_api_access() {
-		// Checks if api can be contacted with existing credentials and returns the result
-		return $this->__get_json( "current_user/campaigns?include=rewards,creator,goals,pledges" );
-	}
-	
 }
