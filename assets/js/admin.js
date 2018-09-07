@@ -31,7 +31,8 @@ jQuery( function( $ ) {
 				}
 			});
 		})
-	}, 1000 );		
+	}, 1000 );
+	
 	jQuery( document ).on( 'submit', '#patreon_attachment_patreon_level_form', function( e ) {
 		e.preventDefault();
 		jQuery.ajax({
@@ -45,8 +46,13 @@ jQuery( function( $ ) {
 			}
 		});	
 	});
+	
 	// Need to bind to event after tinymce is initialized - so we hook to all tinymce instances after a timeout
 	setTimeout( function () {
+		
+		if( typeof tinymce === 'undefined' ) {
+			return;
+		}
 		for ( var i = 0; i < tinymce.editors.length; i++ ) {
 			
 			tinymce.editors[i].on( 'click', function ( e ) {
@@ -77,5 +83,19 @@ jQuery( function( $ ) {
 					}
 			});
 		}
-	}, 1000);	
+	}, 1000);
+
+	jQuery(document).on( 'click', '.patreon-wordpress .notice-dismiss', function(e) {
+
+		jQuery.ajax({
+			url: ajaxurl,
+			type:"POST",
+			dataType : 'html',
+			data: {
+				action: 'patreon_wordpress_dismiss_admin_notice',
+				notice_id: jQuery( this ).parent().attr( "id" ),
+			}
+		});
+	});	
+	
 });

@@ -53,6 +53,8 @@ class Patreon_Wordpress {
 		add_action( 'admin_notices', array( $this, 'AdminMessages' ) );
 		add_action( 'init', array( $this, 'transitionalImageOptionCheck' ) );
 		add_action( 'admin_init', array( $this, 'add_privacy_policy_section' ), 20 ) ;
+		add_filter( 'pre_set_site_transient_update_plugins', array( $this, 'check_for_update' ) );
+		add_action( 'wp_ajax_patreon_wordpress_dismiss_admin_notice', array( $this, 'dismiss_admin_notice' ), 10, 1 );
 
 	}
 	public static function getPatreonUser( $user ) {
@@ -172,6 +174,7 @@ class Patreon_Wordpress {
 	public static function checkPatreonCreatorURL() {
 		
 		// Check if creator url doesnt exist. 
+		$creator_url = self::getPatreonCreatorURL();
 		
 		if ( !get_option( 'patreon-creator-url', false ) OR get_option( 'patreon-creator-url', false ) == '' ) {
 			
@@ -653,7 +656,7 @@ class Patreon_Wordpress {
 			update_option( 'patreon-file-locking-feature-notice-shown', 1 );
 			
 		}
-			
+		
 		if( !get_option( 'patreon-gdpr-notice-shown', false ) ) {
 			
 			?>
@@ -667,6 +670,47 @@ class Patreon_Wordpress {
 			
 		}
 		
+		if( get_option( 'patreon-wordpress-update-available', false ) ) {
+			
+			?>
+				 <div class="notice notice-info is-dismissible patreon-wordpress" id="patreon-wordpress-update-available">
+				 <h3>New version of Patreon WordPress is available</h3>
+					<p>To be able to receive the latest features, security and bug fixes, please update your plugin by <a href="<?php echo wp_nonce_url( get_admin_url() . 'update.php?action=upgrade-plugin&plugin=' . PATREON_WORDPRESS_PLUGIN_SLUG,'upgrade-plugin_' . PATREON_WORDPRESS_PLUGIN_SLUG ); ?>">clicking here</a>.</p>
+				</div>
+			<?php
+			
+		}
+		
 	}
+	public function check_for_update($plugin_check_data) 
+	{
+		global $wp_version, $plugin_version, $plugin_base;
+
+		if ( empty( $plugin_check_data->checked ) ) {
+			return $plugin_check_data;
+		}
+
+		if ( isset( $plugin_check_data->response[PATREON_WORDPRESS_PLUGIN_SLUG] ) AND 
+			version_compare( PATREON_WORDPRESS_VERSION, $plugin_check_data->response[PATREON_WORDPRESS_PLUGIN_SLUG]->new_version, '<' )
+		) {
+
+			update_option( 'patreon-wordpress-update-available', 1 );
+		}
+
+		return $plugin_check_data;
+		
+	}	
+	public function dismiss_admin_notice() 
+	{
+		if( !( is_admin() && current_user_can( 'manage_options' ) ) ) {
+			return;
+		}
+		
+		// Mapping what comes from REQUEST to a given value avoids potential security problems
+		if ( $_REQUEST['notice_id'] == 'patreon-wordpress-update-available' ) {
+			delete_option( 'patreon-wordpress-update-available');
+		}
+
+	}	
 	
 }
