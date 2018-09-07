@@ -63,47 +63,43 @@ class Patron_Metabox {
 
 		<?php
 		
-		if ( get_option( 'patreon-can-use-api-v2',false ) == 'yes' ) {
+		$label    = 'Active patrons only (optional) - if on, only patrons active at and before this post\'s publishing date will be able to see this content )';
+		$readonly = '';
+		
+		if ( !get_option( 'patreon-creator-id', false ) ) {
 			
-			$label    = 'Active patrons only (optional) - if on, only patrons active at and before this post\'s publishing date will be able to see this content )';
-			$readonly = '';
-			
-			if ( !get_option( 'patreon-creator-id', false ) ) {
-				
-				$label    = 'Post locking won\'t work without Creator ID. Please confirm you have it <a href="'.admin_url( "?page=patreon-plugin" ).'">here</a>';
-				$readonly = " readonly";
-				
-			}
-
-			?>
-			<p>
-				<label for="patreon-active-patrons-only"><?php _e( $label, '1' ); ?></label>
-				<br><br>
-				<input type="checkbox" name="patreon-active-patrons-only" value="1" <?php checked( get_post_meta( $object->ID, 'patreon-active-patrons-only', true ),true,true ); ?> <?php echo $readonly ?> /> Yes
-			</p>
-
-			<?php
-			
-			$label    = 'Total patronage (optional) - any patron above total lifetime patronage $ value entered below can see this content';
-			$readonly = '';
-			
-			if ( !get_option( 'patreon-creator-id', false ) ) {
-				
-				$label    = 'Post locking won\'t work without Creator ID. Please confirm you have it <a href="'.admin_url("?page=patreon-plugin").'">here</a>';
-				$readonly = " readonly";
-				
-			}
-
-			?>
-			<p>
-				<label for="patreon-total-patronage-level"><?php _e( $label, '1' ); ?></label>
-				<br><br>
-				<strong>&#36; </strong><input type="text" id="patreon-total-patronage-level" name="patreon-total-patronage-level" value="<?php echo get_post_meta( $object->ID, 'patreon-total-patronage-level', true ); ?>" <?php echo $readonly ?>>
-			</p>
-
-			<?php
+			$label    = 'Post locking won\'t work without Creator ID. Please confirm you have it <a href="'.admin_url( "?page=patreon-plugin" ).'">here</a>';
+			$readonly = " readonly";
 			
 		}
+
+		?>
+		<p>
+			<label for="patreon-active-patrons-only"><?php _e( $label, '1' ); ?></label>
+			<br><br>
+			<input type="checkbox" name="patreon-active-patrons-only" value="1" <?php checked( get_post_meta( $object->ID, 'patreon-active-patrons-only', true ),true,true ); ?> <?php echo $readonly ?> /> Yes
+		</p>
+
+		<?php
+		
+		$label    = 'Total patronage (optional) - any patron above total lifetime patronage $ value entered below can see this content';
+		$readonly = '';
+		
+		if ( !get_option( 'patreon-creator-id', false ) ) {
+			
+			$label    = 'Post locking won\'t work without Creator ID. Please confirm you have it <a href="'.admin_url("?page=patreon-plugin").'">here</a>';
+			$readonly = " readonly";
+			
+		}
+
+		?>
+		<p>
+			<label for="patreon-total-patronage-level"><?php _e( $label, '1' ); ?></label>
+			<br><br>
+			<strong>&#36; </strong><input type="text" id="patreon-total-patronage-level" name="patreon-total-patronage-level" value="<?php echo get_post_meta( $object->ID, 'patreon-total-patronage-level', true ); ?>" <?php echo $readonly ?>>
+		</p>
+
+		<?php
 		
 	}
 

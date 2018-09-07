@@ -462,12 +462,8 @@ class Patreon_Frontend {
 		// Add the patreon nonce that was set via init function to vars.
 		$state['patreon_nonce'] = $_COOKIE['patreon_nonce'];
 		$redirect_uri           = site_url() . '/patreon-authorization/';
-		$v2_params              = '';
-
-		if ( get_option( 'patreon-can-use-api-v2' ,false ) == 'yes' ) {
-			$v2_params = '&scope=identity%20identity[email]';
-		}
-
+		$v2_params = '&scope=identity%20identity[email]';
+		
 		$href = 'https://www.patreon.com/oauth2/become-patron?response_type=code&min_cents=' . $pledge_level . '&client_id=' . $client_id . $v2_params . '&redirect_uri=' . $redirect_uri . '&state=' . urlencode( base64_encode( serialize( $state ) ) );
 
 		// 3rd party dev goodie! Apply custom filters so they can manipulate the url:
@@ -571,13 +567,9 @@ class Patreon_Frontend {
 		// Add the patreon nonce that was set via init function to vars.
 		$state['patreon_nonce'] = $_COOKIE['patreon_nonce'];
 		$redirect_uri           = site_url() . '/patreon-authorization/';
-		$v2_params              = '';
-
-		if ( get_option( 'patreon-can-use-api-v2', false ) == 'yes' ) {		
-			$v2_params = '&scope=identity%20identity[email]%20identity.memberships';
-		}
+		$v2_params = '&scope=' . 'identity+' . urlencode( 'identity[email]' );
 		
-		$href                  = 'https://www.patreon.com/oauth2/authorize?response_type=code&client_id=' . $client_id . '&redirect_uri=' . $redirect_uri . $v2_params . '&state=' . urlencode( base64_encode( serialize( $state ) ) );
+		$href                  = 'https://www.patreon.com/oauth2/authorize?response_type=code&client_id=' . $client_id . $v2_params . '&redirect_uri=' . urlencode($redirect_uri) .  '&state=' . urlencode( base64_encode( serialize( $state ) ) );
 		$href                  = apply_filters( 'ptrn/login_link', $href );
 		$filterable_utm_params = 'utm_term=&utm_content=login_button';
 		$filterable_utm_params = apply_filters( 'ptrn/utm_params_for_login_link', $filterable_utm_params );
@@ -693,15 +685,11 @@ class Patreon_Frontend {
 			$user_lifetime_patronage        = Patreon_Wordpress::get_user_lifetime_patronage();
 			$declined                       = Patreon_Wordpress::checkDeclinedPatronage($user);
 
-			if ( get_option( 'patreon-can-use-api-v2', false ) == 'yes' ) {
+			// Check if post was set for active patrons only
+			$patreon_active_patrons_only = get_post_meta( $post->ID, 'patreon-active-patrons-only', true );
 			
-				// Check if post was set for active patrons only
-				$patreon_active_patrons_only = get_post_meta( $post->ID, 'patreon-active-patrons-only', true );
-				
-				// Check if specific total patronage is given for this post:
-				$post_total_patronage_level = get_post_meta( $post->ID, 'patreon-total-patronage-level', true );
-				
-			}
+			// Check if specific total patronage is given for this post:
+			$post_total_patronage_level = get_post_meta( $post->ID, 'patreon-total-patronage-level', true );
 		
 			$hide_content = true;
 		
@@ -710,36 +698,27 @@ class Patreon_Frontend {
 				|| $declined ) ) {
 					
 				$hide_content = false;
-				
-				// Disable below logic if v2 is not being used:
-				
-				if ( get_option( 'patreon-can-use-api-v2', false ) == 'yes' ) {
 
-					// Seems valid patron. Lets see if active patron option was set and the user fulfills it
+				// Seems valid patron. Lets see if active patron option was set and the user fulfills it
+				
+				if ( $patreon_active_patrons_only == '1'
+				AND $user_pledge_relationship_start >= strtotime( get_the_date( '', $post->ID ) ) ) {
 					
-					if ( $patreon_active_patrons_only == '1'
-					AND $user_pledge_relationship_start >= strtotime( get_the_date( '', $post->ID ) ) ) {
-						
-						$hide_content = true;
-						
-					}
+					$hide_content = true;
+					
 				}
 			}			
 		
-			// Disable below logic if v2 is not being used:
 
-			if ( get_option( 'patreon-can-use-api-v2', false ) == 'yes' ) {
-
-				if ( $post_total_patronage_level !='' AND $post_total_patronage_level > 0 ) {
-					
-					// Total patronage set if user has lifetime patronage over this level, we let him see the content
-					if ( $user_lifetime_patronage >= $post_total_patronage_level * 100 ) {
-						$hide_content = false;
-					}
-					
+			if ( $post_total_patronage_level !='' AND $post_total_patronage_level > 0 ) {
+				
+				// Total patronage set if user has lifetime patronage over this level, we let him see the content
+				if ( $user_lifetime_patronage >= $post_total_patronage_level * 100 ) {
+					$hide_content = false;
 				}
 				
 			}
+			
 			
 			if ( $hide_content ) {
 				
@@ -838,16 +817,14 @@ class Patreon_Frontend {
 			$user_patronage                 = Patreon_Wordpress::getUserPatronage();
 			$user_lifetime_patronage        = Patreon_Wordpress::get_user_lifetime_patronage();
 			$declined                       = Patreon_Wordpress::checkDeclinedPatronage($user);
-
-			if ( get_option( 'patreon-can-use-api-v2',false ) == 'yes' ) {				
-				
-				// Check if post was set for active patrons only
-				$patreon_active_patrons_only = get_post_meta( $post->ID, 'patreon-active-patrons-only', true );
-				
-				// Check if specific total patronage is given for this post:
-				$post_total_patronage_level = get_post_meta( $post->ID, 'patreon-total-patronage-level', true );
-				
-			}
+			
+			
+			// Check if post was set for active patrons only
+			$patreon_active_patrons_only = get_post_meta( $post->ID, 'patreon-active-patrons-only', true );
+			
+			// Check if specific total patronage is given for this post:
+			$post_total_patronage_level = get_post_meta( $post->ID, 'patreon-total-patronage-level', true );
+		
 		
 			$hide_content = true;
 		
@@ -857,36 +834,24 @@ class Patreon_Frontend {
 					
 				$hide_content = false;
 				
-				// Disable below logic if v2 is not being used:
+				// Seems valid patron. Lets see if active patron option was set and the user fulfills it
 				
-				if ( get_option( 'patreon-can-use-api-v2', false ) == 'yes' ) {
-
-					// Seems valid patron. Lets see if active patron option was set and the user fulfills it
-					
-					if ( $patreon_active_patrons_only == '1'
-					AND $user_pledge_relationship_start >= strtotime( get_the_date( '', $post->ID ) ) ) {
-						$hide_content = true;
-					}
-					
+				if ( $patreon_active_patrons_only == '1'
+				AND $user_pledge_relationship_start >= strtotime( get_the_date( '', $post->ID ) ) ) {
+					$hide_content = true;
 				}
 				
 			}			
 		
-			// Disable below logic if v2 is not being used:
-
-			if ( get_option( 'patreon-can-use-api-v2', false ) == 'yes' ) {
-
-				if ( $post_total_patronage_level !='' AND $post_total_patronage_level > 0) {
-					
-					// Total patronage set if user has lifetime patronage over this level, we let him see the content
-					if( $user_lifetime_patronage >= $post_total_patronage_level * 100 ) {
-						$hide_content = false;
-					}
-					
+			if ( $post_total_patronage_level !='' AND $post_total_patronage_level > 0) {
+				
+				// Total patronage set if user has lifetime patronage over this level, we let him see the content
+				if( $user_lifetime_patronage >= $post_total_patronage_level * 100 ) {
+					$hide_content = false;
 				}
 				
 			}
-			
+				
 			
 			if( $hide_content ) {
 				

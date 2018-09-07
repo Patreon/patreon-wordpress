@@ -314,7 +314,7 @@ class Patreon_Routing {
 			
 		}
 		if ( strpos( $_SERVER['REQUEST_URI'], '/patreon-authorization/' ) !== false ) {
-	
+
 			if( array_key_exists( 'code', $wp->query_vars ) ) {
 				
 				// Get state vars if they exist
@@ -354,6 +354,7 @@ class Patreon_Routing {
 				}
 
 				$tokens = $oauth_client->get_tokens( $wp->query_vars['code'], site_url() . '/patreon-authorization/' );
+
 
 				if( array_key_exists( 'error', $tokens ) ) {
 
