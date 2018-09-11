@@ -569,7 +569,11 @@ class Patreon_Frontend {
 		$redirect_uri           = site_url() . '/patreon-authorization/';
 		$v2_params = '&scope=' . 'identity+' . urlencode( 'identity[email]' );
 		
-		$href                  = 'https://www.patreon.com/oauth2/authorize?response_type=code&client_id=' . $client_id . $v2_params . '&redirect_uri=' . urlencode($redirect_uri) .  '&state=' . urlencode( base64_encode( serialize( $state ) ) );
+		$href                  = 'https://www.patreon.com/oauth2/authorize?response_type=code&client_id=' 
+		. $client_id . $v2_params 
+		. '&redirect_uri=' . urlencode($redirect_uri) 
+		. '&state=' . urlencode( base64_encode( serialize( $state ) ) );
+		
 		$href                  = apply_filters( 'ptrn/login_link', $href );
 		$filterable_utm_params = 'utm_term=&utm_content=login_button';
 		$filterable_utm_params = apply_filters( 'ptrn/utm_params_for_login_link', $filterable_utm_params );
