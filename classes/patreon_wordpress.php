@@ -13,6 +13,7 @@ class Patreon_Wordpress {
 	private static $Patreon_Protect;
 	private static $Patreon_Options;
 	private static $Patron_Metabox;
+	private static $Patron_Compatibility;
 	private static $Patreon_User_Profiles;
 	public static $current_user_pledge_amount = -1;
 	public static $current_user_patronage_declined = -1;
@@ -34,6 +35,7 @@ class Patreon_Wordpress {
 		include 'patreon_metabox.php';
 		include 'patreon_user_profiles.php';
 		include 'patreon_protect.php';
+		include 'patreon_compatibility.php';
 
 		self::$Patreon_Routing       = new Patreon_Routing;
 		self::$Patreon_Frontend      = new Patreon_Frontend;
@@ -41,6 +43,7 @@ class Patreon_Wordpress {
 		self::$Patron_Metabox        = new Patron_Metabox;
 		self::$Patreon_User_Profiles = new Patreon_User_Profiles;
 		self::$Patreon_Protect       = new Patreon_Protect;
+		self::$Patron_Compatibility  = new Patreon_Compatibility;
 
 		add_action( 'wp_head', array( $this, 'updatePatreonUser' ) );
 		add_action( 'init', array( $this, 'checkPatreonCreatorID' ) );
