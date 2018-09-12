@@ -41,6 +41,8 @@ class Patron_Metabox {
 	}
 
 	function patreon_plugin_meta_box( $object, $box ) { 
+	
+		$current_user = wp_get_current_user();
 			
 		$label    = 'Add a minimum Patreon contribution required to access this content.  (Makes entire post patron only)';
 		$readonly = '';
@@ -63,11 +65,11 @@ class Patron_Metabox {
 		
 		<?php 
 			
-			$advanced_post_options_toggle_status = get_option( 'patreon-wordpress-advanced-options-toggle', false );
+			$advanced_post_options_toggle_status = get_user_meta( $current_user->ID, 'patreon-wordpress-advanced-options-toggle', true );
 						
 			$advanced_post_options_toggle_status_display = 'style=" display: block;" ';
 			
-			if( !$advanced_post_options_toggle_status OR $advanced_post_options_toggle_status == 'off' ) {
+			if( $advanced_post_options_toggle_status == '' OR $advanced_post_options_toggle_status == 'off' ) {
 				$advanced_post_options_toggle_status_display = 'style=" display: none;" ';
 			}
 		?> 		
@@ -119,7 +121,7 @@ class Patron_Metabox {
 			
 			$advanced_post_options_toggle_text = 'Hide advanced';
 			
-			if( !$advanced_post_options_toggle_status OR $advanced_post_options_toggle_status == 'off' ) {
+			if( $advanced_post_options_toggle_status == '' OR $advanced_post_options_toggle_status == 'off' ) {
 				$advanced_post_options_toggle_text = 'Show advanced';
 			}
 		?>

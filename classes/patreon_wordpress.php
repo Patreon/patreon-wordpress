@@ -719,9 +719,11 @@ class Patreon_Wordpress {
 			return;
 		}
 		
+		$current_user = wp_get_current_user();
+		
 		$option_to_toggle = $_REQUEST['toggle_id'];
 		
-		$current_value = get_option( $option_to_toggle, false );
+		$current_value = get_user_meta( $current_user->ID, $option_to_toggle, true );
 		
 		$new_value = 'off';
 		
@@ -729,7 +731,7 @@ class Patreon_Wordpress {
 			$new_value = 'on';			
 		}
 		
-		update_option( $option_to_toggle, $new_value );
+		update_user_meta( $current_user->ID, $option_to_toggle, $new_value );
 		
 	}	
 	
