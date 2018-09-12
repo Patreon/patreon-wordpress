@@ -55,6 +55,7 @@ class Patreon_Wordpress {
 		add_action( 'admin_init', array( $this, 'add_privacy_policy_section' ), 20 ) ;
 		add_filter( 'pre_set_site_transient_update_plugins', array( $this, 'check_for_update' ) );
 		add_action( 'wp_ajax_patreon_wordpress_dismiss_admin_notice', array( $this, 'dismiss_admin_notice' ), 10, 1 );
+		add_action( 'wp_ajax_patreon_wordpress_toggle_option', array( $this, 'toggle_option' ), 10, 1 );
 
 	}
 	public static function getPatreonUser( $user ) {
@@ -711,6 +712,25 @@ class Patreon_Wordpress {
 			delete_option( 'patreon-wordpress-update-available');
 		}
 
+	}	
+	public function toggle_option() 
+	{
+		if( !( is_admin() && current_user_can( 'manage_options' ) ) ) {
+			return;
+		}
+		
+		$option_to_toggle = $_REQUEST['toggle_id'];
+		
+		$current_value = get_option( $option_to_toggle, false );
+		
+		$new_value = 'off';
+		
+		if( !$current_value OR $current_value == 'off' ) {
+			$new_value = 'on';			
+		}
+		
+		update_option( $option_to_toggle, $new_value );
+		
 	}	
 	
 }
