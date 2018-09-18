@@ -82,16 +82,46 @@ class Patreon_Frontend {
 		global $wp;
 		global $post;
 		
+		// Get the post from post id if it is supplied
+		if ( isset( $args['post_id'] ) ) {
+			$post = get_post( $args['post_id'] );			
+		}
+		
 		if ( !$args OR !is_array( $args ) ) {
 			$args = array();
 		}
-
+		
+		echo '<pre>';
+		print_r($args);
+		echo '</pre>';
+		
+		
 		$login_with_patreon = get_option( 'patreon-enable-login-with-patreon', false );
 		$client_id 			= get_option( 'patreon-client-id', false );
 	
 		// Check existence of a custom patreon banners as saved in plugin options
 		$custom_universal_banner = get_option( 'patreon-custom-universal-banner', false );
+		
 		$contribution_required   = PATREON_TEXT_LOCKED_POST;
+		
+		if( isset( $args['patreon_active_patrons_only'] ) AND $args['patreon_active_patrons_only'] == 1 ) {
+			
+			// Prepare and append active patrons only text
+			$locked_post_addendum   = PATREON_TEXT_LOCKED_POST_ACTIVE_PATRONS;
+			$post_date = get_the_date( false, $post->ID );
+			$contribution_required .= ' ' . str_replace( '%%post_date%%', $post_date, $locked_post_addendum );
+			
+		}
+		
+		if( isset( $args['post_total_patronage_level'] ) AND $args['post_total_patronage_level'] != '' ) {
+			
+			$locked_post_addendum   = PATREON_TEXT_LOCKED_POST_ACTIVE_PATRONS_WITH_TOTAL_PLEDGE;
+			$contribution_required .= ' '.str_replace( '%%total_pledge%%', $args['post_total_patronage_level'], $locked_post_addendum );
+			
+		}
+
+		// Add the ! at the end of the notification		
+		$contribution_required .= PATREON_CONTRIBUTION_REQUIRED_STOP_MARK;
 		
         if ( $custom_universal_banner AND $custom_universal_banner !='' ) {
 			// Custom banner exists and it is not empty. Override the message
@@ -124,9 +154,9 @@ class Patreon_Frontend {
 			$universal_button	   = self::patreonMakeUniversalButton( $patreon_level, false, false, false, $button_args );
 			$universal_button 	   = apply_filters( 'ptrn/final_state_universal_button', '<div class="patreon-universal-button">' . $universal_button . '</div>', $patreon_level, $post );
 			
-			$text_over_universal_button  = apply_filters( 'ptrn/final_state_label_over_universal_button', self::getLabelOverUniversalButton( $patreon_level ), $patreon_level, $post );
+			$text_over_universal_button  = apply_filters( 'ptrn/final_state_label_over_universal_button', self::getLabelOverUniversalButton( $patreon_level, $args ), $patreon_level, $post );
 			
-			$text_under_universal_button = apply_filters( 'ptrn/final_state_label_under_universal_button', self::getLabelUnderUniversalButton( $patreon_level ), $patreon_level, $post );
+			$text_under_universal_button = apply_filters( 'ptrn/final_state_label_under_universal_button', self::getLabelUnderUniversalButton( $patreon_level, false, false, $args ), $patreon_level, $post );
 			
 			// Wrap all of them in a responsive div
 			
@@ -151,18 +181,36 @@ class Patreon_Frontend {
         }
 		
 	}
-	public static function getLabelOverUniversalButton( $patreon_level ) {
+	public static function getLabelOverUniversalButton( $patreon_level, $args = false ) {
 
 		$label                    = PATREON_TEXT_OVER_BUTTON_1;
 		$user_logged_into_patreon = self::isUserLoggedInPatreon();
 		$is_patron                = Patreon_Wordpress::isPatron();
 		$messages                 = self::processPatreonMessages();
-		
+				
 		if ( !$user_logged_into_patreon ) {
 			
-			// Patron logged in and patron, but we are still showing the banner. This means pledge level is not enough.
+			// User not logged in
 			
-			return $messages . apply_filters( 'ptrn/label_text_over_universal_button', str_replace( '%%pledgelevel%%',$patreon_level, PATREON_TEXT_OVER_BUTTON_1 ), 'user_not_logged_in', $user_logged_into_patreon, $is_patron, $patreon_level );
+			if( isset( $args['patreon_active_patrons_only'] ) AND $args['patreon_active_patrons_only'] == 1 ) {
+				
+				// Prepare and append active patrons only text
+				$locked_post_addendum   = PATREON_TEXT_OVER_BUTTON_4;
+				$post_date = get_the_date( false, $post->ID );
+				$label .= ' ' . str_replace( '%%post_date%%', $post_date, $locked_post_addendum );
+				
+			}
+			
+			if( isset( $args['post_total_patronage_level'] ) AND $args['post_total_patronage_level'] != '' ) {
+				
+				$locked_post_addendum   = PATREON_TEXT_OVER_BUTTON_5;
+				$label .= ' '.str_replace( '%%total_pledge%%', $args['post_total_patronage_level'], $locked_post_addendum );
+				
+			}
+			
+			$label .= ' ' . PATREON_TEXT_OVER_BUTTON_6;
+			
+			return $messages . apply_filters( 'ptrn/label_text_over_universal_button', str_replace( '%%pledgelevel%%',$patreon_level, $label ), 'user_not_logged_in', $user_logged_into_patreon, $is_patron, $patreon_level );
 			
 		}
 		
@@ -178,17 +226,55 @@ class Patreon_Frontend {
 		if ( !$is_patron ) {
 			
 			// User logged in and not patron
-			return $messages . apply_filters( 'ptrn/label_text_over_universal_button', str_replace( '%%pledgelevel%%',$patreon_level, PATREON_TEXT_OVER_BUTTON_1 ), 'not_a_patron', $user_logged_into_patreon, $is_patron,$patreon_level );
+			
+			if( isset( $args['patreon_active_patrons_only'] ) AND $args['patreon_active_patrons_only'] == 1 ) {
+				
+				// Prepare and append active patrons only text
+				$locked_post_addendum   = PATREON_TEXT_OVER_BUTTON_4;
+				$post_date = get_the_date( false, $post->ID );
+				$label .= ' ' . str_replace( '%%post_date%%', $post_date, $locked_post_addendum );
+				
+			}
+			
+			if( isset( $args['post_total_patronage_level'] ) AND $args['post_total_patronage_level'] != '' ) {
+				
+				$locked_post_addendum   = PATREON_TEXT_OVER_BUTTON_5;
+				$label .= ' '.str_replace( '%%total_pledge%%', $args['post_total_patronage_level'], $locked_post_addendum );
+				
+			}
+			
+			$label .= ' ' . PATREON_TEXT_OVER_BUTTON_6;
+					
+			return $messages . apply_filters( 'ptrn/label_text_over_universal_button', str_replace( '%%pledgelevel%%',$patreon_level, $label ), 'not_a_patron', $user_logged_into_patreon, $is_patron,$patreon_level );
 			
 		}
 		
 		$user_patronage = Patreon_Wordpress::getUserPatronage();
 		
 		if ( $user_patronage < ( $patreon_level * 100 ) AND $user_patronage > 0 ) {
-			// Patron logged in and not patron
+			// Patron logged in and pledge not enough
 			
 			$label = str_replace( '%%pledgelevel%%', $patreon_level, PATREON_TEXT_OVER_BUTTON_2 );
 			
+			
+			if( isset( $args['patreon_active_patrons_only'] ) AND $args['patreon_active_patrons_only'] == 1 ) {
+				
+				// Prepare and append active patrons only text
+				$locked_post_addendum   = PATREON_TEXT_OVER_BUTTON_4;
+				$post_date = get_the_date( false, $post->ID );
+				$label .= ' ' . str_replace( '%%post_date%%', $post_date, $locked_post_addendum );
+				
+			}
+			
+			if( isset( $args['post_total_patronage_level'] ) AND $args['post_total_patronage_level'] != '' ) {
+				
+				$locked_post_addendum   = PATREON_TEXT_OVER_BUTTON_5;
+				$label .= ' '.str_replace( '%%total_pledge%%', $args['post_total_patronage_level'], $locked_post_addendum );
+				
+			}
+			
+			$label .= ' ' . PATREON_TEXT_OVER_BUTTON_6;
+						
 			// Get creator full name:
 			$creator_full_name = get_option( 'patreon-creator-full-name', false );
 			
@@ -236,7 +322,7 @@ class Patreon_Frontend {
 		return '';
 		
 	}
-	public static function getLabelUnderUniversalButton( $patreon_level, $state = false, $post = false ) {
+	public static function getLabelUnderUniversalButton( $patreon_level, $state = false, $post = false, $args ) {
 		
 		if ( !$post ) {
 			global $post;
@@ -425,8 +511,7 @@ class Patreon_Frontend {
 		return '<div class="patreon-responsive-button-wrapper"><div class="patreon-responsive-button"><img class="patreon_logo" src="' . PATREON_PLUGIN_ASSETS . '/img/patreon-logomark-on-coral.svg" alt="' . $label . '" /> ' . $label . '</div></div>';
 		
 	}
-	public static function MakeUniversalFlowLink( $pledge_level, $state = false, $client_id = false, $post = false, $args = false )
-	{
+	public static function MakeUniversalFlowLink( $pledge_level, $state = false, $client_id = false, $post = false, $args = false ) {
 		
 		if ( !$post AND !isset( $args['direct_unlock'] ) ) {
 			global $post;
@@ -749,26 +834,39 @@ class Patreon_Frontend {
 		return false;
 		
 	}
-	public static function protectContentFromUsers( $content ) {
+	public static function protectContentFromUsers( $content, $post_id = false ) {
 		
-		// Function is being fed content as the input var. Meaning we have to be inside the_content filter
+		// This function receives content and optionally post id.
 		
-		global $post;
+		// If content is received but no post id, the function acts to lock the existing post. In this case it can be hooked to the_content filter
 		
-		// Just bail out if this is not the main query for content
-		if ( !is_main_query() ) {
+		// If post id is given, then the function acts as a stand alone function to generate a lock interface and return the interface to whatever called it (another function or routine)
+
+		// This way it can be used to lock posts if hooked to the_content and post_id is not passed and to decide lock and if so, generate lock interface and return it if post_id is passed. 
+		
+		// If post id is not given, try to get it from post global
+		if ( !$post_id ) {
+			
+			global $post;
+			$post_id = $post->ID;
+			
+		}
+		
+		// Just bail out if this is not the main query for content and there still isnt a post id
+		if ( !is_main_query() AND !$post_id ) {
 			return $content;
 		}
 		
 		// Now send the post id to locking decision function 
 		
-		$lock_or_not = Patreon_Wordpress::lock_or_not($post->ID);
+		$lock_or_not = Patreon_Wordpress::lock_or_not($post_id);
 		
 		// An array with args should be returned
 
 		$hide_content = $lock_or_not['lock'];
+		$patreon_level = $lock_or_not['patreon_level'];
 
-		if( $hide_content ) {
+		if ( $hide_content ) {
 			
 			// protect content from user
 			
@@ -778,23 +876,29 @@ class Patreon_Frontend {
 			
 			// // If client id exists. Do the banner. If not, no point in protecting since we wont be able to send people to patronage. If so dont modify normal content.
 			
-			if( $client_id ) {
+			if ( $client_id ) {
 				
-				$content = self::displayPatreonCampaignBanner( $patreon_level );
-				$content = apply_filters( 'ptrn/post_content', $content, $patreon_level, $user_patronage );
+				$content = self::displayPatreonCampaignBanner( $patreon_level, $lock_or_not );
+				$content = apply_filters( 'ptrn/post_content', $content, $patreon_level, $user_patronage, $lock_or_not );
+				
 				return $content;
 				
 			}
 		}
-			
-		// If we are here, it means post is protected, user is patron, patronage is valid. Slap the post footer:
-		return $content . self::MakeValidPatronFooter($patreon_level, $user_patronage);		
-						
-		return $content . self::MakeAdminPostFooter( $patreon_level );
 		
-		return $content . self::MakeValidPatronFooter($patreon_level, $user_patronage);
-		// Return content in all other cases
-		return $content;
+		if ( !$hide_content AND $lock_or_not['reason'] == 'post_is_not_locked' ) {
+			// This is not a locked post. Return content without any footer
+			return $content;
+		}
+		
+		// If is an admin, just return the content with an admin-related notice
+		
+		if( current_user_can( 'manage_options' ) ) {
+			return $content . self::MakeAdminPostFooter( $patreon_level );
+		}
+		
+		// If we are here, it means post is protected, user is patron, patronage is valid. Slap the post footer:
+		return $content . self::MakeValidPatronFooter( $patreon_level, $user_patronage, $lock_or_not );
 		
 	}
 	public static function MakeAdminPostFooter( $patreon_level ) {
@@ -804,7 +908,7 @@ class Patreon_Frontend {
 		 '</div>';
 		
 	}
-	public static function MakeValidPatronFooter( $patreon_level, $user_patronage ) {
+	public static function MakeValidPatronFooter( $patreon_level, $user_patronage, $lock_or_not ) {
 		
 		// Get patreon creator url:
 		$creator_profile_url = get_option( 'patreon-creator-url', false );
@@ -857,4 +961,5 @@ class Patreon_Frontend {
 		}
 		
 	}
+	
 }
