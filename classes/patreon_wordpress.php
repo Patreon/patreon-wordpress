@@ -103,6 +103,15 @@ class Patreon_Wordpress {
 		if ( $user == false ) {
 			return false;
 		}
+		
+		// Temporarily introduced caching until calls are moved to webhooks #REVISIT
+		
+		$last_update = get_user_meta( $user->ID, 'patreon_user_details_last_updated', true );
+		
+		// If last update time is not empty and it is closer to time() than one day, dont update
+		if ( !( $last_update == '' OR ( ( time() - $last_update ) > 86400 ) ) ) {
+			return false;	
+		}
 
 		/* query Patreon API to get users patreon details */
 		$user_response = self::getPatreonUser( $user );
@@ -134,8 +143,11 @@ class Patreon_Wordpress {
 		if ( $user_response == false ) {
 			return false;
 		}
-
+		
 		if ( isset( $user_response['data'] ) ) {
+			
+			// Set the update time
+			update_user_meta( $user->ID, 'patreon_user_details_last_updated', time() );
 			
 			/* all the details you want to update on wordpress user account */
 			update_user_meta( $user->ID, 'patreon_user', $user_response['data']['attributes']['vanity'] );
