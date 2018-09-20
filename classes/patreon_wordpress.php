@@ -851,14 +851,14 @@ class Patreon_Wordpress {
 			
 			// Seems valid patron. Lets see if active patron option was set and the user fulfills it
 			
-			if ( $patreon_active_patrons_only == '1'
+			if ( $patreon_active_patrons_on2ly == '1'
 			AND $user_pledge_relationship_start >= strtotime( get_the_date( '', $post->ID ) ) ) {
 				$hide_content = true;
 				$reason = 'not_active_patron_at_post_date';
 			}
 			
 		}	
-	
+	$user_lifetime_patronage =100;
 		if ( $post_total_patronage_level !='' AND $post_total_patronage_level > 0) {
 			
 			// Total patronage set if user has lifetime patronage over this level, we let him see the content
