@@ -35,7 +35,7 @@ class Patreon_API {
 		if ( $api_return['included'][0]['attributes']['last_charge_status'] != 'Paid' ) {
 			$api_return['included'][0]['attributes']['declined_since'] = $api_return['included'][0]['attributes']['last_charge_date'];
 		}
-			
+
 		return $api_return;
 	}
 	
