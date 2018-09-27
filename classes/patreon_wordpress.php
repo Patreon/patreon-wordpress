@@ -895,7 +895,7 @@ class Patreon_Wordpress {
 			
 		}
 		
-		return array(
+		$result = array(
 			'lock'                         => $hide_content,
 			'reason'                       => $reason,
 			'patreon_level'                => $patreon_level,
@@ -904,7 +904,9 @@ class Patreon_Wordpress {
 			'user_is_patron'               => $is_patron,
 			'user_active_pledge'           => $user_patronage,
 			'user_total_historical_pledge' => $user_lifetime_patronage,
-		);
+		), 
+		
+		return apply_filters( 'ptrn/lock_or_not', $result, $post_id, $declined, $user );
 		
 	}
 	
