@@ -47,7 +47,6 @@ class Patreon_Wordpress {
 
 		add_action( 'wp_head', array( $this, 'updatePatreonUser' ) );
 		add_action( 'init', array( $this, 'checkPatreonCreatorID' ) );
-		add_action( 'init', array( $this, 'checkv2APIAccess' ) );
 		add_action( 'init', array( $this, 'checkPatreonCampaignID' ) );
 		add_action( 'init', array( $this, 'checkPatreonCreatorURL' ) );
 		add_action( 'init', array( $this, 'checkPatreonCreatorName' ) );
@@ -163,7 +162,7 @@ class Patreon_Wordpress {
 
 	}
 	public static function checkPatreonCreatorID() {
-	
+		
 		// Check if creator id doesnt exist. Account for the case in which creator id was saved as empty by the Creator
 
 		if ( !get_option( 'patreon-creator-id', false ) OR get_option( 'patreon-creator-id', false )== '' ) {
@@ -184,39 +183,6 @@ class Patreon_Wordpress {
 				// Creator id acquired. Update.
 				update_option( 'patreon-creator-id', $creator_id );
 			}
-			
-		}
-		
-	}
-	public static function checkv2APIAccess() {
-		
-		// Check if we can contact API v2 with the creator access token we have. Account for the case in which creator id was saved as empty by the Creator
-		
-		if ( !get_option('patreon-can-use-api-v2', false ) ) {	
-		
-			// Making sure access credentials are there to avoid fruitlessly contacting the api:
-			
-			if ( get_option( 'patreon-client-id', false ) 
-				&& get_option( 'patreon-client-secret', false ) 
-				&& get_option( 'patreon-creators-access-token', false )
-			) {
-				
-				// Credentials are in. Go.
-				
-				$api_client = new Patreon_API( get_option( 'patreon-creators-access-token' , false ) );
-
-				$api_response = $api_client->check_api_v2();
-		
-			}
-			
-			$can_use = 'no';
-			
-			if ( $api_response['data'][0]['type']=='campaign' ) {
-				// Got a valid result. Update.
-				$can_use = 'yes';
-			}
-			
-			update_option( 'patreon-can-use-api-v2', $can_use );
 			
 		}
 		
