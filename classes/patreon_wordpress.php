@@ -382,18 +382,19 @@ class Patreon_Wordpress {
         return false;
 		
 	}
-	public static function getUserPatronage( $user = false ) {
+	public static function getUserPatronage() {
 		
 		if ( self::$current_user_pledge_amount != -1 ) {
 			return self::$current_user_pledge_amount;
 		}
 
-		// If user is not given, try to get the current user attribute ID will be 0 if there is no logged in user
-		if ( $user == false ) {
-			$user = wp_get_current_user();
+		if ( is_user_logged_in() == false ) {
+			return false;
 		}
-		// If still no user object, return false
-		if ( $user->ID == 0 ) {
+
+		$user = wp_get_current_user();
+		
+		if ( $user == false ) {
 			return false;
 		}
 
@@ -552,24 +553,19 @@ class Patreon_Wordpress {
 		return 0;
 		
 	}
-	public static function isPatron( $user = false ) {
-		
+	public static function isPatron() {
+
 		if( self::$current_user_is_patron != -1 ) {
 			return self::$current_user_is_patron;
-		}
-
-		// If user is not given, try to get the current user attribute ID will be 0 if there is no logged in user
-		if ( $user == false ) {
-			$user = wp_get_current_user();
 		}
 		
 		$user_patronage = self::getUserPatronage();
 
 		if( is_numeric( $user_patronage ) && $user_patronage > 0 ) {
-			return self::$current_user_is_patron = true;
+			self::$current_user_is_patron = true;
 		}
 		else {
-			return self::$current_user_is_patron = false;
+			self::$current_user_is_patron = false;
 		}
 
 	}
@@ -732,7 +728,8 @@ class Patreon_Wordpress {
 		}
 		
 	}
-	public function check_for_update($plugin_check_data) {
+	public function check_for_update($plugin_check_data) 
+	{
 		global $wp_version, $plugin_version, $plugin_base;
 
 		if ( empty( $plugin_check_data->checked ) ) {
@@ -749,7 +746,8 @@ class Patreon_Wordpress {
 		return $plugin_check_data;
 		
 	}	
-	public function dismiss_admin_notice() {
+	public function dismiss_admin_notice() 
+	{
 		if( !( is_admin() && current_user_can( 'manage_options' ) ) ) {
 			return;
 		}
@@ -759,9 +757,9 @@ class Patreon_Wordpress {
 			delete_option( 'patreon-wordpress-update-available');
 		}
 
-	}
-	public function toggle_option() {
-		
+	}	
+	public function toggle_option() 
+	{
 		if( !( is_admin() && current_user_can( 'manage_options' ) ) ) {
 			return;
 		}
@@ -780,179 +778,6 @@ class Patreon_Wordpress {
 		
 		update_user_meta( $current_user->ID, $option_to_toggle, $new_value );
 		
-	}
-	public static function lock_or_not( $post_id = false ) {
-		
-		// Just bail out if this is not the main query for content and no post id was given
-		if ( !is_main_query() AND !$post_id ) {
-			
-			return array(
-				'lock' => false,
-				'reason' => 'no_post_id_no_main_query',
-			);
-			
-		}
-		
-		// If post it received, get that post. If no post id received, try to get post from global
-		if ( $post_id ) {
-			$post = get_post( $post_id );
-		}
-		else {
-			global $post;
-		}
-			
-		$exclude = array(
-		);
-		
-		// Enables 3rd party plugins to modify the post types excluded from locking
-		$exclude = apply_filters( 'ptrn/filter_excluded_posts', $exclude );
-
-		if ( in_array( get_post_type( $post->ID ), $exclude ) ) {
-			
-			return array(
-				'lock' => false,
-				'reason' => 'post_type_excluded_from_locking',
-			);
-			
-		}
-		
-		// First check if entire site is locked, get the level for locking.
-		
-		$patreon_level = get_option( 'patreon-lock-entire-site', false );
-		
-		// Check if specific level is given for this post:
-		
-		$post_level = get_post_meta( $post->ID, 'patreon-level', true );
-		
-		// get post meta returns empty if no value is found. If so, set the value to 0.
-		
-		if ( $post_level == '' ) {
-			$post_level = 0;				
-		}
-
-		// Check if both post level and site lock level are set to 0 or nonexistent. If so return normal content.
-		
-		if ( $post_level == 0 
-			&& ( !$patreon_level
-				|| $patreon_level == 0 )
-		) {
-			
-			return array(
-				'lock' => false,
-				'reason' => 'post_is_public',
-			);
-			
-		}
-		
-		// If we are at this point, then this post is protected. 
-		
-		// Below define can be defined in any plugin to bypass core locking function and use a custom one from plugin
-		// It is independent of the plugin load order since it checks if it is defined.
-		// It can be defined by any plugin until right before the_content filter is run.
-
-		if ( apply_filters( 'ptrn/bypass_filtering', defined( 'PATREON_BYPASS_FILTERING' ) ) ) {
-			
-			return array(
-				'lock'   => false,
-				'reason' => 'lock_bypassed_by_filter',
-			);
-			
-		}
-		 
-		if ( current_user_can( 'manage_options' ) ) {
-			
-			// Here we need to put a notification to admins so they will know they can see the content because they are admin_login_with_patreon_disabled
-			return array(
-				'lock' => false,
-				'reason' => 'show_to_admin_users',
-			);
-			
-		}
-							
-		// Passed checks. If post level is not 0, override patreon level and hence site locking value with post's. This will allow Creators to lock entire site and then set a different value for individual posts for access. Ie, site locking is $5, but one particular post can be $10, and it will require $10 to see. 
-		
-		if ( $post_level !=0 ) {
-			$patreon_level = $post_level;
-		}
-		 
-		$user                           = wp_get_current_user();
-		$user_pledge_relationship_start = Patreon_Wordpress::get_user_pledge_relationship_start( $user );
-		$user_patronage                 = Patreon_Wordpress::getUserPatronage( $user );
-		$is_patron                      = Patreon_Wordpress::isPatron( $user );
-		$user_lifetime_patronage        = Patreon_Wordpress::get_user_lifetime_patronage( $user );
-		$declined                       = Patreon_Wordpress::checkDeclinedPatronage( $user );
-				
-		// Check if post was set for active patrons only
-		$patreon_active_patrons_only = get_post_meta( $post->ID, 'patreon-active-patrons-only', true );
-		
-		// Check if specific total patronage is given for this post:
-		$post_total_patronage_level = get_post_meta( $post->ID, 'patreon-total-patronage-level', true );
-		
-		$hide_content = true;
-		$reason = 'active_pledge_not_enough';
-		
-		// Check if user is logged in
-		
-		if ( !is_user_logged_in() ) {
-			
-			$hide_content = true;
-			$reason = 'user_not_logged_in';
-			
-		}
-		
-		if ( $declined ) {
-			
-			$hide_content = true;
-			$reason = 'payment_declined';
-			
-		}
-		
-		if ( is_user_logged_in() AND !$is_patron ) {
-			
-			$hide_content = true;
-			$reason = 'not_a_patron';
-			
-		}
-	
-		if ( !( $user_patronage == false
-			|| $user_patronage < ( $patreon_level * 100 )
-			|| $declined ) AND is_user_logged_in() ) {
-				
-			$hide_content = false;
-			
-			// Seems valid patron. Lets see if active patron option was set and the user fulfills it
-			
-			if ( $patreon_active_patrons_only == '1'
-			AND $user_pledge_relationship_start >= strtotime( get_the_date( '', $post->ID ) ) ) {
-				$hide_content = true;
-				$reason = 'not_active_patron_at_post_date';
-			}
-			
-		}
-
-		if ( $post_total_patronage_level !='' AND $post_total_patronage_level > 0) {
-			
-			// Total patronage set if user has lifetime patronage over this level, we let him see the content
-			if( $user_lifetime_patronage >= $post_total_patronage_level * 100 ) {
-				$hide_content = false;
-				$reason = 'patron_fulfills_total_historical_pledge_requirement';
-			}
-			
-		}
-		
-		$result = array(
-			'lock'                         => $hide_content,
-			'reason'                       => $reason,
-			'patreon_level'                => $patreon_level,
-			'post_total_patronage_level'   => $post_total_patronage_level,
-			'patreon_active_patrons_only'  => $patreon_active_patrons_only,
-			'user_is_patron'               => $is_patron,
-			'user_active_pledge'           => $user_patronage,
-			'user_total_historical_pledge' => $user_lifetime_patronage,
-		); 
-		
-		return apply_filters( 'ptrn/lock_or_not', $result, $post_id, $declined, $user );
-		
-	}
+	}	
 	
 }
