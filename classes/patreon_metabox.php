@@ -44,7 +44,7 @@ class Patron_Metabox {
 	
 		$current_user = wp_get_current_user();
 			
-		$label    = 'Add a minimum Patreon contribution required to access this content.  (Makes entire post patron only)';
+		$label    = 'Require Patreon pledge of this dollar amount or higher to view this post.  (Makes entire post patron only)  <a href="https://www.patreondevelopers.com/t/patreon-wordpress-locking-options-guide/1135#section_1" target="_blank">(?)</a>';
 		$readonly = '';
 		
 		if ( !get_option( 'patreon-creator-id', false ) ) {
@@ -78,8 +78,8 @@ class Patron_Metabox {
 		
 			<?php
 			
-			$label    = 'Active patrons only (optional) - if on, only patrons active at and before this post\'s publishing date will be able to see this content )';
-			$readonly = '';
+			$label    = 'Require an active pledge at the time of this post’s creation to view this post. (optional) <a href="https://www.patreondevelopers.com/t/patreon-wordpress-locking-options-guide/1135#section_2" target="_blank">(?)</a>';
+		$readonly = '';
 			
 			if ( !get_option( 'patreon-creator-id', false ) ) {
 				
@@ -97,8 +97,8 @@ class Patron_Metabox {
 
 			<?php
 			
-			$label    = 'Total patronage (optional) - any patron above total lifetime patronage $ value entered below can see this content';
-			$readonly = '';
+			$label    = 'Require a lifetime pledge amount greater than this amount to view this post. (optional) <a href="https://www.patreondevelopers.com/t/patreon-wordpress-locking-options-guide/1135#section_3" target="_blank">(?)</a>';
+		  $readonly = '';
 			
 			if ( !get_option( 'patreon-creator-id', false ) ) {
 				
@@ -116,6 +116,7 @@ class Patron_Metabox {
 		
 		</div>
 		<br />
+
 		
 		<?php 
 			
