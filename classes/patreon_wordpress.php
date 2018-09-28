@@ -13,6 +13,7 @@ class Patreon_Wordpress {
 	private static $Patreon_Protect;
 	private static $Patreon_Options;
 	private static $Patron_Metabox;
+	private static $Patron_Compatibility;
 	private static $Patreon_User_Profiles;
 	public static $current_user_pledge_amount = -1;
 	public static $current_user_patronage_declined = -1;
@@ -34,6 +35,7 @@ class Patreon_Wordpress {
 		include 'patreon_metabox.php';
 		include 'patreon_user_profiles.php';
 		include 'patreon_protect.php';
+		include 'patreon_compatibility.php';
 
 		self::$Patreon_Routing       = new Patreon_Routing;
 		self::$Patreon_Frontend      = new Patreon_Frontend;
@@ -41,11 +43,11 @@ class Patreon_Wordpress {
 		self::$Patron_Metabox        = new Patron_Metabox;
 		self::$Patreon_User_Profiles = new Patreon_User_Profiles;
 		self::$Patreon_Protect       = new Patreon_Protect;
+		self::$Patron_Compatibility  = new Patreon_Compatibility;
 
 		add_action( 'wp_head', array( $this, 'updatePatreonUser' ) );
 		add_action( 'init', array( $this, 'checkPatreonCreatorID' ) );
 		add_action( 'init', array( $this, 'check_creator_token_expiration' ) );
-		// add_action( 'admin_init', array( $this, 'checkv2APIAccess' ) );
 		add_action( 'init', array( $this, 'checkPatreonCampaignID' ) );
 		add_action( 'init', array( $this, 'checkPatreonCreatorURL' ) );
 		add_action( 'init', array( $this, 'checkPatreonCreatorName' ) );
@@ -55,6 +57,8 @@ class Patreon_Wordpress {
 		add_action( 'admin_notices', array( $this, 'AdminMessages' ) );
 		add_action( 'init', array( $this, 'transitionalImageOptionCheck' ) );
 		add_action( 'admin_init', array( $this, 'add_privacy_policy_section' ), 20 ) ;
+		add_filter( 'pre_set_site_transient_update_plugins', array( $this, 'check_for_update' ) );
+		add_action( 'wp_ajax_patreon_wordpress_dismiss_admin_notice', array( $this, 'dismiss_admin_notice' ), 10, 1 );
 
 	}
 	public static function getPatreonUser( $user ) {
@@ -90,6 +94,7 @@ class Patreon_Wordpress {
 		return self::$current_patreon_user = false;
 		
 	}
+	
 	static function updatePatreonUser() {
 
 		/* check if current user is loggedin, get ID */
@@ -101,6 +106,15 @@ class Patreon_Wordpress {
 		$user = wp_get_current_user();
 		if ( $user == false ) {
 			return false;
+		}
+		
+		// Temporarily introduced caching until calls are moved to webhooks #REVISIT
+		
+		$last_update = get_user_meta( $user->ID, 'patreon_user_details_last_updated', true );
+		
+		// If last update time is not empty and it is closer to time() than one day, dont update
+		if ( !( $last_update == '' OR ( ( time() - $last_update ) > 86400 ) ) ) {
+			return false;	
 		}
 
 		/* query Patreon API to get users patreon details */
@@ -133,8 +147,11 @@ class Patreon_Wordpress {
 		if ( $user_response == false ) {
 			return false;
 		}
-
+		
 		if ( isset( $user_response['data'] ) ) {
+			
+			// Set the update time
+			update_user_meta( $user->ID, 'patreon_user_details_last_updated', time() );
 			
 			/* all the details you want to update on wordpress user account */
 			update_user_meta( $user->ID, 'patreon_user', $user_response['data']['attributes']['vanity'] );
@@ -167,39 +184,6 @@ class Patreon_Wordpress {
 				// Creator id acquired. Update.
 				update_option( 'patreon-creator-id', $creator_id );
 			}
-			
-		}
-		
-	}
-	public static function checkv2APIAccess() {
-
-		// Check if we can contact API v2 with the creator access token we have. Account for the case in which creator id was saved as empty by the Creator
-
-		if ( !get_option('patreon-can-use-api-v2', false ) ) {
-		
-			// Making sure access credentials are there to avoid fruitlessly contacting the api:
-			
-			if ( get_option( 'patreon-client-id', false ) 
-				&& get_option( 'patreon-client-secret', false ) 
-				&& get_option( 'patreon-creators-access-token', false )
-			) {
-				
-				// Credentials are in. Go.
-				
-				$api_client = new Patreon_API( get_option( 'patreon-creators-access-token' , false ) );
-
-				$api_response = $api_client->check_api_v2();
-		
-			}
-			
-			$can_use = 'no';
-			
-			if ( $api_response['data'][0]['type'] == 'campaign' ) {
-				// Got a valid result. Update.
-				$can_use = 'yes';
-			}
-			
-			update_option( 'patreon-can-use-api-v2', $can_use );
 			
 		}
 		
@@ -730,18 +714,48 @@ class Patreon_Wordpress {
 			update_option( 'patreon-gdpr-notice-shown', 1 );
 			
 		}
-		
-		if( get_option( 'patreon-warning-check-api-credentials', false ) == 'yes' ) {
+	
+		if( get_option( 'patreon-wordpress-update-available', false ) ) {
 			
 			?>
-				 <div class="notice notice-error">
-				 <h3>Please check your Patreon API credentials</h3>
-					<p>Patreon WordPress was not able to successfully authenticate with Patreon. It's possible that your access credentials are incorrect or expired. Please visit <a href="https://www.patreon.com/portal/registration/register-clients" target="_blank">your Patreon app credentials page</a> and make sure non-expired, correct credentials are saved into <a href="<?php echo admin_url('?page=patreon-plugin'); ?>">your plugin settings</a></p>
+				 <div class="notice notice-info is-dismissible patreon-wordpress" id="patreon-wordpress-update-available">
+				 <h3>New version of Patreon WordPress is available</h3>
+					<p>To be able to receive the latest features, security and bug fixes, please update your plugin by <a href="<?php echo wp_nonce_url( get_admin_url() . 'update.php?action=upgrade-plugin&plugin=' . PATREON_WORDPRESS_PLUGIN_SLUG,'upgrade-plugin_' . PATREON_WORDPRESS_PLUGIN_SLUG ); ?>">clicking here</a>.</p>
 				</div>
 			<?php
 			
 		}
 		
 	}
+	public function check_for_update($plugin_check_data) 
+	{
+		global $wp_version, $plugin_version, $plugin_base;
+
+		if ( empty( $plugin_check_data->checked ) ) {
+			return $plugin_check_data;
+		}
+
+		if ( isset( $plugin_check_data->response[PATREON_WORDPRESS_PLUGIN_SLUG] ) AND 
+			version_compare( PATREON_WORDPRESS_VERSION, $plugin_check_data->response[PATREON_WORDPRESS_PLUGIN_SLUG]->new_version, '<' )
+		) {
+
+			update_option( 'patreon-wordpress-update-available', 1 );
+		}
+
+		return $plugin_check_data;
+		
+	}	
+	public function dismiss_admin_notice() 
+	{
+		if( !( is_admin() && current_user_can( 'manage_options' ) ) ) {
+			return;
+		}
+		
+		// Mapping what comes from REQUEST to a given value avoids potential security problems
+		if ( $_REQUEST['notice_id'] == 'patreon-wordpress-update-available' ) {
+			delete_option( 'patreon-wordpress-update-available');
+		}
+
+	}	
 	
 }
