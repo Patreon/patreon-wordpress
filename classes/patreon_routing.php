@@ -361,6 +361,7 @@ class Patreon_Routing {
 
 				$tokens = $oauth_client->get_tokens( $wp->query_vars['code'], site_url() . '/patreon-authorization/' );
 
+
 				if( array_key_exists( 'error', $tokens ) ) {
 
 					if( $tokens['error']=='invalid_client' ) {
