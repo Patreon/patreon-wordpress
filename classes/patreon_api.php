@@ -35,7 +35,7 @@ class Patreon_API {
 		if ( $api_return['included'][0]['attributes']['last_charge_status'] != 'Paid' ) {
 			$api_return['included'][0]['attributes']['declined_since'] = $api_return['included'][0]['attributes']['last_charge_date'];
 		}
-
+			
 		return $api_return;
 	}
 	
@@ -92,7 +92,7 @@ class Patreon_API {
 		if ( $v2 ) {
 			$api_endpoint = "https://www.patreon.com/api/oauth2/v2/" . $suffix;	
 		}
-		
+
 		$headers = array(
 			'Authorization' => 'Bearer ' . $this->access_token,
 			'User-Agent' => 'Patreon-Wordpress, version ' . PATREON_WORDPRESS_VERSION . ', platform ' . php_uname('s') . '-' . php_uname( 'r' ),
