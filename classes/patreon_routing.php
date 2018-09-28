@@ -314,7 +314,7 @@ class Patreon_Routing {
 			
 		}
 		if ( strpos( $_SERVER['REQUEST_URI'], '/patreon-authorization/' ) !== false ) {
-			
+
 			// First slap the noindex header so search engines wont index this page:
 			header( 'X-Robots-Tag: noindex, nofollow' );
 			 

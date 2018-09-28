@@ -47,6 +47,7 @@ class Patreon_Wordpress {
 
 		add_action( 'wp_head', array( $this, 'updatePatreonUser' ) );
 		add_action( 'init', array( $this, 'checkPatreonCreatorID' ) );
+		add_action( 'init', array( $this, 'check_creator_token_expiration' ) );
 		add_action( 'init', array( $this, 'checkPatreonCampaignID' ) );
 		add_action( 'init', array( $this, 'checkPatreonCreatorURL' ) );
 		add_action( 'init', array( $this, 'checkPatreonCreatorName' ) );
@@ -162,11 +163,11 @@ class Patreon_Wordpress {
 
 	}
 	public static function checkPatreonCreatorID() {
-		
+
 		// Check if creator id doesnt exist. Account for the case in which creator id was saved as empty by the Creator
 
 		if ( !get_option( 'patreon-creator-id', false ) OR get_option( 'patreon-creator-id', false )== '' ) {
-		
+
 			// Making sure access credentials are there to avoid fruitlessly contacting the api:
 
 			if ( get_option( 'patreon-client-id', false ) 
@@ -189,8 +190,7 @@ class Patreon_Wordpress {
 	}
 	public static function checkPatreonCreatorURL() {
 		
-		// Check if creator url doesnt exist. 
-		$creator_url = self::getPatreonCreatorURL();
+		// Check if creator url doesnt exist.
 		
 		if ( !get_option( 'patreon-creator-url', false ) OR get_option( 'patreon-creator-url', false ) == '' ) {
 			
@@ -251,7 +251,7 @@ class Patreon_Wordpress {
 			// Making sure access credentials are there to avoid fruitlessly contacting the api:
 			
 			if ( get_option('patreon-client-id', false )  && get_option( 'patreon-client-secret', false ) && get_option('patreon-creators-access-token', false ) ) {
-				
+
 				// Credentials are in. Go.
 				$creator_info = self::getPatreonCreatorInfo();
 				
@@ -277,7 +277,7 @@ class Patreon_Wordpress {
 		}
 	}
 	public static function getPatreonCreatorInfo() {
-	
+
 		$api_client    = new Patreon_API( get_option( 'patreon-creators-access-token' , false ) );
         $user_response = $api_client->fetch_creator_info();
 
@@ -291,24 +291,9 @@ class Patreon_Wordpress {
 				
 				if ( $error['code'] == 1 ) {
 
-					/* refresh creators token if error 1 */
-					$refresh_token = get_option( 'patreon-creators-refresh-token', false );
-
-					if( $refresh_token == false ) {
-						return false;
+					if( self::refresh_creator_access_token() ) {
+						return $api_client->fetch_creator_info();
 					}
-
-					$oauth_client = new Patreon_Oauth;
-					$tokens       = $oauth_client->refresh_token( $refresh_token, site_url() . '/patreon-authorization/' );
-
-					if( isset( $tokens['refresh_token'] ) && isset( $tokens['access_token'] ) ) {
-						
-						update_option( 'patreon-creators-refresh-token', $tokens['refresh_token'] );
-						update_option( 'patreon-creators-access-token', $tokens['access_token'] );
-						
-					}
-
-					$user_response = $api_client->fetch_creator_info();
 					
 				}
 				
@@ -316,8 +301,52 @@ class Patreon_Wordpress {
 			
 		}
 		
-		return $user_response;
+		return false;
 		
+	}
+	public static function refresh_creator_access_token() {
+		/* refresh creators token if error 1 */
+		$refresh_token = get_option( 'patreon-creators-refresh-token', false );
+
+		if( $refresh_token == false ) {
+			return false;
+		}
+
+		$oauth_client = new Patreon_Oauth;
+		$tokens       = $oauth_client->refresh_token( $refresh_token, site_url() . '/patreon-authorization/' );
+
+		if( isset( $tokens['refresh_token'] ) && isset( $tokens['access_token'] ) ) {
+			
+			update_option( 'patreon-creators-refresh-token', $tokens['refresh_token'] );
+			update_option( 'patreon-creators-access-token', $tokens['access_token'] );
+			
+			return $tokens;
+		}		
+		
+		return false;
+	}
+	public static function check_creator_token_expiration() {
+		/* Checks if creator's token is expired or if expire date is missing. Then attempts refreshing the token */
+		
+		$refresh_token = get_option( 'patreon-creators-refresh-token', false );
+
+		if ( $refresh_token == false ) {
+			return false;
+		}
+		
+		$expiration = get_option( 'patreon-creators-refresh-token-expiration', false );
+		
+		if ( !$expiration OR $expiration <= time() ) {
+			if ( $tokens = self::refresh_creator_access_token() ) {
+				
+				update_option( 'patreon-creators-refresh-token-expiration', time() + $tokens['expires_in'] );
+				update_option( 'patreon-creators-access-token-scope', $tokens['scope'] );
+				
+				return true;
+			}
+		}
+		
+		return false;
 	}
 	public static function getPatreonCreatorID() {
 
@@ -685,7 +714,7 @@ class Patreon_Wordpress {
 			update_option( 'patreon-gdpr-notice-shown', 1 );
 			
 		}
-		
+	
 		if( get_option( 'patreon-wordpress-update-available', false ) ) {
 			
 			?>
