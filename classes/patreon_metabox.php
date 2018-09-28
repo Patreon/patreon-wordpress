@@ -41,6 +41,8 @@ class Patron_Metabox {
 	}
 
 	function patreon_plugin_meta_box( $object, $box ) { 
+	
+		$current_user = wp_get_current_user();
 			
 		$label    = 'Add a minimum Patreon contribution required to access this content.  (Makes entire post patron only)';
 		$readonly = '';
@@ -60,45 +62,72 @@ class Patron_Metabox {
 			<br><br>
 			<strong>&#36; </strong><input type="text" id="patreon-level" name="patreon-level" value="<?php echo get_post_meta( $object->ID, 'patreon-level', true ); ?>" <?php echo $readonly ?>>
 		</p>
-
-		<?php
 		
-		$label    = 'Active patrons only (optional) - if on, only patrons active at and before this post\'s publishing date will be able to see this content )';
-		$readonly = '';
+		<?php 
+			
+			$advanced_post_options_toggle_status = get_user_meta( $current_user->ID, 'patreon-wordpress-advanced-options-toggle', true );
+						
+			$advanced_post_options_toggle_status_display = 'style=" display: block;" ';
+			
+			if( $advanced_post_options_toggle_status == '' OR $advanced_post_options_toggle_status == 'off' ) {
+				$advanced_post_options_toggle_status_display = 'style=" display: none;" ';
+			}
+		?> 		
 		
-		if ( !get_option( 'patreon-creator-id', false ) ) {
+		<div <?php echo $advanced_post_options_toggle_status_display ?>id="patreon-wordpress-advanced-options-toggle">
+		
+			<?php
 			
-			$label    = 'Post locking won\'t work without Creator ID. Please confirm you have it <a href="'.admin_url( "?page=patreon-plugin" ).'">here</a>';
-			$readonly = " readonly";
+			$label    = 'Active patrons only (optional) - if on, only patrons active at and before this post\'s publishing date will be able to see this content )';
+			$readonly = '';
 			
-		}
+			if ( !get_option( 'patreon-creator-id', false ) ) {
+				
+				$label    = 'Post locking won\'t work without Creator ID. Please confirm you have it <a href="'.admin_url( "?page=patreon-plugin" ).'">here</a>';
+				$readonly = " readonly";
+				
+			}
 
+			?>
+			<p>
+				<label for="patreon-active-patrons-only"><?php _e( $label, '1' ); ?></label>
+				<br><br>
+				<input type="checkbox" name="patreon-active-patrons-only" value="1" <?php checked( get_post_meta( $object->ID, 'patreon-active-patrons-only', true ),true,true ); ?> <?php echo $readonly ?> /> Yes
+			</p>
+
+			<?php
+			
+			$label    = 'Total patronage (optional) - any patron above total lifetime patronage $ value entered below can see this content';
+			$readonly = '';
+			
+			if ( !get_option( 'patreon-creator-id', false ) ) {
+				
+				$label    = 'Post locking won\'t work without Creator ID. Please confirm you have it <a href="'.admin_url("?page=patreon-plugin").'">here</a>';
+				$readonly = " readonly";
+				
+			}
+
+			?>
+			<p>
+				<label for="patreon-total-patronage-level"><?php _e( $label, '1' ); ?></label>
+				<br><br>
+				<strong>&#36; </strong><input type="text" id="patreon-total-patronage-level" name="patreon-total-patronage-level" value="<?php echo get_post_meta( $object->ID, 'patreon-total-patronage-level', true ); ?>" <?php echo $readonly ?>>
+			</p>
+		
+		</div>
+		<br />
+		
+		<?php 
+			
+			$advanced_post_options_toggle_text = 'Hide advanced';
+			
+			if( $advanced_post_options_toggle_status == '' OR $advanced_post_options_toggle_status == 'off' ) {
+				$advanced_post_options_toggle_text = 'Show advanced';
+			}
 		?>
-		<p>
-			<label for="patreon-active-patrons-only"><?php _e( $label, '1' ); ?></label>
-			<br><br>
-			<input type="checkbox" name="patreon-active-patrons-only" value="1" <?php checked( get_post_meta( $object->ID, 'patreon-active-patrons-only', true ),true,true ); ?> <?php echo $readonly ?> /> Yes
-		</p>
-
-		<?php
 		
-		$label    = 'Total patronage (optional) - any patron above total lifetime patronage $ value entered below can see this content';
-		$readonly = '';
+		<a href="" toggle="patreon-wordpress-advanced-options-toggle" togglestatus="<?php echo $advanced_post_options_toggle_status ?>" ontext="Hide advanced" offtext="Show advanced" class="patreon-wordpress-admin-toggle"><?php echo $advanced_post_options_toggle_text ?></a>
 		
-		if ( !get_option( 'patreon-creator-id', false ) ) {
-			
-			$label    = 'Post locking won\'t work without Creator ID. Please confirm you have it <a href="'.admin_url("?page=patreon-plugin").'">here</a>';
-			$readonly = " readonly";
-			
-		}
-
-		?>
-		<p>
-			<label for="patreon-total-patronage-level"><?php _e( $label, '1' ); ?></label>
-			<br><br>
-			<strong>&#36; </strong><input type="text" id="patreon-total-patronage-level" name="patreon-total-patronage-level" value="<?php echo get_post_meta( $object->ID, 'patreon-total-patronage-level', true ); ?>" <?php echo $readonly ?>>
-		</p>
-
 		<?php
 		
 	}
