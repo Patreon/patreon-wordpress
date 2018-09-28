@@ -98,4 +98,37 @@ jQuery( function( $ ) {
 		});
 	});	
 	
+	jQuery(document).on( 'click', '.patreon-wordpress-admin-toggle', function(e) {
+		
+		e.preventDefault();
+		
+		var toggle_id = jQuery( this ).attr( 'toggle' );
+		var toggle_target = document.getElementById( toggle_id );
+
+		jQuery( toggle_target ).slideToggle();
+		
+		if( jQuery( this ).attr( 'togglestatus' ) == 'off' ) {
+			
+			jQuery( this ).html( jQuery( this ).attr( 'ontext' ) );
+			jQuery( this ).attr( 'togglestatus', 'on' );
+			
+		}
+		else if( jQuery( this ).attr( 'togglestatus' ) == 'on' ) {
+			
+			jQuery( this ).html( jQuery( this ).attr( 'offtext' ) );
+			jQuery( this ).attr( 'togglestatus', 'off' );
+			
+		}
+				
+		jQuery.ajax({
+			url: ajaxurl,
+			type:"POST",
+			dataType : 'html',
+			data: {
+				action: 'patreon_wordpress_toggle_option',
+				toggle_id: toggle_id,
+			}
+		});		
+		
+	});
 });
