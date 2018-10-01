@@ -4,7 +4,7 @@
 Plugin Name: Patreon Wordpress
 Plugin URI: https://www.patreon.com/apps/wordpress
 Description: Patron-only content, directly on your website.
-Version: 1.1.1
+Version: 1.2.0
 Author: Patreon <platform@patreon.com>
 Author URI: https://patreon.com
 */
@@ -42,8 +42,8 @@ define( "PATREON_TEXT_OVER_BUTTON_2", 'Edit your pledge to %%creator%% to $%%ple
 define( "PATREON_TEXT_OVER_BUTTON_3", 'Please <a href="https://www.patreon.com/settings/payment" target="_blank" ref="nofollow">update</a> your Patreon payment method to access this post.' );
 define( "PATREON_VALID_PATRON_POST_FOOTER_TEXT", 'This content is exclusively available to %%creatorprofileurl%% members who pledge $%%pledgelevel%%  or more.' );
 define( "PATREON_TEXT_UNDER_BUTTON_1", '' );
-define( "PATREON_TEXT_UNDER_BUTTON_2", 'Already a Patreon member? <a href="%%flow_link%%" rel="nofollow">refresh</a> to access this post.' );
-define( "PATREON_TEXT_UNDER_BUTTON_3", 'Already updated? <a href="%%flow_link%%" rel="nofollow">refresh</a> to access this post.' );
+define( "PATREON_TEXT_UNDER_BUTTON_2", 'Already a Patreon member? <a href="%%flow_link%%" rel="nofollow">Refresh</a> to access this post.' );
+define( "PATREON_TEXT_UNDER_BUTTON_3", 'Already updated? <a href="%%flow_link%%" rel="nofollow">Refresh</a> to access this post.' );
 define( "PATREON_CANT_LOGIN_STRICT_OAUTH", 'Sorry, couldn\'t log you in with Patreon because you have to be logged in to '.get_bloginfo('NAME').' first' );
 define( "PATREON_LOGIN_WITH_WORDPRESS_NOW", 'You can now login with your wordpress username/password.' );
 define( "PATREON_CANT_LOGIN_NONCES_DONT_MATCH", 'Sorry. Aborted Patreon login for security because security cookies dont match.' );
@@ -59,7 +59,7 @@ define( "PATREON_ADMIN_BYPASSES_FILTER_MESSAGE", 'This content is for Patrons on
 define( "PATREON_CREATOR_BYPASSES_FILTER_MESSAGE", 'This content is for Patrons only, it\'s not locked for you because you are logged in as the Patreon creator' );
 define( "PATREON_NO_LOCKING_LEVEL_SET_FOR_THIS_POST", 'Post is already public. If you would like to lock this post, please set a pledge level for it' );
 define( "PATREON_NO_POST_ID_TO_UNLOCK_POST", 'Sorry - could not get the post id for this locked post' );
-define( "PATREON_WORDPRESS_VERSION", '1.1.1' );
+define( "PATREON_WORDPRESS_VERSION", '1.2.0' );
 define( "PATREON_WORDPRESS_PLUGIN_SLUG", plugin_basename( __FILE__ ) );
 define( "PATREON_PRIVACY_POLICY_ADDENDUM", '<h2>Patreon features in this website</h2>In order to enable you to use this website with Patreon services, we save certain functionally important Patreon information about you in this website if you log in with Patreon.
 <br /><br />
