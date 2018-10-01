@@ -2,8 +2,8 @@
 Contributors: wordpressorg@patreon.com, codebard
 Tags: patreon, membership, members
 Requires at least: 4.0
-Tested up to: 4.9.6
-Stable tag: 1.1.1
+Tested up to: 4.9.8
+Stable tag: 1.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -89,6 +89,50 @@ It is  difficult to protect videos due the intensive bandwidth requirements of h
 
 
 == Changelog ==
+
+= 1.2.0 =
+
+* Now compatible with Patreon API v2
+* Patron info related calls to API made to work using v2 - they currently work without needing to upgrade tokens to v2 
+* New advanced locking option based on total historical pledge of patrons added
+* New advanced locking option based on membership start date of patrons added
+* New advanced locking options made work in conjunction with each other to provide a total of 4 locking options
+* New advanced locking options added to post locking interface
+* Locked content interface now takes into account the new locking options - a proper text is shown to user for each locking case (simple lock, membership start date, total pledge etc)
+* Post locking interface now uses a jQuery "Show/Hide Advanced" toggle to keep interface clean
+* "Show/Hide Advanced" toggle now remembers user preference
+* Existing locking option and new locking options linked to help document from post metabox
+* New method for directly locking any part of content or site added - now anything can be locked, not only posts or custom post types. A part of the theme or content can be locked for any given pledge level by using some code (content in sidebars, widgets, header, footer, inside posts etc)
+* 
+* Compatibility class to hold compatibility related code added
+* Do not cache variable added to compatibility class to tell caching plugins to not cache critical Patreon related routing pages (flow, auth)
+* Cache control / no cache headers added to headers for Patreon routing pages (flow, auth)
+* Added update available notice to tell site owners that a new version is available (dismissable until next update check)
+* API v2 accessibility checking functions removed since API v2 is now always being used for patron related calls
+* Creator's token refresh code removed from getPatreonCreatorInfo
+* Code added to keep track of expiration of creator's access token
+* Function added to refresh creators token before it expires to prevent any connectivity issues related to expiration - now it will auto refresh when necessary
+* Function that checked creator's url on every page load was removed - this should reduce load
+* Function which retrieves patron's details from Patreon on every page load made to do the check every 24 hours instead of every page load - this should reduce load
+* Hooks and filters added to Patreon login action that happens in WordPress site after Patreon oAuth
+* All API access error cases covered with error messages
+* Security cookie check removed to address issues with sites experiencing problems with cookies
+* lock_or_not function to receive a post id and decide whether a content should be locked is added
+* lock_or_not function now returns the reason why content was locked (not enough pledge, membership start not old enough, not enough total pledge, declined etc)
+* All interface functions in locked content interface are made to use lock_or_not function and are simplified
+* All interface generating functions made to receive post id so now they can be used programmatically to generate interface for any content - not only the current post
+* Error message added in case Patreon does not return a result or WP site cannot connect to Patreon. This will prevent parse errors when this situation happens
+* User agent string added to oAuth calls
+* Message added to creators that they are seeing the post because they are the creator - for when they log in with creator account
+* Unlock button CSS was updated to prevent themes from overriding its size. This will fix issues in sites where the button was showing up too large or too long
+* Fixed patronage checking function not returning a value for catch-all case
+* get_user_pledge_relationship_start function added to get membership relationship start from v2 API
+* Fixed interface text for declined patrons not being used
+* Redundant duplicate text for locked content was removed from custom banner part of the interface in cases when no custom banner was entered in plugin options
+* fetch_user call uses API v2 with v1 tokens without needing to upgrade to v2
+* fetch_creator_info uses still API v1 with v1 tokens - to be revisited in future
+* New routing case added to enable direct unlocks
+* Numerous more minor fixes and changes
 
 = 1.1.2 =
 
