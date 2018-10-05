@@ -184,10 +184,11 @@ class Patreon_Frontend {
 		
 		if ( !$creator_full_name OR $creator_full_name == '' ) {
 			$creator_full_name = 'this creator';
-		}
-				
-		if ( $array AND is_array( $args ) ) {
-			$args = array_merge_recursive( $args, Patreon_Wordpress::lock_or_not() );
+		}		
+		
+		// Merge the args array into lock_or_not results if args is given. For duplicate keys, use lock_or_not function's values
+		if ( $args AND is_array( $args ) ) {
+			$args = Patreon_Wordpress::lock_or_not() + $args;
 		}
 		else {
 			$args = Patreon_Wordpress::lock_or_not();
@@ -268,7 +269,6 @@ class Patreon_Frontend {
 		
 		$label = str_replace( '%%creator%%', $creator_full_name, $label );
 		$label = str_replace( '%%pledgelevel%%', $patreon_level, $label );
-		$label = str_replace( '%%post_date%%', $post_date, $label );
 		$label = str_replace( '%%flow_link%%', self::patreonMakeCacheableFlowLink(), $label );
 		$label = str_replace( '%%total_pledge%%', $args['post_total_patronage_level'], $label );
 	
@@ -291,9 +291,10 @@ class Patreon_Frontend {
 		if ( !$creator_full_name OR $creator_full_name == '' ) {
 			$creator_full_name = 'this creator';
 		}
-				
-		if ( $array AND is_array( $args ) ) {
-			$args = array_merge_recursive( $args, Patreon_Wordpress::lock_or_not() );
+		
+		// Merge the args array into lock_or_not results if args is given. For duplicate keys, use lock_or_not function's values
+		if ( $args AND is_array( $args ) ) {
+			$args = Patreon_Wordpress::lock_or_not() + $args;
 		}
 		else {
 			$args = Patreon_Wordpress::lock_or_not();
@@ -317,7 +318,6 @@ class Patreon_Frontend {
 			
 		$label = str_replace( '%%creator%%', $creator_full_name, $label );
 		$label = str_replace( '%%pledgelevel%%', $patreon_level, $label );
-		$label = str_replace( '%%post_date%%', $post_date, $label );
 		$label = str_replace( '%%flow_link%%', self::patreonMakeCacheableFlowLink(), $label );
 		$label = str_replace( '%%total_pledge%%', $args['post_total_patronage_level'], $label );
 	
@@ -837,9 +837,19 @@ class Patreon_Frontend {
 		$lock_or_not = Patreon_Wordpress::lock_or_not($post_id);
 		
 		// An array with args should be returned
-
-		$hide_content = $lock_or_not['lock'];
-		$patreon_level = $lock_or_not['patreon_level'];
+		$hide_content = false;
+		$patreon_level = 0;
+		$user_patronage = 0;
+		
+		if ( isset( $lock_or_not['lock'] ) ) {
+			$hide_content = $lock_or_not['lock'];			
+		}
+		if ( isset( $lock_or_not['patreon_level'] ) ) {
+			$patreon_level = $lock_or_not['patreon_level'];
+		}
+		if ( isset( $lock_or_not['user_active_pledge'] ) ) {
+			$user_patronage = $lock_or_not['user_active_pledge'];
+		}
 
 		if ( $hide_content ) {
 			
@@ -883,7 +893,7 @@ class Patreon_Frontend {
 		 '</div>';
 		
 	}
-	public static function MakeValidPatronFooter( $patreon_level, $user_patronage, $args ) {
+	public static function MakeValidPatronFooter( $patreon_level, $user_patronage, $args = false ) {
 		
 		// Creates conditional text for footer shown to valid patrons
 		
@@ -901,9 +911,10 @@ class Patreon_Frontend {
 		if ( !$creator_full_name OR $creator_full_name == '' ) {
 			$creator_full_name = 'this creator';
 		}
-				
-		if ( $array AND is_array( $args ) ) {
-			$args = array_merge_recursive( $args, Patreon_Wordpress::lock_or_not() );
+		
+		// Merge the args array into lock_or_not results if args is given. For duplicate keys, use lock_or_not function's values
+		if ( $args AND is_array( $args ) ) {
+			$args = Patreon_Wordpress::lock_or_not() + $args;
 		}
 		else {
 			$args = Patreon_Wordpress::lock_or_not();
@@ -927,9 +938,10 @@ class Patreon_Frontend {
 			
 		$label = str_replace( '%%creator%%', $creator_full_name, $label );
 		$label = str_replace( '%%pledgelevel%%', $patreon_level, $label );
-		$label = str_replace( '%%post_date%%', $post_date, $label );
 		$label = str_replace( '%%flow_link%%', self::patreonMakeCacheableFlowLink(), $label );
-		$label = str_replace( '%%total_pledge%%', $args['post_total_patronage_level'], $label );		
+		if ( isset( $args['post_total_patronage_level'] ) ) {
+			$label = str_replace( '%%total_pledge%%', $args['post_total_patronage_level'], $label );
+		}		
 		
 		// Get patreon creator url:
 		$creator_profile_url = get_option( 'patreon-creator-url', false );
