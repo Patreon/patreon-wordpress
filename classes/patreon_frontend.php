@@ -265,12 +265,18 @@ class Patreon_Frontend {
 			}
 			
 		}
-	
+		
+		// We init vars so picky users will not see undefined var/index errors:
+		
+		$post_total_patronage_level = '';
+		if( isset( $args['post_total_patronage_level'] ) ) {
+			$post_total_patronage_level = $args['post_total_patronage_level'];
+		}
 		
 		$label = str_replace( '%%creator%%', $creator_full_name, $label );
 		$label = str_replace( '%%pledgelevel%%', $patreon_level, $label );
 		$label = str_replace( '%%flow_link%%', self::patreonMakeCacheableFlowLink(), $label );
-		$label = str_replace( '%%total_pledge%%', $args['post_total_patronage_level'], $label );
+		$label = str_replace( '%%total_pledge%%', $post_total_patronage_level, $label );
 	
 		return $messages . apply_filters( 'ptrn/label_text_over_universal_button', str_replace( '%%pledgelevel%%',$patreon_level, $label ), $args['reason'], $user_logged_into_patreon, $is_patron, $patreon_level, $args );
 		
@@ -315,11 +321,16 @@ class Patreon_Frontend {
 		if ( $args['reason'] == 'not_active_patron_at_post_date' ) {
 			$label = PATREON_TEXT_UNDER_BUTTON_2;
 		}
+		
+		$post_total_patronage_level = '';
+		if( isset( $args['post_total_patronage_level'] ) ) {
+			$post_total_patronage_level = $args['post_total_patronage_level'];
+		}		
 			
 		$label = str_replace( '%%creator%%', $creator_full_name, $label );
 		$label = str_replace( '%%pledgelevel%%', $patreon_level, $label );
 		$label = str_replace( '%%flow_link%%', self::patreonMakeCacheableFlowLink(), $label );
-		$label = str_replace( '%%total_pledge%%', $args['post_total_patronage_level'], $label );
+		$label = str_replace( '%%total_pledge%%', $post_total_patronage_level, $label );
 	
 		return apply_filters( 'ptrn/label_text_under_universal_button', $label, $args['reason'], $user_logged_into_patreon, $is_patron, $patreon_level, $state, $args);
 		
