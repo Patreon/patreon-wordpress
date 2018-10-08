@@ -531,10 +531,10 @@ class Patreon_Frontend {
 			
 		}		
 		
-		// Add the patreon nonce that was set via init function to vars.
-		$state['patreon_nonce'] = $_COOKIE['patreon_nonce'];
 		$redirect_uri           = site_url() . '/patreon-authorization/';
 		$v2_params = '&scope=identity%20identity[email]';
+		
+		$pledge_level = apply_filters( 'ptrn/patron_link_pledge_level', $pledge_level );
 		
 		$href = 'https://www.patreon.com/oauth2/become-patron?response_type=code&min_cents=' . $pledge_level . '&client_id=' . $client_id . $v2_params . '&redirect_uri=' . $redirect_uri . '&state=' . urlencode( base64_encode( serialize( $state ) ) );
 
