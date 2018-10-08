@@ -129,7 +129,7 @@ class Patreon_Frontend {
 				$contribution_required = '';				
 			}
 			
-			$button_vars = array();
+			$button_args = array();
 			
 			if ( isset( $args['direct_unlock'] ) ) {
 				
@@ -408,6 +408,7 @@ class Patreon_Frontend {
 		// We changed the above universal flow link maker to a function which will create cache-able links
 		// Some of the vars in current function which the earlier function used may not be needed now - clean up later #REVISIT
 		
+		$flow_link_args = array();
 						
 		if ( isset( $args['direct_unlock'] ) ) {
 			

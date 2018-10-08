@@ -782,14 +782,27 @@ class Patreon_Wordpress {
 		
 	}
 	public static function lock_or_not( $post_id = false ) {
+
+		$user                           = wp_get_current_user();
+		$user_pledge_relationship_start = Patreon_Wordpress::get_user_pledge_relationship_start( $user );
+		$user_patronage                 = Patreon_Wordpress::getUserPatronage( $user );
+		$is_patron                      = Patreon_Wordpress::isPatron( $user );
+		$user_lifetime_patronage        = Patreon_Wordpress::get_user_lifetime_patronage( $user );
+		$declined                       = Patreon_Wordpress::checkDeclinedPatronage( $user );
 		
 		// Just bail out if this is not the main query for content and no post id was given
 		if ( !is_main_query() AND !$post_id ) {
 			
-			return array(
-				'lock' => false,
-				'reason' => 'no_post_id_no_main_query',
-			);
+			return apply_filters( 
+				'ptrn/lock_or_not', 
+				array(
+					'lock' => false,
+					'reason' => 'no_post_id_no_main_query',
+				),
+				$post_id, 
+				$declined,
+				$user 
+			);			
 			
 		}
 		
@@ -809,9 +822,15 @@ class Patreon_Wordpress {
 
 		if ( in_array( get_post_type( $post->ID ), $exclude ) ) {
 			
-			return array(
-				'lock' => false,
-				'reason' => 'post_type_excluded_from_locking',
+			return apply_filters( 
+				'ptrn/lock_or_not', 
+				array(
+					'lock' => false,
+					'reason' => 'post_type_excluded_from_locking',
+				),
+				$post_id, 
+				$declined,
+				$user 
 			);
 			
 		}
@@ -837,11 +856,16 @@ class Patreon_Wordpress {
 				|| $patreon_level == 0 )
 		) {
 			
-			return array(
-				'lock' => false,
-				'reason' => 'post_is_public',
-			);
-			
+			return apply_filters( 
+				'ptrn/lock_or_not', 
+				array(
+					'lock' => false,
+					'reason' => 'post_is_public',
+				),
+				$post_id, 
+				$declined,
+				$user 
+			);			
 		}
 		
 		// If we are at this point, then this post is protected. 
@@ -852,19 +876,31 @@ class Patreon_Wordpress {
 
 		if ( apply_filters( 'ptrn/bypass_filtering', defined( 'PATREON_BYPASS_FILTERING' ) ) ) {
 			
-			return array(
-				'lock'   => false,
-				'reason' => 'lock_bypassed_by_filter',
-			);
-			
+			return apply_filters( 
+				'ptrn/lock_or_not', 
+				array(
+					'lock' => false,
+					'reason' => 'lock_bypassed_by_filter',
+				),
+				$post_id, 
+				$declined,
+				$user 
+			);					
 		}
 		 
 		if ( current_user_can( 'manage_options' ) ) {
 			
 			// Here we need to put a notification to admins so they will know they can see the content because they are admin_login_with_patreon_disabled
-			return array(
-				'lock' => false,
-				'reason' => 'show_to_admin_users',
+
+			return apply_filters( 
+				'ptrn/lock_or_not', 
+				array(
+					'lock' => false,
+					'reason' => 'show_to_admin_users',
+				),
+				$post_id, 
+				$declined,
+				$user 
 			);
 			
 		}
@@ -874,14 +910,7 @@ class Patreon_Wordpress {
 		if ( $post_level !=0 ) {
 			$patreon_level = $post_level;
 		}
-		 
-		$user                           = wp_get_current_user();
-		$user_pledge_relationship_start = Patreon_Wordpress::get_user_pledge_relationship_start( $user );
-		$user_patronage                 = Patreon_Wordpress::getUserPatronage( $user );
-		$is_patron                      = Patreon_Wordpress::isPatron( $user );
-		$user_lifetime_patronage        = Patreon_Wordpress::get_user_lifetime_patronage( $user );
-		$declined                       = Patreon_Wordpress::checkDeclinedPatronage( $user );
-				
+		
 		// Check if post was set for active patrons only
 		$patreon_active_patrons_only = get_post_meta( $post->ID, 'patreon-active-patrons-only', true );
 		
