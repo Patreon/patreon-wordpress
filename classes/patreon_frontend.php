@@ -534,7 +534,13 @@ class Patreon_Frontend {
 		$redirect_uri           = site_url() . '/patreon-authorization/';
 		$v2_params = '&scope=identity%20identity[email]';
 		
-		$pledge_level = apply_filters( 'ptrn/patron_link_pledge_level', $pledge_level );
+		$send_post_id = false;
+		
+		if ( $post ) {
+			$send_post_id = $post->ID;
+		}
+		 
+		$pledge_level = apply_filters( 'ptrn/patron_link_pledge_level', $pledge_level, $send_post_id, $args );
 		
 		$href = 'https://www.patreon.com/oauth2/become-patron?response_type=code&min_cents=' . $pledge_level . '&client_id=' . $client_id . $v2_params . '&redirect_uri=' . $redirect_uri . '&state=' . urlencode( base64_encode( serialize( $state ) ) );
 
