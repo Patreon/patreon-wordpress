@@ -13,7 +13,6 @@ class Patreon_Routing {
 		add_filter( 'query_vars', array( $this, 'query_vars' ) );
 		add_action( 'parse_request', array( $this, 'parse_request' ) );
 		add_action( 'init', array( $this, 'force_rewrite_rules' ) );
-		add_action( 'init', array( $this,'set_patreon_nonce' ), 1);
 		
 	}
 
@@ -73,18 +72,6 @@ class Patreon_Routing {
 		array_push( $public_query_vars, 'state' );
 		array_push( $public_query_vars, 'patreon-redirect' );
 		return $public_query_vars;
-		
-	}
-
-	function set_patreon_nonce() {
-		
-		if( isset( $_COOKIE['patreon_nonce'] ) == false ) {
-			
-			$nonce = md5( bin2hex( openssl_random_pseudo_bytes( 32 ) . md5( time() ) . openssl_random_pseudo_bytes( 32 ) ) );
-			setcookie( 'patreon_nonce', $nonce, 0, COOKIEPATH, COOKIE_DOMAIN );
-			$_COOKIE['patreon_nonce'] = $nonce;
-			
- 		}
 		
 	}
 
@@ -338,16 +325,7 @@ class Patreon_Routing {
 				}		
 			
 				$redirect = apply_filters( 'ptrn/redirect', $redirect );		
-	
-				if( $state['patreon_nonce'] != $_COOKIE['patreon_nonce'] ) {
 					
-					// Nonces do not match. Abort, show message.
-					$redirect = add_query_arg( 'patreon_message', 'patreon_nonces_dont_match', $redirect );
-					wp_redirect( $redirect );
-					exit;
-					
-				}
-				
 				if( get_option( 'patreon-client-id', false ) == false || get_option( 'patreon-client-secret', false ) == false ) {
 
 					/* redirect to homepage because of oauth client_id or secure_key error  */

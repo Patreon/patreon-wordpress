@@ -28,7 +28,6 @@ class Patreon_Frontend {
 		self::$messages_map = array(
 			'patreon_cant_login_strict_oauth'            => PATREON_CANT_LOGIN_STRICT_OAUTH,		
 			'login_with_wordpress'                       => PATREON_LOGIN_WITH_WORDPRESS_NOW,		
-			'patreon_nonces_dont_match'                  => PATREON_CANT_LOGIN_NONCES_DONT_MATCH,		
 			'patreon_cant_login_api_error'               => PATREON_CANT_LOGIN_DUE_TO_API_ERROR,		
 			'patreon_cant_login_api_error_credentials'   => PATREON_CANT_LOGIN_DUE_TO_API_ERROR_CHECK_CREDENTIALS,
 			'patreon_no_locking_level_set_for_this_post' => PATREON_NO_LOCKING_LEVEL_SET_FOR_THIS_POST,
@@ -642,8 +641,6 @@ class Patreon_Frontend {
 			
 		}
 		
-		// Add the patreon nonce that was set via init function to vars.
-		$state['patreon_nonce'] = $_COOKIE['patreon_nonce'];
 		$redirect_uri           = site_url() . '/patreon-authorization/';
 		$v2_params = '&scope=' . 'identity+' . urlencode( 'identity[email]' );
 		
@@ -689,7 +686,7 @@ class Patreon_Frontend {
 		
 		$href = self::patreonMakeCacheableLoginLink( $client_id );
 
-		return apply_filters( 'ptrn/login_button', '<a href="' . $href . '" class="ptrn-login" data-ptrn_nonce="' . wp_create_nonce( 'patreon-nonce' ) . '"><div class="patreon-responsive-button-wrapper"><div class="patreon-responsive-button"><img class="patreon_logo" src="' . PATREON_PLUGIN_ASSETS . '/img/patreon-logomark-on-coral.svg" alt=""> ' . $login_label . '</div></div></a>', $href );
+		return apply_filters( 'ptrn/login_button', '<a href="' . $href . '" class="ptrn-login"><div class="patreon-responsive-button-wrapper"><div class="patreon-responsive-button"><img class="patreon_logo" src="' . PATREON_PLUGIN_ASSETS . '/img/patreon-logomark-on-coral.svg" alt=""> ' . $login_label . '</div></div></a>', $href );
 
 	}
 	public static function lock_this_post( $post = false ) {
