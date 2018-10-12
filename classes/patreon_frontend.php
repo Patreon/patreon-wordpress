@@ -81,6 +81,15 @@ class Patreon_Frontend {
 		global $wp;
 		global $post;
 		
+		// Allow 3rd party plugins to override interface - this will abort interface generation and replace it with the code that returns from this filter, and also allow 3rd party code to still apply rest of this function's filters without causing recursion
+		
+		$override_interface = array();
+		$override_interface = apply_filters( 'ptrn/override_interface_template', $patreon_level, $args );
+		
+		if ( isset( $override_interface['override'] ) ) {
+			return $override_interface['interface'];			
+		}
+		
 		// Get the post from post id if it is supplied
 		if ( isset( $args['post_id'] ) ) {
 			$post = get_post( $args['post_id'] );			
@@ -842,6 +851,16 @@ class Patreon_Frontend {
 			
 		}
 		
+		// Allow addons to override this function - this will bypass this function, but also will allow addons to apply this function's filters in their own gating function to keep compatibility with other addons
+		
+		$override_content_filtering = array();
+		
+		$override_content_filtering = apply_filters( 'ptrn/override_content_filtering', $content, $post_id, $override_content_filtering );
+		
+		if ( isset( $override_content_filtering['override'] ) ) {
+			return $override_content_filtering['content'];			
+		}
+		
 		// Just bail out if this is not the main query for content and there still isnt a post id
 		if ( !is_main_query() AND !$post_id ) {
 			return $content;
@@ -877,7 +896,7 @@ class Patreon_Frontend {
 			// // If client id exists. Do the banner. If not, no point in protecting since we wont be able to send people to patronage. If so dont modify normal content.
 			
 			if ( $client_id ) {
-				
+			
 				$content = self::displayPatreonCampaignBanner( $patreon_level, $lock_or_not );
 				$content = apply_filters( 'ptrn/post_content', $content, $patreon_level, $user_patronage, $lock_or_not );
 				
@@ -886,7 +905,7 @@ class Patreon_Frontend {
 			}
 		}
 		
-		if ( !$hide_content AND $lock_or_not['reason'] == 'post_is_not_locked' ) {
+		if ( !$hide_content AND $lock_or_not['reason'] == 'post_is_public' ) {
 			// This is not a locked post. Return content without any footer
 			return $content;
 		}

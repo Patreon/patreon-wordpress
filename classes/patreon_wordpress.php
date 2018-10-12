@@ -948,7 +948,7 @@ class Patreon_Wordpress {
 			|| $declined ) AND is_user_logged_in() ) {
 				
 			$hide_content = false;
-			
+			$reason = 'valid_patron';
 			// Seems valid patron. Lets see if active patron option was set and the user fulfills it
 			
 			if ( $patreon_active_patrons_only == '1'
@@ -979,7 +979,7 @@ class Patreon_Wordpress {
 			'user_active_pledge'           => $user_patronage,
 			'user_total_historical_pledge' => $user_lifetime_patronage,
 		); 
-		
+
 		return apply_filters( 'ptrn/lock_or_not', $result, $post_id, $declined, $user );
 		
 	}
