@@ -79,7 +79,6 @@ class Patreon_Frontend {
 	public static function displayPatreonCampaignBanner( $patreon_level = false, $args = false ) {
 
 		global $wp;
-		global $post;
 		
 		// Allow 3rd party plugins to override interface - this will abort interface generation and replace it with the code that returns from this filter, and also allow 3rd party code to still apply rest of this function's filters without causing recursion
 		
@@ -96,7 +95,8 @@ class Patreon_Frontend {
 		}
 		
 		if ( !$args OR !is_array( $args ) ) {
-			$args = array();
+			global $post;
+			$args = array();		
 		}
 		
 		$login_with_patreon = get_option( 'patreon-enable-login-with-patreon', false );
@@ -127,7 +127,6 @@ class Patreon_Frontend {
 			
 			// Hide the custom banner if no custom banner was saved
 			
-
 			if ( $custom_universal_banner AND $custom_universal_banner !='' ) {
 			
 				$contribution_required = apply_filters( 'ptrn/final_state_main_banner_message', '<div class="patreon-locked-content-message">' . $contribution_required . '</div>', $patreon_level, $post );
@@ -192,14 +191,37 @@ class Patreon_Frontend {
 		
 		if ( !$creator_full_name OR $creator_full_name == '' ) {
 			$creator_full_name = 'this creator';
-		}		
+		}
 		
-		// Merge the args array into lock_or_not results if args is given. For duplicate keys, use lock_or_not function's values
-		if ( $args AND is_array( $args ) ) {
-			$args = Patreon_Wordpress::lock_or_not() + $args;
+		// Get lock or not details if it is not given. If post id given, use it. 
+		if ( !isset( $args['lock'] ) ) {
+			
+			if ( isset( $args['post_id'] ) ) {
+				$lock_or_not = Patreon_Wordpress::lock_or_not( $args['post_id'] );
+			}
+			else {
+				$lock_or_not = Patreon_Wordpress::lock_or_not();
+			}
+		}
+		
+		// If lock or not details were not given, merge the incoming args with what we just got.
+		if( $args AND is_array( $args ) AND !isset( $args['lock'] ) ) {
+			$args = $lock_or_not + $args;
+		}
+		
+		// If no args given, just feed lock or not:
+		
+		if ( !isset( $args ) ) {
+			$args = $lock_or_not;
+		}			
+		
+		$post_id = false;
+		
+		if ( isset( $args['post_id'] ) ) {
+			$post = get_post( $args['post_id'] );
 		}
 		else {
-			$args = Patreon_Wordpress::lock_or_not();
+			global $post;
 		}
 		
 		if ( $args['reason'] == 'user_not_logged_in' ) {
@@ -283,7 +305,7 @@ class Patreon_Frontend {
 		
 		$label = str_replace( '%%creator%%', $creator_full_name, $label );
 		$label = str_replace( '%%pledgelevel%%', $patreon_level, $label );
-		$label = str_replace( '%%flow_link%%', self::patreonMakeCacheableFlowLink(), $label );
+		$label = str_replace( '%%flow_link%%', self::patreonMakeCacheableFlowLink( $post ), $label );
 		$label = str_replace( '%%total_pledge%%', $post_total_patronage_level, $label );
 	
 		return $messages . apply_filters( 'ptrn/label_text_over_universal_button', str_replace( '%%pledgelevel%%',$patreon_level, $label ), $args['reason'], $user_logged_into_patreon, $is_patron, $patreon_level, $args );
@@ -306,12 +328,20 @@ class Patreon_Frontend {
 			$creator_full_name = 'this creator';
 		}
 		
-		// Merge the args array into lock_or_not results if args is given. For duplicate keys, use lock_or_not function's values
-		if ( $args AND is_array( $args ) ) {
-			$args = Patreon_Wordpress::lock_or_not() + $args;
+		// Get lock or not details if it is not given. If post id given, use it. 
+		if ( !isset( $args['lock'] ) ) {
+			
+			if ( isset( $args['post_id'] ) ) {
+				$lock_or_not = Patreon_Wordpress::lock_or_not( $args['post_id'] );
+			}
+			else {
+				$lock_or_not = Patreon_Wordpress::lock_or_not();
+			}
 		}
-		else {
-			$args = Patreon_Wordpress::lock_or_not();
+		
+		// If lock or not details were not given, merge the incoming args with what we just got.
+		if( $args AND is_array( $args ) AND !isset( $args['lock'] ) ) {
+			$args = $lock_or_not + $args;
 		}
 				
 		if ( $args['reason'] == 'not_a_patron' ) {
@@ -884,6 +914,8 @@ class Patreon_Frontend {
 		if ( isset( $lock_or_not['user_active_pledge'] ) ) {
 			$user_patronage = $lock_or_not['user_active_pledge'];
 		}
+		
+		$lock_or_not['post_id'] = $post_id;
 
 		if ( $hide_content ) {
 			
@@ -946,14 +978,27 @@ class Patreon_Frontend {
 			$creator_full_name = 'this creator';
 		}
 		
-		// Merge the args array into lock_or_not results if args is given. For duplicate keys, use lock_or_not function's values
-		if ( $args AND is_array( $args ) ) {
-			$args = Patreon_Wordpress::lock_or_not() + $args;
+		// Get lock or not details if it is not given. If post id given, use it. 
+		if ( !isset( $args['lock'] ) ) {
+			
+			if ( isset( $args['post_id'] ) ) {
+				$lock_or_not = Patreon_Wordpress::lock_or_not( $args['post_id'] );
+			}
+			else {
+				$lock_or_not = Patreon_Wordpress::lock_or_not();
+			}
 		}
-		else {
-			$args = Patreon_Wordpress::lock_or_not();
+		
+		// If lock or not details were not given, merge the incoming args with what we just got.
+		if( $args AND is_array( $args ) AND !isset( $args['lock'] ) ) {
+			$args = $lock_or_not + $args;
 		}
-	
+		
+		// If no args given, just feed lock or not:
+		
+		if ( !isset( $args ) ) {
+			$args = $lock_or_not;
+		}	
 	
 		if ( isset( $args['patreon_active_patrons_only'] ) AND $args['patreon_active_patrons_only'] == 1 ) {
 			$label = PATREON_TEXT_OVER_BUTTON_11;
