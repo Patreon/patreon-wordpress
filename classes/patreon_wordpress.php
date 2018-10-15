@@ -23,6 +23,7 @@ class Patreon_Wordpress {
 	public static $current_user_patronage_duration = -1;
 	public static $current_user_lifetime_patronage = -1;
 	public static $current_user_pledge_relationship_start = -1;
+	public static $lock_or_not = -1;
 
 	function __construct() {
 
@@ -782,6 +783,10 @@ class Patreon_Wordpress {
 		
 	}
 	public static function lock_or_not( $post_id = false ) {
+		
+		if ( self::$lock_or_not != -1 ) {
+			return self::$lock_or_not;
+		}		
 
 		$user                           = wp_get_current_user();
 		$user_pledge_relationship_start = Patreon_Wordpress::get_user_pledge_relationship_start( $user );
@@ -979,8 +984,8 @@ class Patreon_Wordpress {
 			'user_active_pledge'           => $user_patronage,
 			'user_total_historical_pledge' => $user_lifetime_patronage,
 		); 
-
-		return apply_filters( 'ptrn/lock_or_not', $result, $post_id, $declined, $user );
+		self::$lock_or_not = $result;
+		return apply_filters( 'ptrn/lock_or_not', self::$lock_or_not, $post_id, $declined, $user );
 		
 	}
 	
