@@ -303,7 +303,7 @@ class Patreon_Wordpress {
 			
 		}
 		
-		return false;
+		return $user_response;
 		
 	}
 	public static function refresh_creator_access_token() {
