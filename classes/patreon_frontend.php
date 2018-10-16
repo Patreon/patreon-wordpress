@@ -85,7 +85,7 @@ class Patreon_Frontend {
 		$override_interface = array();
 		$override_interface = apply_filters( 'ptrn/override_interface_template', $patreon_level, $args );
 		
-		if ( isset( $override_interface['override'] ) ) {
+		if ( is_array( $override_interface ) AND isset( $override_interface['override'] ) ) {
 			return $override_interface['interface'];			
 		}
 		
@@ -887,7 +887,7 @@ class Patreon_Frontend {
 		
 		$override_content_filtering = apply_filters( 'ptrn/override_content_filtering', $content, $post_id );
 		
-		if ( isset( $override_content_filtering['override'] ) ) {
+		if ( is_array($override_content_filtering) AND isset( $override_content_filtering['override'] ) ) {
 			return $override_content_filtering['content'];			
 		}
 		
