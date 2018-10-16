@@ -885,7 +885,7 @@ class Patreon_Frontend {
 		
 		$override_content_filtering = array();
 		
-		$override_content_filtering = apply_filters( 'ptrn/override_content_filtering', $content, $post_id, $override_content_filtering );
+		$override_content_filtering = apply_filters( 'ptrn/override_content_filtering', $content, $post_id );
 		
 		if ( isset( $override_content_filtering['override'] ) ) {
 			return $override_content_filtering['content'];			
