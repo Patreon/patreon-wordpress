@@ -49,6 +49,7 @@ class Patreon_Wordpress {
 		add_action( 'wp_head', array( $this, 'updatePatreonUser' ) );
 		add_action( 'init', array( $this, 'checkPatreonCreatorID' ) );
 		add_action( 'init', array( $this, 'check_creator_token_expiration' ) );
+		add_action( 'init', array( $this, 'update_option_patreon-creators-access-token' ), array( $this, 'update_creator_access_token_refresh_toggle' ) );
 		add_action( 'init', array( $this, 'checkPatreonCampaignID' ) );
 		add_action( 'init', array( $this, 'checkPatreonCreatorURL' ) );
 		add_action( 'init', array( $this, 'checkPatreonCreatorName' ) );
@@ -337,16 +338,23 @@ class Patreon_Wordpress {
 		}
 		
 		$expiration = get_option( 'patreon-creators-refresh-token-expiration', false );
+		$recently_saved = get_option( 'patreon-wordpress-creator-access-token-recently-saved', false );
 		
-		if ( !$expiration OR $expiration <= time() ) {
+		// Attempt to refresh the token if the token expiration is not found or token is expired, but only if the token was not just saved.
+		
+		if ( ( !$expiration OR $expiration <= time() ) AND !$recently_saved) {
+			
 			if ( $tokens = self::refresh_creator_access_token() ) {
 				
 				update_option( 'patreon-creators-refresh-token-expiration', time() + $tokens['expires_in'] );
 				update_option( 'patreon-creators-access-token-scope', $tokens['scope'] );
+				delete_option( 'patreon-wordpress-creator-access-token-recently-saved' );
 				
 				return true;
 			}
 		}
+		
+		delete_option( 'patreon-wordpress-creator-access-token-recently-saved' );
 		
 		return false;
 	}
@@ -760,6 +768,13 @@ class Patreon_Wordpress {
 			delete_option( 'patreon-wordpress-update-available');
 		}
 
+	}
+	public function update_creator_access_token_refresh_toggle() {
+		
+		// This function fires when creator's access token is updated by saving it in plugin options and takes a note of that - so that creator's access token refresh wont fire immediately for new installations, leading to the token being refreshed at patreon and saved with refreshed value but the register clients page at Patreon which users has open in browser showing the old value - this can be revisited later
+		
+		update_option( 'patreon-wordpress-creator-access-token-recently-saved', true);
+		
 	}
 	public function toggle_option() {
 		
