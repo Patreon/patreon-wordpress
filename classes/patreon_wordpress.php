@@ -913,6 +913,8 @@ class Patreon_Wordpress {
 		$is_patron                      = Patreon_Wordpress::isPatron( $user );
 		$user_lifetime_patronage        = Patreon_Wordpress::get_user_lifetime_patronage( $user );
 		$declined                       = Patreon_Wordpress::checkDeclinedPatronage( $user );
+		$declined                       = Patreon_Wordpress::checkDeclinedPatronage( $user );
+		$active_patron_at_post_date     = false;
 		
 		// Just bail out if this is not the main query for content and no post id was given
 		if ( !is_main_query() AND !$post_id ) {
@@ -1079,6 +1081,11 @@ class Patreon_Wordpress {
 			AND $user_pledge_relationship_start >= strtotime( get_the_date( '', $post->ID ) ) ) {
 				$hide_content = true;
 				$reason = 'not_active_patron_at_post_date';
+				$active_patron_at_post_date = false;
+			}
+			else {
+				$hide_content = false;
+				$active_patron_at_post_date = true;
 			}
 			
 		}
@@ -1099,6 +1106,7 @@ class Patreon_Wordpress {
 			'patreon_level'                => $patreon_level,
 			'post_total_patronage_level'   => $post_total_patronage_level,
 			'patreon_active_patrons_only'  => $patreon_active_patrons_only,
+			'active_patron_at_post_date'   => $active_patron_at_post_date,
 			'user_is_patron'               => $is_patron,
 			'user_active_pledge'           => $user_patronage,
 			'user_total_historical_pledge' => $user_lifetime_patronage,
