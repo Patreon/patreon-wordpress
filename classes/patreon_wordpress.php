@@ -48,6 +48,11 @@ class Patreon_Wordpress {
 
 		add_action( 'wp_head', array( $this, 'updatePatreonUser' ) );
 		add_action( 'init', array( $this, 'checkPatreonCreatorID' ) );
+		add_action( 'admin_init', array( $this, 'post_credential_update_api_connectivity_check' ) );
+		add_action( 'update_option_patreon-client-id', array( $this, 'toggle_check_api_credentials_on_setting_save' ), 10, 2 );
+		add_action( 'update_option_patreon-client-secret', array( $this, 'toggle_check_api_credentials_on_setting_save' ), 10, 2 );
+		add_action( 'update_option_patreon-creators-access-token', array( $this, 'toggle_check_api_credentials_on_setting_save' ), 10, 2 );
+		add_action( 'update_option_patreon-creators-refresh-token', array( $this, 'toggle_check_api_credentials_on_setting_save' ), 10, 2 );
 		add_action( 'init', array( $this, 'check_creator_token_expiration' ) );
 		add_action( 'init', array( $this, 'checkPatreonCampaignID' ) );
 		add_action( 'init', array( $this, 'checkPatreonCreatorURL' ) );
@@ -732,6 +737,30 @@ class Patreon_Wordpress {
 			
 		}
 		
+		if( get_option( 'patreon-wordpress-app-credentials-success', false ) ) {
+			
+			?>
+				 <div class="notice notice-success is-dismissible patreon-wordpress" id="patreon-wordpress-update-available">
+				 <h3>Your Patreon client details were successfully saved!</h3>
+					<p>Patreon WordPress is now ready to go and your site is connected to Patreon! You can now lock any content by using the "Patreon Level" meta box in your post editor!</p>
+				</div>
+			<?php
+			
+			delete_option( 'patreon-wordpress-app-credentials-success' );
+		}
+		
+		if( get_option( 'patreon-wordpress-app-credentials-failure', false ) ) {
+			
+			?>
+				 <div class="notice notice-error is-dismissible patreon-wordpress" id="patreon-wordpress-update-available">
+				 <h3>Sorry - couldn't connect your site to Patreon</h3>
+					<p>Patreon WordPress wasn't able to contact Patreon with the app details you provided. This may be because there is an error in the app details, or because there is something preventing proper connectivity in between your site/server and Patreon API. You can get help by visiting our support forum <a href="https://www.patreondevelopers.com/c/patreon-wordpress-plugin-support" target="_blank">here</a></p>
+				</div>
+			<?php
+			
+			delete_option( 'patreon-wordpress-app-credentials-failure' );
+		}
+		
 	}
 	public function check_for_update($plugin_check_data) {
 		global $wp_version, $plugin_version, $plugin_base;
@@ -761,6 +790,96 @@ class Patreon_Wordpress {
 		}
 
 	}
+	public function toggle_check_api_credentials_on_setting_save(  $old_value, $new_value ) {
+		
+		// This function fires after any of the client details are updated. 
+		
+		if ( !( is_admin() AND current_user_can( 'manage_options' ) ) ) {
+			return;			
+		}
+
+		// This filter only runs when settings are actually updated, but just in case:
+		// Try contacting the api 
+		if( $new_value != $old_value ) {
+
+			// One of access credentials were updated. Set a flag to do an api connectivity check
+			update_option( 'patreon-wordpress-do-api-connectivity-check', 1 );
+			
+		}
+				
+	}
+
+	public function post_credential_update_api_connectivity_check() {
+
+		// This function checks if the saved app credentials are valid if the check toggle is set
+		
+		if ( !( is_admin() AND current_user_can( 'manage_options' ) ) ) {
+			return;			
+		}
+
+		if( get_option( 'patreon-wordpress-do-api-connectivity-check', false ) ) {
+			
+			$result = self::check_api_connection();
+			delete_option( 'patreon-wordpress-do-api-connectivity-check' );
+		}
+				
+	}
+	
+	public static function check_api_connection() {
+		// Just attempts to connect to API with given credentials, and returns result
+		
+		$api_client    = new Patreon_API( get_option( 'patreon-creators-access-token' , false ) );
+        $user_response = $api_client->fetch_creator_info();
+		
+		$creator_access = false;
+		$client_access = false;
+		
+		if ( isset( $user_response['included'][0]['id'] ) AND $user_response['included'][0]['id'] != '' ) {
+			// Got creator id. Credentials must be valid
+			
+			// Success - set flag
+			// update_option( 'patreon-wordpress-app-credentials-success', 1 );
+			
+			$creator_access = true;
+			
+		}
+		
+		// Try to do a creator's token refresh
+	
+		if ( $tokens = self::refresh_creator_access_token() ) {
+			
+			update_option( 'patreon-creators-refresh-token-expiration', time() + $tokens['expires_in'] );
+			update_option( 'patreon-creators-access-token-scope', $tokens['scope'] );
+			
+			// Try again:
+			
+			$api_client    = new Patreon_API( get_option( 'patreon-creators-access-token' , false ) );
+			$user_response = $api_client->fetch_creator_info();
+			
+			if ( isset( $user_response['included'][0]['id'] ) AND $user_response['included'][0]['id'] != '' ) {
+				
+				// Got creator id. Credentials must be valid
+				// Success - set flag
+				
+				$creator_access = true;
+				
+			}			
+			
+		}
+		
+		// Here some check for client id and secret may be entered in future - currently only checks creator access token 
+		
+		if ( $creator_access ) {
+			
+			update_option( 'patreon-wordpress-app-credentials-success', 1 );	
+			return;
+		}
+		
+		// All flopped. Set failure flag
+		update_option( 'patreon-wordpress-app-credentials-failure', 1 );	
+		
+	}
+	
 	public function toggle_option() {
 		
 		if( !( is_admin() && current_user_can( 'manage_options' ) ) ) {
