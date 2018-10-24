@@ -23,6 +23,7 @@ class Patreon_Wordpress {
 	public static $current_user_patronage_duration = -1;
 	public static $current_user_lifetime_patronage = -1;
 	public static $current_user_pledge_relationship_start = -1;
+	public static $lock_or_not = -1;
 
 	function __construct() {
 
@@ -47,6 +48,11 @@ class Patreon_Wordpress {
 
 		add_action( 'wp_head', array( $this, 'updatePatreonUser' ) );
 		add_action( 'init', array( $this, 'checkPatreonCreatorID' ) );
+		add_action( 'admin_init', array( $this, 'post_credential_update_api_connectivity_check' ) );
+		add_action( 'update_option_patreon-client-id', array( $this, 'toggle_check_api_credentials_on_setting_save' ), 10, 2 );
+		add_action( 'update_option_patreon-client-secret', array( $this, 'toggle_check_api_credentials_on_setting_save' ), 10, 2 );
+		add_action( 'update_option_patreon-creators-access-token', array( $this, 'toggle_check_api_credentials_on_setting_save' ), 10, 2 );
+		add_action( 'update_option_patreon-creators-refresh-token', array( $this, 'toggle_check_api_credentials_on_setting_save' ), 10, 2 );
 		add_action( 'init', array( $this, 'check_creator_token_expiration' ) );
 		add_action( 'init', array( $this, 'checkPatreonCampaignID' ) );
 		add_action( 'init', array( $this, 'checkPatreonCreatorURL' ) );
@@ -302,7 +308,7 @@ class Patreon_Wordpress {
 			
 		}
 		
-		return false;
+		return $user_response;
 		
 	}
 	public static function refresh_creator_access_token() {
@@ -731,6 +737,30 @@ class Patreon_Wordpress {
 			
 		}
 		
+		if( get_option( 'patreon-wordpress-app-credentials-success', false ) ) {
+			
+			?>
+				 <div class="notice notice-success is-dismissible patreon-wordpress" id="patreon-wordpress-update-available">
+				 <h3>Your Patreon client details were successfully saved!</h3>
+					<p>Patreon WordPress is now ready to go and your site is connected to Patreon! You can now lock any content by using the "Patreon Level" meta box in your post editor!</p>
+				</div>
+			<?php
+			
+			delete_option( 'patreon-wordpress-app-credentials-success' );
+		}
+		
+		if( get_option( 'patreon-wordpress-app-credentials-failure', false ) ) {
+			
+			?>
+				 <div class="notice notice-error is-dismissible patreon-wordpress" id="patreon-wordpress-update-available">
+				 <h3>Sorry - couldn't connect your site to Patreon</h3>
+					<p>Patreon WordPress wasn't able to contact Patreon with the app details you provided. This may be because there is an error in the app details, or because there is something preventing proper connectivity in between your site/server and Patreon API. You can get help by visiting our support forum <a href="https://www.patreondevelopers.com/c/patreon-wordpress-plugin-support" target="_blank">here</a></p>
+				</div>
+			<?php
+			
+			delete_option( 'patreon-wordpress-app-credentials-failure' );
+		}
+		
 	}
 	public function check_for_update($plugin_check_data) {
 		global $wp_version, $plugin_version, $plugin_base;
@@ -760,6 +790,96 @@ class Patreon_Wordpress {
 		}
 
 	}
+	public function toggle_check_api_credentials_on_setting_save(  $old_value, $new_value ) {
+		
+		// This function fires after any of the client details are updated. 
+		
+		if ( !( is_admin() AND current_user_can( 'manage_options' ) ) ) {
+			return;			
+		}
+
+		// This filter only runs when settings are actually updated, but just in case:
+		// Try contacting the api 
+		if( $new_value != $old_value ) {
+
+			// One of access credentials were updated. Set a flag to do an api connectivity check
+			update_option( 'patreon-wordpress-do-api-connectivity-check', 1 );
+			
+		}
+				
+	}
+
+	public function post_credential_update_api_connectivity_check() {
+
+		// This function checks if the saved app credentials are valid if the check toggle is set
+		
+		if ( !( is_admin() AND current_user_can( 'manage_options' ) ) ) {
+			return;			
+		}
+
+		if( get_option( 'patreon-wordpress-do-api-connectivity-check', false ) ) {
+			
+			$result = self::check_api_connection();
+			delete_option( 'patreon-wordpress-do-api-connectivity-check' );
+		}
+				
+	}
+	
+	public static function check_api_connection() {
+		// Just attempts to connect to API with given credentials, and returns result
+		
+		$api_client    = new Patreon_API( get_option( 'patreon-creators-access-token' , false ) );
+        $user_response = $api_client->fetch_creator_info();
+		
+		$creator_access = false;
+		$client_access = false;
+		
+		if ( isset( $user_response['included'][0]['id'] ) AND $user_response['included'][0]['id'] != '' ) {
+			// Got creator id. Credentials must be valid
+			
+			// Success - set flag
+			// update_option( 'patreon-wordpress-app-credentials-success', 1 );
+			
+			$creator_access = true;
+			
+		}
+		
+		// Try to do a creator's token refresh
+	
+		if ( $tokens = self::refresh_creator_access_token() ) {
+			
+			update_option( 'patreon-creators-refresh-token-expiration', time() + $tokens['expires_in'] );
+			update_option( 'patreon-creators-access-token-scope', $tokens['scope'] );
+			
+			// Try again:
+			
+			$api_client    = new Patreon_API( get_option( 'patreon-creators-access-token' , false ) );
+			$user_response = $api_client->fetch_creator_info();
+			
+			if ( isset( $user_response['included'][0]['id'] ) AND $user_response['included'][0]['id'] != '' ) {
+				
+				// Got creator id. Credentials must be valid
+				// Success - set flag
+				
+				$creator_access = true;
+				
+			}			
+			
+		}
+		
+		// Here some check for client id and secret may be entered in future - currently only checks creator access token 
+		
+		if ( $creator_access ) {
+			
+			update_option( 'patreon-wordpress-app-credentials-success', 1 );	
+			return;
+		}
+		
+		// All flopped. Set failure flag
+		update_option( 'patreon-wordpress-app-credentials-failure', 1 );	
+		
+	}
+	
 	public function toggle_option() {
 		
 		if( !( is_admin() && current_user_can( 'manage_options' ) ) ) {
@@ -783,13 +903,32 @@ class Patreon_Wordpress {
 	}
 	public static function lock_or_not( $post_id = false ) {
 		
+		if ( self::$lock_or_not != -1 ) {
+			return self::$lock_or_not;
+		}		
+
+		$user                           = wp_get_current_user();
+		$user_pledge_relationship_start = Patreon_Wordpress::get_user_pledge_relationship_start( $user );
+		$user_patronage                 = Patreon_Wordpress::getUserPatronage( $user );
+		$is_patron                      = Patreon_Wordpress::isPatron( $user );
+		$user_lifetime_patronage        = Patreon_Wordpress::get_user_lifetime_patronage( $user );
+		$declined                       = Patreon_Wordpress::checkDeclinedPatronage( $user );
+		$declined                       = Patreon_Wordpress::checkDeclinedPatronage( $user );
+		$active_patron_at_post_date     = false;
+		
 		// Just bail out if this is not the main query for content and no post id was given
 		if ( !is_main_query() AND !$post_id ) {
 			
-			return array(
-				'lock' => false,
-				'reason' => 'no_post_id_no_main_query',
-			);
+			return apply_filters( 
+				'ptrn/lock_or_not', 
+				array(
+					'lock' => false,
+					'reason' => 'no_post_id_no_main_query',
+				),
+				$post_id, 
+				$declined,
+				$user 
+			);			
 			
 		}
 		
@@ -809,9 +948,15 @@ class Patreon_Wordpress {
 
 		if ( in_array( get_post_type( $post->ID ), $exclude ) ) {
 			
-			return array(
-				'lock' => false,
-				'reason' => 'post_type_excluded_from_locking',
+			return apply_filters( 
+				'ptrn/lock_or_not', 
+				array(
+					'lock' => false,
+					'reason' => 'post_type_excluded_from_locking',
+				),
+				$post_id, 
+				$declined,
+				$user 
 			);
 			
 		}
@@ -837,11 +982,16 @@ class Patreon_Wordpress {
 				|| $patreon_level == 0 )
 		) {
 			
-			return array(
-				'lock' => false,
-				'reason' => 'post_is_public',
-			);
-			
+			return apply_filters( 
+				'ptrn/lock_or_not', 
+				array(
+					'lock' => false,
+					'reason' => 'post_is_public',
+				),
+				$post_id, 
+				$declined,
+				$user 
+			);			
 		}
 		
 		// If we are at this point, then this post is protected. 
@@ -852,19 +1002,31 @@ class Patreon_Wordpress {
 
 		if ( apply_filters( 'ptrn/bypass_filtering', defined( 'PATREON_BYPASS_FILTERING' ) ) ) {
 			
-			return array(
-				'lock'   => false,
-				'reason' => 'lock_bypassed_by_filter',
-			);
-			
+			return apply_filters( 
+				'ptrn/lock_or_not', 
+				array(
+					'lock' => false,
+					'reason' => 'lock_bypassed_by_filter',
+				),
+				$post_id, 
+				$declined,
+				$user 
+			);					
 		}
 		 
 		if ( current_user_can( 'manage_options' ) ) {
 			
 			// Here we need to put a notification to admins so they will know they can see the content because they are admin_login_with_patreon_disabled
-			return array(
-				'lock' => false,
-				'reason' => 'show_to_admin_users',
+
+			return apply_filters( 
+				'ptrn/lock_or_not', 
+				array(
+					'lock' => false,
+					'reason' => 'show_to_admin_users',
+				),
+				$post_id, 
+				$declined,
+				$user 
 			);
 			
 		}
@@ -874,14 +1036,7 @@ class Patreon_Wordpress {
 		if ( $post_level !=0 ) {
 			$patreon_level = $post_level;
 		}
-		 
-		$user                           = wp_get_current_user();
-		$user_pledge_relationship_start = Patreon_Wordpress::get_user_pledge_relationship_start( $user );
-		$user_patronage                 = Patreon_Wordpress::getUserPatronage( $user );
-		$is_patron                      = Patreon_Wordpress::isPatron( $user );
-		$user_lifetime_patronage        = Patreon_Wordpress::get_user_lifetime_patronage( $user );
-		$declined                       = Patreon_Wordpress::checkDeclinedPatronage( $user );
-				
+		
 		// Check if post was set for active patrons only
 		$patreon_active_patrons_only = get_post_meta( $post->ID, 'patreon-active-patrons-only', true );
 		
@@ -919,13 +1074,18 @@ class Patreon_Wordpress {
 			|| $declined ) AND is_user_logged_in() ) {
 				
 			$hide_content = false;
-			
+			$reason = 'valid_patron';
 			// Seems valid patron. Lets see if active patron option was set and the user fulfills it
 			
 			if ( $patreon_active_patrons_only == '1'
 			AND $user_pledge_relationship_start >= strtotime( get_the_date( '', $post->ID ) ) ) {
 				$hide_content = true;
 				$reason = 'not_active_patron_at_post_date';
+				$active_patron_at_post_date = false;
+			}
+			else {
+				$hide_content = false;
+				$active_patron_at_post_date = true;
 			}
 			
 		}
@@ -946,12 +1106,13 @@ class Patreon_Wordpress {
 			'patreon_level'                => $patreon_level,
 			'post_total_patronage_level'   => $post_total_patronage_level,
 			'patreon_active_patrons_only'  => $patreon_active_patrons_only,
+			'active_patron_at_post_date'   => $active_patron_at_post_date,
 			'user_is_patron'               => $is_patron,
 			'user_active_pledge'           => $user_patronage,
 			'user_total_historical_pledge' => $user_lifetime_patronage,
 		); 
-		
-		return apply_filters( 'ptrn/lock_or_not', $result, $post_id, $declined, $user );
+		self::$lock_or_not = $result;
+		return apply_filters( 'ptrn/lock_or_not', self::$lock_or_not, $post_id, $declined, $user );
 		
 	}
 	

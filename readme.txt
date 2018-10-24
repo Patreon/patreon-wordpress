@@ -132,6 +132,13 @@ It is  difficult to protect videos due the intensive bandwidth requirements of h
 * fetch_user call uses API v2 with v1 tokens without needing to upgrade to v2
 * fetch_creator_info uses still API v1 with v1 tokens - to be revisited in future
 * New routing case added to enable direct unlocks
+* Plugin now checks if the saved creator's access token is valid upon change/save of credentials, informs of success/failure
+* lock_or_not caches its results in a static var to prevent redundant running of code and to increase speed
+* Label generators for labels over and under universal button now accept post id and are usable outside loop
+* Case for valid patron return fixed
+* Undefined var/index notices fixed
+* MakeUniversalFlowLink now has a filter to allow filtering of links before sending user to Patreon flow
+* Lingering security cookie code removed
 * Numerous more minor fixes and changes
 
 = 1.1.2 =

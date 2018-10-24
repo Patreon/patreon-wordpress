@@ -28,7 +28,6 @@ class Patreon_Frontend {
 		self::$messages_map = array(
 			'patreon_cant_login_strict_oauth'            => PATREON_CANT_LOGIN_STRICT_OAUTH,		
 			'login_with_wordpress'                       => PATREON_LOGIN_WITH_WORDPRESS_NOW,		
-			'patreon_nonces_dont_match'                  => PATREON_CANT_LOGIN_NONCES_DONT_MATCH,		
 			'patreon_cant_login_api_error'               => PATREON_CANT_LOGIN_DUE_TO_API_ERROR,		
 			'patreon_cant_login_api_error_credentials'   => PATREON_CANT_LOGIN_DUE_TO_API_ERROR_CHECK_CREDENTIALS,
 			'patreon_no_locking_level_set_for_this_post' => PATREON_NO_LOCKING_LEVEL_SET_FOR_THIS_POST,
@@ -80,7 +79,15 @@ class Patreon_Frontend {
 	public static function displayPatreonCampaignBanner( $patreon_level = false, $args = false ) {
 
 		global $wp;
-		global $post;
+		
+		// Allow 3rd party plugins to override interface - this will abort interface generation and replace it with the code that returns from this filter, and also allow 3rd party code to still apply rest of this function's filters without causing recursion
+		
+		$override_interface = array();
+		$override_interface = apply_filters( 'ptrn/override_interface_template', $patreon_level, $args );
+		
+		if ( is_array( $override_interface ) AND isset( $override_interface['override'] ) ) {
+			return $override_interface['interface'];			
+		}
 		
 		// Get the post from post id if it is supplied
 		if ( isset( $args['post_id'] ) ) {
@@ -88,7 +95,8 @@ class Patreon_Frontend {
 		}
 		
 		if ( !$args OR !is_array( $args ) ) {
-			$args = array();
+			global $post;
+			$args = array();		
 		}
 		
 		$login_with_patreon = get_option( 'patreon-enable-login-with-patreon', false );
@@ -119,7 +127,6 @@ class Patreon_Frontend {
 			
 			// Hide the custom banner if no custom banner was saved
 			
-
 			if ( $custom_universal_banner AND $custom_universal_banner !='' ) {
 			
 				$contribution_required = apply_filters( 'ptrn/final_state_main_banner_message', '<div class="patreon-locked-content-message">' . $contribution_required . '</div>', $patreon_level, $post );
@@ -129,7 +136,7 @@ class Patreon_Frontend {
 				$contribution_required = '';				
 			}
 			
-			$button_vars = array();
+			$button_args = array();
 			
 			if ( isset( $args['direct_unlock'] ) ) {
 				
@@ -185,12 +192,36 @@ class Patreon_Frontend {
 		if ( !$creator_full_name OR $creator_full_name == '' ) {
 			$creator_full_name = 'this creator';
 		}
-				
-		if ( $array AND is_array( $args ) ) {
-			$args = array_merge_recursive( $args, Patreon_Wordpress::lock_or_not() );
+		
+		// Get lock or not details if it is not given. If post id given, use it. 
+		if ( !isset( $args['lock'] ) ) {
+			
+			if ( isset( $args['post_id'] ) ) {
+				$lock_or_not = Patreon_Wordpress::lock_or_not( $args['post_id'] );
+			}
+			else {
+				$lock_or_not = Patreon_Wordpress::lock_or_not();
+			}
+		}
+		
+		// If lock or not details were not given, merge the incoming args with what we just got.
+		if( $args AND is_array( $args ) AND !isset( $args['lock'] ) ) {
+			$args = $lock_or_not + $args;
+		}
+		
+		// If no args given, just feed lock or not:
+		
+		if ( !isset( $args ) ) {
+			$args = $lock_or_not;
+		}			
+		
+		$post_id = false;
+		
+		if ( isset( $args['post_id'] ) ) {
+			$post = get_post( $args['post_id'] );
 		}
 		else {
-			$args = Patreon_Wordpress::lock_or_not();
+			global $post;
 		}
 		
 		if ( $args['reason'] == 'user_not_logged_in' ) {
@@ -264,13 +295,18 @@ class Patreon_Frontend {
 			}
 			
 		}
-	
+		
+		// We init vars so picky users will not see undefined var/index errors:
+		
+		$post_total_patronage_level = '';
+		if( isset( $args['post_total_patronage_level'] ) ) {
+			$post_total_patronage_level = $args['post_total_patronage_level'];
+		}
 		
 		$label = str_replace( '%%creator%%', $creator_full_name, $label );
 		$label = str_replace( '%%pledgelevel%%', $patreon_level, $label );
-		$label = str_replace( '%%post_date%%', $post_date, $label );
-		$label = str_replace( '%%flow_link%%', self::patreonMakeCacheableFlowLink(), $label );
-		$label = str_replace( '%%total_pledge%%', $args['post_total_patronage_level'], $label );
+		$label = str_replace( '%%flow_link%%', self::patreonMakeCacheableFlowLink( $post ), $label );
+		$label = str_replace( '%%total_pledge%%', $post_total_patronage_level, $label );
 	
 		return $messages . apply_filters( 'ptrn/label_text_over_universal_button', str_replace( '%%pledgelevel%%',$patreon_level, $label ), $args['reason'], $user_logged_into_patreon, $is_patron, $patreon_level, $args );
 		
@@ -291,12 +327,21 @@ class Patreon_Frontend {
 		if ( !$creator_full_name OR $creator_full_name == '' ) {
 			$creator_full_name = 'this creator';
 		}
-				
-		if ( $array AND is_array( $args ) ) {
-			$args = array_merge_recursive( $args, Patreon_Wordpress::lock_or_not() );
+		
+		// Get lock or not details if it is not given. If post id given, use it. 
+		if ( !isset( $args['lock'] ) ) {
+			
+			if ( isset( $args['post_id'] ) ) {
+				$lock_or_not = Patreon_Wordpress::lock_or_not( $args['post_id'] );
+			}
+			else {
+				$lock_or_not = Patreon_Wordpress::lock_or_not();
+			}
 		}
-		else {
-			$args = Patreon_Wordpress::lock_or_not();
+		
+		// If lock or not details were not given, merge the incoming args with what we just got.
+		if( $args AND is_array( $args ) AND !isset( $args['lock'] ) ) {
+			$args = $lock_or_not + $args;
 		}
 				
 		if ( $args['reason'] == 'not_a_patron' ) {
@@ -314,12 +359,16 @@ class Patreon_Frontend {
 		if ( $args['reason'] == 'not_active_patron_at_post_date' ) {
 			$label = PATREON_TEXT_UNDER_BUTTON_2;
 		}
+		
+		$post_total_patronage_level = '';
+		if( isset( $args['post_total_patronage_level'] ) ) {
+			$post_total_patronage_level = $args['post_total_patronage_level'];
+		}		
 			
 		$label = str_replace( '%%creator%%', $creator_full_name, $label );
 		$label = str_replace( '%%pledgelevel%%', $patreon_level, $label );
-		$label = str_replace( '%%post_date%%', $post_date, $label );
 		$label = str_replace( '%%flow_link%%', self::patreonMakeCacheableFlowLink(), $label );
-		$label = str_replace( '%%total_pledge%%', $args['post_total_patronage_level'], $label );
+		$label = str_replace( '%%total_pledge%%', $post_total_patronage_level, $label );
 	
 		return apply_filters( 'ptrn/label_text_under_universal_button', $label, $args['reason'], $user_logged_into_patreon, $is_patron, $patreon_level, $state, $args);
 		
@@ -408,6 +457,7 @@ class Patreon_Frontend {
 		// We changed the above universal flow link maker to a function which will create cache-able links
 		// Some of the vars in current function which the earlier function used may not be needed now - clean up later #REVISIT
 		
+		$flow_link_args = array();
 						
 		if ( isset( $args['direct_unlock'] ) ) {
 			
@@ -519,10 +569,16 @@ class Patreon_Frontend {
 			
 		}		
 		
-		// Add the patreon nonce that was set via init function to vars.
-		$state['patreon_nonce'] = $_COOKIE['patreon_nonce'];
 		$redirect_uri           = site_url() . '/patreon-authorization/';
 		$v2_params = '&scope=identity%20identity[email]';
+		
+		$send_post_id = false;
+		
+		if ( $post ) {
+			$send_post_id = $post->ID;
+		}
+		 
+		$pledge_level = apply_filters( 'ptrn/patron_link_pledge_level', $pledge_level, $send_post_id, $args );
 		
 		$href = 'https://www.patreon.com/oauth2/become-patron?response_type=code&min_cents=' . $pledge_level . '&client_id=' . $client_id . $v2_params . '&redirect_uri=' . $redirect_uri . '&state=' . urlencode( base64_encode( serialize( $state ) ) );
 
@@ -624,8 +680,6 @@ class Patreon_Frontend {
 			
 		}
 		
-		// Add the patreon nonce that was set via init function to vars.
-		$state['patreon_nonce'] = $_COOKIE['patreon_nonce'];
 		$redirect_uri           = site_url() . '/patreon-authorization/';
 		$v2_params = '&scope=' . 'identity+' . urlencode( 'identity[email]' );
 		
@@ -671,7 +725,7 @@ class Patreon_Frontend {
 		
 		$href = self::patreonMakeCacheableLoginLink( $client_id );
 
-		return apply_filters( 'ptrn/login_button', '<a href="' . $href . '" class="ptrn-login" data-ptrn_nonce="' . wp_create_nonce( 'patreon-nonce' ) . '"><div class="patreon-responsive-button-wrapper"><div class="patreon-responsive-button"><img class="patreon_logo" src="' . PATREON_PLUGIN_ASSETS . '/img/patreon-logomark-on-coral.svg" alt=""> ' . $login_label . '</div></div></a>', $href );
+		return apply_filters( 'ptrn/login_button', '<a href="' . $href . '" class="ptrn-login"><div class="patreon-responsive-button-wrapper"><div class="patreon-responsive-button"><img class="patreon_logo" src="' . PATREON_PLUGIN_ASSETS . '/img/patreon-logomark-on-coral.svg" alt=""> ' . $login_label . '</div></div></a>', $href );
 
 	}
 	public static function lock_this_post( $post = false ) {
@@ -827,6 +881,16 @@ class Patreon_Frontend {
 			
 		}
 		
+		// Allow addons to override this function - this will bypass this function, but also will allow addons to apply this function's filters in their own gating function to keep compatibility with other addons
+		
+		$override_content_filtering = array();
+		
+		$override_content_filtering = apply_filters( 'ptrn/override_content_filtering', $content, $post_id );
+		
+		if ( is_array($override_content_filtering) AND isset( $override_content_filtering['override'] ) ) {
+			return $override_content_filtering['content'];			
+		}
+		
 		// Just bail out if this is not the main query for content and there still isnt a post id
 		if ( !is_main_query() AND !$post_id ) {
 			return $content;
@@ -837,9 +901,21 @@ class Patreon_Frontend {
 		$lock_or_not = Patreon_Wordpress::lock_or_not($post_id);
 		
 		// An array with args should be returned
-
-		$hide_content = $lock_or_not['lock'];
-		$patreon_level = $lock_or_not['patreon_level'];
+		$hide_content = false;
+		$patreon_level = 0;
+		$user_patronage = 0;
+		
+		if ( isset( $lock_or_not['lock'] ) ) {
+			$hide_content = $lock_or_not['lock'];			
+		}
+		if ( isset( $lock_or_not['patreon_level'] ) ) {
+			$patreon_level = $lock_or_not['patreon_level'];
+		}
+		if ( isset( $lock_or_not['user_active_pledge'] ) ) {
+			$user_patronage = $lock_or_not['user_active_pledge'];
+		}
+		
+		$lock_or_not['post_id'] = $post_id;
 
 		if ( $hide_content ) {
 			
@@ -852,7 +928,7 @@ class Patreon_Frontend {
 			// // If client id exists. Do the banner. If not, no point in protecting since we wont be able to send people to patronage. If so dont modify normal content.
 			
 			if ( $client_id ) {
-				
+			
 				$content = self::displayPatreonCampaignBanner( $patreon_level, $lock_or_not );
 				$content = apply_filters( 'ptrn/post_content', $content, $patreon_level, $user_patronage, $lock_or_not );
 				
@@ -861,7 +937,7 @@ class Patreon_Frontend {
 			}
 		}
 		
-		if ( !$hide_content AND $lock_or_not['reason'] == 'post_is_not_locked' ) {
+		if ( !$hide_content AND $lock_or_not['reason'] == 'post_is_public' ) {
 			// This is not a locked post. Return content without any footer
 			return $content;
 		}
@@ -883,7 +959,7 @@ class Patreon_Frontend {
 		 '</div>';
 		
 	}
-	public static function MakeValidPatronFooter( $patreon_level, $user_patronage, $args ) {
+	public static function MakeValidPatronFooter( $patreon_level, $user_patronage, $args = false ) {
 		
 		// Creates conditional text for footer shown to valid patrons
 		
@@ -901,14 +977,28 @@ class Patreon_Frontend {
 		if ( !$creator_full_name OR $creator_full_name == '' ) {
 			$creator_full_name = 'this creator';
 		}
-				
-		if ( $array AND is_array( $args ) ) {
-			$args = array_merge_recursive( $args, Patreon_Wordpress::lock_or_not() );
+		
+		// Get lock or not details if it is not given. If post id given, use it. 
+		if ( !isset( $args['lock'] ) ) {
+			
+			if ( isset( $args['post_id'] ) ) {
+				$lock_or_not = Patreon_Wordpress::lock_or_not( $args['post_id'] );
+			}
+			else {
+				$lock_or_not = Patreon_Wordpress::lock_or_not();
+			}
 		}
-		else {
-			$args = Patreon_Wordpress::lock_or_not();
+		
+		// If lock or not details were not given, merge the incoming args with what we just got.
+		if( $args AND is_array( $args ) AND !isset( $args['lock'] ) ) {
+			$args = $lock_or_not + $args;
 		}
-	
+		
+		// If no args given, just feed lock or not:
+		
+		if ( !isset( $args ) ) {
+			$args = $lock_or_not;
+		}	
 	
 		if ( isset( $args['patreon_active_patrons_only'] ) AND $args['patreon_active_patrons_only'] == 1 ) {
 			$label = PATREON_TEXT_OVER_BUTTON_11;
@@ -927,9 +1017,10 @@ class Patreon_Frontend {
 			
 		$label = str_replace( '%%creator%%', $creator_full_name, $label );
 		$label = str_replace( '%%pledgelevel%%', $patreon_level, $label );
-		$label = str_replace( '%%post_date%%', $post_date, $label );
 		$label = str_replace( '%%flow_link%%', self::patreonMakeCacheableFlowLink(), $label );
-		$label = str_replace( '%%total_pledge%%', $args['post_total_patronage_level'], $label );		
+		if ( isset( $args['post_total_patronage_level'] ) ) {
+			$label = str_replace( '%%total_pledge%%', $args['post_total_patronage_level'], $label );
+		}		
 		
 		// Get patreon creator url:
 		$creator_profile_url = get_option( 'patreon-creator-url', false );
