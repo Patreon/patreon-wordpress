@@ -23,7 +23,7 @@ class Patreon_Wordpress {
 	public static $current_user_patronage_duration = -1;
 	public static $current_user_lifetime_patronage = -1;
 	public static $current_user_pledge_relationship_start = -1;
-	public static $lock_or_not = -1;
+	public static $lock_or_not = array();
 
 	function __construct() {
 
@@ -903,9 +903,26 @@ class Patreon_Wordpress {
 	}
 	public static function lock_or_not( $post_id = false ) {
 		
-		if ( self::$lock_or_not != -1 ) {
-			return self::$lock_or_not;
-		}		
+		// If the caching var is initialized, consider using it:
+		if ( count( self::$lock_or_not ) > 0 ) {
+			
+			if( !$post_id ) {
+				
+				global $post;
+				
+				if ( isset( $post->ID ) ) {
+					$post_id = $post->ID;
+				}
+				
+			}
+			
+			// If post id could be acquired, check if this post's result was already cached:
+			
+			if ( $post_id AND isset( self::$lock_or_not[$post_id] ) ) {
+				return self::$lock_or_not[$post_id];		
+			}
+			
+		}
 
 		$user                           = wp_get_current_user();
 		$user_pledge_relationship_start = Patreon_Wordpress::get_user_pledge_relationship_start( $user );
@@ -913,13 +930,12 @@ class Patreon_Wordpress {
 		$is_patron                      = Patreon_Wordpress::isPatron( $user );
 		$user_lifetime_patronage        = Patreon_Wordpress::get_user_lifetime_patronage( $user );
 		$declined                       = Patreon_Wordpress::checkDeclinedPatronage( $user );
-		$declined                       = Patreon_Wordpress::checkDeclinedPatronage( $user );
 		$active_patron_at_post_date     = false;
 		
 		// Just bail out if this is not the main query for content and no post id was given
 		if ( !is_main_query() AND !$post_id ) {
 			
-			return apply_filters( 
+			return self::$lock_or_not[$post_id] = apply_filters( 
 				'ptrn/lock_or_not', 
 				array(
 					'lock' => false,
@@ -937,6 +953,7 @@ class Patreon_Wordpress {
 			$post = get_post( $post_id );
 		}
 		else {
+			// If post could be acquired from global, 
 			global $post;
 		}
 			
@@ -948,7 +965,7 @@ class Patreon_Wordpress {
 
 		if ( in_array( get_post_type( $post->ID ), $exclude ) ) {
 			
-			return apply_filters( 
+			return self::$lock_or_not[$post_id] = apply_filters( 
 				'ptrn/lock_or_not', 
 				array(
 					'lock' => false,
@@ -982,7 +999,7 @@ class Patreon_Wordpress {
 				|| $patreon_level == 0 )
 		) {
 			
-			return apply_filters( 
+			return self::$lock_or_not[$post_id] = apply_filters( 
 				'ptrn/lock_or_not', 
 				array(
 					'lock' => false,
@@ -1002,7 +1019,7 @@ class Patreon_Wordpress {
 
 		if ( apply_filters( 'ptrn/bypass_filtering', defined( 'PATREON_BYPASS_FILTERING' ) ) ) {
 			
-			return apply_filters( 
+			return self::$lock_or_not[$post_id] = apply_filters( 
 				'ptrn/lock_or_not', 
 				array(
 					'lock' => false,
@@ -1018,7 +1035,7 @@ class Patreon_Wordpress {
 			
 			// Here we need to put a notification to admins so they will know they can see the content because they are admin_login_with_patreon_disabled
 
-			return apply_filters( 
+			return self::$lock_or_not[$post_id] = apply_filters( 
 				'ptrn/lock_or_not', 
 				array(
 					'lock' => false,
@@ -1110,9 +1127,11 @@ class Patreon_Wordpress {
 			'user_is_patron'               => $is_patron,
 			'user_active_pledge'           => $user_patronage,
 			'user_total_historical_pledge' => $user_lifetime_patronage,
-		); 
-		self::$lock_or_not = $result;
-		return apply_filters( 'ptrn/lock_or_not', self::$lock_or_not, $post_id, $declined, $user );
+		);
+		
+		self::$lock_or_not[$post_id] = $result;
+		
+		return apply_filters( 'ptrn/lock_or_not', self::$lock_or_not[$post_id], $post_id, $declined, $user );
 		
 	}
 	
