@@ -901,7 +901,23 @@ class Patreon_Wordpress {
 		update_user_meta( $current_user->ID, $option_to_toggle, $new_value );
 		
 	}
+	public static function add_to_lock_or_not_results( $post_id, $result ) {
+		// Manages the lock_or_not post id <-> lock info var cache. The cache is run in a FIFO basis to prevent memory bloat in WP installs which may have long post listings. What it does is snip the first element in array and add the newly added var in the end
+		
+		// If the lock or not array is large than 50, snip the first item
+		
+		if ( count( self::$lock_or_not > 50 ) ) {
+			array_shift( self::$lock_or_not );
+		}
+		
+		// Add the sent element at the end:
+		
+		return self::$lock_or_not[$post_id] = $result;
+		
+	}
 	public static function lock_or_not( $post_id = false ) {
+		
+		// This function has the logic which decides if a post should be locked. It can be called inside or outside the loop
 		
 		// If the caching var is initialized, consider using it:
 		if ( count( self::$lock_or_not ) > 0 ) {
@@ -935,15 +951,16 @@ class Patreon_Wordpress {
 		// Just bail out if this is not the main query for content and no post id was given
 		if ( !is_main_query() AND !$post_id ) {
 			
-			return self::$lock_or_not[$post_id] = apply_filters( 
-				'ptrn/lock_or_not', 
-				array(
-					'lock' => false,
-					'reason' => 'no_post_id_no_main_query',
-				),
-				$post_id, 
-				$declined,
-				$user 
+			return self::add_to_lock_or_not_results( $post_id, apply_filters( 
+					'ptrn/lock_or_not', 
+					array(
+						'lock' => false,
+						'reason' => 'no_post_id_no_main_query',
+					),
+					$post_id, 
+					$declined,
+					$user 
+				)
 			);			
 			
 		}
@@ -965,15 +982,16 @@ class Patreon_Wordpress {
 
 		if ( in_array( get_post_type( $post->ID ), $exclude ) ) {
 			
-			return self::$lock_or_not[$post_id] = apply_filters( 
-				'ptrn/lock_or_not', 
-				array(
-					'lock' => false,
-					'reason' => 'post_type_excluded_from_locking',
-				),
-				$post_id, 
-				$declined,
-				$user 
+			return self::add_to_lock_or_not_results( $post_id, apply_filters( 
+					'ptrn/lock_or_not', 
+					array(
+						'lock' => false,
+						'reason' => 'post_type_excluded_from_locking',
+					),
+					$post_id, 
+					$declined,
+					$user 
+				)
 			);
 			
 		}
@@ -999,15 +1017,16 @@ class Patreon_Wordpress {
 				|| $patreon_level == 0 )
 		) {
 			
-			return self::$lock_or_not[$post_id] = apply_filters( 
-				'ptrn/lock_or_not', 
-				array(
-					'lock' => false,
-					'reason' => 'post_is_public',
-				),
-				$post_id, 
-				$declined,
-				$user 
+			return self::add_to_lock_or_not_results( $post_id, apply_filters( 
+					'ptrn/lock_or_not', 
+					array(
+						'lock' => false,
+						'reason' => 'post_is_public',
+					),
+					$post_id, 
+					$declined,
+					$user 
+				)
 			);			
 		}
 		
@@ -1019,31 +1038,33 @@ class Patreon_Wordpress {
 
 		if ( apply_filters( 'ptrn/bypass_filtering', defined( 'PATREON_BYPASS_FILTERING' ) ) ) {
 			
-			return self::$lock_or_not[$post_id] = apply_filters( 
-				'ptrn/lock_or_not', 
-				array(
-					'lock' => false,
-					'reason' => 'lock_bypassed_by_filter',
-				),
-				$post_id, 
-				$declined,
-				$user 
-			);					
+			return self::add_to_lock_or_not_results( $post_id, apply_filters( 
+					'ptrn/lock_or_not', 
+					array(
+						'lock' => false,
+						'reason' => 'lock_bypassed_by_filter',
+					),
+					$post_id, 
+					$declined,
+					$user 
+				)
+			);
 		}
 		 
 		if ( current_user_can( 'manage_options' ) ) {
 			
 			// Here we need to put a notification to admins so they will know they can see the content because they are admin_login_with_patreon_disabled
 
-			return self::$lock_or_not[$post_id] = apply_filters( 
-				'ptrn/lock_or_not', 
-				array(
-					'lock' => false,
-					'reason' => 'show_to_admin_users',
-				),
-				$post_id, 
-				$declined,
-				$user 
+			return self::add_to_lock_or_not_results( $post_id, apply_filters( 
+					'ptrn/lock_or_not', 
+					array(
+						'lock' => false,
+						'reason' => 'show_to_admin_users',
+					),
+					$post_id, 
+					$declined,
+					$user 
+				)
 			);
 			
 		}
@@ -1129,9 +1150,7 @@ class Patreon_Wordpress {
 			'user_total_historical_pledge' => $user_lifetime_patronage,
 		);
 		
-		self::$lock_or_not[$post_id] = $result;
-		
-		return apply_filters( 'ptrn/lock_or_not', self::$lock_or_not[$post_id], $post_id, $declined, $user );
+		return apply_filters( 'ptrn/lock_or_not', self::add_to_lock_or_not_results( $post_id, $result) , $post_id, $declined, $user );
 		
 	}
 	
