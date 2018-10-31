@@ -906,7 +906,7 @@ class Patreon_Wordpress {
 		
 		// If the lock or not array is large than 50, snip the first item
 		
-		if ( count( self::$lock_or_not > 50 ) ) {
+		if ( count( self::$lock_or_not ) > 50  ) {
 			array_shift( self::$lock_or_not );
 		}
 		
