@@ -52,10 +52,18 @@ class Patreon_OAuth {
 		);
 
 		$response = wp_remote_post( $api_endpoint, $api_request );
-
-		$response_decoded = json_decode($response['body'], true );
 		
-		if(is_array($response_decoded)) {
+		if ( is_wp_error( $response ) ) {
+			
+			$result                    = array( 'error' => $response->get_error_message() );
+			$GLOBALS['patreon_notice'] = $response->get_error_message();
+			return $result;
+			
+		}	
+		
+		$response_decoded = json_decode( $response['body'], true );
+		
+		if ( is_array( $response_decoded ) ) {
 			return $response_decoded;
 		}
 		

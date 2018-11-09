@@ -3,7 +3,7 @@ Contributors: wordpressorg@patreon.com, codebard
 Tags: patreon, membership, members
 Requires at least: 4.0
 Tested up to: 4.9.8
-Stable tag: 1.2.0
+Stable tag: 1.2.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -89,6 +89,12 @@ It is  difficult to protect videos due the intensive bandwidth requirements of h
 
 
 == Changelog ==
+
+= 1.2.1 =
+
+* A bug causing posts to display earlier posts' locking info in locked excerpts was fixed
+* oAuth process now returns errors in case Patreon API can't be contacted due to maintenance or any other reason
+* 3rd party code and plugins can now override custom banner even if no custom banner was saved in plugin options
 
 = 1.2.0 =
 
