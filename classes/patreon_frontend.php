@@ -125,16 +125,16 @@ class Patreon_Frontend {
 		
 			// Wrap message and buttons in divs for responsive interface mechanics
 			
-			// Hide the custom banner if no custom banner was saved
+			$contribution_required = '<div class="patreon-locked-content-message">' . $contribution_required . '</div>';
 			
-			if ( $custom_universal_banner AND $custom_universal_banner !='' ) {
+			// But hide the custom banner if no custom banner was saved
 			
-				$contribution_required = apply_filters( 'ptrn/final_state_main_banner_message', '<div class="patreon-locked-content-message">' . $contribution_required . '</div>', $patreon_level, $post );
-			
+			if ( !$custom_universal_banner OR $custom_universal_banner =='' ) {
+				$contribution_required = '';
 			}
-			else {
-				$contribution_required = '';				
-			}
+			
+			// Still apply the filters so it can be modified by 3rd party code
+			$contribution_required = apply_filters( 'ptrn/final_state_main_banner_message', $contribution_required, $patreon_level, $post );
 			
 			$button_args = array();
 			
