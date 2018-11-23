@@ -313,7 +313,7 @@ class Patreon_Routing {
 				// Get state vars if they exist
 	
 				if( $wp->query_vars['state'] !='' ) {
-					$state = unserialize( base64_decode( urldecode( $wp->query_vars['state'] ) ) );
+					$state = json_decode( base64_decode( urldecode( $wp->query_vars['state'] ) ), true );
 				}
 
 				$redirect = false;
