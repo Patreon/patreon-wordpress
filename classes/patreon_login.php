@@ -173,7 +173,11 @@ class Patreon_Login {
 					wp_set_current_user( $user->ID, $user->user_login );
 					wp_set_auth_cookie( $user->ID );
 					do_action( 'wp_login', $user->user_login, $user );
-
+					
+					// If a Patreon avatar for this user exists, update it
+					
+					self::get_update_user_patreon_avatar( $user_response['data']['attributes']['thumb_url'], $user );
+									
 					// Below filter vars and the following filter allows plugin devs to acquire/filter info about Patron/user after the user returns from Patreon
 					
 					$filter_args = array(
@@ -250,6 +254,7 @@ class Patreon_Login {
 				$first_name   = '';
 				$last_name    = '';
 				
+				
 				if ( isset( $user_response['data']['attributes']['full_name'] ) ) {
 					$display_name = $user_response['data']['attributes']['full_name'];
 				}		
@@ -276,6 +281,11 @@ class Patreon_Login {
 				);
 				
 				wp_update_user( $args );
+							
+				// Import Patreon avatar for this user since it is a new user
+				
+				self::get_update_user_patreon_avatar( $user_response['data']['attributes']['thumb_url'], $user );
+					
 				
 				wp_set_current_user( $user->ID, $user->data->user_login );
 				wp_set_auth_cookie( $user->ID );
@@ -344,5 +354,93 @@ class Patreon_Login {
 	    return $danger_user_list;
 		
 	}
+	
+	public static function get_update_user_patreon_avatar( $patreon_image_url, $user = false ) {
 
+		// Gets and saves a user's Patreon profile image from Patreon into WP media folder
+
+		// Get user from current user if user object was not provided
+		if ( $user == false ) {
+			$user = wp_get_current_user();
+		}
+		
+		// If still no user object, return false
+		if ( $user->ID == 0 ) {
+			return false;
+		}
+		
+		// Abort if GD is not installed
+		
+		if ( !( extension_loaded( 'gd' ) AND function_exists( 'gd_info' ) ) ) {
+			return false;
+		}
+		
+		$patreon_image_data = wp_remote_get( $patreon_image_url );
+		
+		if ( is_wp_error( $patreon_image_data ) ) {
+			return false;
+		}		
+		
+		$headers = $patreon_image_data['headers'];
+		
+		// If mime type is not set, abort
+		
+		if ( !isset( $headers ) OR !isset( $headers['content-type'] ) ) {
+			return false;
+		}
+		
+		$mime_type = $headers['content-type'];
+		
+		$patreon_image = $patreon_image_data['body'];
+		
+		if ( $mime_type == 'image/png' ) {
+			$extension = 'png';
+		}
+		if ( $mime_type == 'image/gif' ) {
+			$extension = 'gif';
+		}
+		if ($mime_type =='image/jpeg') {
+			$extension = 'jpg';
+		}
+		if ( $mime_type == 'image/bmp' ) {
+			$extension = 'bmp';
+		}
+				
+		// Get the existing avatar from user meta if it was saved:
+		
+		$user_patreon_avatar_path = get_user_meta( $user->ID, 'patreon-avatar-file', true );
+		
+		// Delete existing Patreon avatar
+				
+		if ( file_exists( $user_patreon_avatar_path ) ) {
+			unlink( $user_patreon_avatar_path );
+		}
+		
+		// Upload new one
+		$uploaded = wp_upload_bits( 'patreon_avatar_' . $user->ID . '.' . $extension, null, $patreon_image );
+		
+		if ( is_wp_error( $uploaded ) ) {
+			return false;	
+		}
+		
+		// All went through.		
+		
+		// Remove the existing avatar metas
+		
+		delete_user_meta( $user->ID, 'patreon-avatar-url' );
+		delete_user_meta( $user->ID, 'patreon-avatar-file' );
+		
+		// Add the Patreon avatar as meta to the user - this will false if adding meta fails, primary key if it succeeds
+		
+		// At this point, if earlier file deletion succeeded, the avatar should be named properly with patreon_avatar_ + user id + extension. If not, then it would get -1, -2 etc suffix after patreon_avatar + user id since WP would upload it as a new file to not override existing file
+		
+		if ( add_user_meta( $user->ID, 'patreon-avatar-url', $uploaded['url'] ) AND
+			add_user_meta( $user->ID, 'patreon-avatar-file', $uploaded['file'] )
+		) {
+			return true;
+		}
+		
+		return false;
+		
+	}
 }
