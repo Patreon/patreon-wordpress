@@ -20,6 +20,18 @@ class Patreon_Login {
 		update_user_meta($user_id, 'patreon_token_minted', microtime());
 		update_user_meta($user_id, 'patreon_token_expires_in', $tokens['expires_in']);
 		
+		$user = get_user_by( 'ID', $user_id );
+
+		// Below filter vars and the following filter allows plugin devs to acquire/filter info about Patron/user after the user returns from Patreon
+		
+		$filter_args = array(
+			'user' => $user,
+			'user_response' => $user_response,
+			'tokens' => $tokens,
+		);
+		
+		do_action( 'patreon_do_action_after_local_user_is_updated_with_patreon_info', $filter_args );					
+
 	}
 
 	public static function updateLoggedInUserForStrictoAuth( $user_response, $tokens, $redirect = false ) {
@@ -96,17 +108,19 @@ class Patreon_Login {
 		if ( is_user_logged_in() ) {
 			
 			$user = wp_get_current_user();
-						
-			self::updateExistingUser( $user->ID, $user_response, $tokens );
 
+			self::updateExistingUser( $user->ID, $user_response, $tokens );	
+			
 			// Below filter vars and the following filter allows plugin devs to acquire/filter info about Patron/user after the user returns from Patreon
 			
 			$filter_args = array(
 				'user' => $user,
 				'redirect' => $redirect,
+				'user_response' => $user_response,
+				'tokens' => $tokens,
 			);
 			
-			do_action( 'patreon_action_after_wp_logged_user_is_updated', $filter_args );		
+			do_action( 'patreon_action_after_wp_logged_user_is_updated', $filter_args );
 			
 			wp_redirect( $redirect );
 			exit;
@@ -174,17 +188,20 @@ class Patreon_Login {
 					wp_set_auth_cookie( $user->ID );
 					do_action( 'wp_login', $user->user_login, $user );
 
+					/* update user meta data with patreon data */
+					self::updateExistingUser( $user->ID, $user_response, $tokens );
+					
 					// Below filter vars and the following filter allows plugin devs to acquire/filter info about Patron/user after the user returns from Patreon
 					
 					$filter_args = array(
 						'user' => $user,
 						'redirect' => $redirect,
+						'user_response' => $user_response,
+						'tokens' => $tokens,
 					);
 					
 					do_action( 'patreon_do_action_after_user_logged_in_via_patreon', $filter_args );					
 						
-					/* update user meta data with patreon data */
-					self::updateExistingUser( $user->ID, $user_response, $tokens );
 					wp_redirect( $redirect );
 					exit;
 					
@@ -281,17 +298,20 @@ class Patreon_Login {
 				wp_set_auth_cookie( $user->ID );
 				do_action( 'wp_login', $user->data->user_login, $user );
 				
+				/* update user meta data with patreon data */
+				self::updateExistingUser( $user->ID, $user_response, $tokens );	
+				
 				// Below filter vars and the following filter allows plugin devs to acquire/filter info about Patron/user after the user returns from Patreon
 				
 				$filter_args = array(
 					'user' => $user,
 					'redirect' => $redirect,
+					'user_response' => $user_response,
+					'tokens' => $tokens,
 				);
 				
 				do_action( 'patreon_do_action_after_new_user_created_from_patreon_logged_in', $filter_args );				
 
-				/* update user meta data with patreon data */
-				self::updateExistingUser( $user->ID, $user_response, $tokens );	
 				wp_redirect( $redirect );
 				exit;	
 
@@ -314,7 +334,19 @@ class Patreon_Login {
 				do_action( 'wp_login', $user->data->user_login, $user );
 
 				/* update user meta data with patreon data */
-				self::updateExistingUser( $user->ID, $user_response, $tokens );	
+				self::updateExistingUser( $user->ID, $user_response, $tokens );
+				
+				// Below filter vars and the following filter allows plugin devs to acquire/filter info about Patron/user after the user returns from Patreon
+				
+				$filter_args = array(
+					'user' => $user,
+					'redirect' => $redirect,
+					'user_response' => $user_response,
+					'tokens' => $tokens,
+				);
+				
+				do_action( 'patreon_do_action_after_existing_user_from_patreon_logged_in', $filter_args );				
+
 				wp_redirect( $redirect );
 				exit;
 				
