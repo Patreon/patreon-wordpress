@@ -1103,11 +1103,11 @@ class Patreon_Frontend {
 			
 			// Override avatar if there is a saved Patreon avatar
 			if ( $user_patreon_avatar != '' ) {
-				$avatar = $user_patreon_avatar;
+				$avatar = '<img alt="'.$alt.'" src="'.$user_patreon_avatar.'" class="avatar avatar-"'.$size.' photo" height="'.$size.'" width="'.$size.'" />'
 			}
 		}
 		
-		return '<img alt="'.$alt.'" src="'.$avatar.'" class="avatar avatar-"'.$size.' photo" height="'.$size.'" width="'.$size.'" />';
+		return $avatar;
 
 	}
 	
