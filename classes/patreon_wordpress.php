@@ -630,13 +630,14 @@ class Patreon_Wordpress {
 				delete_option( 'patreon-mailing-list-notice-shown' );
 				delete_option( 'patreon-rate-plugin-notice-shown' );
 				delete_option( 'patreon-file-locking-feature-notice-shown' );
+					
+				// Transitional code to fix creator id pulling bug - campaign id was being pulled instead. Can be removed in 1-2 versions
+				
+				delete_option( 'patreon-creator-id' );
+				delete_option( 'patreon-campaign-id' );
 				
 			}
 
-			// Transitional code to fix creator id pulling bug - campaign id was being pulled instead. Can be removed in 1-2 versions
-			
-			delete_option( 'patreon-creator-id' );
-			delete_option( 'patreon-campaign-id' );
 			
 		}
 		
