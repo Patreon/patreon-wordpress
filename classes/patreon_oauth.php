@@ -67,9 +67,9 @@ class Patreon_OAuth {
 			return $response_decoded;
 		}
 		
-		echo $response['body'];
-		wp_die();
-
+		// Commented out to address issues caused by Patreon's maintenance in between 01 - 02 Feb 2019 - the plugin was showing Patreon's maintenance page at WP sites yin certain cases
+		// echo $response['body'];
+		// wp_die();
 	}
 	
 }
