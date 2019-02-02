@@ -3,7 +3,7 @@ Contributors: wordpressorg@patreon.com, codebard
 Tags: patreon, membership, members
 Requires at least: 4.0
 Tested up to: 5.0.2
-Stable tag: 1.2.2
+Stable tag: 1.2.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -89,6 +89,10 @@ It is  difficult to protect videos due the intensive bandwidth requirements of h
 
 
 == Changelog ==
+
+= 1.2.3 =
+
+* Hotfix - addressed a potential issue which could occur during Patreon maintenance, causing some sites to show Patreon maintenance page in admin or to logged in users. This would happen when the plugin attempted to refresh expired creator tokens or update a user's Patreon details or update any info via Patreon_OAuth class. 
 
 = 1.2.2 =
 
