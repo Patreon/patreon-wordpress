@@ -367,7 +367,7 @@ class Patreon_Routing {
 					
 					// Check out if there is a proper user return. 
 					
-					if( !isset( $user_response['data']['id'] ) ) {
+					if( !is_array( $user_response ) OR !isset( $user_response['data']['id'] ) ) {
 						
 						// We didnt get user info back from the API. Cancel with a message
 							
