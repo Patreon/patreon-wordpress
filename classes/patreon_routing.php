@@ -89,7 +89,7 @@ class Patreon_Routing {
 				
 				// Login intent. 
 				
-				$final_redirect = home_url();
+				$final_redirect = wp_login_url();
 				
 				if( isset( $wp->query_vars['patreon-final-redirect'] ) ) {
 					
@@ -300,6 +300,7 @@ class Patreon_Routing {
 			exit;
 			
 		}
+		
 		if ( strpos( $_SERVER['REQUEST_URI'], '/patreon-authorization/' ) !== false ) {
 
 			// First slap the noindex header so search engines wont index this page:
@@ -363,6 +364,19 @@ class Patreon_Routing {
 					$api_client = new Patreon_API( $tokens['access_token'] );
 					
 					$user_response = $api_client->fetch_user();
+					
+					// Check out if there is a proper user return. 
+					
+					if( !isset( $user_response['data']['id'] ) ) {
+						
+						// We didnt get user info back from the API. Cancel with a message
+							
+						$redirect = add_query_arg( 'patreon_message', 'patreon_couldnt_acquire_user_details', $redirect );
+						
+						wp_redirect( $redirect );
+						exit;						
+					
+					}
 					
 					if( apply_filters( 'ptrn/force_strict_oauth', get_option( 'patreon-enable-strict-oauth', false ) ) ) {
 						$user = Patreon_Login::updateLoggedInUserForStrictoAuth( $user_response, $tokens, $redirect );
