@@ -1101,9 +1101,14 @@ class Patreon_Frontend {
 			
 			$user_patreon_avatar = get_user_meta( $user->ID, 'patreon-avatar-url', true );
 			
+			if ( !$size OR !is_numeric($size) OR $size == 0 ) {
+				// Set size to WP default 48 if no size was provided by WP installation for whatsoever reason
+				$size = 48;
+			}
+			
 			// Override avatar if there is a saved Patreon avatar
 			if ( $user_patreon_avatar != '' ) {
-				$avatar = '<img alt="'.$alt.'" src="'.$user_patreon_avatar.'" class="avatar avatar-"'.$size.' photo" height="'.$size.'" width="'.$size.'" />';
+				$avatar = "<img alt='{$alt}' src='{$user_patreon_avatar}' class='avatar avatar-{$size} photo' height='{$size}' width='{$size}' />";
 			}
 		}
 		
