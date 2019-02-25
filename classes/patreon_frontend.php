@@ -43,9 +43,11 @@ class Patreon_Frontend {
 			'no_code_receved_from_patreon'               => PATREON_NO_CODE_RECEIVED_FROM_PATREON,
 			'no_patreon_action_provided_for_flow'        => PATREON_NO_FLOW_ACTION_PROVIDED,
 			'patreon_direct_unlocks_not_turned_on'       => PATREON_DIRECT_UNLOCKS_NOT_ON,
+			'patreon_couldnt_acquire_user_details'       => PATREON_COULDNT_ACQUIRE_USER_DETAILS,
 		);
 		
 	}
+	
 	function patreonEnqueueJs() {
 		
 		wp_register_script( 'patreon-wordpress-js', PATREON_PLUGIN_ASSETS . '/js/app.js', array( 'jquery' ) );

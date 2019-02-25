@@ -80,6 +80,7 @@ define( "PATREON_TEXT_OVER_BUTTON_8", 'This content is available exclusively to 
 define( "PATREON_TEXT_OVER_BUTTON_9", 'This content is available exclusively to Patreon members pledging $%%pledgelevel%% or more, or having at least $%%total_pledge%% pledged in total.' );
 define( "PATREON_TEXT_OVER_BUTTON_10", 'This content is available exclusively to Patreon members pledging $%%pledgelevel%% or more at the time this content was posted, or having at least $%%total_pledge%% pledged in total.' );
 define( "PATREON_TEXT_OVER_BUTTON_11", 'This content is available exclusively to Patreon members pledging $%%pledgelevel%% or more at the time this content was posted.' );
+define( "PATREON_COULDNT_ACQUIRE_USER_DETAILS", 'Sorry. Could not acquire your info from Patreon. Please try again later.' );
 
 include 'classes/patreon_wordpress.php';
 
