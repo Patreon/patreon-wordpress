@@ -2,8 +2,8 @@
 Contributors: wordpressorg@patreon.com, codebard
 Tags: patreon, membership, members
 Requires at least: 4.0
-Tested up to: 5.0.2
-Stable tag: 1.2.3
+Tested up to: 5.1
+Stable tag: 1.2.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -89,6 +89,13 @@ It is  difficult to protect videos due the intensive bandwidth requirements of h
 
 
 == Changelog ==
+
+= 1.2.4 =
+
+* Plugin now automatically acquires Patreon avatar of Patreon users and uses it if they dont already have an avatar
+* Addressed reports of client credentials being deleted and forcibly refreshed
+* A rare issue which could cause spammy but harmless accounts being created when Patreon API was returning HTML was addressed
+* Unused remove_fetch_creator_id was removed
 
 = 1.2.3 =
 
