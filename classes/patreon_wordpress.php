@@ -63,9 +63,11 @@ class Patreon_Wordpress {
 		add_action( 'admin_notices', array( $this, 'AdminMessages' ) );
 		add_action( 'init', array( $this, 'transitionalImageOptionCheck' ) );
 		add_action( 'admin_init', array( $this, 'add_privacy_policy_section' ), 20 ) ;
+		add_action( 'admin_init', array( $this, 'check_setup' ), 5 ) ;
 		add_filter( 'pre_set_site_transient_update_plugins', array( $this, 'check_for_update' ) );
 		add_action( 'wp_ajax_patreon_wordpress_dismiss_admin_notice', array( $this, 'dismiss_admin_notice' ), 10, 1 );
 		add_action( 'wp_ajax_patreon_wordpress_toggle_option', array( $this, 'toggle_option' ), 10, 1 );
+
 
 	}
 	public static function getPatreonUser( $user ) {
@@ -1147,6 +1149,58 @@ class Patreon_Wordpress {
 		);
 		
 		return apply_filters( 'ptrn/lock_or_not', self::add_to_lock_or_not_results( $post_id, $result) , $post_id, $declined, $user );
+		
+	}
+	public static function check_setup() {
+		
+		// Checks if setup was done and does necessary procedures
+		
+		if( is_admin() AND current_user_can( 'manage_options' ) ) {
+			
+			// Check if redirect to setup wizard was set.
+			$redirect_to_setup_wizard = get_option( 'patreon-redirect_to_setup_wizard', false );
+			
+			if( $redirect_to_setup_wizard ) {
+				
+				// Redirect to setup wizard was set. Set necessary flags and redirect to setup wizard page
+				
+				// The below flag will allow hiding notices or avoiding recursive redirections 
+				update_option( 'patreon-setup_is_being_done', true );
+				
+				// Toggle redirect flag off. If the user skips the wizard we will just show a notice in admin and not force subsequent redirections
+				update_option( 'patreon-redirect_to_setup_wizard', false );
+				
+				wp_redirect($this->internal['admin_url'].'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=0');
+				exit;
+			}
+			
+		}
+		
+	}
+	public static function activate() {
+		
+		// Kicks in after activation of the plugin and does necessary actions
+
+		// Check if setup was done and put up a redirect flag if not
+		$patreon_setup_done = get_option( 'patreon-setup_done', false );
+		
+		if( !$patreon_setup_done ) {
+			// Setup complete flag not received. Set flag for redirection in next page load
+			update_option( 'patreon-redirect_to_setup_wizard', true );
+		}
+		
+	}
+	public static function setup_wizard() {
+		
+		// Handles setup wizard screens
+		
+		if ( !isset( $_REQUEST['setup_stage'] ) OR $_REQUEST['setup_stage'] == '0' ) {
+			echo '<div id="patreon_setup_screen">';
+			echo '<div id="patreon_setup_logo"><img src="' . PATREON_PLUGIN_ASSETS . '/img/Patreon_Logo_100.png" /></div>';
+			echo '<div id="patreon_setup_content"><h1 style="margin-top: 5px;">Let\'s connect your site to Patreon!</h1>We will now collect necessary information and settings about your site to link it to Patreon.</div>';
+			echo '</div>';
+		}
+		
 		
 	}
 	
