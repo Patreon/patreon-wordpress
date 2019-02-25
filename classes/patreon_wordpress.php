@@ -633,10 +633,6 @@ class Patreon_Wordpress {
 				
 			}
 
-			// Transitional code to fix creator id pulling bug - campaign id was being pulled instead. Can be removed in 1-2 versions
-			
-			delete_option( 'patreon-creator-id' );
-			delete_option( 'patreon-campaign-id' );
 			
 		}
 		
