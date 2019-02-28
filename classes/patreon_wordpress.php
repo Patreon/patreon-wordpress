@@ -60,7 +60,7 @@ class Patreon_Wordpress {
 		add_action( 'init', 'Patreon_Login::checkTokenExpiration' );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueueAdminScripts' ) );
 		add_action( 'upgrader_process_complete', 'Patreon_Wordpress::AfterUpdateActions', 10, 2 );
-		add_action( 'admin_notices', array( $this, 'AdminMessages' ) );
+		add_action( 'admin_notices', array( $this, '3ages' ) );
 		add_action( 'init', array( $this, 'transitionalImageOptionCheck' ) );
 		add_action( 'admin_init', array( $this, 'add_privacy_policy_section' ), 20 ) ;
 		add_filter( 'pre_set_site_transient_update_plugins', array( $this, 'check_for_update' ) );
@@ -666,6 +666,11 @@ class Patreon_Wordpress {
 	public static function AdminMessages() {
 		
 		// This function processes any message or notification to display once after updates.
+		
+		// Skip showing any notice if setup is being done
+		if ( get_option( 'patreon-setup_is_being_done', false ) ) {
+			return;
+		}
 		
 		$mailing_list_notice_shown = get_option( 'patreon-mailing-list-notice-shown', false );
 		
