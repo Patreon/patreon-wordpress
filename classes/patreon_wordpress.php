@@ -1155,7 +1155,7 @@ class Patreon_Wordpress {
 		
 		// Checks if setup was done and does necessary procedures
 		
-		if( is_admin() AND current_user_can( 'manage_options' ) ) {
+		if( is_admin() AND current_user_can( 'manage_options' ) AND !is_network_admin() ) {
 			
 			// Check if redirect to setup wizard flag was set.
 			$redirect_to_setup_wizard = get_option( 'patreon-redirect_to_setup_wizard', false );
@@ -1184,11 +1184,12 @@ class Patreon_Wordpress {
 	public static function activate( $network_wide ) {
 		
 		// Kicks in after activation of the plugin and does necessary actions
-		
+
 		// We check if it is multisite, and if this is a network activation
 		
 		if ( is_multisite() AND $network_wide ) {
 			// True. This means that plugin was activated by an admin for all sites on the network, so we dont trigger setup wizard
+			return;
 		}
 		
 		// Check if setup was done and put up a redirect flag if not
