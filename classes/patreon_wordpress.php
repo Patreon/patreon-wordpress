@@ -60,7 +60,7 @@ class Patreon_Wordpress {
 		add_action( 'init', 'Patreon_Login::checkTokenExpiration' );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueueAdminScripts' ) );
 		add_action( 'upgrader_process_complete', 'Patreon_Wordpress::AfterUpdateActions', 10, 2 );
-		add_action( 'admin_notices', array( $this, '3ages' ) );
+		add_action( 'admin_notices', array( $this, 'AdminMessages' ) );
 		add_action( 'init', array( $this, 'transitionalImageOptionCheck' ) );
 		add_action( 'admin_init', array( $this, 'add_privacy_policy_section' ), 20 ) ;
 		add_filter( 'pre_set_site_transient_update_plugins', array( $this, 'check_for_update' ) );
