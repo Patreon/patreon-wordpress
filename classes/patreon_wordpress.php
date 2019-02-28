@@ -1181,10 +1181,16 @@ class Patreon_Wordpress {
 		}
 		
 	}
-	public static function activate() {
+	public static function activate( $network_wide ) {
 		
 		// Kicks in after activation of the plugin and does necessary actions
-
+		
+		// We check if it is multisite, and if this is a network activation
+		
+		if ( is_multisite() AND $network_wide ) {
+			// True. This means that plugin was activated by an admin for all sites on the network, so we dont trigger setup wizard
+		}
+		
 		// Check if setup was done and put up a redirect flag if not
 		$patreon_setup_done = get_option( 'patreon-setup_done', false );
 		
