@@ -28,7 +28,7 @@ class Patreon_Compatibility {
 		}
 	}
 	
-	public function check_requirements() {
+	public static function check_requirements() {
 		
 		// Checks if requirements for Patreon WordPress are being met
 		

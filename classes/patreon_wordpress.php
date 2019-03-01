@@ -1220,6 +1220,8 @@ class Patreon_Wordpress {
 		// Handles setup wizard screens
 		
 		if ( !isset( $_REQUEST['setup_stage'] ) OR $_REQUEST['setup_stage'] == '0' ) {
+			
+			$requirements_check = Patreon_Compatibility::check_requirements();
 
 			echo '<div id="patreon_setup_screen">';
 			echo '<div id="patreon_setup_logo"><img src="' . PATREON_PLUGIN_ASSETS . '/img/Patreon_Logo_100.png" /></div>';
