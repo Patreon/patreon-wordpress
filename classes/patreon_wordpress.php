@@ -1164,6 +1164,7 @@ class Patreon_Wordpress {
 		return apply_filters( 'ptrn/lock_or_not', self::add_to_lock_or_not_results( $post_id, $result) , $post_id, $declined, $user );
 		
 	}
+
 	public static function check_setup() {
 		
 		// Checks if setup was done and does necessary procedures
@@ -1227,7 +1228,30 @@ class Patreon_Wordpress {
 			echo '</div>';
 
 		}
+	}
 
+	public static function collect_app_info() {
+		
+		// Collects app information from WP site to be used in client settins at Patreon
+		
+		$blog_info = get_bloginfo();
+		
+		$parsed_home_url = parse_url( $blog_info['wpurl'] );
+		
+		$company_domain = $parsed_home_url['host'];
+		
+		$app_info = array(
+			'app_name'         => $blog_info['name'],
+			'app_desc'         => $blog_info['description'],
+			'author'           => $blog_info['name'],
+			'company_domain'   => $company_domain,
+			'icon_url'         => PATREON_PLUGIN_ASSETS . '/img/patreon_wordpress_app_icon',
+			'redirect_uri'     => site_url( '/patreon-authorization/' ),
+			'api_version'      => '1',
+		);
+		
+		return $app_info;
+		
 	}
 	
 }
