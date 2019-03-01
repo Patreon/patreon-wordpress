@@ -21,6 +21,10 @@ if( !file_exists($patreon_locked_image_cache_dir ) ) {
 	wp_mkdir_p( $patreon_locked_image_cache_dir );
 }
 
+// Register activation hook for the plugin
+
+register_activation_hook( __FILE__, array( 'Patreon_Wordpress','activate' ) );
+
 define( "PATREON_PLUGIN_URL", plugin_dir_url( __FILE__ ) );
 define( "PATREON_PLUGIN_ASSETS", plugin_dir_url( __FILE__ ).'assets' );
 define( "PATREON_PLUGIN_ASSETS_DIR", plugin_dir_path( __FILE__ ).'assets' );
