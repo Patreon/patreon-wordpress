@@ -34,7 +34,7 @@ class Patreon_Compatibility {
 		
 		// Check if permalinks are default (none). PW needs pretty permalinks of any sort
 		
-		$required[] = array();
+		$required = array();
 		
 		if ( get_option('permalink_structure') == '' ) {
 			
