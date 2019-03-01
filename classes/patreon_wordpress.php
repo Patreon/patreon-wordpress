@@ -669,6 +669,11 @@ class Patreon_Wordpress {
 		
 		// This function processes any message or notification to display once after updates.
 	
+		// Skip showing any notice if setup is being done
+		if ( get_option( 'patreon-setup_is_being_done', false ) ) {
+			return;
+		}
+		
 		// Show a notice if setup was not done
 		$setup_done = get_option( 'patreon-setup_done', false );
 		
@@ -681,12 +686,7 @@ class Patreon_Wordpress {
 			<?php	
 			
 		}
-		
-		// Skip showing any notice if setup is being done
-		if ( get_option( 'patreon-setup_is_being_done', false ) ) {
-			return;
-		}
-		
+				
 		$mailing_list_notice_shown = get_option( 'patreon-mailing-list-notice-shown', false );
 		
 		if( !$mailing_list_notice_shown ) {
