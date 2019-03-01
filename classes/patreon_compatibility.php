@@ -28,4 +28,24 @@ class Patreon_Compatibility {
 		}
 	}
 	
+	public function check_requirements() {
+		
+		// Checks if requirements for Patreon WordPress are being met
+		
+		// Check if permalinks are default (none). PW needs pretty permalinks of any sort
+		
+		$required[] = array();
+		
+		if ( get_option('permalink_structure') == '' ) {
+			
+			// Empty string - pretty permalinks are not enabled. This requirement fails
+			
+			$required[] = 'pretty_permalinks_are_required';
+			
+		}
+		
+		return $required;
+		
+	}
+	
 }
