@@ -86,6 +86,7 @@ define( "PATREON_TEXT_OVER_BUTTON_10", 'This content is available exclusively to
 define( "PATREON_TEXT_OVER_BUTTON_11", 'This content is available exclusively to Patreon members pledging $%%pledgelevel%% or more at the time this content was posted.' );
 define( "PATREON_COULDNT_ACQUIRE_USER_DETAILS", 'Sorry. Could not acquire your info from Patreon. Please try again later.' );
 define( "PATREON_PRETTY_PERMALINKS_NEED_TO_BE_ENABLED", 'Pretty permalinks are required for Patreon WordPress to work. Please visit <a href="'.admin_url('options-permalink.php').'" target="_blank">permalink options page</a> and set an option that is different from "Plain"' );
+define( "PATREON_ENSURE_REQUIREMENTS_MET", '<h3>Please ensure following requirements are met before starting setup:</h3>' );
 
 include 'classes/patreon_wordpress.php';
 
