@@ -670,7 +670,8 @@ class Patreon_Wordpress {
 		// This function processes any message or notification to display once after updates.
 	
 		// Skip showing any notice if setup is being done
-		if ( get_option( 'patreon-setup_is_being_done', false ) ) {
+		
+		if ( $_REQUEST['page'] == 'patreon_wordpress_setup_wizard' ) {
 			return;
 		}
 		
@@ -681,10 +682,12 @@ class Patreon_Wordpress {
 			
 			?>
 				 <div class="notice notice-success is-dismissible">
-					<p>We must connect your site to Patreon to enable Patreon features. Please click <a href="<?php echo wp_redirect( admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=0' ) ) ?>" target="_blank">here</a> to start the setup wizard</p>
+					<p>We must connect your site to Patreon to enable Patreon features. Please click <a href="<?php echo admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=0' ) ?>" target="_self">here</a> to start the setup wizard</p>
 				</div>
 			<?php	
 			
+			// Dont show any more notices until setup is done
+			return;
 		}
 				
 		$mailing_list_notice_shown = get_option( 'patreon-mailing-list-notice-shown', false );
