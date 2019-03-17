@@ -148,3 +148,25 @@
 	width: 23px;
 	height: 37px;
 }
+
+#patreon_setup_screen {
+
+	display:block;
+	clear: both;
+	margin-top:30px;
+}
+
+#patreon_setup_logo {
+
+	display:inline-block;
+	float:left;
+	vertical-align: top;
+}
+
+#patreon_setup_content {
+
+	display:inline-block;
+	float:left;
+	padding-left: 20px;
+	font-size: 125%;
+} 
