@@ -332,7 +332,23 @@ class Patreon_Routing {
 				wp_redirect( admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=0&patreon_message=error_missing_credentials') );
 				exit;
 				
-			}	
+			}
+			
+			// If we are here, the info is good. Save it to options:
+			
+			
+			if ( update_option('patreon-client-id', sanitize_text_field( $_POST['client_id'] ) ) AND
+				update_option('patreon-client-secret', sanitize_text_field( $_POST['client_secret'] ) ) AND
+				update_option('patreon-creators-access-token', sanitize_text_field( $_POST['creator_access_token'] ) ) AND
+				update_option('patreon-creators-refresh-token', sanitize_text_field( $_POST['creator_refresh_token'] ) )
+			) {
+				// All succeeded. Redirect to success screen:
+
+				wp_redirect( admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=final') );
+				exit;				
+				
+			}
+			
 			
 		}		
 		
