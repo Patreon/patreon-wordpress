@@ -689,6 +689,11 @@ class Patreon_Wordpress {
 			return;
 		}
 		
+		// Skip showing any notice if setup is being done
+		if ( get_option( 'patreon-setup_is_being_done', false ) ) {
+			return;
+		}
+		
 		$mailing_list_notice_shown = get_option( 'patreon-mailing-list-notice-shown', false );
 		
 		if( !$mailing_list_notice_shown ) {
