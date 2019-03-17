@@ -1265,13 +1265,42 @@ class Patreon_Wordpress {
 				}
 			}
 
+			$config_info = self::collect_app_info();
+			$config_input = '';
+			
+			foreach ( $config_info as $key => $value ) {
+				$config_input .= '<input type="hidden" name="' . $key . '" value="' . $config_info[$key] . '" />';
+			}
+
 			echo '<div id="patreon_setup_screen">';
 			echo '<div id="patreon_setup_logo"><img src="' . PATREON_PLUGIN_ASSETS . '/img/Patreon_Logo_100.png" /></div>';
-			echo '<div id="patreon_setup_content"><h1 style="margin-top: 5px;">Let\'s connect your site to Patreon!</h1>We will now take you to Patreon in order to automatically connect your site.' . $requirement_notices . '<form style="display:block;" method="post" action="https://www.patreon.com/connect-app/"><p class="submit" style="margin-top: 10px;"><input type="submit" name="submit" id="submit" class="button button-primary" value="Let\'s start!"></p></form></div>';
+
+			echo '<div id="patreon_setup_content"><h1 style="margin-top: 5px;">Let\'s connect your site to Patreon!</h1>We will now take you to Patreon in order to automatically connect your site.' . $requirement_notices . '<form style="display:block;" method="post" action="https://www.patreon.com/connect-app/"><p class="submit" style="margin-top: 10px;"><input type="submit" name="submit" id="submit" class="button button-primary" value="Let\'s start!"></p>' . $config_input . '</form></div>';
 			echo '</div>';
 
 		}
+	}
 
+	public static function collect_app_info() {
+		
+		// Collects app information from WP site to be used in client settins at Patreon
+				
+		$parsed_home_url = parse_url( get_bloginfo( 'url' ) );
+		
+		$company_domain = $parsed_home_url['host'];
+		
+		$app_info = array(
+			'app_name'         => get_bloginfo( 'name' ),
+			'app_desc'         => 'Patreon app for ' . get_bloginfo( 'name' ),
+			'author'           => get_bloginfo( 'name' ),
+			'company_domain'   => $company_domain,
+			'icon_url'         => PATREON_PLUGIN_ASSETS . '/img/patreon_wordpress_app_icon.png',
+			'redirect_uri'     => site_url( '/patreon-authorization/' ),
+			'api_version'      => '1',
+		);
+		
+		return $app_info;
+		
 	}
 	
 }
