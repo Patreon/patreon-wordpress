@@ -1254,10 +1254,20 @@ class Patreon_Wordpress {
 		// Handles setup wizard screens
 		
 		if ( !isset( $_REQUEST['setup_stage'] ) OR $_REQUEST['setup_stage'] == '0' ) {
+			
+			$requirements_check = Patreon_Compatibility::check_requirements();
+			$requirement_notices = '';
+			
+			if ( is_array( $requirements_check ) AND count( $requirements_check ) > 0 ) {
+				$requirement_notices .= PATREON_ENSURE_REQUIREMENTS_MET;
+				foreach ( $requirements_check as $key => $value ) {
+					$requirement_notices .= '&bull; ' . Patreon_Frontend::$messages_map[$requirements_check[$key]].'<br />';
+				}
+			}
 
 			echo '<div id="patreon_setup_screen">';
 			echo '<div id="patreon_setup_logo"><img src="' . PATREON_PLUGIN_ASSETS . '/img/Patreon_Logo_100.png" /></div>';
-			echo '<div id="patreon_setup_content"><h1 style="margin-top: 5px;">Let\'s connect your site to Patreon!</h1>We will now take you to Patreon in order to automatically connect your site.<form method="post" action="https://www.patreon.com/connect-app/"><p class="submit" style="margin-top: 10px;"><input type="submit" name="submit" id="submit" class="button button-primary" value="Let\'s start!"></p></form></div>';
+			echo '<div id="patreon_setup_content"><h1 style="margin-top: 5px;">Let\'s connect your site to Patreon!</h1>We will now take you to Patreon in order to automatically connect your site.' . $requirement_notices . '<form style="display:block;" method="post" action="https://www.patreon.com/connect-app/"><p class="submit" style="margin-top: 10px;"><input type="submit" name="submit" id="submit" class="button button-primary" value="Let\'s start!"></p></form></div>';
 			echo '</div>';
 
 		}
