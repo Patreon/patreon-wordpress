@@ -1285,6 +1285,22 @@ class Patreon_Wordpress {
 			echo '</div>';
 
 		}
+		
+		if ( isset( $_REQUEST['setup_stage'] ) AND $_REQUEST['setup_stage'] == 'final' ) {
+
+			$setup_message = PATREON_SETUP_SUCCESS_MESSAGE;
+
+			if ( $_REQUEST['patreon_message'] != '' ) {
+				$setup_message = Patreon_Frontend::$messages_map[$_REQUEST['patreon_message']];
+			}
+
+			echo '<div id="patreon_setup_screen">';
+			echo '<div id="patreon_setup_logo"><img src="' . PATREON_PLUGIN_ASSETS . '/img/Patreon_Logo_100.png" /></div>';
+
+			echo '<div id="patreon_setup_content"><h1 style="margin-top: 5px;">Patreon WordPress is set up and ready to go!</h1><div id="patreon_setup_message">' . $setup_message . '</div>';
+			echo '</div>';
+
+		}
 	}
 	
 }

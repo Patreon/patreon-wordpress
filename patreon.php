@@ -89,6 +89,7 @@ define( "PATREON_PRETTY_PERMALINKS_NEED_TO_BE_ENABLED", 'Pretty permalinks are r
 define( "PATREON_ENSURE_REQUIREMENTS_MET", '<h3>Please ensure following requirements are met before starting setup:</h3>' );
 define( "PATREON_ERROR_MISSING_CREDENTIALS", 'One or more of app credentials were not received. Please try again.' );
 define( "PATREON_SETUP_INITIAL_MESSAGE", 'We will now take you to Patreon in order to automatically connect your site.' );
+define( "PATREON_SETUP_SUCCESS_MESSAGE", 'Great! Your site is now connected to Patreon!' );
 
 include 'classes/patreon_wordpress.php';
 
