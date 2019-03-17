@@ -169,4 +169,12 @@
 	float:left;
 	padding-left: 20px;
 	font-size: 125%;
+}
+
+#patreon_setup_message {
+
+	display:block;
+	margin-top: 10px;
+	margin-bottom: 10px;
+	font-size: 125%;
 } 

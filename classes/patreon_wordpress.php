@@ -1271,11 +1271,17 @@ class Patreon_Wordpress {
 			foreach ( $config_info as $key => $value ) {
 				$config_input .= '<input type="hidden" name="' . $key . '" value="' . $config_info[$key] . '" />';
 			}
+			
+			$setup_message = PATREON_SETUP_INITIAL_MESSAGE;
+			
+			if ( $_REQUEST['patreon_message'] != '' ) {
+				$setup_message = Patreon_Frontend::$messages_map[$_REQUEST['patreon_message']];
+			}
 
 			echo '<div id="patreon_setup_screen">';
 			echo '<div id="patreon_setup_logo"><img src="' . PATREON_PLUGIN_ASSETS . '/img/Patreon_Logo_100.png" /></div>';
 
-			echo '<div id="patreon_setup_content"><h1 style="margin-top: 5px;">Let\'s connect your site to Patreon!</h1>We will now take you to Patreon in order to automatically connect your site.' . $requirement_notices . '<form style="display:block;" method="post" action="https://www.patreon.com/connect-app/"><p class="submit" style="margin-top: 10px;"><input type="submit" name="submit" id="submit" class="button button-primary" value="Let\'s start!"></p>' . $config_input . '</form></div>';
+			echo '<div id="patreon_setup_content"><h1 style="margin-top: 5px;">Let\'s connect your site to Patreon!</h1><div id="patreon_setup_message">' . $setup_message . '</div>' . $requirement_notices . '<form style="display:block;" method="post" action="https://www.patreon.com/connect-app/"><p class="submit" style="margin-top: 10px;"><input type="submit" name="submit" id="submit" class="button button-primary" value="Let\'s start!"></p>' . $config_input . '</form></div>';
 			echo '</div>';
 
 		}

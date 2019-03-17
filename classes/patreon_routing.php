@@ -329,7 +329,7 @@ class Patreon_Routing {
 			{
 				// One or more of the app details is kaput. Redirect with an error message.
 				
-				wp_redirect( admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=0&message=error_missing_credentials') );
+				wp_redirect( admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=0&patreon_message=error_missing_credentials') );
 				exit;
 				
 			}	
