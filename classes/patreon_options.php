@@ -21,6 +21,7 @@ class Patreon_Options {
     function patreon_plugin_setup(){
 		
         add_menu_page( 'Patreon Settings', 'Patreon Settings', 'manage_options', 'patreon-plugin', array( $this, 'patreon_plugin_setup_page' ), PATREON_PLUGIN_ASSETS . '/img/Patreon WordPress.png' );
+		add_submenu_page ( '', 'Patreon Settings', 'Patreon Settings', 'administrator', 'patreon_wordpress_setup_wizard', array('Patreon_Wordpress', 'setup_wizard'), '/img/Patreon WordPress.png' );
 		
     }
 
