@@ -1280,27 +1280,5 @@ class Patreon_Wordpress {
 
 		}
 	}
-
-	public static function collect_app_info() {
-		
-		// Collects app information from WP site to be used in client settins at Patreon
-				
-		$parsed_home_url = parse_url( get_bloginfo( 'url' ) );
-		
-		$company_domain = $parsed_home_url['host'];
-		
-		$app_info = array(
-			'app_name'         => get_bloginfo( 'name' ),
-			'app_desc'         => 'Patreon app for ' . get_bloginfo( 'name' ),
-			'author'           => get_bloginfo( 'name' ),
-			'company_domain'   => $company_domain,
-			'icon_url'         => PATREON_PLUGIN_ASSETS . '/img/patreon_wordpress_app_icon.png',
-			'redirect_uri'     => site_url( '/patreon-authorization/' ),
-			'api_version'      => '1',
-		);
-		
-		return $app_info;
-		
-	}
 	
 }
