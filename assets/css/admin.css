@@ -154,6 +154,7 @@
 	display:block;
 	clear: both;
 	margin-top:30px;
+	line-height : 1;
 }
 
 #patreon_setup_logo {
@@ -161,14 +162,16 @@
 	display:inline-block;
 	float:left;
 	vertical-align: top;
+	margin-right: 20px;
 }
 
 #patreon_setup_content {
 
 	display:inline-block;
 	float:left;
-	padding-left: 20px;
+	width: auto;
 	font-size: 125%;
+	
 }
 
 #patreon_setup_message {
@@ -177,4 +180,64 @@
 	margin-top: 10px;
 	margin-bottom: 10px;
 	font-size: 125%;
+}
+
+#patreon_success_inserts {
+
+	display:block;
+	clear: both;
+	margin-bottom: 10px;
+	padding-top: 20px;
+	font-size: 125%;
+}
+
+.patreon_success_insert {
+
+	display:inline-block;
+	float: left;
+	margin: 5px;
+	padding: 10px;
+	padding-bottom: 30px;
+	background-color : #ffffff;
+	border: 1px solid #c0c0c0;
+	width : 100%;
+	max-width : 250px;
+}
+
+.patreon_success_insert:hover {
+	background-color : #f9f9f9;
+	cursor: pointer;
+}
+
+.patreon_success_insert_content {
+
+	display:inline-block;
+	float:left;
+}
+
+.patreon_success_insert h3 {
+	display:inline-block;
+	float:left;
+	vertical-align: top;
+	margin: 5px;
+	margin-top: 0px;
 } 
+
+.patreon_success_insert_logo {
+	display:block;
+	width: 100%;
+	text-align: center;
+	vertical-align: top;
+}
+
+.patreon_success_insert_heading {
+	display:block;
+	width: 100%;
+	margin-top: 10px;
+	vertical-align: top;
+	text-align: center;
+}
+
+.patreon_success_insert_heading h3 {
+	font-size: 175% !important;
+}
