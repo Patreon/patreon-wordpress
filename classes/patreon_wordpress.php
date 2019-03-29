@@ -694,34 +694,7 @@ class Patreon_Wordpress {
 			update_option( 'patreon-rate-plugin-notice-shown', 1 );
 			
 		}
-		
-		$file_feature_notice_shown = get_option( 'patreon-file-locking-feature-notice-shown', false );
-		
-		if( !$file_feature_notice_shown AND !get_option( 'patreon-enable-file-locking', false ) ) {
 			
-			?>
-				 <div class="notice notice-info is-dismissible">
-				 <h3>The Patreon Wordpress plugin now supports image locking!</h3>
-					<p>If you were using or would like to use image locking feature that Patreon WordPress offers, now you must turn it on in your <a href="<?php echo admin_url('admin.php?page=patreon-plugin'); ?>">plugin settings</a> and visit 'Permalinks' settings of your WordPress site and click 'Save'. Otherwise image locking feature will be disabled or your images may appear broken. <br /><br />Want to learn more about why image locking could be useful for you? <a href="https://www.patreondevelopers.com/t/how-to-use-image-locking-feature-in-patreon-wordpress-plugin/461" target="_blank">Read more about image locking here</a>.</p>
-				</div>
-			<?php	
-			update_option( 'patreon-file-locking-feature-notice-shown', 1 );
-			
-		}
-		
-		if( !get_option( 'patreon-gdpr-notice-shown', false ) ) {
-			
-			?>
-				 <div class="notice notice-info is-dismissible">
-				 <h3>Making your site GDPR compliant with Patreon WordPress</h3>
-					<p>Please visit <a href="<?php echo admin_url('tools.php?wp-privacy-policy-guide=1#wp-privacy-policy-guide-patreon-wordpress'); ?>">the new WordPress privacy policy recommendation page</a> and copy & paste the section related to Patreon WordPress to your privacy policy page.<br><br>You can read our easy tutorial for GDPR compliance with Patreon WordPress <a href="https://patreon.zendesk.com/hc/en-us/articles/360004198011" target="_blank">by visiting our GDPR help page</a></p>
-				</div>
-			<?php	
-			
-			update_option( 'patreon-gdpr-notice-shown', 1 );
-			
-		}
-	
 		if( get_option( 'patreon-wordpress-update-available', false ) ) {
 			
 			?>
