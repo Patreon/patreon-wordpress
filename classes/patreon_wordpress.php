@@ -1307,7 +1307,7 @@ class Patreon_Wordpress {
 
 			echo '<a href="/test.html" target="_blank"><div class="patreon_success_insert"><div class="patreon_success_insert_logo"><img src="' . PATREON_PLUGIN_ASSETS . '/img/Patron-Plugin-Pro-120.png" /></div><div class="patreon_success_insert_heading"><h3>Patron Plugin Pro</h3></div><div class="patreon_success_insert_content"><br clear="both">Power up your integration and increase your income with premium addon Patron Plugin Pro</div></div></a>';
 			
-			echo '<a href="/test.html" target="_blank"><div class="patreon_success_insert"><div class="patreon_success_insert_logo"><img src="' . PATREON_PLUGIN_ASSETS . '/img/Patron-Button-Widgets-and-Plugin.png" /></div><div class="patreon_success_insert_heading"><h3>Patron Plugin Pro</h3></div><div class="patreon_success_insert_content"><br clear="both">Add Patreon buttons and widgets to your site with free Widgets addon</div></div></a>';
+			echo '<a href="/test.html" target="_blank"><div class="patreon_success_insert"><div class="patreon_success_insert_logo"><img src="' . PATREON_PLUGIN_ASSETS . '/img/Patron-Button-Widgets-and-Plugin.png" /></div><div class="patreon_success_insert_heading"><h3>Patron Widgets</h3></div><div class="patreon_success_insert_content"><br clear="both">Add Patreon buttons and widgets to your site with free Widgets addon</div></div></a>';
 			
 			echo '</div>';
 

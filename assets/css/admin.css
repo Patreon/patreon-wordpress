@@ -239,5 +239,11 @@
 }
 
 .patreon_success_insert_heading h3 {
-	font-size: 175% !important;
+	font-size: 175%;
+}
+
+@media only screen and (max-width: 500px) {
+  .patreon_success_insert_heading h3 {
+    font-size: 50% !important;
+  }
 }
