@@ -687,7 +687,7 @@ class Patreon_Wordpress {
 			
 			?>
 				 <div class="notice notice-info is-dismissible">
-					<p>Did Patreon WordPress plugin transform your membership business? Help creators like yourself find out about this plugin <a href="https://wordpress.org/support/plugin/patreon-connect/reviews/#new-post" target="_blank">by rating and giving your brutally honest thoughts!</a></p>
+					<p>Did Patreon WordPress help your site? Help creators like yourself find out about it <a href="https://wordpress.org/support/plugin/patreon-connect/reviews/#new-post" target="_blank">by giving us a good rating!</a></p>
 				</div>
 			<?php	
 			
