@@ -681,9 +681,20 @@ class Patreon_Wordpress {
 			
 		}
 		
-		$rate_plugin_notice_shown = get_option('patreon-rate-plugin-notice-shown',false);
+		$rate_plugin_notice_shown = get_option( 'patreon-rate-plugin-notice-shown', false );
+		$plugin_first_installed   = get_option( 'patreon-rate-plugin-first-installed', 0 );
 		
-		if( !$rate_plugin_notice_shown ) {
+		// If plugin first installed date is not present, then this is an old installation. Reset the rate plugin notice shown flag.
+		
+		if ( $plugin_first_installed == 0 ) {
+			$rate_plugin_notice_shown = false;
+			update_option( 'patreon-rate-plugin-first-installed', time() );
+			delete_option( 'patreon-rate-plugin-notice-shown' );
+		}
+		
+		// The below will trigger a rating notice once if it was not shown and the plugin was installed more than 30 days ago.
+		// It will also trigger once for existing installs before this version.
+		if( !$rate_plugin_notice_shown AND ( ( time() - $plugin_first_installed ) > ( 30 * 24 * 3600 ) ) AND $plugin_first_installed > 0 ) {
 			
 			?>
 				 <div class="notice notice-info is-dismissible">
