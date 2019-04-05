@@ -170,7 +170,7 @@ class Patreon_Wordpress {
 
 	}
 	public static function checkPatreonCreatorID() {
-
+		
 		// Check if creator id doesnt exist. Account for the case in which creator id was saved as empty by the Creator
 
 		if ( !get_option( 'patreon-creator-id', false ) OR get_option( 'patreon-creator-id', false )== '' ) {
@@ -1148,6 +1148,101 @@ class Patreon_Wordpress {
 		
 		return apply_filters( 'ptrn/lock_or_not', self::add_to_lock_or_not_results( $post_id, $result) , $post_id, $declined, $user );
 		
+	}
+	public static function make_tiers_select( $post = false ) {
+		
+		if ( !$post ) {
+			global $post;
+		}
+		
+		// This function makes a select box with rewards and reward ids from creator's campaign to be used in post locking and site locking
+		
+		$api_client = new Patreon_API( get_option( 'patreon-creators-access-token', false ) );
+		$creator_info = $api_client->fetch_campaign_and_patrons();
+
+		// Set the select to default
+		$select_options = PATREON_TEXT_YOU_HAVE_NO_REWARDS_IN_THIS_CAMPAIGN;
+		// 1st element is 'everyone' and 2nd element is 'Patrons' (with cent amount 1) in the rewards array.
+		
+		if ( is_array( $creator_info['included'] ) ) {
+			
+			// We want to sort tiers according to their $ level.
+			
+			usort( $creator_info['included'], function( $a, $b ) {
+				return $a['attributes']['amount_cents'] - $b['attributes']['amount_cents'];
+			} );
+		
+			$select_options = '';
+			
+			// Lets get the current Patreon level for the post:
+			$patreon_level = get_post_meta( $post->ID, 'patreon-level', true );
+			
+			$tier_count = 1;
+			
+			// Flag for determining if the matching tier was found during iteration of tiers
+			$matching_level_found = false;
+
+			foreach( $creator_info['included'] as $key => $value ) {
+				
+				// If its not a reward element, continue, just to make sure
+				
+				if(	
+					!isset( $creator_info['included'][$key]['type'] )
+					OR $creator_info['included'][$key]['type'] != 'reward'
+				)  {
+					continue; 
+				}
+				
+				$reward = $creator_info['included'][$key];
+								
+				// Special conditions for label for element 0, which is 'everyone' and '1, which is 'patron only'
+				
+				if ( $reward['id'] == -1 ) {
+					$label = PATREON_TEXT_EVERYONE;
+				}
+				if ( $reward['id'] == 0 ) {
+					$label = PATREON_TEXT_ANY_PATRON;
+				}
+				
+				// Use title if exists, and cents amount converted to dollar for any other reward level
+				if ( $reward['id'] > 0 ) {
+					
+					$tier_title = 'Tier ' . $tier_count;
+					
+					$tier_count++;
+					
+					if ( $reward['title'] != '' ) {
+						
+						$tier_title = $reward['title'];
+						
+						// If the title is too long, snip it
+						if ( strlen( $tier_title ) > 23 ) {
+							$tier_title = substr( $tier_title , 0 , 23 ) .'...';
+						}
+						
+					}
+					
+					$label = $tier_title . ' - $' . ( $reward['attributes']['amount_cents'] / 100 );
+				}
+				
+				$selected = '';
+				
+				if ( ( $reward['attributes']['amount_cents'] / 100 ) >= $patreon_level  AND !$matching_level_found ) {
+					
+					// Matching level was present, but now found. Set selected and toggle flag.
+					// selected = selected for XHTML compatibility
+					$selected = ' selected="selected"';
+					
+					$matching_level_found = true;
+				}
+				
+				$select_options .= '<option value="'.$creator_info['included'][$key]['id'].'"'.$selected.'>'. $label . '</option>';
+			}
+			
+		}
+		
+		return apply_filters( 'ptrn/post_locking_reward_selection', $select_options, $post );
+	
 	}
 	
 }

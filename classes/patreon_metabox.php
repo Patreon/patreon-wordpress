@@ -44,13 +44,13 @@ class Patron_Metabox {
 	
 		$current_user = wp_get_current_user();
 			
-		$label    = 'Require Patreon pledge of this dollar amount or higher to view this post.  (Makes entire post patron only)  <a href="https://www.patreondevelopers.com/t/patreon-wordpress-locking-options-guide/1135#heading--section-1" target="_blank">(?)</a>';
+		$label    = 'Require the below membership tier or higher to view this post. (Makes entire post patron only)  <a href="https://www.patreondevelopers.com/t/patreon-wordpress-locking-options-guide/1135#heading--section-1" target="_blank">(?)</a>';
 		$readonly = '';
 		
 		if ( !get_option( 'patreon-creator-id', false ) ) {
 			
 			$label    = 'Post locking won\'t work without Creator ID. Please confirm you have it <a href="'.admin_url( "?page=patreon-plugin ").'">here</a>';
-			$readonly = " readonly";
+			$disabled = " disabled";
 			
 		}
 
@@ -60,7 +60,7 @@ class Patron_Metabox {
 		<p>
 			<label for="patreon-level"><?php _e( $label, '1' ); ?></label>
 			<br><br>
-			<strong>&#36; </strong><input type="text" id="patreon-level" name="patreon-level" value="<?php echo get_post_meta( $object->ID, 'patreon-level', true ); ?>" <?php echo $readonly ?>>
+			<select name="patreon-level"<?php echo $disabled ?>><?php echo Patreon_Wordpress::make_tiers_select(); ?></select>			
 		</p>
 		
 		<?php 
@@ -75,11 +75,26 @@ class Patron_Metabox {
 		?> 		
 		
 		<div <?php echo $advanced_post_options_toggle_status_display ?>id="patreon-wordpress-advanced-options-toggle">
+		<?php
+		
+			if ( !get_option( 'patreon-creator-id', false ) ) {
+				
+				$label    = 'Post locking won\'t work without Creator ID. Please confirm you have it <a href="'.admin_url( "?page=patreon-plugin ").'">here</a>';
+				$readonly = " readonly";
+				
+			}
+		?>
+		
+			<p>
+			<label for="patreon-level"><?php _e( $label, '1' ); ?></label>
+			<br><br>
+			<strong>&#36; </strong><input type="text" id="patreon-level" name="patreon-level" value="<?php echo get_post_meta( $object->ID, 'patreon-level', true ); ?>" <?php echo $readonly ?>>		
+		</p>
 		
 			<?php
 			
 			$label    = 'Require an active pledge at the time of this post’s creation to view this post. (optional) <a href="https://www.patreondevelopers.com/t/patreon-wordpress-locking-options-guide/1135#heading--section-2" target="_blank">(?)</a>';
-		$readonly = '';
+			$readonly = '';
 			
 			if ( !get_option( 'patreon-creator-id', false ) ) {
 				
@@ -98,7 +113,7 @@ class Patron_Metabox {
 			<?php
 			
 			$label    = 'Require a lifetime pledge amount greater than this amount to view this post. (optional) <a href="https://www.patreondevelopers.com/t/patreon-wordpress-locking-options-guide/1135#heading--section-3" target="_blank">(?)</a>';
-		  $readonly = '';
+			$readonly = '';
 			
 			if ( !get_option( 'patreon-creator-id', false ) ) {
 				

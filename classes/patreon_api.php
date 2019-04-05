@@ -78,10 +78,22 @@ class Patreon_API {
 		// Below conditional and different endpoint can be deprecated to only use v2 api after transition period
 		
 		if ( $v2 ) {
-			return $this->__get_json( "campaigns?include=rewards,creator,goals" );
+			return $this->__get_json( "campaigns?include=tiers,creator,goals", $v2 );
 		}
 
 		return $this->__get_json( "current_user/campaigns?include=rewards,creator,goals" );
+		
+	}
+	
+	public function fetch_tiers( $v2 = false ) {
+		
+		// Below conditional and different endpoint can be deprecated to only use v2 api after transition period
+		
+		if ( $v2 ) {
+			return $this->__get_json( "campaigns?include=tiers,creator,goals", $v2 );
+		}
+
+		return $this->__get_json( "current_user/campaigns?include=rewards" );
 		
 	}
 
