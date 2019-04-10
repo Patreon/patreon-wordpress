@@ -1236,7 +1236,7 @@ class Patreon_Wordpress {
 					$matching_level_found = true;
 				}
 				
-				$select_options .= '<option value="'.$creator_info['included'][$key]['id'].'"'.$selected.'>'. $label . '</option>';
+				$select_options .= '<option value="' . ( $reward['attributes']['amount_cents'] / 100 ) . '"'.$selected.'>'. $label . '</option>';
 			}
 			
 		}

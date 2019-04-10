@@ -77,6 +77,9 @@ class Patron_Metabox {
 		<div <?php echo $advanced_post_options_toggle_status_display ?>id="patreon-wordpress-advanced-options-toggle">
 		<?php
 		
+			$label    = 'Require the below precise $ membership value or over to view this post. (Makes entire post patron only)  <a href="https://www.patreondevelopers.com/t/patreon-wordpress-locking-options-guide/1135#heading--section-1" target="_blank">(?)</a>';
+			$readonly = '';		
+		
 			if ( !get_option( 'patreon-creator-id', false ) ) {
 				
 				$label    = 'Post locking won\'t work without Creator ID. Please confirm you have it <a href="'.admin_url( "?page=patreon-plugin ").'">here</a>';
@@ -88,7 +91,7 @@ class Patron_Metabox {
 			<p>
 			<label for="patreon-level"><?php _e( $label, '1' ); ?></label>
 			<br><br>
-			<strong>&#36; </strong><input type="text" id="patreon-level" name="patreon-level" value="<?php echo get_post_meta( $object->ID, 'patreon-level', true ); ?>" <?php echo $readonly ?>>		
+			<strong>&#36; </strong><input type="text" id="patreon-level-exact" name="patreon-level-exact" value="<?php echo get_post_meta( $object->ID, 'patreon-level', true ); ?>" <?php echo $readonly ?>>		
 		</p>
 		
 			<?php
@@ -166,18 +169,18 @@ class Patron_Metabox {
 		}
 
 		$patreon_level = get_post_meta( $post_id, 'patreon-level', true );
-
-		if ( $new_patreon_level && $patreon_level == '' ) {
+		
+		// Now, an exception for the old metabox which was moved to patreon-level-exact - if it is different from the value already saved or from 0, override the select box with its value since it would mean a specific override initiated by user.
+		
+		if( isset( $_POST['patreon-level-exact'] ) && is_numeric( $_POST['patreon-level-exact'] ) ) {
 			
-			add_post_meta( $post_id, 'patreon-level', $new_patreon_level, true );
+			if ( $_POST['patreon-level-exact'] != $patreon_level ) {
+				$new_patreon_level = $_POST['patreon-level-exact'];
+			}
 			
-		} else if ( ( $new_patreon_level || $new_patreon_level == 0 || $new_patreon_level == '0' ) && $new_patreon_level != $patreon_level ) {
-			
-			update_post_meta( $post_id, 'patreon-level', $new_patreon_level );
-
-		} else if ( $new_patreon_level == '' && $patreon_level ) {
-			delete_post_meta( $post_id, 'patreon-level', $patreon_level );
 		}
+		
+		update_post_meta( $post_id, 'patreon-level', $new_patreon_level );
 
 		// Handles active patrons only toggle
 		if ( isset( $_POST['patreon-active-patrons-only']) && $_POST['patreon-active-patrons-only'] != '') {
