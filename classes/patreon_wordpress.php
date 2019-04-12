@@ -66,6 +66,7 @@ class Patreon_Wordpress {
 		add_filter( 'pre_set_site_transient_update_plugins', array( $this, 'check_for_update' ) );
 		add_action( 'wp_ajax_patreon_wordpress_dismiss_admin_notice', array( $this, 'dismiss_admin_notice' ), 10, 1 );
 		add_action( 'wp_ajax_patreon_wordpress_toggle_option', array( $this, 'toggle_option' ), 10, 1 );
+		add_action( 'wp_ajax_patreon_wordpress_populate_patreon_level_select', array( $this, 'populate_patreon_level_select_from_ajax' ), 10, 1 );
 
 	}
 	public static function getPatreonUser( $user ) {
@@ -776,6 +777,7 @@ class Patreon_Wordpress {
 		
 	}	
 	public function dismiss_admin_notice() {
+		
 		if( !( is_admin() && current_user_can( 'manage_options' ) ) ) {
 			return;
 		}
@@ -1149,7 +1151,36 @@ class Patreon_Wordpress {
 		return apply_filters( 'ptrn/lock_or_not', self::add_to_lock_or_not_results( $post_id, $result) , $post_id, $declined, $user );
 		
 	}
+	
+	public static function populate_patreon_level_select_from_ajax() {
+		// This function accepts the ajax request from the metabox and calls the relevant function to populate the tiers select
+		
+		if( !( is_admin() && current_user_can( 'manage_options' ) ) ) {
+			return;
+		}
+		
+		// Just bail out if the action is not relevant, just in case
+		if ( $_REQUEST['action'] != 'patreon_wordpress_populate_patreon_level_select' ) {
+			return;
+		}
+		
+		// If post id was not passed, exit with error
+		if ( !isset( $_REQUEST['pw_post_id'] ) OR $_REQUEST['pw_post_id'] == '' ) {
+			echo 'Error: Could not get post id';
+			exit;
+		}
+		
+		$post = get_post( $_REQUEST['pw_post_id'] );
+		
+		echo Patreon_Wordpress::make_tiers_select( $post );
+		exit;
+		
+	}
 	public static function make_tiers_select( $post = false ) {
+		
+		if( !( is_admin() && current_user_can( 'manage_options' ) ) ) {
+			return;
+		}
 		
 		if ( !$post ) {
 			global $post;
@@ -1241,7 +1272,7 @@ class Patreon_Wordpress {
 			
 		}
 		
-		return apply_filters( 'ptrn/post_locking_reward_selection', $select_options, $post );
+		return apply_filters( 'ptrn/post_locking_tier_selection', $select_options, $post );
 	
 	}
 	

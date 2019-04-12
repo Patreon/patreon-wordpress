@@ -54,13 +54,13 @@ class Patron_Metabox {
 			
 		}
 
-			wp_nonce_field( basename( __FILE__ ), 'patreon_metabox_nonce' ); 
-			
+			wp_nonce_field( basename( __FILE__ ), 'patreon_metabox_nonce' );
+				
 		?>
 		<p>
 			<label for="patreon-level"><?php _e( $label, '1' ); ?></label>
 			<br><br>
-			<select name="patreon-level"<?php echo $disabled ?>><?php echo Patreon_Wordpress::make_tiers_select(); ?></select>			
+			<select id="patreon_level_select" name="patreon-level"<?php echo $disabled ?> pw_post_id="<?php echo $object->ID; ?>"><option value="<?php echo get_post_meta( $object->ID, 'patreon-level', true ); ?>">Loading...</option></select>			
 		</p>
 		
 		<?php 
@@ -69,7 +69,7 @@ class Patron_Metabox {
 						
 			$advanced_post_options_toggle_status_display = 'style=" display: block;" ';
 			
-			if( $advanced_post_options_toggle_status == '' OR $advanced_post_options_toggle_status == 'off' ) {
+			if ( $advanced_post_options_toggle_status == '' OR $advanced_post_options_toggle_status == 'off' ) {
 				$advanced_post_options_toggle_status_display = 'style=" display: none;" ';
 			}
 		?> 		
@@ -89,7 +89,7 @@ class Patron_Metabox {
 		?>
 		
 			<p>
-			<label for="patreon-level"><?php _e( $label, '1' ); ?></label>
+			<label for="patreon-level-exact"><?php _e( $label, '1' ); ?></label>
 			<br><br>
 			<strong>&#36; </strong><input type="text" id="patreon-level-exact" name="patreon-level-exact" value="<?php echo get_post_meta( $object->ID, 'patreon-level', true ); ?>" <?php echo $readonly ?>>		
 		</p>
