@@ -171,7 +171,7 @@ class Patreon_Wordpress {
 
 	}
 	public static function checkPatreonCreatorID() {
-		
+				
 		// Check if creator id doesnt exist. Account for the case in which creator id was saved as empty by the Creator
 
 		if ( !get_option( 'patreon-creator-id', false ) OR get_option( 'patreon-creator-id', false )== '' ) {
@@ -1171,7 +1171,7 @@ class Patreon_Wordpress {
 		}
 		
 		$post = get_post( $_REQUEST['pw_post_id'] );
-		
+				
 		echo Patreon_Wordpress::make_tiers_select( $post );
 		exit;
 		
@@ -1188,8 +1188,13 @@ class Patreon_Wordpress {
 		
 		// This function makes a select box with rewards and reward ids from creator's campaign to be used in post locking and site locking
 		
+		
+		// When we move to webhooks, this code can be changed to read from the already present creator details
 		$api_client = new Patreon_API( get_option( 'patreon-creators-access-token', false ) );
-		$creator_info = $api_client->fetch_campaign_and_patrons();
+		$creator_info = $api_client->fetch_tiers();
+		
+		// Save creator tiers for using in locked interface text
+		update_option( 'patreon-creator-tiers', $creator_info );
 
 		// Set the select to default
 		$select_options = PATREON_TEXT_YOU_HAVE_NO_REWARDS_IN_THIS_CAMPAIGN;
@@ -1272,7 +1277,7 @@ class Patreon_Wordpress {
 			
 		}
 		
-		return apply_filters( 'ptrn/post_locking_tier_selection', $select_options, $post );
+		return apply_filters( 'ptrn/post_locking_tier_select', $select_options, $post );
 	
 	}
 	
