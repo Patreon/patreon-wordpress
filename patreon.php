@@ -76,10 +76,10 @@ define( "PATREON_TEXT_OVER_BUTTON_4", ' while having been active patrons on %%po
 define( "PATREON_TEXT_OVER_BUTTON_5", ' or Patrons with total $%%total_pledge%% or more pledge' );
 define( "PATREON_TEXT_OVER_BUTTON_6", ' on Patreon' );
 define( "PATREON_TEXT_OVER_BUTTON_7", 'This content is available exclusively to members of <a href="%%creator_link%%" target="_blank">%%creator%%\'s Patreon</a> at the time this content was posted. <a href="%%flow_link%%" rel="nofollow">Become a patron</a> to get exclusive content like this in the future.' );
-define( "PATREON_TEXT_OVER_BUTTON_8", 'This content is available exclusively to Patreon members pledging $%%pledgelevel%% at the time this content was posted. <a href="%%flow_link%%" rel="nofollow">Become a patron</a> to get exclusive content like this in the future.' );
-define( "PATREON_TEXT_OVER_BUTTON_9", 'This content is available exclusively to members of <a href="%%creator_link%%" target="_blank">%%creator%%\'s Patreon</a> at %%tier_level%% tier or higher, or having at least $%%total_pledge%% pledged in total.' );
-define( "PATREON_TEXT_OVER_BUTTON_10", 'This content is available exclusively to members of <a href="%%creator_link%%" target="_blank">%%creator%%\'s Patreon</a> at %%tier_level%% tier or higher at the time this content was posted, or having at least $%%total_pledge%% pledged in total.' );
-define( "PATREON_TEXT_OVER_BUTTON_11", 'This content is available exclusively to members of <a href="%%creator_link%%" target="_blank">%%creator%%\'s Patreon</a> at %%tier_level%% tier or higher at the time this content was posted.' );
+define( "PATREON_TEXT_OVER_BUTTON_8", 'This content is available exclusively to members of <a href="%%creator_link%%" target="_blank">%%creator%%\'s Patreon</a> at the time this content was posted. <a href="%%flow_link%%" rel="nofollow">Become a patron</a> to get exclusive content like this in the future.' );
+define( "PATREON_TEXT_OVER_BUTTON_9", 'This content is available exclusively to members of <a href="%%creator_link%%" target="_blank">%%creator%%\'s Patreon</a> at %%tier_level%% or higher tier, or having at least $%%total_pledge%% pledged in total.' );
+define( "PATREON_TEXT_OVER_BUTTON_10", 'This content is available exclusively to members of <a href="%%creator_link%%" target="_blank">%%creator%%\'s Patreon</a> at %%tier_level%% or higher tier at the time this content was posted, or having at least $%%total_pledge%% pledged in total.' );
+define( "PATREON_TEXT_OVER_BUTTON_11", 'This content is available exclusively to members of <a href="%%creator_link%%" target="_blank">%%creator%%\'s Patreon</a> at %%tier_level%% or higher tier at the time this content was posted.' );
 define( "PATREON_COULDNT_ACQUIRE_USER_DETAILS", 'Sorry. Could not acquire your info from Patreon. Please try again later.' );
 define("PATREON_TEXT_EVERYONE", 'Everyone' );
 define("PATREON_TEXT_ANY_PATRON", 'Any Patron' );
