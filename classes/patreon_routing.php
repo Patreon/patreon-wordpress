@@ -52,6 +52,7 @@ class Patreon_Routing {
 		$rules = array(
 			'patreon-authorization\/?$' => 'index.php?patreon-oauth=true',
 			'patreon-flow\/?$' => 'index.php?patreon-flow=true',
+			'patreon-setup\/?$' => 'index.php?patreon-setup=true',
 		);
 
 		$wp_rewrite->rules = $rules + (array) $wp_rewrite->rules;
@@ -71,6 +72,7 @@ class Patreon_Routing {
 		array_push( $public_query_vars, 'code' );
 		array_push( $public_query_vars, 'state' );
 		array_push( $public_query_vars, 'patreon-redirect' );
+		array_push( $public_query_vars, 'patreon-setup' );
 		return $public_query_vars;
 		
 	}
@@ -300,6 +302,55 @@ class Patreon_Routing {
 			exit;
 			
 		}
+		
+
+		if ( strpos( $_SERVER['REQUEST_URI'], '/patreon-setup/' ) !== false ) {
+			
+			// First slap the noindex header so search engines wont index this page:
+			header( 'X-Robots-Tag: noindex, nofollow' );
+			 
+			// Make sure browsers dont cache this
+			header( 'cache-control: no-cache, must-revalidate, max-age=0' );			
+	
+			if ( !current_user_can( 'manage_options' ) ) {
+				// If user is not an admin, abort
+				echo 'Sorry - to setup Patreon WordPress you need to be an admin user.';
+				exit;
+				
+			}
+			
+			// Assuming _POST with separate inputs - can be changed later
+			
+			if ( !isset( $_POST['client_id'] ) OR $_POST['client_id'] == '' OR
+				!isset( $_POST['client_secret'] ) OR $_POST['client_secret'] == '' OR
+				!isset( $_POST['creator_access_token'] ) OR $_POST['creator_access_token'] == '' OR
+				!isset( $_POST['creator_refresh_token'] ) OR $_POST['creator_refresh_token'] == ''		
+			)
+			{
+				// One or more of the app details is kaput. Redirect with an error message.
+				
+				wp_redirect( admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=0&patreon_message=error_missing_credentials') );
+				exit;
+				
+			}
+			
+			// If we are here, the info is good. Save it to options:
+			
+			
+			if ( update_option('patreon-client-id', sanitize_text_field( $_POST['client_id'] ) ) AND
+				update_option('patreon-client-secret', sanitize_text_field( $_POST['client_secret'] ) ) AND
+				update_option('patreon-creators-access-token', sanitize_text_field( $_POST['creator_access_token'] ) ) AND
+				update_option('patreon-creators-refresh-token', sanitize_text_field( $_POST['creator_refresh_token'] ) )
+			) {
+				// All succeeded. Redirect to success screen:
+
+				wp_redirect( admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=final') );
+				exit;				
+				
+			}
+			
+			
+		}		
 		
 		if ( strpos( $_SERVER['REQUEST_URI'], '/patreon-authorization/' ) !== false ) {
 
