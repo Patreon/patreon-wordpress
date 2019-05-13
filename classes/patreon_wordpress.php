@@ -66,6 +66,7 @@ class Patreon_Wordpress {
 		add_filter( 'pre_set_site_transient_update_plugins', array( $this, 'check_for_update' ) );
 		add_action( 'wp_ajax_patreon_wordpress_dismiss_admin_notice', array( $this, 'dismiss_admin_notice' ), 10, 1 );
 		add_action( 'wp_ajax_patreon_wordpress_toggle_option', array( $this, 'toggle_option' ), 10, 1 );
+		add_action( 'plugin_action_links_' . PATREON_WORDPRESS_PLUGIN_SLUG, array( $this, 'add_plugin_action_links' ), 10, 1 );
 
 	}
 	public static function getPatreonUser( $user ) {
@@ -667,6 +668,18 @@ class Patreon_Wordpress {
 		
 		// This function processes any message or notification to display once after updates.
 		
+		$addon_upsell_shown = get_option( 'patreon-addon-upsell-shown', false );
+		
+		if( !$addon_upsell_shown ) {
+			
+			?>
+				<div class="notice notice-success is-dismissible patreon-wordpress" id="patreon-addon-upsell-shown"><img class="addon_upsell" src="<?php echo PATREON_PLUGIN_ASSETS ?>/img/Patron-Plugin-Pro-128.png" style="float:left; margin-right: 20px;" alt="Patron Plugin Pro" />
+					<p><h2 style="margin-top: 0px; font-size: 150%; font-weight: bold;">Power up your Patreon integration with Patron Pro!</h2><div style="font-size: 125% !important">Get Patron Pro third party addon for Patreon WordPress to increase your patrons and pledges! Enjoy powerful features like partial post locking, sneak peeks, advanced locking methods, login lock, vip users and more.<br /><br /><a href="https://codebard.com/patron-pro-addon-for-patreon-wordpress" target="_blank">Check out all features here</a></div></p>
+				</div>
+			<?php	
+						
+		}
+		
 		$mailing_list_notice_shown = get_option( 'patreon-mailing-list-notice-shown', false );
 		
 		if( !$mailing_list_notice_shown ) {
@@ -780,9 +793,14 @@ class Patreon_Wordpress {
 			return;
 		}
 		
-		// Mapping what comes from REQUEST to a given value avoids potential security problems
+		// Mapping what comes from REQUEST to a given value avoids potential security problems and allows custom actions depending on notice
+		
 		if ( $_REQUEST['notice_id'] == 'patreon-wordpress-update-available' ) {
 			delete_option( 'patreon-wordpress-update-available');
+		}
+
+		if ( $_REQUEST['notice_id'] == 'patreon-addon-upsell-shown' ) {
+			update_option( 'patreon-addon-upsell-shown', true);
 		}
 
 	}
@@ -909,6 +927,18 @@ class Patreon_Wordpress {
 		// Add the sent element at the end:
 		
 		return self::$lock_or_not[$post_id] = $result;
+		
+	}
+	public static function add_plugin_action_links( $links ) {
+		
+		// Adds action links to plugin listing in WP plugin admin
+		
+		
+		$links = array_merge( array(
+			'<a href="' . esc_url( admin_url('admin.php?page=patreon-plugin') ) . '">' . __( 'Settings', 'textdomain' ) . '</a>',
+			'<a href="https://codebard.com/patron-pro-addon-for-patreon-wordpress" target="_blank">Upgrade to Pro</a>',
+		), $links );
+		return $links;
 		
 	}
 	public static function lock_or_not( $post_id = false ) {
