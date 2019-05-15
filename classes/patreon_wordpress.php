@@ -1301,7 +1301,7 @@ class Patreon_Wordpress {
 				$creator_tiers = $api_client->fetch_tiers();
 				
 		}
-		if ( isset( $creator_tiers['included'][2]['type'] ) AND $creator_tiers['included'][2]['type'] == 'reward' ) {
+		if ( is_array( $creator_info['included'] ) AND isset( $creator_tiers['included'][2]['type'] ) AND $creator_tiers['included'][2]['type'] == 'reward' ) {
 
 			// Creator info acquired. Update.
 			// We want to sort tiers according to their $ level.
