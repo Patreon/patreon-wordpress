@@ -1298,7 +1298,7 @@ class Patreon_Wordpress {
 				// Credentials are in. Go.
 				
 				$api_client = new Patreon_API( get_option( 'patreon-creators-access-token', false ) );
-				$creator_tiers = $api_client->fetch_tiers();
+				$creator_info = $api_client->fetch_tiers();
 				
 		}
 		if ( is_array( $creator_info['included'] ) AND isset( $creator_tiers['included'][2]['type'] ) AND $creator_tiers['included'][2]['type'] == 'reward' ) {
@@ -1310,7 +1310,7 @@ class Patreon_Wordpress {
 				return $a['attributes']['amount_cents'] - $b['attributes']['amount_cents'];
 			} );
 
-			update_option( 'patreon-creator-tiers', $creator_tiers );
+			update_option( 'patreon-creator-tiers', $creator_info );
 		}
 		
 		
