@@ -63,6 +63,11 @@ class Patron_Metabox {
 			<select id="patreon_level_select" name="patreon-level"<?php echo $disabled ?> pw_post_id="<?php echo $object->ID; ?>"><option value="<?php echo get_post_meta( $object->ID, 'patreon-level', true ); ?>">Loading...</option></select>			
 		</p>
 		
+		<p> If you set a precise amount in advanced settings below, or had one set before, that will be used instead.
+		</p>
+		
+		
+		
 		<?php 
 			
 			$advanced_post_options_toggle_status = get_user_meta( $current_user->ID, 'patreon-wordpress-advanced-options-toggle', true );

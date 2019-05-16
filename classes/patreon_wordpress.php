@@ -1277,6 +1277,15 @@ class Patreon_Wordpress {
 					$selected = ' selected="selected"';
 					
 					$matching_level_found = true;
+					
+					// Check if a precise amount is set for this content. If so, add the actual locking amount in parantheses
+					
+					if ( ( $reward['attributes']['amount_cents'] / 100 ) != $patreon_level ) {
+						
+						$label .= ' ($'.$patreon_level.' exact)';
+						
+					}
+					
 				}
 				
 				$select_options .= '<option value="' . ( $reward['attributes']['amount_cents'] / 100 ) . '"'.$selected.'>'. $label . '</option>';
@@ -1301,7 +1310,7 @@ class Patreon_Wordpress {
 				$creator_info = $api_client->fetch_tiers();
 				
 		}
-		if ( is_array( $creator_info['included'] ) AND isset( $creator_tiers['included'][2]['type'] ) AND $creator_tiers['included'][2]['type'] == 'reward' ) {
+		if ( is_array( $creator_info['included'] ) AND isset( $creator_info['included'][1]['type'] ) AND $creator_info['included'][1]['type'] == 'reward' ) {
 
 			// Creator info acquired. Update.
 			// We want to sort tiers according to their $ level.
