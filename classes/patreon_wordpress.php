@@ -670,11 +670,11 @@ class Patreon_Wordpress {
 		
 		$addon_upsell_shown = get_option( 'patreon-addon-upsell-shown', false );
 		
-		if( !$addon_upsell_shown ) {
+		if( !$addon_upsell_shown AND !self::check_plugin_exists( 'patron-plugin-pro/index.php' ) ) {
 			
 			?>
 				<div class="notice notice-success is-dismissible patreon-wordpress" id="patreon-addon-upsell-shown"><img class="addon_upsell" src="<?php echo PATREON_PLUGIN_ASSETS ?>/img/Patron-Plugin-Pro-128.png" style="float:left; margin-right: 20px;" alt="Patron Plugin Pro" />
-					<p><h2 style="margin-top: 0px; font-size: 150%; font-weight: bold;">Power up your Patreon integration with Patron Pro!</h2><div style="font-size: 125% !important">Get Patron Pro third party addon for Patreon WordPress to increase your patrons and pledges! Enjoy powerful features like partial post locking, sneak peeks, advanced locking methods, login lock, vip users and more.<br /><br /><a href="https://codebard.com/patron-pro-addon-for-patreon-wordpress" target="_blank">Check out all features here</a></div></p>
+					<p><h2 style="margin-top: 0px; font-size: 150%; font-weight: bold;">Boost your pledges and patrons at Patreon with Patron Pro!</h2><div style="font-size: 125% !important">Get Patron Pro third party addon for Patreon WordPress to increase your patrons and pledges! Enjoy powerful features like partial post locking, sneak peeks, advanced locking methods, login lock, vip users and more.<br /><br /><a href="https://codebard.com/patron-pro-addon-for-patreon-wordpress" target="_blank">Check out all features here</a></div></p>
 				</div>
 			<?php	
 						
@@ -1179,5 +1179,18 @@ class Patreon_Wordpress {
 		return apply_filters( 'ptrn/lock_or_not', self::add_to_lock_or_not_results( $post_id, $result) , $post_id, $declined, $user );
 		
 	}
+	public function check_plugin_exists( $plugin_slug ) {
+		// Simple function to check if a plugin is installed (may be active, or not active) in the WP instalation
+		
+		// Plugin slug is the wp's plugin dir together with the plugin's file which has the plugin header
+
+		if ( file_exists( WP_PLUGIN_DIR . '/' . $plugin_slug ) ) {
+			return true;			
+		}
+		
+		return false;
+		
+	}
+	
 	
 }
