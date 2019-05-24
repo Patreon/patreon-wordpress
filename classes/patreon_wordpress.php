@@ -678,6 +678,7 @@ class Patreon_Wordpress {
 		// Wp org wants non-error / non-functionality related notices to be shown infrequently and one per admin-wide page load, and be dismissable permanently. 		
 
 		$addon_upsell_shown = get_option( 'patreon-addon-upsell-shown', false );
+		$existing_install = get_option( 'patreon-existing-installation', false );
 		
 		if( !$addon_upsell_shown AND ( (self::check_days_after_last_non_system_notice( 7 ) AND self::calculate_days_after_first_activation( 30 ) ) OR $existing_install ) AND !$already_showed_non_system_notice ) {
 			
