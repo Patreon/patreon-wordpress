@@ -232,6 +232,7 @@ class Patreon_Wordpress {
 		if ( $plugin_first_activated == 0 ) {
 			// If no date was set, set it to now
 			update_option( 'patreon-plugin-first-activated', time() );
+			update_option( 'patreon-existing-installation', true );
 		}
 		
 	}
@@ -660,7 +661,7 @@ class Patreon_Wordpress {
 			update_option( 'patreon-image-option-transition-done', true );
 			
 		}
-		
+
 	}
 	public static function add_privacy_policy_section() {
 
@@ -671,6 +672,8 @@ class Patreon_Wordpress {
 		
 		// This function processes any admin wide message or notification to display
 		
+		$already_showed_non_system_notice = false;
+			
 		// Wp org wants non-error / non-functionality related notices to be shown infrequently and one per admin-wide page load, and be dismissable permanently. 
 		
 		$mailing_list_notice_shown = get_option( 'patreon-mailing-list-notice-shown', false );
@@ -680,36 +683,32 @@ class Patreon_Wordpress {
 		if( !$mailing_list_notice_shown ) {
 			
 			?>
-				 <div class="notice notice-success is-dismissible  patreon-wordpress">
+				 <div class="notice notice-success is-dismissible  patreon-wordpress" id="patreon-mailing-list-notice-shown">
 					<p>Would you like to receive notices, tips & tricks for Patreon WordPress? <a href="https://patreonforms.typeform.com/to/dPBVp1" target="_blank">Join our mailing list here!</a></p>
 				</div>
 			<?php	
 			
-			// Set the last notice shown date
-			self::set_last_non_system_notice_shown_date();
 			$already_showed_non_system_notice = true;
 			
 		}
-
+		
 		$rate_plugin_notice_shown = get_option( 'patreon-rate-plugin-notice-shown', false );
 		
 		// The below will trigger a rating notice once if it was not shown and the plugin was installed more than 37 days ago.
 		// It will also trigger once for existing installs before this version. Show 30 days after the plugin was first installed, and 7 days after any last notice
 
-		if( !$rate_plugin_notice_shown AND self::check_days_after_last_non_system_notice( 7 ) AND self::calculate_days_after_first_activation( 37 ) ) {
+		if( !$rate_plugin_notice_shown AND self::check_days_after_last_non_system_notice( 7 ) AND self::calculate_days_after_first_activation( 37 ) AND !$already_showed_non_system_notice ) {
 
 			?>
-				 <div class="notice notice-info is-dismissible patreon-wordpress">
+				 <div class="notice notice-info is-dismissible patreon-wordpress" id="patreon-rate-plugin-notice-shown">
 					<p>Did Patreon WordPress help your site? Help creators like yourself find out about it <a href="https://wordpress.org/support/plugin/patreon-connect/reviews/#new-post" target="_blank">by giving us a good rating!</a></p>
 				</div>
 			<?php	
 
-			// Set the last notice shown date
-			self::set_last_non_system_notice_shown_date();
 			$already_showed_non_system_notice = true;
 			
 		}
-		
+
 		// This is a plugin system info notice. 
 		if( get_option( 'patreon-wordpress-app-credentials-success', false ) ) {
 			
@@ -762,7 +761,30 @@ class Patreon_Wordpress {
 		
 		// Mapping what comes from REQUEST to a given value avoids potential security problems
 		if ( $_REQUEST['notice_id'] == 'patreon-wordpress-update-available' ) {
-			delete_option( 'patreon-wordpress-update-available');
+			delete_option( 'patreon-wordpress-update-available' );
+		}
+		
+		// Mapping what comes from REQUEST to a given value avoids potential security problems
+		if ( $_REQUEST['notice_id'] == 'patreon-mailing-list-notice-shown' ) {
+			update_option( 'patreon-mailing-list-notice-shown', true );
+			
+			// Set the last notice shown date
+			self::set_last_non_system_notice_shown_date();
+		}
+		
+		// Mapping what comes from REQUEST to a given value avoids potential security problems
+		if ( $_REQUEST['notice_id'] == 'patreon-rate-plugin-notice-shown' ) {
+			update_option( 'patreon-rate-plugin-notice-shown', true );
+			
+			// Set the last notice shown date
+			self::set_last_non_system_notice_shown_date();
+		}
+		// Mapping what comes from REQUEST to a given value avoids potential security problems
+		if ( $_REQUEST['notice_id'] == 'apatreon-rate-plugin-notice-shown' ) {
+			update_option( 'apatreon-rate-plugin-notice-shown', true );
+			
+			// Set the last notice shown date
+			self::set_last_non_system_notice_shown_date();
 		}
 		
 	}
