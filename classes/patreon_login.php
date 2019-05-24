@@ -188,6 +188,10 @@ class Patreon_Login {
 					wp_set_auth_cookie( $user->ID );
 					do_action( 'wp_login', $user->user_login, $user );
 
+					// Import Patreon avatar for this user since it is a new user
+				
+					self::get_update_user_patreon_avatar( $user_response['data']['attributes']['thumb_url'], $user );
+					
 					/* update user meta data with patreon data */
 					self::updateExistingUser( $user->ID, $user_response, $tokens );
 					
