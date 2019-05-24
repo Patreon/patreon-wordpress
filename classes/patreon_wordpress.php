@@ -48,6 +48,7 @@ class Patreon_Wordpress {
 
 		add_action( 'wp_head', array( $this, 'updatePatreonUser' ) );
 		add_action( 'init', array( $this, 'checkPatreonCreatorID' ) );
+		add_action( 'init', array( $this, 'check_creator_tiers' ) );
 		add_action( 'init', array( $this, 'check_plugin_activation_date_for_existing_installs' ) );
 		add_action( 'admin_init', array( $this, 'post_credential_update_api_connectivity_check' ) );
 		add_action( 'update_option_patreon-client-id', array( $this, 'toggle_check_api_credentials_on_setting_save' ), 10, 2 );
@@ -67,6 +68,7 @@ class Patreon_Wordpress {
 		add_filter( 'pre_set_site_transient_update_plugins', array( $this, 'check_for_update' ) );
 		add_action( 'wp_ajax_patreon_wordpress_dismiss_admin_notice', array( $this, 'dismiss_admin_notice' ), 10, 1 );
 		add_action( 'wp_ajax_patreon_wordpress_toggle_option', array( $this, 'toggle_option' ), 10, 1 );
+		add_action( 'wp_ajax_patreon_wordpress_populate_patreon_level_select', array( $this, 'populate_patreon_level_select_from_ajax' ), 10, 1 );
 		add_action( 'plugin_action_links_' . PATREON_WORDPRESS_PLUGIN_SLUG, array( $this, 'add_plugin_action_links' ), 10, 1 );
 
 	}
@@ -172,7 +174,7 @@ class Patreon_Wordpress {
 
 	}
 	public static function checkPatreonCreatorID() {
-
+				
 		// Check if creator id doesnt exist. Account for the case in which creator id was saved as empty by the Creator
 
 		if ( !get_option( 'patreon-creator-id', false ) OR get_option( 'patreon-creator-id', false )== '' ) {
@@ -196,6 +198,19 @@ class Patreon_Wordpress {
 			
 		}
 		
+	}
+	public static function check_creator_tiers() {
+				
+		// Check if creator tier info doesnt exist. This will make sure the new version is compatible with existing installs and will show the tiers in locked interface text from the get go
+
+		// When we move to webhooks, this code can be changed to read from the already present creator details
+
+		if ( !get_option( 'patreon-creator-tiers', false ) OR get_option( 'patreon-creator-tiers', false ) == '' ) {
+			
+			// Trigger an update of credentials
+			self::update_creator_tiers_from_api();
+			
+		}
 	}
 	public static function checkPatreonCreatorURL() {
 		
@@ -771,6 +786,7 @@ class Patreon_Wordpress {
 		
 	}	
 	public function dismiss_admin_notice() {
+		
 		if( !( is_admin() && current_user_can( 'manage_options' ) ) ) {
 			return;
 		}
@@ -1241,5 +1257,164 @@ class Patreon_Wordpress {
 			
 	}
 
+	
+	public static function populate_patreon_level_select_from_ajax() {
+		// This function accepts the ajax request from the metabox and calls the relevant function to populate the tiers select
+		
+		if( !( is_admin() && current_user_can( 'manage_options' ) ) ) {
+			return;
+		}
+		
+		// Just bail out if the action is not relevant, just in case
+		if ( $_REQUEST['action'] != 'patreon_wordpress_populate_patreon_level_select' ) {
+			return;
+		}
+		
+		// If post id was not passed, exit with error
+		if ( !isset( $_REQUEST['pw_post_id'] ) OR $_REQUEST['pw_post_id'] == '' ) {
+			echo 'Error: Could not get post id';
+			exit;
+		}
+		
+		$post = get_post( $_REQUEST['pw_post_id'] );
+				
+		echo Patreon_Wordpress::make_tiers_select( $post );
+		exit;
+		
+	}
+	public static function make_tiers_select( $post = false ) {
+		
+		if( !( is_admin() && current_user_can( 'manage_options' ) ) ) {
+			return;
+		}
+		
+		if ( !$post ) {
+			global $post;
+		}
+		
+		// This function makes a select box with rewards and reward ids from creator's campaign to be used in post locking and site locking
+		
+		// First force an update of creator tiers from the api in case they were changed.
+		
+		self::update_creator_tiers_from_api();
+		
+		// Get updated tiers from db
+		$creator_tiers = get_option( 'patreon-creator-tiers', false );
+
+		// Set the select to default
+		$select_options = PATREON_TEXT_YOU_HAVE_NO_REWARDS_IN_THIS_CAMPAIGN;
+		// 1st element is 'everyone' and 2nd element is 'Patrons' (with cent amount 1) in the rewards array.
+		
+		if ( is_array( $creator_tiers['included'] ) ) {
+					
+			$select_options = '';
+			
+			// Lets get the current Patreon level for the post:
+			$patreon_level = get_post_meta( $post->ID, 'patreon-level', true );
+			
+			$tier_count = 1;
+			
+			// Flag for determining if the matching tier was found during iteration of tiers
+			$matching_level_found = false;
+
+			foreach( $creator_tiers['included'] as $key => $value ) {
+				
+				// If its not a reward element, continue, just to make sure
+				
+				if(	
+					!isset( $creator_tiers['included'][$key]['type'] )
+					OR $creator_tiers['included'][$key]['type'] != 'reward'
+				)  {
+					continue; 
+				}
+				
+				$reward = $creator_tiers['included'][$key];
+								
+				// Special conditions for label for element 0, which is 'everyone' and '1, which is 'patron only'
+				
+				if ( $reward['id'] == -1 ) {
+					$label = PATREON_TEXT_EVERYONE;
+				}
+				if ( $reward['id'] == 0 ) {
+					$label = PATREON_TEXT_ANY_PATRON;
+				}
+				
+				// Use title if exists, and cents amount converted to dollar for any other reward level
+				if ( $reward['id'] > 0 ) {
+					
+					$tier_title = 'Tier ' . $tier_count;
+					
+					$tier_count++;
+					
+					if ( $reward['title'] != '' ) {
+						
+						$tier_title = $reward['title'];
+						
+						// If the title is too long, snip it
+						if ( strlen( $tier_title ) > 23 ) {
+							$tier_title = substr( $tier_title , 0 , 23 ) .'...';
+						}
+						
+					}
+					
+					$label = $tier_title . ' - $' . ( $reward['attributes']['amount_cents'] / 100 );
+				}
+				
+				$selected = '';
+				
+				if ( ( $reward['attributes']['amount_cents'] / 100 ) >= $patreon_level  AND !$matching_level_found ) {
+					
+					// Matching level was present, but now found. Set selected and toggle flag.
+					// selected = selected for XHTML compatibility
+					$selected = ' selected="selected"';
+					
+					$matching_level_found = true;
+					
+					// Check if a precise amount is set for this content. If so, add the actual locking amount in parantheses
+					
+					if ( ( $reward['attributes']['amount_cents'] / 100 ) != $patreon_level ) {
+						
+						$label .= ' ($'.$patreon_level.' exact)';
+						
+					}
+					
+				}
+				
+				$select_options .= '<option value="' . ( $reward['attributes']['amount_cents'] / 100 ) . '"'.$selected.'>'. $label . '</option>';
+			}
+			
+		}
+		
+		return apply_filters( 'ptrn/post_locking_tier_select', $select_options, $post );
+	
+	}
+	public static function update_creator_tiers_from_api() {
+		
+		// Does an update of creator tiers from the api
+		
+		if ( get_option( 'patreon-client-id', false ) 
+				&& get_option( 'patreon-client-secret', false ) 
+				&& get_option( 'patreon-creators-access-token' , false )
+		) {
+				// Credentials are in. Go.
+				
+				$api_client = new Patreon_API( get_option( 'patreon-creators-access-token', false ) );
+				$creator_info = $api_client->fetch_tiers();
+				
+		}
+		if ( is_array( $creator_info['included'] ) AND isset( $creator_info['included'][1]['type'] ) AND $creator_info['included'][1]['type'] == 'reward' ) {
+
+			// Creator info acquired. Update.
+			// We want to sort tiers according to their $ level.
+			
+			usort( $creator_info['included'], function( $a, $b ) {
+				return $a['attributes']['amount_cents'] - $b['attributes']['amount_cents'];
+			} );
+
+			update_option( 'patreon-creator-tiers', $creator_info );
+		}
+		
+		
+	}
 	
 }
