@@ -24,6 +24,7 @@ class Patreon_Frontend {
 		add_action( 'register_form', array( $this, 'displayPatreonLoginButtonInLoginForm' ) );
 		add_filter( 'the_content', array( $this, 'protectContentFromUsers'), PHP_INT_MAX - 5 );
 		add_shortcode( 'patreon_login_button', array( $this,'LoginButtonShortcode' ) );
+		add_filter('get_avatar', array( $this, 'show_patreon_avatar' ), 10, 5);
 
 		self::$messages_map = array(
 			'patreon_cant_login_strict_oauth'            => PATREON_CANT_LOGIN_STRICT_OAUTH,		
@@ -42,9 +43,11 @@ class Patreon_Frontend {
 			'no_code_receved_from_patreon'               => PATREON_NO_CODE_RECEIVED_FROM_PATREON,
 			'no_patreon_action_provided_for_flow'        => PATREON_NO_FLOW_ACTION_PROVIDED,
 			'patreon_direct_unlocks_not_turned_on'       => PATREON_DIRECT_UNLOCKS_NOT_ON,
+			'patreon_couldnt_acquire_user_details'       => PATREON_COULDNT_ACQUIRE_USER_DETAILS,
 		);
 		
 	}
+	
 	function patreonEnqueueJs() {
 		
 		wp_register_script( 'patreon-wordpress-js', PATREON_PLUGIN_ASSETS . '/js/app.js', array( 'jquery' ) );
@@ -1072,6 +1075,47 @@ class Patreon_Frontend {
 			return Patreon_Frontend::showPatreonLoginButton();
 		}
 		
+	}
+	public static function show_patreon_avatar( $avatar, $id_or_email, $size, $default, $alt ) {
+		
+		// Checks if the user has a Patreon avatar saved, and returns that avatar in place of WP/site default
+		$user = false;
+
+		if ( is_numeric( $id_or_email ) ) {
+
+			$id = (int) $id_or_email;
+			$user = get_user_by( 'id' , $id );
+
+		} elseif ( is_object( $id_or_email ) ) {
+
+			if ( ! empty( $id_or_email->user_id ) ) {
+				$id = (int) $id_or_email->user_id;
+				$user = get_user_by( 'id' , $id );
+			}
+
+		} else {
+			$user = get_user_by( 'email', $id_or_email );	
+		}
+
+		if ( $user && is_object( $user ) ) {
+			
+			// Get user's Patreon avatar meta:
+			
+			$user_patreon_avatar = get_user_meta( $user->ID, 'patreon-avatar-url', true );
+			
+			if ( !$size OR !is_numeric($size) OR $size == 0 ) {
+				// Set size to WP default 48 if no size was provided by WP installation for whatsoever reason
+				$size = 48;
+			}
+			
+			// Override avatar if there is a saved Patreon avatar
+			if ( $user_patreon_avatar != '' ) {
+				$avatar = "<img alt='{$alt}' src='{$user_patreon_avatar}' class='avatar avatar-{$size} photo' height='{$size}' width='{$size}' />";
+			}
+		}
+		
+		return $avatar;
+
 	}
 	
 }

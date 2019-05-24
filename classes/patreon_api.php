@@ -30,11 +30,12 @@ class Patreon_API {
 			$api_return['included'][0]['attributes']['amount_cents']             = $api_return['included'][0]['attributes']['currently_entitled_amount_cents'];
 			$api_return['included'][0]['attributes']['created_at']               = $api_return['included'][0]['attributes']['pledge_relationship_start'];
 			
+			if ( $api_return['included'][0]['attributes']['last_charge_status'] != 'Paid' ) {
+				$api_return['included'][0]['attributes']['declined_since'] = $api_return['included'][0]['attributes']['last_charge_date'];
+			}
+			
 		}
 		
-		if ( $api_return['included'][0]['attributes']['last_charge_status'] != 'Paid' ) {
-			$api_return['included'][0]['attributes']['declined_since'] = $api_return['included'][0]['attributes']['last_charge_date'];
-		}
 			
 		return $api_return;
 	}
@@ -95,7 +96,7 @@ class Patreon_API {
 		
 		$headers = array(
 			'Authorization' => 'Bearer ' . $this->access_token,
-			'User-Agent' => 'Patreon-Wordpress, version ' . PATREON_WORDPRESS_VERSION . ', platform ' . php_uname('s') . '-' . php_uname( 'r' ),
+			'User-Agent' => 'Patreon-Wordpress, version ' . PATREON_WORDPRESS_VERSION . PATREON_WORDPRESS_BETA_STRING . ', platform ' . php_uname('s') . '-' . php_uname( 'r' ),
 		);
 		
 		$api_request = array(

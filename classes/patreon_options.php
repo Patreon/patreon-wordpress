@@ -49,20 +49,6 @@ class Patreon_Options {
 		
     }
 	
-    function fetch_creator_id() {
-
-        if( is_admin() && current_user_can( 'manage_options' ) && isset( $_POST[''] )) {
-			
-            $creator_id = Patreon_Wordpress::getPatreonCreatorID();
-			
-            if( $creator_id != false ) {
-                update_option( 'patreon-creator-id', $creator_id );
-            }
-			
-        }
-		
-    }
-
     function patreon_plugin_setup_page(){
 
         $args = array(

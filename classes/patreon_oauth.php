@@ -42,7 +42,7 @@ class Patreon_OAuth {
 		$api_endpoint = "https://api.patreon.com/oauth2/token";
 		
 		$headers = array(
-			'User-Agent' => 'Patreon-Wordpress, version ' . PATREON_WORDPRESS_VERSION . ', platform ' . php_uname('s') . '-' . php_uname( 'r' ),
+			'User-Agent' => 'Patreon-Wordpress, version ' . PATREON_WORDPRESS_VERSION . PATREON_WORDPRESS_BETA_STRING . ', platform ' . php_uname('s') . '-' . php_uname( 'r' ),
 		);		
 	
 		$api_request = array(
@@ -66,10 +66,10 @@ class Patreon_OAuth {
 		if ( is_array( $response_decoded ) ) {
 			return $response_decoded;
 		}
-		
-		echo $response['body'];
-		wp_die();
-
+	
+		// Commented out to address issues caused by Patreon's maintenance in between 01 - 02 Feb 2019 - the plugin was showing Patreon's maintenance page at WP sites yin certain cases
+		// echo $response['body'];
+		// wp_die();
 	}
 	
 }

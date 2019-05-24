@@ -4,7 +4,7 @@
 Plugin Name: Patreon Wordpress
 Plugin URI: https://www.patreon.com/apps/wordpress
 Description: Patron-only content, directly on your website.
-Version: 1.2.2
+Version: 1.2.4
 Author: Patreon <platform@patreon.com>
 Author URI: https://patreon.com
 */
@@ -59,7 +59,8 @@ define( "PATREON_ADMIN_BYPASSES_FILTER_MESSAGE", 'This content is for Patrons on
 define( "PATREON_CREATOR_BYPASSES_FILTER_MESSAGE", 'This content is for Patrons only, it\'s not locked for you because you are logged in as the Patreon creator' );
 define( "PATREON_NO_LOCKING_LEVEL_SET_FOR_THIS_POST", 'Post is already public. If you would like to lock this post, please set a pledge level for it' );
 define( "PATREON_NO_POST_ID_TO_UNLOCK_POST", 'Sorry - could not get the post id for this locked post' );
-define( "PATREON_WORDPRESS_VERSION", '1.2.2' );
+define( "PATREON_WORDPRESS_VERSION", '1.2.4' );
+define( "PATREON_WORDPRESS_BETA_STRING", '' );
 define( "PATREON_WORDPRESS_PLUGIN_SLUG", plugin_basename( __FILE__ ) );
 define( "PATREON_PRIVACY_POLICY_ADDENDUM", '<h2>Patreon features in this website</h2>In order to enable you to use this website with Patreon services, we save certain functionally important Patreon information about you in this website if you log in with Patreon.
 <br /><br />
@@ -80,7 +81,10 @@ define( "PATREON_TEXT_OVER_BUTTON_8", 'This content is available exclusively to 
 define( "PATREON_TEXT_OVER_BUTTON_9", 'This content is available exclusively to Patreon members pledging $%%pledgelevel%% or more, or having at least $%%total_pledge%% pledged in total.' );
 define( "PATREON_TEXT_OVER_BUTTON_10", 'This content is available exclusively to Patreon members pledging $%%pledgelevel%% or more at the time this content was posted, or having at least $%%total_pledge%% pledged in total.' );
 define( "PATREON_TEXT_OVER_BUTTON_11", 'This content is available exclusively to Patreon members pledging $%%pledgelevel%% or more at the time this content was posted.' );
+define( "PATREON_COULDNT_ACQUIRE_USER_DETAILS", 'Sorry. Could not acquire your info from Patreon. Please try again later.' );
 
 include 'classes/patreon_wordpress.php';
+
+register_activation_hook( __FILE__, array( 'Patreon_Wordpress', 'activate' ) );
 
 $Patreon_Wordpress = new Patreon_Wordpress;
