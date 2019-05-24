@@ -87,4 +87,6 @@ define( "PATREON_TEXT_ANY_PATRON", 'Any patron' );
 
 include 'classes/patreon_wordpress.php';
 
+register_activation_hook( __FILE__, array( 'Patreon_Wordpress', 'activate' ) );
+
 $Patreon_Wordpress = new Patreon_Wordpress;

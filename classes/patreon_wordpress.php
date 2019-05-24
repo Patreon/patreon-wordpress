@@ -49,6 +49,7 @@ class Patreon_Wordpress {
 		add_action( 'wp_head', array( $this, 'updatePatreonUser' ) );
 		add_action( 'init', array( $this, 'checkPatreonCreatorID' ) );
 		add_action( 'init', array( $this, 'check_creator_tiers' ) );
+		add_action( 'init', array( $this, 'check_plugin_activation_date_for_existing_installs' ) );
 		add_action( 'admin_init', array( $this, 'post_credential_update_api_connectivity_check' ) );
 		add_action( 'update_option_patreon-client-id', array( $this, 'toggle_check_api_credentials_on_setting_save' ), 10, 2 );
 		add_action( 'update_option_patreon-client-secret', array( $this, 'toggle_check_api_credentials_on_setting_save' ), 10, 2 );
@@ -68,6 +69,7 @@ class Patreon_Wordpress {
 		add_action( 'wp_ajax_patreon_wordpress_dismiss_admin_notice', array( $this, 'dismiss_admin_notice' ), 10, 1 );
 		add_action( 'wp_ajax_patreon_wordpress_toggle_option', array( $this, 'toggle_option' ), 10, 1 );
 		add_action( 'wp_ajax_patreon_wordpress_populate_patreon_level_select', array( $this, 'populate_patreon_level_select_from_ajax' ), 10, 1 );
+		add_action( 'plugin_action_links_' . PATREON_WORDPRESS_PLUGIN_SLUG, array( $this, 'add_plugin_action_links' ), 10, 1 );
 
 	}
 	public static function getPatreonUser( $user ) {
@@ -234,6 +236,19 @@ class Patreon_Wordpress {
 				
 			}
 			
+		}
+		
+	}
+	public static function check_plugin_activation_date_for_existing_installs() {
+		
+		// Checks if plugin first activation date is saved for existing installs. Its here for backwards compatibility for existing installs before this version (1.2.5), and in case this meta info is lost in the db for any reason
+		
+		$plugin_first_activated = get_option( 'patreon-plugin-first-activated', 0 );
+				
+		if ( $plugin_first_activated == 0 ) {
+			// If no date was set, set it to now
+			update_option( 'patreon-plugin-first-activated', time() );
+			update_option( 'patreon-existing-installation', true );
 		}
 		
 	}
@@ -437,7 +452,7 @@ class Patreon_Wordpress {
 			
 			foreach ( $user_response['included'] as $obj ) {
 				
-				if ( $obj["type"] == "pledge" && $obj["relationships"]["creator"]["data"]["id"] == $creator_id ) {
+				if ( isset( $obj["type"] ) && $obj["type"] == "pledge" && $obj["relationships"]["creator"]["data"]["id"] == $creator_id ) {
 					$pledge = $obj;
 					break;
 				}
@@ -635,17 +650,8 @@ class Patreon_Wordpress {
 
 			if( $got_updated ) {
 				
-				// Yep, this plugin was updated. Do whatever necessary post-update action:
-				
-				// Flush permalinks (htaccess rules) for Apache servers to make image protection rules active
-				flush_rewrite_rules();
-				
-				// Now remove the flags for regular notifications:
-	
-				delete_option( 'patreon-mailing-list-notice-shown' );
-				delete_option( 'patreon-rate-plugin-notice-shown' );
-				delete_option( 'patreon-file-locking-feature-notice-shown' );
-				
+				// This section is used to do any tasks need doing after plugin updates. Any code changes to this part would take effect not immediately in the same version, but in the next update cycle since WP would use the new code only after plugin has been updated once.
+								
 			}
 
 			
@@ -671,7 +677,7 @@ class Patreon_Wordpress {
 			update_option( 'patreon-image-option-transition-done', true );
 			
 		}
-		
+
 	}
 	public static function add_privacy_policy_section() {
 
@@ -679,87 +685,74 @@ class Patreon_Wordpress {
 		
 	}
 	public static function AdminMessages() {
-		
+				
 		// This function processes any message or notification to display once after updates.
 		
+		$already_showed_non_system_notice = false;
+		
+		// Wp org wants non-error / non-functionality related notices to be shown infrequently and one per admin-wide page load, and be dismissable permanently. 		
+
+		$addon_upsell_shown = get_option( 'patreon-addon-upsell-shown', false );
+		
+		if( !$addon_upsell_shown AND ( (self::check_days_after_last_non_system_notice( 7 ) AND self::calculate_days_after_first_activation( 30 ) ) OR $existing_install ) AND !$already_showed_non_system_notice ) {
+			
+			?>
+				<div class="notice notice-success is-dismissible patreon-wordpress" id="patreon-addon-upsell-shown"><img class="addon_upsell" src="<?php echo PATREON_PLUGIN_ASSETS ?>/img/Patron-Plugin-Pro-128.png" style="float:left; margin-right: 20px;" alt="Patron Plugin Pro" />
+					<p><h2 style="margin-top: 0px; font-size: 150%; font-weight: bold;">Boost your pledges and patrons at Patreon with Patron Pro!</h2><div style="font-size: 125% !important">Get Patron Pro third party addon for Patreon WordPress to increase your patrons and pledges! Enjoy powerful features like partial post locking, sneak peeks, advanced locking methods, login lock, vip users and more.<br /><br /><a href="https://codebard.com/patron-pro-addon-for-patreon-wordpress" target="_blank">Check out all features here</a></div></p>
+				</div>
+			<?php	
+			
+			$already_showed_non_system_notice = true;
+			
+		}
+		
 		$mailing_list_notice_shown = get_option( 'patreon-mailing-list-notice-shown', false );
+
+		// Queue this message immediately after activation if not already shown
 		
 		if( !$mailing_list_notice_shown ) {
 			
 			?>
-				 <div class="notice notice-success is-dismissible">
-					<p>Would you like to receive update notices, tips & tricks for Patreon WordPress? <a href="https://patreonforms.typeform.com/to/dPBVp1" target="_blank">Join our mailing list here!</a></p>
+				 <div class="notice notice-success is-dismissible  patreon-wordpress" id="patreon-mailing-list-notice-shown">
+					<p>Would you like to receive notices, tips & tricks for Patreon WordPress? <a href="https://patreonforms.typeform.com/to/dPBVp1" target="_blank">Join our mailing list here!</a></p>
 				</div>
 			<?php	
 			
-			update_option('patreon-mailing-list-notice-shown',1);
+			$already_showed_non_system_notice = true;
 			
 		}
 		
-		$rate_plugin_notice_shown = get_option('patreon-rate-plugin-notice-shown',false);
+		$rate_plugin_notice_shown = get_option( 'patreon-rate-plugin-notice-shown', false );
 		
-		if( !$rate_plugin_notice_shown ) {
-			
+		// The below will trigger a rating notice once if it was not shown and the plugin was installed more than 37 days ago.
+		// It will also trigger once for existing installs before this version. Show 30 days after the plugin was first installed, and 7 days after any last notice
+
+		if( !$rate_plugin_notice_shown AND self::check_days_after_last_non_system_notice( 7 ) AND self::calculate_days_after_first_activation( 37 ) AND !$already_showed_non_system_notice ) {
+
 			?>
-				 <div class="notice notice-info is-dismissible">
-					<p>Did Patreon WordPress plugin transform your membership business? Help creators like yourself find out about this plugin <a href="https://wordpress.org/support/plugin/patreon-connect/reviews/#new-post" target="_blank">by rating and giving your brutally honest thoughts!</a></p>
+				 <div class="notice notice-info is-dismissible patreon-wordpress" id="patreon-rate-plugin-notice-shown">
+					<p>Did Patreon WordPress help your site? Help creators like yourself find out about it <a href="https://wordpress.org/support/plugin/patreon-connect/reviews/#new-post" target="_blank">by giving us a good rating!</a></p>
 				</div>
 			<?php	
-			
-			update_option( 'patreon-rate-plugin-notice-shown', 1 );
-			
-		}
-		
-		$file_feature_notice_shown = get_option( 'patreon-file-locking-feature-notice-shown', false );
-		
-		if( !$file_feature_notice_shown AND !get_option( 'patreon-enable-file-locking', false ) ) {
-			
-			?>
-				 <div class="notice notice-info is-dismissible">
-				 <h3>The Patreon Wordpress plugin now supports image locking!</h3>
-					<p>If you were using or would like to use image locking feature that Patreon WordPress offers, now you must turn it on in your <a href="<?php echo admin_url('admin.php?page=patreon-plugin'); ?>">plugin settings</a> and visit 'Permalinks' settings of your WordPress site and click 'Save'. Otherwise image locking feature will be disabled or your images may appear broken. <br /><br />Want to learn more about why image locking could be useful for you? <a href="https://www.patreondevelopers.com/t/how-to-use-image-locking-feature-in-patreon-wordpress-plugin/461" target="_blank">Read more about image locking here</a>.</p>
-				</div>
-			<?php	
-			update_option( 'patreon-file-locking-feature-notice-shown', 1 );
+
+			$already_showed_non_system_notice = true;
 			
 		}
-		
-		if( !get_option( 'patreon-gdpr-notice-shown', false ) ) {
-			
-			?>
-				 <div class="notice notice-info is-dismissible">
-				 <h3>Making your site GDPR compliant with Patreon WordPress</h3>
-					<p>Please visit <a href="<?php echo admin_url('tools.php?wp-privacy-policy-guide=1#wp-privacy-policy-guide-patreon-wordpress'); ?>">the new WordPress privacy policy recommendation page</a> and copy & paste the section related to Patreon WordPress to your privacy policy page.<br><br>You can read our easy tutorial for GDPR compliance with Patreon WordPress <a href="https://patreon.zendesk.com/hc/en-us/articles/360004198011" target="_blank">by visiting our GDPR help page</a></p>
-				</div>
-			<?php	
-			
-			update_option( 'patreon-gdpr-notice-shown', 1 );
-			
-		}
-	
-		if( get_option( 'patreon-wordpress-update-available', false ) ) {
-			
-			?>
-				 <div class="notice notice-info is-dismissible patreon-wordpress" id="patreon-wordpress-update-available">
-				 <h3>New version of Patreon WordPress is available</h3>
-					<p>To be able to receive the latest features, security and bug fixes, please update your plugin by <a href="<?php echo wp_nonce_url( get_admin_url() . 'update.php?action=upgrade-plugin&plugin=' . PATREON_WORDPRESS_PLUGIN_SLUG,'upgrade-plugin_' . PATREON_WORDPRESS_PLUGIN_SLUG ); ?>">clicking here</a>.</p>
-				</div>
-			<?php
-			
-		}
-		
+
+		// This is a plugin system info notice. 
 		if( get_option( 'patreon-wordpress-app-credentials-success', false ) ) {
 			
 			?>
 				 <div class="notice notice-success is-dismissible patreon-wordpress" id="patreon-wordpress-update-available">
 				 <h3>Your Patreon client details were successfully saved!</h3>
-					<p>Patreon WordPress is now ready to go and your site is connected to Patreon! You can now lock any content by using the "Patreon Level" meta box in your post editor!</p>
+					<p>Patreon WordPress is now ready to go and your site is connected to Patreon! You can now lock any post by using the "Patreon Level" meta box in your post editor!</p>
 				</div>
 			<?php
-			
+
 			delete_option( 'patreon-wordpress-app-credentials-success' );
 		}
 		
+		// This is a plugin system info notice. 
 		if( get_option( 'patreon-wordpress-app-credentials-failure', false ) ) {
 			
 			?>
@@ -770,6 +763,7 @@ class Patreon_Wordpress {
 			<?php
 			
 			delete_option( 'patreon-wordpress-app-credentials-failure' );
+			
 		}
 		
 	}
@@ -796,11 +790,35 @@ class Patreon_Wordpress {
 			return;
 		}
 		
-		// Mapping what comes from REQUEST to a given value avoids potential security problems
+		// Mapping what comes from REQUEST to a given value avoids potential security problems and allows custom actions depending on notice
+		
 		if ( $_REQUEST['notice_id'] == 'patreon-wordpress-update-available' ) {
-			delete_option( 'patreon-wordpress-update-available');
+			delete_option( 'patreon-wordpress-update-available' );
 		}
 
+		if ( $_REQUEST['notice_id'] == 'patreon-addon-upsell-shown' ) {
+			update_option( 'patreon-addon-upsell-shown', true);
+			
+			// Set the last notice shown date
+			self::set_last_non_system_notice_shown_date();
+		}
+		
+		// Mapping what comes from REQUEST to a given value avoids potential security problems
+		if ( $_REQUEST['notice_id'] == 'patreon-mailing-list-notice-shown' ) {
+			update_option( 'patreon-mailing-list-notice-shown', true );
+			
+			// Set the last notice shown date
+			self::set_last_non_system_notice_shown_date();
+		}
+		
+		// Mapping what comes from REQUEST to a given value avoids potential security problems
+		if ( $_REQUEST['notice_id'] == 'patreon-rate-plugin-notice-shown' ) {
+			update_option( 'patreon-rate-plugin-notice-shown', true );
+			
+			// Set the last notice shown date
+			self::set_last_non_system_notice_shown_date();
+		}
+		
 	}
 	public function toggle_check_api_credentials_on_setting_save(  $old_value, $new_value ) {
 		
@@ -855,7 +873,7 @@ class Patreon_Wordpress {
 			$creator_access = true;
 			
 		}
-		
+
 		// Try to do a creator's token refresh
 	
 		if ( $tokens = self::refresh_creator_access_token() ) {
@@ -925,6 +943,18 @@ class Patreon_Wordpress {
 		// Add the sent element at the end:
 		
 		return self::$lock_or_not[$post_id] = $result;
+		
+	}
+	public static function add_plugin_action_links( $links ) {
+		
+		// Adds action links to plugin listing in WP plugin admin
+		
+		
+		$links = array_merge( array(
+			'<a href="' . esc_url( admin_url('admin.php?page=patreon-plugin') ) . '">' . __( 'Settings', 'textdomain' ) . '</a>',
+			'<a href="https://codebard.com/patron-pro-addon-for-patreon-wordpress" target="_blank">Upgrade to Pro</a>',
+		), $links );
+		return $links;
 		
 	}
 	public static function lock_or_not( $post_id = false ) {
@@ -1165,6 +1195,67 @@ class Patreon_Wordpress {
 		return apply_filters( 'ptrn/lock_or_not', self::add_to_lock_or_not_results( $post_id, $result) , $post_id, $declined, $user );
 		
 	}
+
+	public function check_plugin_exists( $plugin_slug ) {
+		// Simple function to check if a plugin is installed (may be active, or not active) in the WP instalation
+		
+		// Plugin slug is the wp's plugin dir together with the plugin's file which has the plugin header
+
+		if ( file_exists( WP_PLUGIN_DIR . '/' . $plugin_slug ) ) {
+			return true;			
+		}
+	}
+	public function activate() {
+		
+		// This function kicks in after the plugin is activated. Used to perform tasks which need to be run during plugin activation
+		
+		// Checking if $plugin_first_activated value exists prevents resetting of this value on every plugin deactivation/activation
+
+		$plugin_first_activated   = get_option( 'patreon-plugin-first-activated', 0 );
+				
+		if ( $plugin_first_activated == 0 ) {
+			update_option( 'patreon-plugin-first-activated', time() );
+		}
+		
+	}
+	public static function check_days_after_last_non_system_notice( $days ) {
+		// Calculates if $days many days passed after last non system notice was showed. Used in deciding if and when to show admin wide notices
+		
+		$last_non_system_notice_shown_date = get_option( 'patreon-last-non-system-notice-shown-date', 0 );
+		
+		// Calculate if $days days passed since last notice was shown		
+		if ( ( time() - $last_non_system_notice_shown_date ) > ( $days * 24 * 3600 ) ) {
+			// More than $days days. Set flag
+			return true;
+		}
+
+		return false;
+		
+	}
+
+	public static function calculate_days_after_first_activation( $days ) {
+		
+		// Used to calculate days passed after first plugin activation. 
+		
+		$plugin_first_activated   = get_option( 'patreon-plugin-first-activated', 0 );
+				
+		// Calculate if $days days passed since last notice was shown		
+		if ( ( time() - $plugin_first_activated ) > ( $days * 24 * 3600 ) ) {
+			// More than $days days. Set flag
+			return true;
+		}
+
+		return false;
+			
+	}
+	public static function set_last_non_system_notice_shown_date() {
+		
+		// Sets the last non system notice shown date to now whenever called. Used for decicing when to show admin wide notices that are not related to functionality. 
+		
+		update_option( 'patreon-last-non-system-notice-shown-date', time() );
+			
+	}
+
 	
 	public static function populate_patreon_level_select_from_ajax() {
 		// This function accepts the ajax request from the metabox and calls the relevant function to populate the tiers select
