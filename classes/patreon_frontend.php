@@ -363,7 +363,7 @@ class Patreon_Frontend {
 		$label = str_replace( '%%creator_link%%', $creator_url, $label );
 		$label = str_replace( '%%creator%%', $creator_full_name, $label );
 		$label = str_replace( '%%pledgelevel%%', $patreon_level, $label );
-		$label = str_replace( '%%tier_level%%', $tier_title, $label );
+		$label = str_replace( '%%tier_level%%', strip_tags( $tier_title ), $label );
 		$label = str_replace( '%%flow_link%%', self::patreonMakeCacheableFlowLink( $post ), $label );
 		$label = str_replace( '%%total_pledge%%', $post_total_patronage_level, $label );
 	
