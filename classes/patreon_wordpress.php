@@ -694,9 +694,12 @@ class Patreon_Wordpress {
 
 		$addon_upsell_shown = get_option( 'patreon-addon-upsell-shown', false );
 		$existing_install = get_option( 'patreon-existing-installation', false );
+		$current_screen = get_current_screen();
 		
-		if( !$addon_upsell_shown AND ( (self::check_days_after_last_non_system_notice( 7 ) AND self::calculate_days_after_first_activation( 30 ) ) OR $existing_install ) AND !$already_showed_non_system_notice ) {
-			
+		// The addon upsell must be admin wide, permanently dismissable, and must not appear in plugin manager page in admin
+		
+		if( !$addon_upsell_shown AND !self::check_plugin_exists('patron-plugin-pro') AND $current_screen->id != 'plugins' AND ( (self::check_days_after_last_non_system_notice( 7 ) AND self::calculate_days_after_first_activation( 30 ) ) OR $existing_install ) AND !$already_showed_non_system_notice ) {
+
 			?>
 				<div class="notice notice-success is-dismissible patreon-wordpress" id="patreon-addon-upsell-shown"><img class="addon_upsell" src="<?php echo PATREON_PLUGIN_ASSETS ?>/img/Patron-Plugin-Pro-128.png" style="float:left; margin-right: 20px;" alt="Patron Plugin Pro" />
 					<p><h2 style="margin-top: 0px; font-size: 150%; font-weight: bold;">Boost your pledges and patrons at Patreon with Patron Pro!</h2><div style="font-size: 125% !important">Get Patron Pro third party addon for Patreon WordPress to increase your patrons and pledges! Enjoy powerful features like partial post locking, sneak peeks, advanced locking methods, login lock, vip users and more.<br /><br /><a href="https://codebard.com/patron-pro-addon-for-patreon-wordpress" target="_blank">Check out all features here</a></div></p>
@@ -1197,7 +1200,7 @@ class Patreon_Wordpress {
 		
 	}
 
-	public function check_plugin_exists( $plugin_slug ) {
+	public static function check_plugin_exists( $plugin_slug ) {
 		// Simple function to check if a plugin is installed (may be active, or not active) in the WP instalation
 		
 		// Plugin slug is the wp's plugin dir together with the plugin's file which has the plugin header
