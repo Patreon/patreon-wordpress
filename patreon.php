@@ -85,4 +85,6 @@ define( "PATREON_COULDNT_ACQUIRE_USER_DETAILS", 'Sorry. Could not acquire your i
 
 include 'classes/patreon_wordpress.php';
 
+register_activation_hook( __FILE__, array( 'Patreon_Wordpress', 'activate' ) );
+
 $Patreon_Wordpress = new Patreon_Wordpress;
