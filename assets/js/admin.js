@@ -166,4 +166,9 @@ jQuery( function( $ ) {
 		
 	}
 	
+	// Sync the exact amount value to select value if select is changed
+	jQuery( "#patreon_level_select" ).on( 'change', function() {
+		jQuery( "#patreon-level-exact" ).val( this.value );
+	});
+	
 });
