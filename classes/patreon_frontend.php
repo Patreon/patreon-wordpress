@@ -1137,7 +1137,7 @@ class Patreon_Frontend {
 		// Get patreon creator url:
 		$creator_profile_url = get_option( 'patreon-creator-url', false );
 		$post_footer         = str_replace( '%%pledgelevel%%', $patreon_level,  apply_filters( 'ptrn/valid_patron_footer_text', $label , $patreon_level, $user_patronage ) );
-		$post_footer         = apply_filters( 'ptrn/valid_patron_processed_message', str_replace( '%%creatorprofileurl%%',apply_filters( 'ptrn/valid_patron_creator_profile_url', '<a href="' . $creator_profile_url . '">Patreon</a>',$creator_profile_url ), $post_footer ), $patreon_level, $user_patronage );
+		$post_footer         = apply_filters( 'ptrn/valid_patron_processed_message', str_replace( '%%creator_link%%',apply_filters( 'ptrn/valid_patron_creator_profile_url', $creator_profile_url, $creator_full_name ), $post_footer ), $patreon_level, $user_patronage );
 		
 		$post_footer = 
 		'<div class="patreon-valid-patron-message">'.
