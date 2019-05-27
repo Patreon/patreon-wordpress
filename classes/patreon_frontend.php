@@ -1073,6 +1073,60 @@ class Patreon_Frontend {
 			}
 			
 		}
+		
+
+		// Get Patreon creator tiers
+				
+		$tiers = get_option( 'patreon-creator-tiers', false );
+		
+		foreach( $tiers['included'] as $key => $value ) {
+			
+			// If its not a reward element, continue, just to make sure
+			
+			if(	
+				!isset( $tiers['included'][$key]['type'] )
+				OR $tiers['included'][$key]['type'] != 'reward'
+			)  {
+				continue; 
+			}
+			
+			$reward = $tiers['included'][$key];
+							
+			// Special conditions for label for element 0, which is 'everyone' and '1, which is 'patron only'
+			
+			if ( $reward['id'] == -1 ) {
+				$tier_title = PATREON_TEXT_EVERYONE;
+			}
+			if ( $reward['id'] == 0 ) {
+				$tier_title = PATREON_TEXT_ANY_PATRON;
+			}
+
+			if ( ( $reward['attributes']['amount_cents'] / 100 ) >= $patreon_level ) {
+				
+				// Matching level was present, but now found. Set selected and toggle flag.
+				// selected = selected for XHTML compatibility
+				
+				// Use title if it exists, description if it does not.
+				$tier_title = $reward['attributes']['title'];
+				
+				if ( $tier_title == '' ) {
+					$tier_title = $reward['attributes']['description'];
+				}
+			
+				// If the title is too long, snip it
+				if ( strlen( $tier_title ) > 23 ) {
+					$tier_title = substr( $tier_title , 0 , 23 ) .'...';
+				}
+				
+				$tier_title = '"' . $tier_title . '"';
+				
+				break;
+			}
+
+		}
+
+		
+		$label = str_replace( '%%tier_level%%', strip_tags( $tier_title ), $label );			
 			
 		$label = str_replace( '%%creator%%', $creator_full_name, $label );
 		$label = str_replace( '%%pledgelevel%%', $patreon_level, $label );
