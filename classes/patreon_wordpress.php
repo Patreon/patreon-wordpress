@@ -953,9 +953,16 @@ class Patreon_Wordpress {
 		
 		// Adds action links to plugin listing in WP plugin admin
 		
+		$links = array_merge( array(
+			'<a href="' . esc_url( admin_url('admin.php?page=patreon-plugin') ) . '">' . __( 'Settings', 'textdomain' ) . '</a>'), $links );
+		
+		// Check if the currently only available addon Patron Pro is installed, if so, dont add the link
+		
+		if ( self::check_plugin_exists('patron-plugin-pro') ) {
+			return $links;
+		}
 		
 		$links = array_merge( array(
-			'<a href="' . esc_url( admin_url('admin.php?page=patreon-plugin') ) . '">' . __( 'Settings', 'textdomain' ) . '</a>',
 			'<a href="https://codebard.com/patron-pro-addon-for-patreon-wordpress" target="_blank">Upgrade to Pro</a>',
 		), $links );
 		return $links;
