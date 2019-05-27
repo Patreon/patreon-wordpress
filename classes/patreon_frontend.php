@@ -1112,7 +1112,7 @@ class Patreon_Frontend {
 				if ( $tier_title == '' ) {
 					$tier_title = $reward['attributes']['description'];
 				}
-			
+
 				// If the title is too long, snip it
 				if ( strlen( $tier_title ) > 23 ) {
 					$tier_title = substr( $tier_title , 0 , 23 ) .'...';
@@ -1125,20 +1125,18 @@ class Patreon_Frontend {
 
 		}
 
-		
 		$label = str_replace( '%%tier_level%%', strip_tags( $tier_title ), $label );			
-			
 		$label = str_replace( '%%creator%%', $creator_full_name, $label );
 		$label = str_replace( '%%pledgelevel%%', $patreon_level, $label );
 		$label = str_replace( '%%flow_link%%', self::patreonMakeCacheableFlowLink(), $label );
 		if ( isset( $args['post_total_patronage_level'] ) ) {
 			$label = str_replace( '%%total_pledge%%', $args['post_total_patronage_level'], $label );
-		}		
+		}
 		
 		// Get patreon creator url:
 		$creator_profile_url = get_option( 'patreon-creator-url', false );
 		$post_footer         = str_replace( '%%pledgelevel%%', $patreon_level,  apply_filters( 'ptrn/valid_patron_footer_text', $label , $patreon_level, $user_patronage ) );
-		$post_footer         = apply_filters( 'ptrn/valid_patron_processed_message', str_replace( '%%creatorprofileurl%%',apply_filters( 'ptrn/valid_patron_creator_profile_url', '<a href="' . $creator_profile_url . '">Patreon</a>',$creator_profile_url ), $post_footer ), $patreon_level, $user_patronage );
+		$post_footer         = apply_filters( 'ptrn/valid_patron_processed_message', str_replace( '%%creator_link%%',apply_filters( 'ptrn/valid_patron_creator_profile_url', $creator_profile_url, $creator_full_name ), $post_footer ), $patreon_level, $user_patronage );
 		
 		$post_footer = 
 		'<div class="patreon-valid-patron-message">'.
