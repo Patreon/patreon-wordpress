@@ -1349,9 +1349,9 @@ class Patreon_Wordpress {
 					
 					$tier_count++;
 					
-					if ( $reward['title'] != '' ) {
+					if ( $reward['attributes']['title'] != '' ) {
 						
-						$tier_title = $reward['title'];
+						$tier_title = $reward['attributes']['title'];
 						
 						// If the title is too long, snip it
 						if ( strlen( $tier_title ) > 23 ) {
