@@ -436,7 +436,7 @@ class Patreon_Wordpress {
 			
 			foreach ( $user_response['included'] as $obj ) {
 				
-				if ( $obj["type"] == "pledge" && $obj["relationships"]["creator"]["data"]["id"] == $creator_id ) {
+				if ( isset( $obj["type"] ) && $obj["type"] == "pledge" && $obj["relationships"]["creator"]["data"]["id"] == $creator_id ) {
 					$pledge = $obj;
 					break;
 				}
