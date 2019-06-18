@@ -262,6 +262,23 @@ class Patreon_Options {
                                 <div class="handlediv" title="Click to toggle"><br></div>
                                 <!-- Toggle -->
 
+                                <h2 class="hndle">Featured Third Party Addon</h2>
+
+                               <div class="inside">
+									<p><strong>Patron Pro</strong></p>
+
+                                    <p>Get Patron Pro addon for Patreon WordPress to increase your patrons and pledges!</p><p>Enjoy powerful features like partial post locking, sneak peeks, advanced locking methods, login lock, vip users and more.<br /><br /><a href="https://codebard.com/patron-pro-addon-for-patreon-wordpress" target="_blank">Check out all features here</a></p>
+                                </div>
+								<!-- .inside -->
+
+                            </div>
+							
+                            <!-- .postbox -->
+                            <div class="postbox">
+
+                                <div class="handlediv" title="Click to toggle"><br></div>
+                                <!-- Toggle -->
+
                                 <h2 class="hndle">GDPR compliance</h2>
 
                                <div class="inside">

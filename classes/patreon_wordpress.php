@@ -67,6 +67,7 @@ class Patreon_Wordpress {
 		add_filter( 'pre_set_site_transient_update_plugins', array( $this, 'check_for_update' ) );
 		add_action( 'wp_ajax_patreon_wordpress_dismiss_admin_notice', array( $this, 'dismiss_admin_notice' ), 10, 1 );
 		add_action( 'wp_ajax_patreon_wordpress_toggle_option', array( $this, 'toggle_option' ), 10, 1 );
+		add_action( 'plugin_action_links_' . PATREON_WORDPRESS_PLUGIN_SLUG, array( $this, 'add_plugin_action_links' ), 10, 1 );
 
 	}
 	public static function getPatreonUser( $user ) {
@@ -669,12 +670,30 @@ class Patreon_Wordpress {
 		
 	}
 	public static function AdminMessages() {
-		
-		// This function processes any admin wide message or notification to display
+				
+		// This function processes any message or notification to display once after updates.
 		
 		$already_showed_non_system_notice = false;
+		
+		// Wp org wants non-error / non-functionality related notices to be shown infrequently and one per admin-wide page load, and be dismissable permanently. 		
+
+		$addon_upsell_shown = get_option( 'patreon-addon-upsell-shown', false );
+		$existing_install = get_option( 'patreon-existing-installation', false );
+		$current_screen = get_current_screen();
+		
+		// The addon upsell must be admin wide, permanently dismissable, and must not appear in plugin manager page in admin
+		
+		if( !$addon_upsell_shown AND !self::check_plugin_exists('patron-plugin-pro') AND $current_screen->id != 'plugins' AND ( (self::check_days_after_last_non_system_notice( 7 ) AND self::calculate_days_after_first_activation( 30 ) ) OR $existing_install ) AND !$already_showed_non_system_notice ) {
+
+			?>
+				<div class="notice notice-success is-dismissible patreon-wordpress" id="patreon-addon-upsell-shown"><img class="addon_upsell" src="<?php echo PATREON_PLUGIN_ASSETS ?>/img/Patron-Plugin-Pro-128.png" style="float:left; margin-right: 20px;" alt="Patron Plugin Pro" />
+					<p><h2 style="margin-top: 0px; font-size: 150%; font-weight: bold;">Boost your pledges and patrons at Patreon with Patron Pro!</h2><div style="font-size: 125% !important">Get Patron Pro third party addon for Patreon WordPress to increase your patrons and pledges! Enjoy powerful features like partial post locking, sneak peeks, advanced locking methods, login lock, vip users and more.<br /><br /><a href="https://codebard.com/patron-pro-addon-for-patreon-wordpress" target="_blank">Check out all features here</a></div></p>
+				</div>
+			<?php	
 			
-		// Wp org wants non-error / non-functionality related notices to be shown infrequently and one per admin-wide page load, and be dismissable permanently. 
+			$already_showed_non_system_notice = true;
+			
+		}
 		
 		$mailing_list_notice_shown = get_option( 'patreon-mailing-list-notice-shown', false );
 
@@ -759,9 +778,17 @@ class Patreon_Wordpress {
 			return;
 		}
 		
-		// Mapping what comes from REQUEST to a given value avoids potential security problems
+		// Mapping what comes from REQUEST to a given value avoids potential security problems and allows custom actions depending on notice
+		
 		if ( $_REQUEST['notice_id'] == 'patreon-wordpress-update-available' ) {
 			delete_option( 'patreon-wordpress-update-available' );
+		}
+
+		if ( $_REQUEST['notice_id'] == 'patreon-addon-upsell-shown' ) {
+			update_option( 'patreon-addon-upsell-shown', true);
+			
+			// Set the last notice shown date
+			self::set_last_non_system_notice_shown_date();
 		}
 		
 		// Mapping what comes from REQUEST to a given value avoids potential security problems
@@ -775,13 +802,6 @@ class Patreon_Wordpress {
 		// Mapping what comes from REQUEST to a given value avoids potential security problems
 		if ( $_REQUEST['notice_id'] == 'patreon-rate-plugin-notice-shown' ) {
 			update_option( 'patreon-rate-plugin-notice-shown', true );
-			
-			// Set the last notice shown date
-			self::set_last_non_system_notice_shown_date();
-		}
-		// Mapping what comes from REQUEST to a given value avoids potential security problems
-		if ( $_REQUEST['notice_id'] == 'apatreon-rate-plugin-notice-shown' ) {
-			update_option( 'apatreon-rate-plugin-notice-shown', true );
 			
 			// Set the last notice shown date
 			self::set_last_non_system_notice_shown_date();
@@ -911,6 +931,25 @@ class Patreon_Wordpress {
 		// Add the sent element at the end:
 		
 		return self::$lock_or_not[$post_id] = $result;
+		
+	}
+	public static function add_plugin_action_links( $links ) {
+		
+		// Adds action links to plugin listing in WP plugin admin
+		
+		$links = array_merge( array(
+			'<a href="' . esc_url( admin_url('admin.php?page=patreon-plugin') ) . '">' . __( 'Settings', 'textdomain' ) . '</a>'), $links );
+		
+		// Check if the currently only available addon Patron Pro is installed, if so, dont add the link
+		
+		if ( self::check_plugin_exists('patron-plugin-pro') ) {
+			return $links;
+		}
+		
+		$links = array_merge( array(
+			'<a href="https://codebard.com/patron-pro-addon-for-patreon-wordpress" target="_blank">Upgrade to Pro</a>',
+		), $links );
+		return $links;
 		
 	}
 	public static function lock_or_not( $post_id = false ) {
@@ -1151,6 +1190,16 @@ class Patreon_Wordpress {
 		return apply_filters( 'ptrn/lock_or_not', self::add_to_lock_or_not_results( $post_id, $result) , $post_id, $declined, $user );
 		
 	}
+
+	public static function check_plugin_exists( $plugin_slug ) {
+		// Simple function to check if a plugin is installed (may be active, or not active) in the WP instalation
+		
+		// Plugin slug is the wp's plugin dir together with the plugin's file which has the plugin header
+
+		if ( file_exists( WP_PLUGIN_DIR . '/' . $plugin_slug ) ) {
+			return true;			
+		}
+	}
 	public function activate() {
 		
 		// This function kicks in after the plugin is activated. Used to perform tasks which need to be run during plugin activation
@@ -1174,10 +1223,11 @@ class Patreon_Wordpress {
 			// More than $days days. Set flag
 			return true;
 		}
-		
+
 		return false;
 		
 	}
+
 	public static function calculate_days_after_first_activation( $days ) {
 		
 		// Used to calculate days passed after first plugin activation. 
@@ -1200,5 +1250,6 @@ class Patreon_Wordpress {
 		update_option( 'patreon-last-non-system-notice-shown-date', time() );
 			
 	}
+
 	
 }
