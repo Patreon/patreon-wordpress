@@ -863,16 +863,13 @@ class Patreon_Wordpress {
 		// Just attempts to connect to API with given credentials, and returns result
 		
 		$api_client    = new Patreon_API( get_option( 'patreon-creators-access-token' , false ) );
-        $user_response = $api_client->fetch_creator_info();
+        $creator_response = $api_client->fetch_creator_info();
 		
 		$creator_access = false;
 		$client_access = false;
 		
-		if ( isset( $user_response['included'][0]['id'] ) AND $user_response['included'][0]['id'] != '' ) {
+		if ( isset( $creator_response['included'][0]['id'] ) AND $creator_response['included'][0]['id'] != '' ) {
 			// Got creator id. Credentials must be valid
-			
-			// Success - set flag
-			// update_option( 'patreon-wordpress-app-credentials-success', 1 );
 			
 			$creator_access = true;
 			
@@ -880,7 +877,7 @@ class Patreon_Wordpress {
 
 		// Try to do a creator's token refresh
 	
-		if ( $tokens = self::refresh_creator_access_token() ) {
+		if ( !$creator_access AND $tokens = self::refresh_creator_access_token() ) {
 			
 			update_option( 'patreon-creators-refresh-token-expiration', time() + $tokens['expires_in'] );
 			update_option( 'patreon-creators-access-token-scope', $tokens['scope'] );
@@ -888,9 +885,9 @@ class Patreon_Wordpress {
 			// Try again:
 			
 			$api_client    = new Patreon_API( get_option( 'patreon-creators-access-token' , false ) );
-			$user_response = $api_client->fetch_creator_info();
+			$creator_response = $api_client->fetch_creator_info();
 			
-			if ( isset( $user_response['included'][0]['id'] ) AND $user_response['included'][0]['id'] != '' ) {
+			if ( isset( $creator_response['included'][0]['id'] ) AND $creator_response['included'][0]['id'] != '' ) {
 				
 				// Got creator id. Credentials must be valid
 				// Success - set flag
@@ -900,7 +897,7 @@ class Patreon_Wordpress {
 			}			
 			
 		}
-		
+
 		// Here some check for client id and secret may be entered in future - currently only checks creator access token 
 		
 		if ( $creator_access ) {
