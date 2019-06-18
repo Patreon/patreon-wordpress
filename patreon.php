@@ -37,10 +37,10 @@ define( "PATREON_TEXT_UPGRADE_PLEDGE", 'Upgrade Pledge' );
 define( "PATREON_TEXT_UNLOCK_WITH_PATREON", 'Unlock with Patreon' );
 define( "PATREON_TEXT_UPDATE_PLEDGE", 'Update Pledge' );
 define( "PATREON_TEXT_LOCKED_POST", 'This content is available exclusively to Patreon members.' );
-define( "PATREON_TEXT_OVER_BUTTON_1", 'To unlock this content, pledge $%%pledgelevel%% or more on Patreon' );
+define( "PATREON_TEXT_OVER_BUTTON_1", 'To view this content, you must be a member of <a href="%%creator_link%%" target="_blank">%%creator%%\'s Patreon</a> at %%tier_level%% or higher tier' );
 define( "PATREON_TEXT_OVER_BUTTON_2", 'Edit your pledge to %%creator%% to $%%pledgelevel%% or more to access this content. You\'re currently pledging $%%currentpledgelevel%%.' );
 define( "PATREON_TEXT_OVER_BUTTON_3", 'Please <a href="https://www.patreon.com/settings/payment" target="_blank" ref="nofollow">update</a> your Patreon payment method to access this post.' );
-define( "PATREON_VALID_PATRON_POST_FOOTER_TEXT", 'This content is exclusively available to %%creatorprofileurl%% members who pledge $%%pledgelevel%%  or more.' );
+define( "PATREON_VALID_PATRON_POST_FOOTER_TEXT", 'This content is available exclusively to members of <a href="%%creator_link%%" target="_blank">%%creator%%\'s Patreon</a> at %%tier_level%% or higher tier.' );
 define( "PATREON_TEXT_UNDER_BUTTON_1", '' );
 define( "PATREON_TEXT_UNDER_BUTTON_2", 'Already a Patreon member? <a href="%%flow_link%%" rel="nofollow">Refresh</a> to access this post.' );
 define( "PATREON_TEXT_UNDER_BUTTON_3", 'Already updated? <a href="%%flow_link%%" rel="nofollow">Refresh</a> to access this post.' );
@@ -60,7 +60,7 @@ define( "PATREON_CREATOR_BYPASSES_FILTER_MESSAGE", 'This content is for Patrons 
 define( "PATREON_NO_LOCKING_LEVEL_SET_FOR_THIS_POST", 'Post is already public. If you would like to lock this post, please set a pledge level for it' );
 define( "PATREON_NO_POST_ID_TO_UNLOCK_POST", 'Sorry - could not get the post id for this locked post' );
 define( "PATREON_WORDPRESS_VERSION", '1.2.4' );
-define( "PATREON_WORDPRESS_BETA_STRING", '' );
+define( "PATREON_WORDPRESS_BETA_STRING", ' ' );
 define( "PATREON_WORDPRESS_PLUGIN_SLUG", plugin_basename( __FILE__ ) );
 define( "PATREON_PRIVACY_POLICY_ADDENDUM", '<h2>Patreon features in this website</h2>In order to enable you to use this website with Patreon services, we save certain functionally important Patreon information about you in this website if you log in with Patreon.
 <br /><br />
@@ -76,12 +76,14 @@ define( "PATREON_CONTRIBUTION_REQUIRED_STOP_MARK", '!' );
 define( "PATREON_TEXT_OVER_BUTTON_4", ' while having been active patrons on %%post_date%%' );
 define( "PATREON_TEXT_OVER_BUTTON_5", ' or Patrons with total $%%total_pledge%% or more pledge' );
 define( "PATREON_TEXT_OVER_BUTTON_6", ' on Patreon' );
-define( "PATREON_TEXT_OVER_BUTTON_7", 'This content is available exclusively to Patreon members at the time this content was posted. <a href="%%flow_link%%" rel="nofollow">Become a patron</a> to get exclusive content like this in the future.' );
-define( "PATREON_TEXT_OVER_BUTTON_8", 'This content is available exclusively to Patreon members pledging $%%pledgelevel%% at the time this content was posted. <a href="%%flow_link%%" rel="nofollow">Become a patron</a> to get exclusive content like this in the future.' );
-define( "PATREON_TEXT_OVER_BUTTON_9", 'This content is available exclusively to Patreon members pledging $%%pledgelevel%% or more, or having at least $%%total_pledge%% pledged in total.' );
-define( "PATREON_TEXT_OVER_BUTTON_10", 'This content is available exclusively to Patreon members pledging $%%pledgelevel%% or more at the time this content was posted, or having at least $%%total_pledge%% pledged in total.' );
-define( "PATREON_TEXT_OVER_BUTTON_11", 'This content is available exclusively to Patreon members pledging $%%pledgelevel%% or more at the time this content was posted.' );
+define( "PATREON_TEXT_OVER_BUTTON_7", 'This content is available exclusively to members of <a href="%%creator_link%%" target="_blank">%%creator%%\'s Patreon</a> at the time this content was posted. <a href="%%flow_link%%" rel="nofollow">Become a patron</a> to get exclusive content like this in the future.' );
+define( "PATREON_TEXT_OVER_BUTTON_8", 'This content is available exclusively to members of <a href="%%creator_link%%" target="_blank">%%creator%%\'s Patreon</a> at the time this content was posted. <a href="%%flow_link%%" rel="nofollow">Become a patron</a> to get exclusive content like this in the future.' );
+define( "PATREON_TEXT_OVER_BUTTON_9", 'This content is available exclusively to members of <a href="%%creator_link%%" target="_blank">%%creator%%\'s Patreon</a> at %%tier_level%% or higher tier, or having at least $%%total_pledge%% pledged in total.' );
+define( "PATREON_TEXT_OVER_BUTTON_10", 'This content is available exclusively to members of <a href="%%creator_link%%" target="_blank">%%creator%%\'s Patreon</a> at %%tier_level%% or higher tier at the time this content was posted, or having at least $%%total_pledge%% pledged in total.' );
+define( "PATREON_TEXT_OVER_BUTTON_11", 'This content is available exclusively to members of <a href="%%creator_link%%" target="_blank">%%creator%%\'s Patreon</a> at %%tier_level%% or higher tier at the time this content was posted.' );
 define( "PATREON_COULDNT_ACQUIRE_USER_DETAILS", 'Sorry. Could not acquire your info from Patreon. Please try again later.' );
+define( "PATREON_TEXT_EVERYONE", 'Everyone' );
+define( "PATREON_TEXT_ANY_PATRON", 'Any patron' );
 
 include 'classes/patreon_wordpress.php';
 
