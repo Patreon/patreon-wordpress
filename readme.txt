@@ -2,8 +2,8 @@
 Contributors: wordpressorg@patreon.com, codebard
 Tags: patreon, membership, members
 Requires at least: 4.0
-Tested up to: 5.1
-Stable tag: 1.2.4
+Tested up to: 5.2.1
+Stable tag: 1.2.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -89,6 +89,17 @@ It is  difficult to protect videos due the intensive bandwidth requirements of h
 
 
 == Changelog ==
+
+= 1.2.5 =
+
+* PW now allows you to lock your posts by your Patreon tiers
+* $ based lock input field moved to advanced toggle
+* Relevant Patreon tier now shows in locked posts instead of $ amount
+* There is now a link to creator's Patreon profile in locked posts
+* Notices revamped. Repeating update notice removed for compatibility with upcoming WP org rule. All notices permanently dismissable.
+* One time addon info notice added to inform about Patron Pro addon
+* Some undefined index notices fixed
+* Beta string added to user string in API calls to be used for betas
 
 = 1.2.4 =
 

@@ -1112,7 +1112,7 @@ class Patreon_Frontend {
 				if ( $tier_title == '' ) {
 					$tier_title = $reward['attributes']['description'];
 				}
-			
+
 				// If the title is too long, snip it
 				if ( strlen( $tier_title ) > 23 ) {
 					$tier_title = substr( $tier_title , 0 , 23 ) .'...';
