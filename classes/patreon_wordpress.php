@@ -462,7 +462,6 @@ class Patreon_Wordpress {
 		}
 		
 		if ( isset( $pledge['attributes']['declined_since'])  && !is_null( $pledge['attributes']['declined_since'] ) ) {
-			do_action('ptrn/declined_since', $pledge, $pledge['attributes']['declined_since']);
 			return false;
 		}
 		
