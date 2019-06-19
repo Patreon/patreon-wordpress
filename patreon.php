@@ -84,6 +84,8 @@ define( "PATREON_TEXT_OVER_BUTTON_11", 'This content is available exclusively to
 define( "PATREON_COULDNT_ACQUIRE_USER_DETAILS", 'Sorry. Could not acquire your info from Patreon. Please try again later.' );
 define( "PATREON_TEXT_EVERYONE", 'Everyone' );
 define( "PATREON_TEXT_ANY_PATRON", 'Any patron' );
+define( "PATREON_WP_SUPER_CACHE_LOGGED_IN_USERS_ENABLED", 'Any patron' );
+define( "PATREON_WP_SUPER_CACHE_MAKE_KNOWN_ANON_ENABLED", 'Any patron' );
 
 include 'classes/patreon_wordpress.php';
 

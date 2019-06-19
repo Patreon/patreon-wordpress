@@ -1207,12 +1207,22 @@ class Patreon_Wordpress {
 		
 	}
 
-	public static function check_plugin_exists( $plugin_slug ) {
+	public static function check_plugin_exists( $plugin_dir ) {
 		// Simple function to check if a plugin is installed (may be active, or not active) in the WP instalation
 		
-		// Plugin slug is the wp's plugin dir together with the plugin's file which has the plugin header
+		// Plugin dir is the wp's plugin dir together with the plugin's dir
 
-		if ( file_exists( WP_PLUGIN_DIR . '/' . $plugin_slug ) ) {
+		if ( file_exists( WP_PLUGIN_DIR . '/' . $plugin_dir ) ) {
+			return true;			
+		}
+	}
+	
+	public static function check_plugin_active( $full_plugin_slug ) {
+		// Simple function to check if a plugin is installed (may be active, or not active) in the WP instalation
+		
+		// Plugin slug is the plugin dir together with the plugin's file which has the plugin header
+
+		if ( is_plugin_active(  $full_plugin_slug ) ) {
 			return true;			
 		}
 	}

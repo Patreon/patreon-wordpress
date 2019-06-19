@@ -6,10 +6,14 @@ if ( !defined( 'WPINC' ) ) {
 }
 
 class Patreon_Compatibility {
+	
+	// Carries site health information - errors, warnings, notices, solutions
+	public static $site_health_info = array();
 
 	function __construct() {
 		
 		add_action( 'init', array( $this, 'set_cache_exceptions' ) );
+		add_action( 'admin_init', array( $this, 'check_wp_super_cache_settings' ) );
 		
 	}
 
@@ -26,6 +30,62 @@ class Patreon_Compatibility {
 			// This constant is used in many plugins - wp super cache, w3 total cache, woocommerce etc and it should disable caching for this page
 		
 		}
+	}
+	
+	public function check_wp_super_cache_settings() {
+		
+		// Checks any important settings of WP super cache which may affect Patreon behavior if WP super cache is installed
+		
+		// Return if its not admin page and no one is going to see the notices
+		if ( !is_admin() ) {
+			return;
+		}
+	
+		// Bail out if WP super cache is not installed
+		if ( !Patreon_Wordpress::check_plugin_exists( 'wp-super-cache' ) ) {
+			return;			
+		}
+		// Bail out if WP super cache is not active
+		if ( !Patreon_Wordpress::check_plugin_active( 'wp-super-cache/wp-cache.php' ) ) {
+			return;			
+		}
+		
+		// Wp super cache loads its options into globals
+		global $wp_cache_not_logged_in;
+		global $wp_cache_make_known_anon;
+	
+		echo admin_url('options-general.php?page=wpsupercache');
+		
+		$toggle_warning = false;
+		
+		// Check for cache not logged in being not set - if its not set, logged in users are served cached files
+		
+		if ( !$wp_cache_not_logged_in ) {
+			
+			$toggle_warning = true;
+
+			$site_health_info['wp_super_cache_caches_pages_for_known_users'] = array(
+				'notice' => PATREON_WP_SUPER_CACHE_LOGGED_IN_USERS_ENABLED,
+				// We can use this for ordering notices on health page
+				'order' => 1,		
+			);
+			
+		}
+		
+		// Check if Make all anon is set - if its set, logged in users are served cached files
+		
+		if ( $wp_cache_make_known_anon ) {
+			$toggle_warning = true;
+			
+			$site_health_info['wp_super_cache_makes_logged_in_anonymous'] = array(
+				'notice' => PATREON_WP_SUPER_CACHE_MAKE_KNOWN_ANON_ENABLED,
+				// We can use this for ordering notices on health page
+				'order' => 2,		
+			);
+			
+		}
+		
+		
 	}
 	
 }
