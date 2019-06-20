@@ -742,6 +742,18 @@ class Patreon_Wordpress {
 			$already_showed_non_system_notice = true;
 			
 		}
+		
+		// This will trigger only when critical or important issues are detected by the compatibility class
+
+		if( Patreon_Compatibility::$toggle_warning AND $_REQUEST['page'] != 'patreon-plugin-health' ) {
+
+			?>
+				 <div class="notice notice-error patreon-wordpress" id="patreon-critical-issues">
+					<p>There are important issues affecting your Patreon integration. Please visit <a href="<?php echo admin_url( 'admin.php?page=patreon-plugin-health' ) ?>">health check page</a> to see the issues and solutions.</p>
+				</div>
+			<?php	
+			
+		}
 
 		// This is a plugin system info notice. 
 		if( get_option( 'patreon-wordpress-app-credentials-success', false ) ) {

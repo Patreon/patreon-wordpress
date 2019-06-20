@@ -171,4 +171,42 @@ jQuery( function( $ ) {
 		jQuery( "#patreon-level-exact" ).val( this.value );
 	});
 	
+	jQuery( ".patreon_toggle_admin_sections" ).on( 'click', function (e) {
+		if ( jQuery( e.target ).hasClass( 'patreon_setting_section_help_icon' ) ) return;
+		jQuery( '#footer-thankyou' ).remove();
+		var patreon_target = jQuery( this ).find( jQuery( this ).attr( 'target' ) );
+        e.preventDefault();
+		if ( jQuery( this ).find( 'span:first' ).hasClass( 'dashicons-arrow-down-alt2' ) ) {
+			jQuery( this ).find( 'span:first' ).removeClass( 'dashicons-arrow-down-alt2' );
+			jQuery( this ).find( 'span:first' ).addClass( 'dashicons-arrow-up-alt2' );
+		}
+		else if ( jQuery( this ).find( 'span:first' ).hasClass( 'dashicons-arrow-up-alt2' ) ) {
+			jQuery( this ).find( 'span:first' ).removeClass( 'dashicons-arrow-up-alt2' );
+			jQuery( this ).find( 'span:first' ).addClass( 'dashicons-arrow-down-alt2' );
+		}
+		jQuery( patreon_target ).toggle( 'slow' );
+	});
+	
+	jQuery( '#patreon_copy_health_check_output' ).on( 'click', function (e) {
+		e.preventDefault();
+		console.log('here');
+		// Some of below is from stack https://stackoverflow.com/questions/23048550/how-to-copy-a-divs-content-to-clipboard-without-flash
+		var textarea = document.createElement( 'textarea' );
+		  textarea.id = 'patreon_temp_element'
+		  // Optional step to make less noise on the page, if any!
+		  textarea.style.height = 0
+		  // Now append it to your page somewhere, I chose <body>
+		  document.body.appendChild( textarea )
+		  // Give our textarea a value of whatever inside the div of id=containerid
+		  textarea.value = jQuery( '#patreon_health_check_output_for_support' ).text();
+		  // Now copy whatever inside the textarea to clipboard
+		  var selector = document.querySelector( '#patreon_temp_element' );
+		  selector.select();
+		  document.execCommand('copy');
+		  // Remove the textarea
+		  document.body.removeChild(textarea);
+		jQuery( "#patreon_copied" ).text( "Copied!" ).show().fadeOut( 1000 );
+    });
+
+	
 });

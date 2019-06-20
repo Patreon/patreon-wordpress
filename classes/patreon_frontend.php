@@ -57,7 +57,7 @@ class Patreon_Frontend {
 	function patreonEnqueueAdminCss() {
 		
 		wp_register_style( 'patreon-wordpress-admin-css', PATREON_PLUGIN_ASSETS . '/css/admin.css', false );
-		wp_enqueue_style( 'patreon-wordpress-admin-css', PATREON_PLUGIN_ASSETS . '/css/admin.css' );
+		wp_enqueue_style( 'patreon-wordpress-admin-css', PATREON_PLUGIN_ASSETS . '/css/admin.css', PATREON_WORDPRESS_VERSION );
 		
 	}
 	function patreonEnqueueCss() {

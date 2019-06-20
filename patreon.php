@@ -84,8 +84,12 @@ define( "PATREON_TEXT_OVER_BUTTON_11", 'This content is available exclusively to
 define( "PATREON_COULDNT_ACQUIRE_USER_DETAILS", 'Sorry. Could not acquire your info from Patreon. Please try again later.' );
 define( "PATREON_TEXT_EVERYONE", 'Everyone' );
 define( "PATREON_TEXT_ANY_PATRON", 'Any patron' );
-define( "PATREON_WP_SUPER_CACHE_LOGGED_IN_USERS_ENABLED", 'Any patron' );
-define( "PATREON_WP_SUPER_CACHE_MAKE_KNOWN_ANON_ENABLED", 'Any patron' );
+define( "PATREON_WP_SUPER_CACHE_LOGGED_IN_USERS_ENABLED_HEADING", 'WP Super Cache caches pages for logged in users' );
+define( "PATREON_WP_SUPER_CACHE_LOGGED_IN_USERS_ENABLED", 'This could cause logged in patrons to see a content they unlocked still as locked because they may be served a cached version of the page.<h3>Solution</h3>Please visit <a target="_blank" href="' . admin_url( 'options-general.php?page=wpsupercache&tab=settings' ) . '">this WP Super Cache settings page</a> and turn the option <b>"Don’t cache pages for known users. (Recommended)"</b> on and click "Update Status" button to save WP Super Cache settings' );
+define( "PATREON_WP_SUPER_CACHE_MAKE_KNOWN_ANON_ENABLED_HEADING", 'WP Super Cache caches treats logged in users as anonymous' );
+define( "PATREON_WP_SUPER_CACHE_MAKE_KNOWN_ANON_ENABLED", 'This could cause logged in patrons to be treated anonymous and cause them to get served a cached version of the unlocked content, therefore preventing them from accessing the content they unlocked.<h3>Solution</h3>Please visit <a target="_blank" href="' . admin_url( 'options-general.php?page=wpsupercache&tab=settings' ) . '">this WP Super Cache settings page</a> and turn the option <b>"Make known users anonymous so they’re served supercached static files."</b> off and click "Update Status" button to save WP Super Cache settings' );
+define( "PATREON_PRETTY_PERMALINKS_ARE_OFF_HEADING", 'Pretty permalinks are turned off' );
+define( "PATREON_PRETTY_PERMALINKS_ARE_OFF", 'Pretty permalinks are off in your WP installation. This would cause content unlock flows to fail when the user is returning from Patreon.<h3>Solution</h3>Please visit <a target="_blank" href="' . admin_url( 'options-permalink.php' ) . '">permalink settings page</a> and select any option other than "Plain" and click "Save Changes". Please note that this will change the link structure of your site.' );
 
 include 'classes/patreon_wordpress.php';
 
