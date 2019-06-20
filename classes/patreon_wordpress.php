@@ -709,23 +709,7 @@ class Patreon_Wordpress {
 			$already_showed_non_system_notice = true;
 			
 		}
-		
-		$mailing_list_notice_shown = get_option( 'patreon-mailing-list-notice-shown', false );
-
-		// Queue this message immediately after activation if not already shown
-		
-		if( !$mailing_list_notice_shown ) {
-			
-			?>
-				 <div class="notice notice-success is-dismissible  patreon-wordpress" id="patreon-mailing-list-notice-shown">
-					<p>Would you like to receive notices, tips & tricks for Patreon WordPress? <a href="https://patreonforms.typeform.com/to/dPBVp1" target="_blank">Join our mailing list here!</a></p>
-				</div>
-			<?php	
-			
-			$already_showed_non_system_notice = true;
-			
-		}
-		
+				
 		$rate_plugin_notice_shown = get_option( 'patreon-rate-plugin-notice-shown', false );
 		
 		// The below will trigger a rating notice once if it was not shown and the plugin was installed more than 37 days ago.
