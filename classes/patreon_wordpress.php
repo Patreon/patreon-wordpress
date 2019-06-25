@@ -200,7 +200,7 @@ class Patreon_Wordpress {
 		
 	}
 	public static function check_creator_tiers() {
-				
+
 		// Check if creator tier info doesnt exist. This will make sure the new version is compatible with existing installs and will show the tiers in locked interface text from the get go
 
 		// When we move to webhooks, this code can be changed to read from the already present creator details
@@ -1449,4 +1449,35 @@ class Patreon_Wordpress {
 		
 	}
 	
+	public static function log_connection_error( $error = false ) {
+		
+		if ( !$error ) {
+			return;
+		}
+	
+		// Get the last 50 connection errors log
+		// Init in case it does not exist, get value if exists - will return empty array if it does not exist.
+		
+		$last_50_conn_errors = get_option( 'patreon-last-50-conn-errors', array() );
+		
+		// If array is 50 or longer, pop it
+		
+		if( count( $last_50_conn_errors ) >= 50 ) {
+			array_pop( $last_50_conn_errors );
+		}
+
+		// Add the error message to last 50 connection errors with time
+		
+		array_unshift ( 
+			$last_50_conn_errors,
+			array (
+				'date'  => time(),
+				'error' => $error
+			)
+		);
+		
+		// Update option
+		update_option( 'patreon-last-50-conn-errors', $last_50_conn_errors );
+
+	}
 }

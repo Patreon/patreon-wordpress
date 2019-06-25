@@ -90,6 +90,8 @@ define( "PATREON_WP_SUPER_CACHE_MAKE_KNOWN_ANON_ENABLED_HEADING", 'WP Super Cach
 define( "PATREON_WP_SUPER_CACHE_MAKE_KNOWN_ANON_ENABLED", 'This could cause logged in patrons to be treated anonymous and cause them to get served a cached version of the unlocked content, therefore preventing them from accessing the content they unlocked.<h3>Solution</h3>Please visit <a target="_blank" href="' . admin_url( 'options-general.php?page=wpsupercache&tab=settings' ) . '">this WP Super Cache settings page</a> and turn the option <b>"Make known users anonymous so they’re served supercached static files."</b> off and click "Update Status" button to save WP Super Cache settings' );
 define( "PATREON_PRETTY_PERMALINKS_ARE_OFF_HEADING", 'Pretty permalinks are turned off' );
 define( "PATREON_PRETTY_PERMALINKS_ARE_OFF", 'Pretty permalinks are off in your WP installation. This would cause content unlock flows to fail when the user is returning from Patreon.<h3>Solution</h3>Please visit <a target="_blank" href="' . admin_url( 'options-permalink.php' ) . '">permalink settings page</a> and select any option other than "Plain" and click "Save Changes". Please note that this will change the link structure of your site.' );
+define( "PATREON_LAST_50_CONNECTION_ERRORS", 'These are the last 50 connection issues encountered by your site when contacting Patreon API. These are here for general info on health of the connection of your WP site to Patreon API. They only constitute an error if there are a lot of recent ones. Healthiest integrations should have a number of them (up to 50) in the long run.' );
+define( "PATREON_LAST_50_CONNECTION_ERRORS_HEADING", 'Last 50 connection errors' );
 
 include 'classes/patreon_wordpress.php';
 

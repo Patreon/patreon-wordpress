@@ -346,6 +346,8 @@ class Patreon_Options {
 				return $a['order'] - $b['order'];
 			} );
 			
+			// Add last 50 connection errors at the end.
+			
 	
 			foreach ( $health_info as $key => $value ) {
 			?>
@@ -358,25 +360,58 @@ class Patreon_Options {
 			<?php
 		
 			}
-					
-			// Output a hidden, non formatted version of the health info to be used by the users to c/p to support
-			?>
+		
 			
-			<div id="patreon_health_check_output_for_support">
-				<?php			
+		}
+
+		// Print out the last 50 connection errors if they exist
+		?>
+		
+		<div class="patreon_admin_health_content_box patreon_toggle_admin_sections" target=".patreon_admin_health_content_box_hidden">
+			<h3><?php echo PATREON_LAST_50_CONNECTION_ERRORS_HEADING ?><span class="dashicons dashicons-arrow-down-alt2 patreon_setting_section_toggle_icon"></span></h3>
+			<div class="patreon_admin_health_content_box_hidden"><?php echo PATREON_LAST_50_CONNECTION_ERRORS ?>
+				<?php 
+					$last_50_conn_errors = get_option( 'patreon-last-50-conn-errors', array() );
+					
+					if ( count( $last_50_conn_errors ) > 0 ) {
+						
+						foreach ( $last_50_conn_errors as $key => $value ) {
+							
 				
-				foreach ( $health_info as $key => $value ) {
-				 echo "\r\n";
-				 echo '# '.$health_info[$key]['heading'].' #';
-				 echo "\r\n";
-				 echo str_replace( '<h3>', "\r\n# ", str_replace( '</h3>', " #\r\n", $health_info[$key]['notice'] ) );			
-				}
-			?>
+							$days = abs( time() - $last_50_conn_errors[$key]['date']  ) / 86400 ;
+
+							echo '<br /><br /><b>' . round( $days, 2 ) . ' days ago</b><br /><br />';
+							echo $last_50_conn_errors[$key]['error'];
+							
+						}
+
+					}
+					else {
+						echo '<br />No recent connection errors<br />';
+					}
+				?>
+			</div>
 			</div>
 			
-			<?php
+		<?php
+		
+				
+		// Output a hidden, non formatted version of the health info to be used by the users to c/p to support
+		?>
+		
+		<div id="patreon_health_check_output_for_support">
+			<?php			
 			
-		}		
+			foreach ( $health_info as $key => $value ) {
+			 echo "\r\n";
+			 echo '# '.$health_info[$key]['heading'].' #';
+			 echo "\r\n";
+			 echo str_replace( '<h3>', "\r\n# ", str_replace( '</h3>', " #\r\n", $health_info[$key]['notice'] ) );			
+			}
+		?>
+		</div>
+		
+		<?php		
 		
     }
 	
