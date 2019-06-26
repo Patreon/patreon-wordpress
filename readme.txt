@@ -9,18 +9,26 @@ License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
 Serve patron-only posts - directly on your WordPress website.
 
-== Description ==
+Connect your WordPress site and your Patreon to increase your patrons and pledges!
 
-When a patron pledges, they can then head over to www.yourwordpresssite.com and click your “Unlock with Patreon” button to let the site know they are a patron. When you create content on WordPress you will be given the option to limit it to only paying patrons.
+With Patreon WordPress, you can easily start posting patron-only content at your WordPress site and encourage your visitors to become your patrons to unlock your content.
 
-This plugin is maintained by Patreon. For advanced features, you can find additional premium WordPress plugins in this directory.
+You can easily lock any single post or all of your posts! You can also lock any custom post type. Your visitors can log into your site via Patreon, making it easier for them to use your site in addition to accessing your locked content.
 
-Read an in-depth review of this free plugin and how to <a href="https://www.elegantthemes.com/blog/tips-tricks/how-to-create-a-patreon-membership-site-on-wordpress" target="_blank">combine Patreon and WordPress part of your membership business</a> on Elegant Themes
+This plugin is maintained by Patreon. 
+
+Read how Lawless French increased their income <a href="https://blog.patreon.com/patreon-wordpress-plugin" target="_blank">50% in just 3 months using Patreon WordPress</a>.
+
+Read an in-depth review of this free plugin and how to <a href="https://www.elegantthemes.com/blog/tips-tricks/how-to-create-a-patreon-membership-site-on-wordpress" target="_blank">combine Patreon and WordPress to create a thriving membership business</a> on Elegant Themes
 
 ### FEATURES FOR CREATORS
 
-- Choose a minimum pledge amount necessary to see a particular post
-- Alternatively, set a minimum pledge amount to see all posts.
+- Choose one of your tiers or a minimum pledge amount necessary to see a particular post
+- All patrons with pledge at or above that minimum tier will be able to access your post
+- Visitors who are not your patrons can click the "Unlock with Patreon" button on the locked post to pledge to you and access content
+- Visitors will be automatically redirected to Patreon, pledge to you and come back to your site to original unlocked post
+- Plugin will automatically log in Patreon users
+- Alternatively, you can set a minimum pledge amount to see all posts.
 - Set custom HTML that non-patrons see instead of the post, prompting them to become a patron
 
 *<b>You can post entirely independently on your WordPress site from your Patreon page.*</b> There is no need for WordPress and Patreon posts to correspond to one another in content or in locked status. The choice is up to you as a creator.
@@ -29,8 +37,8 @@ Got ideas? Suggest them to the developer community on our <a href="https://www.p
 
 ### FEATURES FOR PATRONS
 
-- This plugin adds a “Unlock with Patreon” button to every locked post.
-- “Unlock with Patreon” takes care of everything: whether they’re not yet a patron, need to upgrade their pledge, or already pledging enough, we’ll guide them through the process and back to your content
+- This plugin adds a "Unlock with Patreon" button to every post you lock.
+- "Unlock with Patreon" takes care of everything: whether they’re not yet a patron, need to upgrade their pledge, or already pledging enough, we’ll guide them through the process and back to your content
 
 ### FEATURES FOR DEVELOPERS
 
@@ -49,44 +57,38 @@ This plugin is provided by Patreon for free.
 ## Install the Patreon WordPress Plugin
 
 1. Install & activate the plugin
-2. Click on ‘Patreon Settings’ to view the options page. It will look something like the below, copy the ‘Redirect URI‘ into the clip board and keep for the next step.
-![](https://c5.patreon.com/external/platform/wordpress-client.png)
-3. This plugin requires that you enable "pretty permalinks." (ie /page-name/ as opposed to ?pid=36). You can do this from the WordPress admin interface, visit Settings > Permalinks and choose any format aside from "Plain."
+2. Click on "Patreon Settings" to view the options page. It will look something like the below, copy the "Redirect URI" into the clip board and keep for the next step.
+3. This plugin requires that you enable "pretty permalinks." (ie /page-name/ as opposed to ?pid=36). You can do this from the WordPress admin interface, visit Settings > Permalinks and choose any format aside from "Plain".
 
 ## Generate API Credentials on Patreon.com
 
 1. Ensure you are logged into Patreon, using your creator account. When it comes to testing this out you will want to have two Patreon accounts, one that acts as a patron and one being the content creator. The OAuth client needs to be created on your content creating account.
 2. Visit the [oAuth client page here](https://www.patreon.com/portal/registration/register-clients) and click "Create Client", fill out the form and add in an image URL for the icon that will appear to users when they are connecting to your website.
-3. Note the field for ‘Redirect URI‘, this should still be in your clipboard from the previous steps – if not copy/paste it exactly as it appears on the WordPress admin Patreon Settings page.
-4. Click the ‘Create Client’ button, and you should now see the new client in the list.
+3. Note the field for "Redirect URI", this should still be in your clipboard from the previous steps – if not copy/paste it exactly as it appears on the WordPress admin Patreon Settings page.
+4. Click the "Create Client" button, and you should now see the new client in the list.
 5. Click the downward facing caret on the right side to expose additional information about the client
-6. You should see something like this
-![](https://c5.patreon.com/external/platform/wordpress-install-ss5.png)
-(The keys in the image are fake, doctored for this screenshot.)
+7. This will allow you to see the credential details which you need to copy/paste to your plugin settings
 
 ## Paste Your Credentials into WordPress
 
-1. Copy and paste the Client ID and Client Secret from this page into the matching fields on the ‘Patreon Settings’ page.
+1. Copy and paste the Client ID and Client Secret from this page into the matching fields on the "Patreon Settings" page.
 2. Copy the Client ID, Client Secret, Access Token, and Refresh Token from the top of this page into the WordPress admin Patreon Settings page.
-3. Hit ‘Update Settings’ at the bottom of the page.
-4. IMPORTANT FINAL STEP: In your WordPress admin ‘Settings’ -> ‘Permalinks’ section, click ‘Save’. This ensures your rewrite rules are flushed.
+3. Hit "Update Settings" at the bottom of the page.
+4. IMPORTANT FINAL STEP: In your WordPress admin "Settings" -> "Permalinks" section, click "Save". This ensures your rewrite rules are flushed.
 
-You should now be up and running with the Patreon WordPress plugin!
+Your plugin is now set up and you can start making your posts patron only!
 
 ## Protecting Posts
 
-When editing a post (or a custom post type) you will see a meta box in the right column titled ‘Patreon Level’.
+When posting a new post or editing an existing post (or a custom post type) you will see a meta box in the right column titled "Patreon Level".
 
-This box contains a text field that lets you specify a minimum contribution level in dollars. This could be $1 or $1.40 or even $10000. This is entirely up to you.
+This box contains a select box which will allow you to select a tier from your Patreon to lock this post for. When you select a Patreon tier and then update the post, visitors will need to be your patrons from that tier level or above to be able to access that post.
 
-![](https://c5.patreon.com/external/platform/wordpress_protecting_posts_pages.png)
-
-It defaults to $0 even if left empty.
+To make a locked post public again, just choose "Everyone" from the select box and update your post.
 
 ## Protecting Videos
 
 It is  difficult to protect videos due the intensive bandwidth requirements of hosting video  and having to rely on third parties such as Youtube or Vimeo. Youtube allows you to set videos to ‘private’ but Vimeo offers extra controls by only allowing videos to be played on specific domains. Visit this guide to [protecting your video content with Vimeo](https://help.vimeo.com/hc/en-us/articles/224817847-Privacy-settings-overview).
-
 
 == Changelog ==
 
