@@ -189,11 +189,20 @@ class Patreon_Frontend {
 		$declined                 = Patreon_Wordpress::checkDeclinedPatronage( $user );		
 		$user_patronage           = Patreon_Wordpress::getUserPatronage();						
 			
-		// Get creator full name:
-		$creator_full_name = get_option( 'patreon-creator-full-name', false );
+		// Get the creator or page name which is going to be used for interface text
 		
-		if ( !$creator_full_name OR $creator_full_name == '' ) {
-			$creator_full_name = 'this creator';
+		$creator_full_name = self::make_creator_name_for_interface();
+		
+		// Add 's to make it "creator's Patreon" when placed into label
+		
+		$creator_full_name .= "'s";
+		
+		// Override entire text if the creator set a custom site/creator name string:
+				
+		$patreon_custom_page_name = get_option( 'patreon-custom-page-name', false );
+		
+		if ( $patreon_custom_page_name AND $patreon_custom_page_name != '' ) {
+			$creator_full_name = $patreon_custom_page_name;
 		}
 		
 		// Get lock or not details if it is not given. If post id given, use it. 
@@ -379,13 +388,22 @@ class Patreon_Frontend {
 		$user                     = wp_get_current_user();
 		$declined                 = Patreon_Wordpress::checkDeclinedPatronage( $user );		
 		$user_patronage           = Patreon_Wordpress::getUserPatronage();						
-			
-		// Get creator full name:
-		$creator_full_name = get_option( 'patreon-creator-full-name', false );
 		
-		if ( !$creator_full_name OR $creator_full_name == '' ) {
-			$creator_full_name = 'this creator';
-		}
+		// Get the creator or page name which is going to be used for interface text
+		
+		$creator_full_name = self::make_creator_name_for_interface();
+		
+		// Add 's to make it "creator's Patreon" when placed into label
+		
+		$creator_full_name .= "'s";
+		
+		// Override entire text if the creator set a custom site/creator name string:
+				
+		$patreon_custom_page_name = get_option( 'patreon-custom-page-name', false );
+		
+		if ( $patreon_custom_page_name AND $patreon_custom_page_name != '' ) {
+			$creator_full_name = $patreon_custom_page_name;
+		}		
 		
 		// Get lock or not details if it is not given. If post id given, use it. 
 		if ( !isset( $args['lock'] ) ) {
@@ -1226,6 +1244,28 @@ class Patreon_Frontend {
 		
 		return $avatar;
 
+	}
+	public static function make_creator_name_for_interface( $avatar, $id_or_email, $size, $default, $alt ) {
+		
+		// This function decides which identifier (page name, creator full, first, last name or custom name) should be used for locked post interface text
+	
+		// Go ahead with a cascading series of fallbacks to make sure we have a creator name to use in the end
+		
+		$creator_interface_name = Patreon_Wordpress::get_page_name();			
+
+		if ( !$creator_interface_name OR $creator_interface_name == '' ) {
+			$creator_interface_name = get_option( 'patreon-creator-first-name', false );
+		}
+
+		if ( !$creator_interface_name OR $creator_interface_name == '' ) {
+			$creator_interface_name = 'this creator';
+		}
+		
+		// We skipped using full name or surname because some creators may not want their full name exposed. If they want it, they can set it up in the plugin options
+		
+		// Return the value
+		
+		return $creator_interface_name;
 	}
 	
 }

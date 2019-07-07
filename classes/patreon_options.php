@@ -46,6 +46,7 @@ class Patreon_Options {
         register_setting( 'patreon-options', 'patreon-enable-strict-oauth' );
         register_setting( 'patreon-options', 'patreon-lock-entire-site' );
         register_setting( 'patreon-options', 'patreon-custom-universal-banner' );
+        register_setting( 'patreon-options', 'patreon-custom-page-name' );
 		
     }
 	
@@ -215,6 +216,16 @@ class Patreon_Options {
 											</td>
                                         </tr>
                                         <?php } ?>
+										
+                                        <tr valign="top">
+											<th scope="row">
+												<strong>Custom Patreon Page name</strong>
+												<div class="patreon-options-info">Overrides the Patreon page name in the text on locked posts. You can set a custom text for your page name with this option. If empty, the name you set for your page at Patreon is used, if you did not set a name for your page at Patreon, your first name is used.</div>
+											</th>
+											<td>
+												<input type="text" name="patreon-custom-page-name" value="<?php echo get_option( 'patreon-custom-page-name' ); ?>" />
+											</td>
+                                        </tr>
 
                                     </table>
 
