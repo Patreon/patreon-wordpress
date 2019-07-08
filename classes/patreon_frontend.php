@@ -359,7 +359,9 @@ class Patreon_Frontend {
 			}
 
 		}
-		
+
+		$label = apply_filters( 'ptrn/label_text_over_universal_button_raw', $label, $args['reason'], $user_logged_into_patreon,$is_patron, $args, $post, $creator_full_name, $patreon_level, $post_total_patronage_level, $creator_url, strip_tags( $tier_title ), self::patreonMakeCacheableFlowLink( $post ) );
+
 		$label = str_replace( '%%creator_link%%', $creator_url, $label );
 		$label = str_replace( '%%creator%%', $creator_full_name, $label );
 		$label = str_replace( '%%pledgelevel%%', $patreon_level, $label );
@@ -367,7 +369,7 @@ class Patreon_Frontend {
 		$label = str_replace( '%%flow_link%%', self::patreonMakeCacheableFlowLink( $post ), $label );
 		$label = str_replace( '%%total_pledge%%', $post_total_patronage_level, $label );
 	
-		return $messages . apply_filters( 'ptrn/label_text_over_universal_button', str_replace( '%%pledgelevel%%',$patreon_level, $label ), $args['reason'], $user_logged_into_patreon, $is_patron, $patreon_level, $args );
+		return $messages . apply_filters( 'ptrn/label_text_over_universal_button', str_replace( '%%pledgelevel%%', $patreon_level, $label ), $args['reason'], $user_logged_into_patreon, $is_patron, $patreon_level, $args );
 		
 	}
 	public static function getLabelUnderUniversalButton( $patreon_level,  $state = false, $post = false, $args = false ) {
