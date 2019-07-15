@@ -1276,8 +1276,7 @@ class Patreon_Wordpress {
 			}
 
 			echo '<div id="patreon_setup_screen">';
-			// echo '<div id="patreon_setup_logo"><img src="' . PATREON_PLUGIN_ASSETS . '/img/Patreon_Logo_100.png" /></div>';
-
+	
 			echo '<div id="patreon_setup_content"><img id="patreon_setup_logo" src="' . PATREON_PLUGIN_ASSETS . '/img/Patreon_Logo_100.png" /><h1 style="margin-top: 5px;">Let\'s connect your site to Patreon!</h1><div id="patreon_setup_message">' . $setup_message . '</div>' . $requirement_notices . '<form style="display:block;" method="post" action="https://www.patreon.com/connect-app/"><p class="submit" style="margin-top: 10px;"><input type="submit" name="submit" id="submit" class="button button-primary patreon_setup_wizard_button" value="Let\'s start!"></p>' . $config_input . '</form></div>';
 			echo '</div>';
 
