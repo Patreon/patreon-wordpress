@@ -154,7 +154,7 @@
 	display:block;
 	clear: both;
 	margin-top:30px;
-	line-height : 1;
+	line-height : 1.25;
 }
 
 #patreon_setup_logo {
@@ -163,6 +163,23 @@
 	float:left;
 	vertical-align: top;
 	margin-right: 20px;
+	margin-bottom: 10px;
+}
+
+
+@media only screen and (max-width: 325px) {
+	
+	#patreon_setup_logo {
+		display: block;
+		float:none;
+	}
+}
+
+#patreon_setup_content form .button {
+	
+	/* Have to override WP button styles */
+	font-size: 150% !important;
+	
 }
 
 #patreon_setup_content {
