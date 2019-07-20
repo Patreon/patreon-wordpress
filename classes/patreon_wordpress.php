@@ -5,7 +5,7 @@ if ( !defined( 'WPINC' ) ) {
 	die;
 }
 
-class Patreon_Wordpress {
+class Patreon_WordPress {
 
 	private static $Patreon_Routing;
 	private static $Patreon_Frontend;
@@ -61,7 +61,7 @@ class Patreon_Wordpress {
 		add_action( 'init', array( $this, 'checkPatreonCreatorName' ) );
 		add_action( 'init', 'Patreon_Login::checkTokenExpiration' );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueueAdminScripts' ) );
-		add_action( 'upgrader_process_complete', 'Patreon_Wordpress::AfterUpdateActions', 10, 2 );
+		add_action( 'upgrader_process_complete', 'Patreon_WordPress::AfterUpdateActions', 10, 2 );
 		add_action( 'admin_notices', array( $this, 'AdminMessages' ) );
 		add_action( 'init', array( $this, 'transitionalImageOptionCheck' ) );
 		add_action( 'admin_init', array( $this, 'add_privacy_policy_section' ), 20 ) ;
@@ -164,7 +164,7 @@ class Patreon_Wordpress {
 			// Set the update time
 			update_user_meta( $user->ID, 'patreon_user_details_last_updated', time() );
 			
-			/* all the details you want to update on wordpress user account */
+			/* all the details you want to update on WordPress user account */
 			update_user_meta( $user->ID, 'patreon_user', $user_response['data']['attributes']['vanity'] );
 			update_user_meta( $user->ID, 'patreon_created', $user_response['data']['attributes']['created'] );
 			update_user_meta( $user->ID, 'user_firstname', $user_response['data']['attributes']['first_name'] );
@@ -994,11 +994,11 @@ class Patreon_Wordpress {
 		}
 
 		$user                           = wp_get_current_user();
-		$user_pledge_relationship_start = Patreon_Wordpress::get_user_pledge_relationship_start( $user );
-		$user_patronage                 = Patreon_Wordpress::getUserPatronage( $user );
-		$is_patron                      = Patreon_Wordpress::isPatron( $user );
-		$user_lifetime_patronage        = Patreon_Wordpress::get_user_lifetime_patronage( $user );
-		$declined                       = Patreon_Wordpress::checkDeclinedPatronage( $user );
+		$user_pledge_relationship_start = Patreon_WordPress::get_user_pledge_relationship_start( $user );
+		$user_patronage                 = Patreon_WordPress::getUserPatronage( $user );
+		$is_patron                      = Patreon_WordPress::isPatron( $user );
+		$user_lifetime_patronage        = Patreon_WordPress::get_user_lifetime_patronage( $user );
+		$declined                       = Patreon_WordPress::checkDeclinedPatronage( $user );
 		$active_patron_at_post_date     = false;
 		
 		// Just bail out if this is not the main query for content and no post id was given
@@ -1288,7 +1288,7 @@ class Patreon_Wordpress {
 		
 		$post = get_post( $_REQUEST['pw_post_id'] );
 				
-		echo Patreon_Wordpress::make_tiers_select( $post );
+		echo Patreon_WordPress::make_tiers_select( $post );
 		exit;
 		
 	}
@@ -1428,3 +1428,9 @@ class Patreon_Wordpress {
 	}
 	
 }
+
+
+/**
+ * Backwards compatibility
+**/
+class_alias('Patreon_WordPress','Patreon_Wordpress');

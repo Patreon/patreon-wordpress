@@ -183,11 +183,11 @@ class Patreon_Frontend {
 
 		$label                    = PATREON_TEXT_OVER_BUTTON_1;
 		$user_logged_into_patreon = self::isUserLoggedInPatreon();
-		$is_patron                = Patreon_Wordpress::isPatron( wp_get_current_user() );
+		$is_patron                = Patreon_WordPress::isPatron( wp_get_current_user() );
 		$messages                 = self::processPatreonMessages();
 		$user                     = wp_get_current_user();
-		$declined                 = Patreon_Wordpress::checkDeclinedPatronage( $user );		
-		$user_patronage           = Patreon_Wordpress::getUserPatronage();						
+		$declined                 = Patreon_WordPress::checkDeclinedPatronage( $user );		
+		$user_patronage           = Patreon_WordPress::getUserPatronage();						
 			
 		// Get creator full name:
 		$creator_full_name = get_option( 'patreon-creator-full-name', false );
@@ -200,10 +200,10 @@ class Patreon_Frontend {
 		if ( !isset( $args['lock'] ) ) {
 			
 			if ( isset( $args['post_id'] ) ) {
-				$lock_or_not = Patreon_Wordpress::lock_or_not( $args['post_id'] );
+				$lock_or_not = Patreon_WordPress::lock_or_not( $args['post_id'] );
 			}
 			else {
-				$lock_or_not = Patreon_Wordpress::lock_or_not();
+				$lock_or_not = Patreon_WordPress::lock_or_not();
 			}
 		}
 		
@@ -374,11 +374,11 @@ class Patreon_Frontend {
 
 		$label                    = '';
 		$user_logged_into_patreon = self::isUserLoggedInPatreon();
-		$is_patron                = Patreon_Wordpress::isPatron( wp_get_current_user() );
+		$is_patron                = Patreon_WordPress::isPatron( wp_get_current_user() );
 		$messages                 = self::processPatreonMessages();
 		$user                     = wp_get_current_user();
-		$declined                 = Patreon_Wordpress::checkDeclinedPatronage( $user );		
-		$user_patronage           = Patreon_Wordpress::getUserPatronage();						
+		$declined                 = Patreon_WordPress::checkDeclinedPatronage( $user );		
+		$user_patronage           = Patreon_WordPress::getUserPatronage();						
 			
 		// Get creator full name:
 		$creator_full_name = get_option( 'patreon-creator-full-name', false );
@@ -391,10 +391,10 @@ class Patreon_Frontend {
 		if ( !isset( $args['lock'] ) ) {
 			
 			if ( isset( $args['post_id'] ) ) {
-				$lock_or_not = Patreon_Wordpress::lock_or_not( $args['post_id'] );
+				$lock_or_not = Patreon_WordPress::lock_or_not( $args['post_id'] );
 			}
 			else {
-				$lock_or_not = Patreon_Wordpress::lock_or_not();
+				$lock_or_not = Patreon_WordPress::lock_or_not();
 			}
 		}
 		
@@ -668,7 +668,7 @@ class Patreon_Frontend {
 		
 		$label                    = apply_filters( 'ptrn/universal_button_label', PATREON_TEXT_UNLOCK_WITH_PATREON );
 		$user_logged_into_patreon = self::isUserLoggedInPatreon();
-		$is_patron                = Patreon_Wordpress::isPatron();
+		$is_patron                = Patreon_WordPress::isPatron();
 		
 		// Change this after getting info about which value confirms user's payment is declined. The only different button label is for that condition.
 		
@@ -692,7 +692,7 @@ class Patreon_Frontend {
 			if ( $user ) {
 				
 				// REVISIT - whats below may be a concern - it connects to API to check for valid user for every generation of button. If we could cache it it would be better
-				$user_response = Patreon_Wordpress::getPatreonUser( $user );
+				$user_response = Patreon_WordPress::getPatreonUser( $user );
 
 				if ( $user_response ) {
 					// This is a user logged into Patreon. 
@@ -772,7 +772,7 @@ class Patreon_Frontend {
 
 			if ( $user ) {
 				
-				$user_response = Patreon_Wordpress::getPatreonUser( $user );
+				$user_response = Patreon_WordPress::getPatreonUser( $user );
 				// ^ REVISIT - whats above may be a concern - it connects to API to check for valid user for every generation of button. If we could cache it it would be better
 
 				if ( $user_response ) {
@@ -857,10 +857,10 @@ class Patreon_Frontend {
 			}
 			 
 			$user                           = wp_get_current_user();
-			$user_pledge_relationship_start = Patreon_Wordpress::get_user_pledge_relationship_start();
-			$user_patronage                 = Patreon_Wordpress::getUserPatronage();
-			$user_lifetime_patronage        = Patreon_Wordpress::get_user_lifetime_patronage();
-			$declined                       = Patreon_Wordpress::checkDeclinedPatronage($user);
+			$user_pledge_relationship_start = Patreon_WordPress::get_user_pledge_relationship_start();
+			$user_patronage                 = Patreon_WordPress::getUserPatronage();
+			$user_lifetime_patronage        = Patreon_WordPress::get_user_lifetime_patronage();
+			$declined                       = Patreon_WordPress::checkDeclinedPatronage($user);
 
 			// Check if post was set for active patrons only
 			$patreon_active_patrons_only = get_post_meta( $post->ID, 'patreon-active-patrons-only', true );
@@ -957,7 +957,7 @@ class Patreon_Frontend {
 		
 		// Now send the post id to locking decision function 
 		
-		$lock_or_not = Patreon_Wordpress::lock_or_not($post_id);
+		$lock_or_not = Patreon_WordPress::lock_or_not($post_id);
 		
 		// An array with args should be returned
 		$hide_content = false;
@@ -1024,11 +1024,11 @@ class Patreon_Frontend {
 		
 		$label                    = PATREON_VALID_PATRON_POST_FOOTER_TEXT;
 		$user_logged_into_patreon = self::isUserLoggedInPatreon();
-		$is_patron                = Patreon_Wordpress::isPatron( wp_get_current_user() );
+		$is_patron                = Patreon_WordPress::isPatron( wp_get_current_user() );
 		$messages                 = self::processPatreonMessages();
 		$user                     = wp_get_current_user();
-		$declined                 = Patreon_Wordpress::checkDeclinedPatronage( $user );		
-		$user_patronage           = Patreon_Wordpress::getUserPatronage();						
+		$declined                 = Patreon_WordPress::checkDeclinedPatronage( $user );		
+		$user_patronage           = Patreon_WordPress::getUserPatronage();						
 			
 		// Get creator full name:
 		$creator_full_name = get_option( 'patreon-creator-full-name', false );
@@ -1041,10 +1041,10 @@ class Patreon_Frontend {
 		if ( !isset( $args['lock'] ) ) {
 			
 			if ( isset( $args['post_id'] ) ) {
-				$lock_or_not = Patreon_Wordpress::lock_or_not( $args['post_id'] );
+				$lock_or_not = Patreon_WordPress::lock_or_not( $args['post_id'] );
 			}
 			else {
-				$lock_or_not = Patreon_Wordpress::lock_or_not();
+				$lock_or_not = Patreon_WordPress::lock_or_not();
 			}
 		}
 		

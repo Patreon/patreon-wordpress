@@ -1,7 +1,7 @@
 <?php
 
 /*
-Plugin Name: Patreon Wordpress
+Plugin Name: Patreon WordPress
 Plugin URI: https://www.patreon.com/apps/wordpress
 Description: Patron-only content, directly on your website.
 Version: 1.2.6
@@ -45,7 +45,7 @@ define( "PATREON_TEXT_UNDER_BUTTON_1", '' );
 define( "PATREON_TEXT_UNDER_BUTTON_2", 'Already a Patreon member? <a href="%%flow_link%%" rel="nofollow">Refresh</a> to access this post.' );
 define( "PATREON_TEXT_UNDER_BUTTON_3", 'Already updated? <a href="%%flow_link%%" rel="nofollow">Refresh</a> to access this post.' );
 define( "PATREON_CANT_LOGIN_STRICT_OAUTH", 'Sorry, couldn\'t log you in with Patreon because you have to be logged in to '.get_bloginfo('NAME').' first' );
-define( "PATREON_LOGIN_WITH_WORDPRESS_NOW", 'You can now login with your wordpress username/password.' );
+define( "PATREON_LOGIN_WITH_WORDPRESS_NOW", 'You can now login with your WordPress username/password.' );
 define( "PATREON_CANT_LOGIN_NONCES_DONT_MATCH", 'Sorry. Aborted Patreon login for security because security cookies dont match.' );
 define( "PATREON_CANT_LOGIN_DUE_TO_API_ERROR", 'Sorry. Login aborted due to an API error.' );
 define( "PATREON_CANT_LOGIN_DUE_TO_API_ERROR_CHECK_CREDENTIALS", 'Sorry. Login aborted due to an API error. Please check API credentials.' );
@@ -84,9 +84,10 @@ define( "PATREON_TEXT_OVER_BUTTON_11", 'This content is available exclusively to
 define( "PATREON_COULDNT_ACQUIRE_USER_DETAILS", 'Sorry. Could not acquire your info from Patreon. Please try again later.' );
 define( "PATREON_TEXT_EVERYONE", 'Everyone' );
 define( "PATREON_TEXT_ANY_PATRON", 'Any patron' );
+define( 'PATREON_TEXT_YOU_HAVE_NO_REWARDS_IN_THIS_CAMPAIGN', '' );
 
 include 'classes/patreon_wordpress.php';
 
-register_activation_hook( __FILE__, array( 'Patreon_Wordpress', 'activate' ) );
+register_activation_hook( __FILE__, array( 'Patreon_WordPress', 'activate' ) );
 
-$Patreon_Wordpress = new Patreon_Wordpress;
+$Patreon_WordPress = new Patreon_WordPress;

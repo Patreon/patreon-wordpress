@@ -225,11 +225,11 @@ class Patreon_Protect {
 		
 		// We are here, then we have a nonzero pledge level. Protect the image.
 		
-		$user_patronage = Patreon_Wordpress::getUserPatronage();
+		$user_patronage = Patreon_WordPress::getUserPatronage();
 
 		$user = wp_get_current_user();
 		
-		$declined = Patreon_Wordpress::checkDeclinedPatronage( $user );
+		$declined = Patreon_WordPress::checkDeclinedPatronage( $user );
 			
 		if ($user_patronage == false 
 			|| $user_patronage < ( $patreon_level * 100 )
@@ -833,9 +833,9 @@ RewriteRule ^" . $upload_dir . "/(.*)$ index.php?patreon_action=serve_patron_onl
 			return 0;
 		}		
 		
-		$declined_patron = Patreon_Wordpress::checkDeclinedPatronage($user);
+		$declined_patron = Patreon_WordPress::checkDeclinedPatronage($user);
 
-		$patron_pledge = Patreon_Wordpress::getUserPatronage();
+		$patron_pledge = Patreon_WordPress::getUserPatronage();
 		
 		$patreon_level = get_post_meta( $attachment_id, 'patreon_level', true );
 		

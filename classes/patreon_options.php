@@ -72,7 +72,7 @@ class Patreon_Options {
         <div class="wrap">
 
             <div id="icon-options-general" class="icon32"></div>
-			<h1>Patreon Wordpress Settings</h1>
+			<h1>Patreon WordPress Settings</h1>
 
             <div id="poststuff">
 
@@ -141,7 +141,7 @@ class Patreon_Options {
                                 <div class="handlediv" title="Click to toggle"><br /></div>
                                 <!-- Toggle -->
 
-                                <h2 class="handle"><span>Patreon Wordpress Options</span></h2>
+                                <h2 class="handle"><span>Patreon WordPress Options</span></h2>
 
                                 <div class="inside">
 
@@ -243,13 +243,13 @@ class Patreon_Options {
                                 <div class="handlediv" title="Click to toggle"><br></div>
                                 <!-- Toggle -->
 
-                                <h2 class="hndle">About Patreon Wordpress</h2>
+                                <h2 class="hndle">About Patreon WordPress</h2>
 
                                <div class="inside">
-									<p>Patreon Wordpress developed by Patreon</p>
+									<p>Patreon WordPress developed by Patreon</p>
 
                                     <p><strong>SUPPORT &amp; TECHNICAL HELP</strong> <br>
-                                    We actively support this plugin on our <a href="https://www.patreondevelopers.com/c/patreon-wordpress-plugin-support" target="_blank">Patreon Wordpress Support Forum</a>.</p>
+                                    We actively support this plugin on our <a href="https://www.patreondevelopers.com/c/patreon-wordpress-plugin-support" target="_blank">Patreon WordPress Support Forum</a>.</p>
                                     <p><strong>DOCUMENTATION</strong> <br>Technical documentation and code examples available @ <a href="https://patreon.com/apps/wordpress" target="_blank">https://patreon.com/apps/wordpress</a></p>
                                 </div>
 								<!-- .inside -->

@@ -183,7 +183,7 @@ class Patreon_Login {
 
 				} else {
 
-					/* log user into existing wordpress account with matching username */
+					/* log user into existing WordPress account with matching username */
 					wp_set_current_user( $user->ID, $user->user_login );
 					wp_set_auth_cookie( $user->ID );
 					do_action( 'wp_login', $user->user_login, $user );
@@ -248,7 +248,7 @@ class Patreon_Login {
 
 		if ( $user == false ) {
 
-			/* create wordpress user with provided username */
+			/* create WordPress user with provided username */
 			
 			$random_password = wp_generate_password( 64, false );
 			$user_email 	 = '';
@@ -327,7 +327,7 @@ class Patreon_Login {
 
 			} else {
 				
-				/* wordpress account creation failed */
+				/* WordPress account creation failed */
 				
 				$redirect = add_query_arg( 'patreon_message', 'patreon_could_not_create_wp_account', $redirect );
 				wp_redirect( $redirect );
