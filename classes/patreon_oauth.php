@@ -42,7 +42,7 @@ class Patreon_OAuth {
 		$api_endpoint = "https://api.patreon.com/oauth2/token";
 		
 		$headers = array(
-			'User-Agent' => 'Patreon-Wordpress, version ' . PATREON_WORDPRESS_VERSION . PATREON_WORDPRESS_BETA_STRING . ', platform ' . php_uname('s') . '-' . php_uname( 'r' ),
+			'User-Agent' => 'Patreon-WordPress, version ' . PATREON_WORDPRESS_VERSION . PATREON_WORDPRESS_BETA_STRING . ', platform ' . php_uname('s') . '-' . php_uname( 'r' ),
 		);		
 	
 		$api_request = array(
