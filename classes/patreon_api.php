@@ -5,6 +5,17 @@ if( !defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
+// Switcher - this will conditionally include another file which has a API v2 version of this class - until all installs are upgraded to v2. If this install is old, this should default to false.
+
+$api_version = get_option( 'patreon-installation-api-version', false );
+
+if( $api_version AND $api_version == '2' ) {
+	
+	// Include the v2 version of this class and return
+	require( 'patreon_api_v2.php' );
+	return;
+}
+
 class Patreon_API {
 
 	private $access_token;
