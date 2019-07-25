@@ -15,13 +15,11 @@ class Patreon_API {
 		$this->access_token = $access_token;
 	}
 	
-	public function fetch_user( $v2 = false ) {
-
-		// Only uses v2 starting from this version!
+	public function fetch_user() {
 
 		// We construct the old return from the new returns by combining /me and pledge details
 
-		$api_return = $this->__get_json( "identity?include=memberships&fields[user]=email,first_name,full_name,image_url,last_name,thumb_url,url,vanity,is_email_verified&fields[member]=currently_entitled_amount_cents,lifetime_support_cents,last_charge_status,patron_status,last_charge_date,pledge_relationship_start", true );
+		$api_return = $this->__get_json( "identity?include=memberships&fields[user]=email,first_name,full_name,image_url,last_name,thumb_url,url,vanity,is_email_verified&fields[member]=currently_entitled_amount_cents,lifetime_support_cents,last_charge_status,patron_status,last_charge_date,pledge_relationship_start" );
 		
 		$creator_id = get_option( 'patreon-creator-id', false );
 		
@@ -38,76 +36,34 @@ class Patreon_API {
 			
 		}
 		
-			
 		return $api_return;
 	}
 	
-	public function fetch_campaign_and_patrons($v2 = false ) {
-	
-		// Below conditional and different endpoint can be deprecated to only use v2 api after transition period. Currently we are using v1 for creator/campaign related calls
-		
-		if ( $v2 ) {		
-			// New call to campaigns doesnt return pledges in v2 api - currently this function is not used anywhere in plugin. If 3rd party devs are using it, it will need to be looked into
-			
-			// Requires having gotten permission for pledge scope during auth if used for a normal user instead of the creator
-
-			return $this->__get_json( "campaigns" );
-		}	
-
-		return $this->__get_json( "current_user/campaigns?include=rewards,creator,goals,pledges" );
-		
+	public function fetch_campaign_and_patrons() {
+		return $this->__get_json( "campaigns" );
 	}
 		
 	public function fetch_creator_info( $v2 = false ) {
 	
-		// Below conditional and different endpoint can be deprecated to only use v2 api after transition period. Currently we are using v1 for creator/campaign related calls
-		
-		if ( $v2 ) {
-			
-			// New call to campaigns doesnt return pledges in v2 api - currently this function is not used anywhere in plugin. If 3rd party devs are using it, it will need to be looked into
-			
-			$api_return                      = $this->__get_json( "identity" );
-			$api_return['included'][0]['id'] = $api_return['data'][0]['id'];
+		$api_return                      = $this->__get_json( "identity" );
+		$api_return['included'][0]['id'] = $api_return['data'][0]['id'];
 
-			return $api_return;
-		}
+		return $api_return;
 	
-		return $this->__get_json( "current_user/campaigns?include=creator" );
-		
 	}
 
-	public function fetch_campaign( $v2 = false ) {
-		
-		// Below conditional and different endpoint can be deprecated to only use v2 api after transition period
-		
-		if ( $v2 ) {
-			return $this->__get_json( "campaigns?include=tiers,creator,goals", $v2 );
-		}
-
-		return $this->__get_json( "current_user/campaigns?include=rewards,creator,goals" );
-		
+	public function fetch_campaign() {
+		return $this->__get_json( "campaigns?include=tiers,creator,goals" );
 	}
 	
-	public function fetch_tiers( $v2 = false ) {
-		
-		// Below conditional and different endpoint can be deprecated to only use v2 api after transition period
-		
-		if ( $v2 ) {
-			return $this->__get_json( "campaigns?include=tiers,creator,goals", $v2 );
-		}
-
-		return $this->__get_json( "current_user/campaigns?include=rewards" );
-		
+	public function fetch_tiers() {
+		return $this->__get_json( "campaigns?include=tiers,creator,goals" );
 	}
 
-	private function __get_json( $suffix, $v2 = false ) {		
+	private function __get_json( $suffix ) {		
 
-		$api_endpoint = "https://api.patreon.com/oauth2/api/" . $suffix;
+		$api_endpoint = "https://www.patreon.com/api/oauth2/v2/" . $suffix;	
 
-		if ( $v2 ) {
-			$api_endpoint = "https://www.patreon.com/api/oauth2/v2/" . $suffix;	
-		}
-		
 		$headers = array(
 			'Authorization' => 'Bearer ' . $this->access_token,
 			'User-Agent' => 'Patreon-Wordpress, version ' . PATREON_WORDPRESS_VERSION . PATREON_WORDPRESS_BETA_STRING . ', platform ' . php_uname('s') . '-' . php_uname( 'r' ),
