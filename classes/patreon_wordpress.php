@@ -1426,5 +1426,28 @@ class Patreon_Wordpress {
 		
 		
 	}
+	public static function get_page_name() {
+
+		// This wrapper function wraps the means to get the page name of the creator's campaign
+		// Currently it uses tier details which are already put into the db to pull the page name. In future it can be made pull the name from another source
+		
+		$creator_tiers = get_option( 'patreon-creator-tiers', false );
+
+		if ( !$creator_tiers OR $creator_tiers == '' ) {
+			// Creator tier info not in. bail out
+			return false;			
+		}
+		
+		// Creator tier info in. Get the page name
+	
+		if ( isset( $creator_tiers['data'][0]['attributes']['name'] )  AND isset( $creator_tiers['data'][0]['attributes']['name'] ) != '' ) {
+			
+			// We have the name. Return
+			
+			return  $creator_tiers['data'][0]['attributes']['name'];
+			
+		}
+		
+	}	
 	
 }
