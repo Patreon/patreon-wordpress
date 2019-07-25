@@ -2,8 +2,8 @@
 Contributors: wordpressorg@patreon.com, codebard
 Tags: patreon, membership, members
 Requires at least: 4.0
-Tested up to: 5.2.1
-Stable tag: 1.2.6
+Tested up to: 5.2.2
+Stable tag: 1.2.7
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -89,6 +89,10 @@ It is  difficult to protect videos due the intensive bandwidth requirements of h
 
 
 == Changelog ==
+
+= 1.2.7 =
+
+* Locked posts now show your Patreon page name instead of full name. Added an option in settings to override the page/creator name. The order for deciding what name to show is as follows: Custom name if set in settings -> Patreon page name if exists -> First name -> 'this creator' default text if all fails. 
 
 = 1.2.6 =
 
