@@ -1245,7 +1245,7 @@ class Patreon_Frontend {
 		return $avatar;
 
 	}
-	public static function make_creator_name_for_interface( $avatar, $id_or_email, $size, $default, $alt ) {
+	public static function make_creator_name_for_interface() {
 		
 		// This function decides which identifier (page name, creator full, first, last name or custom name) should be used for locked post interface text
 	
