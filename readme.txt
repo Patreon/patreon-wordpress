@@ -3,7 +3,7 @@ Contributors: wordpressorg@patreon.com, codebard
 Tags: patreon, membership, members
 Requires at least: 4.0
 Tested up to: 5.2.2
-Stable tag: 1.2.7
+Stable tag: 1.2.8
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -89,6 +89,10 @@ It is  difficult to protect videos due the intensive bandwidth requirements of h
 
 
 == Changelog ==
+
+= 1.2.8 =
+
+* Removed unused input parameters from a function - this should fix PHP warnings and other issues at some sites
 
 = 1.2.7 =
 
