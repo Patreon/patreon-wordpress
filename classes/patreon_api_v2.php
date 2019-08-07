@@ -44,9 +44,8 @@ class Patreon_API {
 	}
 		
 	public function fetch_creator_info( $v2 = false ) {
-	
-		$api_return                      = $this->__get_json( "identity" );
-		$api_return['included'][0]['id'] = $api_return['data'][0]['id'];
+			
+		$api_return = $this->__get_json( "campaigns?include=creator&fields[campaign]=created_at,creation_name,discord_server_id,image_small_url,image_url,is_charged_immediately,is_monthly,is_nsfw,main_video_embed,main_video_url,one_liner,one_liner,patron_count,pay_per_name,pledge_url,published_at,summary,thanks_embed,thanks_msg,thanks_video_url,has_rss,has_sent_rss_notify,rss_feed_title,rss_artwork_url,patron_count,discord_server_id,google_analytics_id&fields[user]=about,created,email,first_name,full_name,image_url,last_name,social_connections,thumb_url,url,vanity,is_email_verified" );
 
 		return $api_return;
 	
@@ -57,7 +56,53 @@ class Patreon_API {
 	}
 	
 	public function fetch_tiers() {
-		return $this->__get_json( "campaigns?include=tiers,creator,goals" );
+	
+		$result = $this->__get_json( "campaigns?include=tiers&fields[tier]=amount_cents,created_at,description,discord_role_ids,edited_at,image_url,patron_count,post_count,published,published_at,remaining,requires_shipping,title,unpublished_at,url,user_limit" );
+		
+		// v2 doesnt seem to return the default tiers. We have to add them manually:
+		if ( isset( $result['included'] ) ) {
+			
+			array_unshift( 
+				$result['included'], 
+				array(
+					'attributes' => array(
+						'amount' => 1,
+						'amount_cents' => 1,
+						'created_at' => '',
+						'description' => 'Patrons Only',
+						'remaining' => 0,
+						'requires_shipping' => null,
+						'url' => '',
+						'user_limit' => null,
+						),
+						'id' => 0,
+						'type' => 'reward',
+				)
+			);
+			
+			array_unshift(
+				$result['included'], 
+				array(
+					'attributes' => array(
+						'amount' => 0,
+						'amount_cents' => 0,
+						'created_at' => '',
+						'description' => 'Everyone',
+						'remaining' => 0,
+						'requires_shipping' => null,
+						'url' => '',
+						'user_limit' => null,
+						),
+						'id' => -1,
+						'type' => 'reward',
+				)
+			);
+			
+		}
+		
+		return $result;
+		
+		
 	}
 
 	private function __get_json( $suffix ) {		
