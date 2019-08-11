@@ -1495,7 +1495,7 @@ class Patreon_Wordpress {
 				
 				if(	
 					!isset( $creator_tiers['included'][$key]['type'] )
-					OR $creator_tiers['included'][$key]['type'] != 'reward'
+					OR ( $creator_tiers['included'][$key]['type'] != 'reward' AND $creator_tiers['included'][$key]['type'] != 'tier' )
 				)  {
 					continue; 
 				}
