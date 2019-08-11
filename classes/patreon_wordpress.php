@@ -1230,7 +1230,6 @@ class Patreon_Wordpress {
 		
 	}
 
-<<<<<<< HEAD
 	public static function collect_app_info() {
 		
 		// Collects app information from WP site to be used in client settins at Patreon
@@ -1282,26 +1281,7 @@ class Patreon_Wordpress {
 		}
 		
 	}
-	public static function activate( $network_wide ) {
-		
-		// Kicks in after activation of the plugin and does necessary actions
 
-		// We check if it is multisite, and if this is a network activation
-		
-		if ( is_multisite() AND $network_wide ) {
-			// True. This means that plugin was activated by an admin for all sites on the network, so we dont trigger setup wizard
-			return;
-		}
-		
-		// Check if setup was done and put up a redirect flag if not
-		$patreon_setup_done = get_option( 'patreon-setup_done', false );
-		
-		if( !$patreon_setup_done ) {
-			// Setup complete flag not received. Set flag for redirection in next page load
-			update_option( 'patreon-redirect_to_setup_wizard', true );
-		}
-		
-	}
 	public static function setup_wizard() {
 		
 		// Handles setup wizard screens
@@ -1368,7 +1348,7 @@ class Patreon_Wordpress {
 
 		}
 	}
-=======
+
 	public static function check_plugin_exists( $plugin_slug ) {
 		// Simple function to check if a plugin is installed (may be active, or not active) in the WP instalation
 		
@@ -1378,9 +1358,16 @@ class Patreon_Wordpress {
 			return true;			
 		}
 	}
-	public function activate() {
+	public static function activate( $network_wide ) {
 		
-		// This function kicks in after the plugin is activated. Used to perform tasks which need to be run during plugin activation
+		// Kicks in after activation of the plugin and does necessary actions
+
+		// We check if it is multisite, and if this is a network activation
+		
+		if ( is_multisite() AND $network_wide ) {
+			// True. This means that plugin was activated by an admin for all sites on the network, so we dont trigger setup wizard
+			return;
+		}
 		
 		// Checking if $plugin_first_activated value exists prevents resetting of this value on every plugin deactivation/activation
 
@@ -1390,7 +1377,15 @@ class Patreon_Wordpress {
 			update_option( 'patreon-plugin-first-activated', time() );
 		}
 		
-	}
+		// Check if setup was done and put up a redirect flag if not
+		$patreon_setup_done = get_option( 'patreon-setup_done', false );
+		
+		if( !$patreon_setup_done ) {
+			// Setup complete flag not received. Set flag for redirection in next page load
+			update_option( 'patreon-redirect_to_setup_wizard', true );
+		}
+		
+	}	
 	public static function check_days_after_last_non_system_notice( $days ) {
 		// Calculates if $days many days passed after last non system notice was showed. Used in deciding if and when to show admin wide notices
 		
@@ -1611,6 +1606,6 @@ class Patreon_Wordpress {
 		}
 		
 	}	
->>>>>>> master
+
 	
 }
