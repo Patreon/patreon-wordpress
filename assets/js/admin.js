@@ -131,4 +131,44 @@ jQuery( function( $ ) {
 		});		
 		
 	});
+		
+	// Only trigger if the select dropdown is actually present
+	if ( jQuery( "#patreon_level_select" ).length ) {
+		
+		var pw_input_target = jQuery( "#patreon_level_select" );
+		var pw_post_id = pw_input_target.attr( 'pw_post_id' );
+			
+		jQuery.ajax({
+			url: ajaxurl,
+			async: true, // Just to make sure
+			type:"POST",
+			dataType : 'html',
+			data: {
+				action: 'patreon_wordpress_populate_patreon_level_select',
+				pw_post_id: pw_post_id,
+			},
+			success: function( response ) {
+				jQuery( pw_input_target ).empty();
+				jQuery( pw_input_target ).html( response );
+				
+			},
+			error: function( response ) {
+				jQuery( pw_input_target ).empty();
+				jQuery( pw_input_target ).html( response );
+			},
+			statusCode: {
+				500: function(error) {
+					jQuery( pw_input_target ).empty();
+					jQuery( pw_input_target ).html( 'Sorry - error (500)' );
+				}
+			}
+		});	
+		
+	}
+	
+	// Sync the exact amount value to select value if select is changed
+	jQuery( "#patreon_level_select" ).on( 'change', function() {
+		jQuery( "#patreon-level-exact" ).val( this.value );
+	});
+	
 });

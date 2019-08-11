@@ -191,11 +191,20 @@ class Patreon_Frontend {
 		$declined                 = Patreon_Wordpress::checkDeclinedPatronage( $user );		
 		$user_patronage           = Patreon_Wordpress::getUserPatronage();						
 			
-		// Get creator full name:
-		$creator_full_name = get_option( 'patreon-creator-full-name', false );
+		// Get the creator or page name which is going to be used for interface text
 		
-		if ( !$creator_full_name OR $creator_full_name == '' ) {
-			$creator_full_name = 'this creator';
+		$creator_full_name = self::make_creator_name_for_interface();
+		
+		// Add 's to make it "creator's Patreon" when placed into label
+		
+		$creator_full_name .= "'s";
+		
+		// Override entire text if the creator set a custom site/creator name string:
+				
+		$patreon_custom_page_name = get_option( 'patreon-custom-page-name', false );
+		
+		if ( $patreon_custom_page_name AND $patreon_custom_page_name != '' ) {
+			$creator_full_name = $patreon_custom_page_name;
 		}
 		
 		// Get lock or not details if it is not given. If post id given, use it. 
@@ -308,8 +317,64 @@ class Patreon_Frontend {
 			$post_total_patronage_level = $args['post_total_patronage_level'];
 		}
 		
+		// Get creator url
+		
+		$creator_url = get_option( 'patreon-creator-url', false );
+		
+		// Get Patreon creator tiers
+				
+		$tiers = get_option( 'patreon-creator-tiers', false );
+		
+		foreach( $tiers['included'] as $key => $value ) {
+			
+			// If its not a reward element, continue, just to make sure
+			
+			if(	
+				!isset( $tiers['included'][$key]['type'] )
+				OR $tiers['included'][$key]['type'] != 'reward'
+			)  {
+				continue; 
+			}
+			
+			$reward = $tiers['included'][$key];
+							
+			// Special conditions for label for element 0, which is 'everyone' and '1, which is 'patron only'
+			
+			if ( $reward['id'] == -1 ) {
+				$tier_title = PATREON_TEXT_EVERYONE;
+			}
+			if ( $reward['id'] == 0 ) {
+				$tier_title = PATREON_TEXT_ANY_PATRON;
+			}
+
+			if ( ( $reward['attributes']['amount_cents'] / 100 ) >= $patreon_level ) {
+				
+				// Matching level was present, but now found. Set selected and toggle flag.
+				// selected = selected for XHTML compatibility
+				
+				// Use title if it exists, description if it does not.
+				$tier_title = $reward['attributes']['title'];
+				
+				if ( $tier_title == '' ) {
+					$tier_title = $reward['attributes']['description'];
+				}
+			
+				// If the title is too long, snip it
+				if ( strlen( $tier_title ) > 23 ) {
+					$tier_title = substr( $tier_title , 0 , 23 ) .'...';
+				}
+				
+				$tier_title = '"' . $tier_title . '"';
+				
+				break;
+			}
+
+		}
+		
+		$label = str_replace( '%%creator_link%%', $creator_url, $label );
 		$label = str_replace( '%%creator%%', $creator_full_name, $label );
 		$label = str_replace( '%%pledgelevel%%', $patreon_level, $label );
+		$label = str_replace( '%%tier_level%%', strip_tags( $tier_title ), $label );
 		$label = str_replace( '%%flow_link%%', self::patreonMakeCacheableFlowLink( $post ), $label );
 		$label = str_replace( '%%total_pledge%%', $post_total_patronage_level, $label );
 	
@@ -325,13 +390,22 @@ class Patreon_Frontend {
 		$user                     = wp_get_current_user();
 		$declined                 = Patreon_Wordpress::checkDeclinedPatronage( $user );		
 		$user_patronage           = Patreon_Wordpress::getUserPatronage();						
-			
-		// Get creator full name:
-		$creator_full_name = get_option( 'patreon-creator-full-name', false );
 		
-		if ( !$creator_full_name OR $creator_full_name == '' ) {
-			$creator_full_name = 'this creator';
-		}
+		// Get the creator or page name which is going to be used for interface text
+		
+		$creator_full_name = self::make_creator_name_for_interface();
+		
+		// Add 's to make it "creator's Patreon" when placed into label
+		
+		$creator_full_name .= "'s";
+		
+		// Override entire text if the creator set a custom site/creator name string:
+				
+		$patreon_custom_page_name = get_option( 'patreon-custom-page-name', false );
+		
+		if ( $patreon_custom_page_name AND $patreon_custom_page_name != '' ) {
+			$creator_full_name = $patreon_custom_page_name;
+		}		
 		
 		// Get lock or not details if it is not given. If post id given, use it. 
 		if ( !isset( $args['lock'] ) ) {
@@ -1019,18 +1093,72 @@ class Patreon_Frontend {
 			}
 			
 		}
+		
+
+		// Get Patreon creator tiers
+				
+		$tiers = get_option( 'patreon-creator-tiers', false );
+		
+		foreach( $tiers['included'] as $key => $value ) {
 			
+			// If its not a reward element, continue, just to make sure
+			
+			if(	
+				!isset( $tiers['included'][$key]['type'] )
+				OR $tiers['included'][$key]['type'] != 'reward'
+			)  {
+				continue; 
+			}
+			
+			$reward = $tiers['included'][$key];
+							
+			// Special conditions for label for element 0, which is 'everyone' and '1, which is 'patron only'
+			
+			if ( $reward['id'] == -1 ) {
+				$tier_title = PATREON_TEXT_EVERYONE;
+			}
+			if ( $reward['id'] == 0 ) {
+				$tier_title = PATREON_TEXT_ANY_PATRON;
+			}
+
+			if ( ( $reward['attributes']['amount_cents'] / 100 ) >= $patreon_level ) {
+				
+				// Matching level was present, but now found. Set selected and toggle flag.
+				// selected = selected for XHTML compatibility
+				
+				// Use title if it exists, description if it does not.
+				$tier_title = $reward['attributes']['title'];
+				
+				if ( $tier_title == '' ) {
+					$tier_title = $reward['attributes']['description'];
+				}
+
+				// If the title is too long, snip it
+				if ( strlen( $tier_title ) > 23 ) {
+					$tier_title = substr( $tier_title , 0 , 23 ) .'...';
+				}
+				
+				$tier_title = '"' . $tier_title . '"';
+				
+				break;
+			}
+
+		}
+
+		// Get patreon creator url:
+		$creator_url = get_option( 'patreon-creator-url', false );
+		
+	    $label = str_replace( '%%creator_link%%', $creator_url, $label );
+		$label = str_replace( '%%tier_level%%', strip_tags( $tier_title ), $label );			
 		$label = str_replace( '%%creator%%', $creator_full_name, $label );
 		$label = str_replace( '%%pledgelevel%%', $patreon_level, $label );
 		$label = str_replace( '%%flow_link%%', self::patreonMakeCacheableFlowLink(), $label );
 		if ( isset( $args['post_total_patronage_level'] ) ) {
 			$label = str_replace( '%%total_pledge%%', $args['post_total_patronage_level'], $label );
-		}		
+		}
 		
-		// Get patreon creator url:
-		$creator_profile_url = get_option( 'patreon-creator-url', false );
 		$post_footer         = str_replace( '%%pledgelevel%%', $patreon_level,  apply_filters( 'ptrn/valid_patron_footer_text', $label , $patreon_level, $user_patronage ) );
-		$post_footer         = apply_filters( 'ptrn/valid_patron_processed_message', str_replace( '%%creatorprofileurl%%',apply_filters( 'ptrn/valid_patron_creator_profile_url', '<a href="' . $creator_profile_url . '">Patreon</a>',$creator_profile_url ), $post_footer ), $patreon_level, $user_patronage );
+		$post_footer         = apply_filters( 'ptrn/valid_patron_processed_message', $label, $patreon_level, $user_patronage );
 		
 		$post_footer = 
 		'<div class="patreon-valid-patron-message">'.
@@ -1118,6 +1246,28 @@ class Patreon_Frontend {
 		
 		return $avatar;
 
+	}
+	public static function make_creator_name_for_interface() {
+		
+		// This function decides which identifier (page name, creator full, first, last name or custom name) should be used for locked post interface text
+	
+		// Go ahead with a cascading series of fallbacks to make sure we have a creator name to use in the end
+		
+		$creator_interface_name = Patreon_Wordpress::get_page_name();			
+
+		if ( !$creator_interface_name OR $creator_interface_name == '' ) {
+			$creator_interface_name = get_option( 'patreon-creator-first-name', false );
+		}
+
+		if ( !$creator_interface_name OR $creator_interface_name == '' ) {
+			$creator_interface_name = 'this creator';
+		}
+		
+		// We skipped using full name or surname because some creators may not want their full name exposed. If they want it, they can set it up in the plugin options
+		
+		// Return the value
+		
+		return $creator_interface_name;
 	}
 	
 }

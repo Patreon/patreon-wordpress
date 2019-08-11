@@ -30,11 +30,12 @@ class Patreon_API {
 			$api_return['included'][0]['attributes']['amount_cents']             = $api_return['included'][0]['attributes']['currently_entitled_amount_cents'];
 			$api_return['included'][0]['attributes']['created_at']               = $api_return['included'][0]['attributes']['pledge_relationship_start'];
 			
+			if ( $api_return['included'][0]['attributes']['last_charge_status'] != 'Paid' ) {
+				$api_return['included'][0]['attributes']['declined_since'] = $api_return['included'][0]['attributes']['last_charge_date'];
+			}
+			
 		}
 		
-		if ( $api_return['included'][0]['attributes']['last_charge_status'] != 'Paid' ) {
-			$api_return['included'][0]['attributes']['declined_since'] = $api_return['included'][0]['attributes']['last_charge_date'];
-		}
 			
 		return $api_return;
 	}
@@ -78,10 +79,22 @@ class Patreon_API {
 		// Below conditional and different endpoint can be deprecated to only use v2 api after transition period
 		
 		if ( $v2 ) {
-			return $this->__get_json( "campaigns?include=rewards,creator,goals" );
+			return $this->__get_json( "campaigns?include=tiers,creator,goals", $v2 );
 		}
 
 		return $this->__get_json( "current_user/campaigns?include=rewards,creator,goals" );
+		
+	}
+	
+	public function fetch_tiers( $v2 = false ) {
+		
+		// Below conditional and different endpoint can be deprecated to only use v2 api after transition period
+		
+		if ( $v2 ) {
+			return $this->__get_json( "campaigns?include=tiers,creator,goals", $v2 );
+		}
+
+		return $this->__get_json( "current_user/campaigns?include=rewards" );
 		
 	}
 
@@ -95,7 +108,7 @@ class Patreon_API {
 		
 		$headers = array(
 			'Authorization' => 'Bearer ' . $this->access_token,
-			'User-Agent' => 'Patreon-Wordpress, version ' . PATREON_WORDPRESS_VERSION . ', platform ' . php_uname('s') . '-' . php_uname( 'r' ),
+			'User-Agent' => 'Patreon-Wordpress, version ' . PATREON_WORDPRESS_VERSION . PATREON_WORDPRESS_BETA_STRING . ', platform ' . php_uname('s') . '-' . php_uname( 'r' ),
 		);
 		
 		$api_request = array(

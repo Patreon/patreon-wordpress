@@ -47,6 +47,7 @@ class Patreon_Options {
         register_setting( 'patreon-options', 'patreon-enable-strict-oauth' );
         register_setting( 'patreon-options', 'patreon-lock-entire-site' );
         register_setting( 'patreon-options', 'patreon-custom-universal-banner' );
+        register_setting( 'patreon-options', 'patreon-custom-page-name' );
 		
     }
 	
@@ -216,6 +217,16 @@ class Patreon_Options {
 											</td>
                                         </tr>
                                         <?php } ?>
+										
+                                        <tr valign="top">
+											<th scope="row">
+												<strong>Custom Patreon Page name</strong>
+												<div class="patreon-options-info">Overrides the Patreon page name in the text on locked posts. You can set a custom text for your page name with this option. If empty, the name you set for your page at Patreon is used, if you did not set a name for your page at Patreon, your first name is used.</div>
+											</th>
+											<td>
+												<input type="text" name="patreon-custom-page-name" value="<?php echo get_option( 'patreon-custom-page-name' ); ?>" />
+											</td>
+                                        </tr>
 
                                     </table>
 
@@ -252,6 +263,23 @@ class Patreon_Options {
                                     <p><strong>SUPPORT &amp; TECHNICAL HELP</strong> <br>
                                     We actively support this plugin on our <a href="https://www.patreondevelopers.com/c/patreon-wordpress-plugin-support" target="_blank">Patreon Wordpress Support Forum</a>.</p>
                                     <p><strong>DOCUMENTATION</strong> <br>Technical documentation and code examples available @ <a href="https://patreon.com/apps/wordpress" target="_blank">https://patreon.com/apps/wordpress</a></p>
+                                </div>
+								<!-- .inside -->
+
+                            </div>
+							
+                            <!-- .postbox -->
+                            <div class="postbox">
+
+                                <div class="handlediv" title="Click to toggle"><br></div>
+                                <!-- Toggle -->
+
+                                <h2 class="hndle">Featured Third Party Addon</h2>
+
+                               <div class="inside">
+									<p><strong>Patron Pro</strong></p>
+
+                                    <p>Get Patron Pro addon for Patreon WordPress to increase your patrons and pledges!</p><p>Enjoy powerful features like partial post locking, sneak peeks, advanced locking methods, login lock, vip users and more.<br /><br /><a href="https://codebard.com/patron-pro-addon-for-patreon-wordpress" target="_blank">Check out all features here</a></p>
                                 </div>
 								<!-- .inside -->
 
