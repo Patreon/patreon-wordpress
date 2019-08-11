@@ -101,11 +101,16 @@ class Patreon_API {
 		}
 		
 		return $result;
+	}	
+	public function create_refresh_client( $params ) {
 		
+		// Contacts api to create or refresh client
+		// Only uses v2 
 		
+			return $this->__get_json( "clients?include=creator_token", true, 'POST', $params );
 	}
-
-	private function __get_json( $suffix ) {		
+		
+	private function __get_json( $suffix, $v2 = false, $method = 'GET', $params = false ) {		
 
 		$api_endpoint = "https://www.patreon.com/api/oauth2/v2/" . $suffix;	
 
@@ -116,10 +121,24 @@ class Patreon_API {
 		
 		$api_request = array(
 			'headers' => $headers,
-			'method'  => 'GET',
+			'method'  => $method,
 		);
 
-		$response = wp_remote_request( $api_endpoint, $api_request );
+		if ( isset( $params ) ) {
+			$api_request['body'] = $params;
+			$api_request['data_format'] = 'body';
+			$api_request['headers']['content-type'] = 'application/json';
+		}
+
+		if ( $method == 'GET' ) {
+
+			$response = wp_remote_request( $api_endpoint, $api_request );
+		}
+		
+		if ( $method == 'POST' ) {
+			$response = wp_remote_post( $api_endpoint, $api_request );
+		}
+		
 		$result   = $response;
 
 		if ( is_wp_error( $response ) ) {

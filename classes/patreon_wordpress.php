@@ -1239,13 +1239,16 @@ class Patreon_Wordpress {
 		$company_domain = $parsed_home_url['host'];
 		
 		$app_info = array(
-			'app_name'         => get_bloginfo( 'name' ),
-			'app_desc'         => 'Patreon app for ' . get_bloginfo( 'name' ),
-			'author'           => get_bloginfo( 'name' ),
-			'company_domain'   => $company_domain,
-			'icon_url'         => PATREON_PLUGIN_ASSETS . '/img/patreon_wordpress_app_icon.png',
-			'redirect_uri'     => site_url( '/patreon-authorization/' ),
-			'api_version'      => '1',
+			'name'                  => get_bloginfo( 'name' ),
+			'description'           => 'Patreon app for ' . get_bloginfo( 'name' ),
+			'author_name'           => get_bloginfo( 'name' ),
+			'domain'                => $company_domain,
+			'privacy_policy_url'    => '',
+			'tos_url'               => '',
+			'icon_url'              => PATREON_PLUGIN_ASSETS . '/img/patreon_wordpress_app_icon.png',
+			'redirect_uris'         => site_url( '/patreon-authorization/' ),
+			'version'               => '2',
+			'parent_client_id'      =>  PATREON_PLUGIN_CLIENT_ID,
 		);
 		
 		return $app_info;
@@ -1282,6 +1285,7 @@ class Patreon_Wordpress {
 		
 	}
 
+
 	public static function setup_wizard() {
 		
 		// Handles setup wizard screens
@@ -1313,9 +1317,20 @@ class Patreon_Wordpress {
 
 			}
 
+			// Create state var needed for identifying connection attempt
+			
+			$state = array(
+				'patreon_action' => 'register_refresh_client',			
+			);
+
 			echo '<div id="patreon_setup_screen">';
 	
-			echo '<div id="patreon_setup_content"><img id="patreon_setup_logo" src="' . PATREON_PLUGIN_ASSETS . '/img/Patreon_Logo_100.png" /><h1 style="margin-top: 5px;">Let\'s connect your site to Patreon!</h1><div id="patreon_setup_message">' . $setup_message . '</div>' . $requirement_notices . '<form style="display:block;" method="post" action="https://www.patreon.com/connect-app/"><p class="submit" style="margin-top: 10px;"><input type="submit" name="submit" id="submit" class="button button-primary patreon_setup_wizard_button" value="Let\'s start!"></p>' . $config_input . '</form></div>';
+			echo '<div id="patreon_setup_logo"><img src="' . PATREON_PLUGIN_ASSETS . '/img/Patreon_Logo_100.png" /></div>';
+
+			$api_endpoint = "https://www.patreon.com/api/oauth2/v2/";	
+			
+echo '<div id="patreon_setup_content"><h1 style="margin-top: 5px;">Let\'s connect your site to Patreon!</h1><div id="patreon_setup_message">' . $setup_message . '</div>' . $requirement_notices . '<form style="display:block;" method="get" action="'. $api_endpoint .'register-client-creation"><p class="submit" style="margin-top: 10px;"><input type="submit" name="submit" id="submit" class="button button-primary" value="Let\'s start!"></p>' . $config_input . '<input type="hidden" name="client_id" value="' . PATREON_PLUGIN_CLIENT_ID . '" /><input type="hidden" name="redirect_uri" value="' . site_url() . '/patreon-authorization/' . '" /><input type="hidden" name="state" value="' . urlencode( base64_encode( json_encode( $state ) ) ) . '" /><input type="hidden" name="scopes" value="w:identity.clients" /><input type="hidden" name="response_type" value="code" /></form></div>';
+		
 			echo '</div>';
 
 		}
