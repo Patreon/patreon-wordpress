@@ -93,6 +93,7 @@ define( "PATREON_SETUP_INITIAL_MESSAGE", 'By connecting your site to Patreon, yo
 define( "PATREON_SETUP_SUCCESS_MESSAGE", 'Great! Your site is now connected to Patreon!' );
 define( "PATREON_TEXT_EVERYONE", 'Everyone' );
 define( "PATREON_TEXT_ANY_PATRON", 'Any patron' );
+define( "PATREON_PLUGIN_CLIENT_ID", 'CLIENTIDSTRING' );
 
 include 'classes/patreon_wordpress.php';
 

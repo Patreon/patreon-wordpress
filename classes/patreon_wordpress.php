@@ -699,7 +699,10 @@ class Patreon_Wordpress {
 		// Show a notice if setup was not done
 		$setup_done = get_option( 'patreon-setup_done', false );
 		
-		if( !$setup_done ) {
+		// Check if this site is a v2 site - temporary until we move to make all installations v2
+		$api_version = get_option( 'patreon-installation-api-version', false );
+		
+		if( !$setup_done AND ( $api_version AND $api_version == '2' ) ) {
 			
 			?>
 				 <div class="notice notice-success is-dismissible">
@@ -1327,7 +1330,7 @@ class Patreon_Wordpress {
 	
 			echo '<div id="patreon_setup_logo"><img src="' . PATREON_PLUGIN_ASSETS . '/img/Patreon_Logo_100.png" /></div>';
 
-			$api_endpoint = "https://www.patreon.com/api/oauth2/v2/";	
+			$api_endpoint = "https://www.patreon.com/oauth2/";	
 			
 echo '<div id="patreon_setup_content"><h1 style="margin-top: 5px;">Let\'s connect your site to Patreon!</h1><div id="patreon_setup_message">' . $setup_message . '</div>' . $requirement_notices . '<form style="display:block;" method="get" action="'. $api_endpoint .'register-client-creation"><p class="submit" style="margin-top: 10px;"><input type="submit" name="submit" id="submit" class="button button-primary" value="Let\'s start!"></p>' . $config_input . '<input type="hidden" name="client_id" value="' . PATREON_PLUGIN_CLIENT_ID . '" /><input type="hidden" name="redirect_uri" value="' . site_url() . '/patreon-authorization/' . '" /><input type="hidden" name="state" value="' . urlencode( base64_encode( json_encode( $state ) ) ) . '" /><input type="hidden" name="scopes" value="w:identity.clients" /><input type="hidden" name="response_type" value="code" /></form></div>';
 		
@@ -1389,13 +1392,22 @@ echo '<div id="patreon_setup_content"><h1 style="margin-top: 5px;">Let\'s connec
 		$plugin_first_activated   = get_option( 'patreon-plugin-first-activated', 0 );
 				
 		if ( $plugin_first_activated == 0 ) {
+			
 			update_option( 'patreon-plugin-first-activated', time() );
+			
+			// Currently we are only going to move new installations to v2. Later this flag below can be removed and setup notice can be popped for any install which does not have the app credentials saved.
+
+			update_option( 'patreon-installation-api-version', '2' );
 		}
 		
 		// Check if setup was done and put up a redirect flag if not
+		
 		$patreon_setup_done = get_option( 'patreon-setup_done', false );
 		
-		if( !$patreon_setup_done ) {
+		// Check if this site is a v2 site
+		$api_version = get_option( 'patreon-installation-api-version', false );
+		
+		if( !$patreon_setup_done AND ( $api_version AND $api_version == '2' ) ) {
 			// Setup complete flag not received. Set flag for redirection in next page load
 			update_option( 'patreon-redirect_to_setup_wizard', true );
 		}

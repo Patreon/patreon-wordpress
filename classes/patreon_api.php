@@ -9,7 +9,7 @@ if( !defined( 'ABSPATH' ) ) {
 
 $api_version = get_option( 'patreon-installation-api-version', false );
 
-if( $api_version AND $api_version == '2' ) {
+if ( $api_version AND $api_version == '2' ) {
 	
 	// Include the v2 version of this class and return
 	require( 'patreon_api_v2.php' );
