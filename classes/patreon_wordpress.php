@@ -202,12 +202,14 @@ class Patreon_Wordpress {
 		
 	}
 	public static function check_creator_tiers() {
-				
+
 		// Check if creator tier info doesnt exist. This will make sure the new version is compatible with existing installs and will show the tiers in locked interface text from the get go
 
 		// When we move to webhooks, this code can be changed to read from the already present creator details
 
-		if ( !get_option( 'patreon-creator-tiers', false ) OR get_option( 'patreon-creator-tiers', false ) == '' ) {
+		$creator_tiers = get_option( 'patreon-creator-tiers', false );
+
+		if ( !$creator_tiers OR $creator_tiers == '' OR !is_array( $creator_tiers['included'][1] ) ) {
 			
 			// Trigger an update of credentials
 			self::update_creator_tiers_from_api();
@@ -1596,19 +1598,22 @@ echo '<div id="patreon_setup_content"><h1 style="margin-top: 0px;">Let\'s connec
 				$creator_info = $api_client->fetch_tiers();
 				
 		}
-		if ( is_array( $creator_info['included'] ) AND isset( $creator_info['included'][1]['type'] ) AND $creator_info['included'][1]['type'] == 'reward' ) {
+
+		if ( isset( $creator_info ) AND is_array( $creator_info['included'] ) AND isset( $creator_info['included'][1]['type'] ) AND $creator_info['included'][1]['type'] == 'reward' ) {
 
 			// Creator info acquired. Update.
 			// We want to sort tiers according to their $ level.
-			
+				
 			usort( $creator_info['included'], function( $a, $b ) {
 				return $a['attributes']['amount_cents'] - $b['attributes']['amount_cents'];
 			} );
+		
+			array_walk_recursive ( $creator_info, 'self::format_creator_info_array' );
 
-			update_option( 'patreon-creator-tiers', $creator_info );
+			update_option( 'patreon-creator-tiers',  $creator_info );
+		
 		}
-		
-		
+
 	}
 	public static function get_page_name() {
 
@@ -1633,6 +1638,15 @@ echo '<div id="patreon_setup_content"><h1 style="margin-top: 0px;">Let\'s connec
 		}
 		
 	}	
-
+	public static function format_creator_info_array( &$value, $key, $user ) {
+		
+		// Checks creator info array and formats/cleans as necessary
+				
+		if ( trim( $key ) == 'description' ) {
+			// update_option refuses to save entire creator info array if there are extensive formatting in tier descriptions. base64ing them circumvents this issue
+			$value = base64_encode( $value );
+		}
+		
+	}
 	
 }
