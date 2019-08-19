@@ -94,6 +94,8 @@ define( "PATREON_SETUP_SUCCESS_MESSAGE", 'Great! Your site is now connected to P
 define( "PATREON_TEXT_EVERYONE", 'Everyone' );
 define( "PATREON_TEXT_ANY_PATRON", 'Any patron' );
 define( "PATREON_PLUGIN_CLIENT_ID", 'CLIENTIDSTRING' );
+define( "PATREON_SITE_DISCONNECTED_FROM_PATREON_HEADING", 'Disconnection successful!' );
+define( "PATREON_SITE_DISCONNECTED_FROM_PATREON_TEXT", 'You successfully disconnected your site from Patreon. Now you can connect another creator account to your site.' );
 
 include 'classes/patreon_wordpress.php';
 

@@ -90,13 +90,12 @@ class Patreon_Options {
                                 <div class="handlediv" title="Click to toggle"><br /></div>
                                 <!-- Toggle -->
 
+									<h2 class="handle"><span>Patreon Connection</span></h2>
                                 <div class="inside">
-																		
-									<div id="patreon_options_app_details_main">
-
-										<h2 class="handle"><span>API Settings</span></h2>
+								
 										
-										<p>You can find the oAuth client settings on Patreon <a href="https://www.patreon.com/platform/documentation/clients" target="_blank">here</a>.</p>																
+									<div id="patreon_options_app_details_main">
+									
 										<button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon-connection-details">Connection details</button> <button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon_options_app_details_disconnect patreon_options_app_details_main">Disconnect site</button>
 										
 									</div>
@@ -104,12 +103,16 @@ class Patreon_Options {
 									<div id="patreon_options_app_details_disconnect">
 									
 										We will now remove all info related to currently linked creator account from your site. Post gating values in your posts will be left untouched. After this, you will be able to connect this site to another creator account you have. Gated posts should stay gated from the nearest tier you have in the creator account you connect to this site. <br /><br />
-										<button class="button button-primary button-large patreon_wordpress_interface_toggle">Confirm disconnection</button> <button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon_options_app_details_disconnect patreon_options_app_details_main">Cancel</button>
+										<button id="patreon_wordpress_disconnect_from_patreon" class="button button-primary button-large" target="<?php echo admin_url( 'admin.php?page=patreon-plugin&patreon_wordpress_action=disconnect_site_from_patreon' ); ?>">Confirm disconnection</button> <button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon_options_app_details_disconnect patreon_options_app_details_main">Cancel</button>
 										
 									</div>
 									
                                     <table class="widefat" id="patreon-connection-details">
 
+                                        <tr valign="top">
+											<th scope="row"><strong></strong></th>
+											<td>You can find the oAuth client settings on Patreon <a href="https://www.patreon.com/platform/documentation/clients" target="_blank">here</a></td>
+                                        </tr>
                                         <tr valign="top">
 											<th scope="row"><strong>Redirect URI</strong></th>
 											<td><input type="text" value="<?php echo site_url() . '/patreon-authorization/'; ?>" disabled class="large-text" /></td>

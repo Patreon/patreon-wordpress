@@ -98,6 +98,14 @@ jQuery( function( $ ) {
 		});
 	});	
 	
+	// Doing the below via jQuery because we have to submit some POST info inside another form. Avoided using a link inside button to account for older devices
+	
+	jQuery(document).on( 'click', '#patreon_wordpress_disconnect_from_patreon', function(e) {
+		e.preventDefault();
+		var target = jQuery(this).attr( 'target' );
+		window.location.replace( target );
+	});
+	
 	jQuery(document).on( 'click', '.patreon-wordpress-admin-toggle', function(e) {
 		
 		e.preventDefault();

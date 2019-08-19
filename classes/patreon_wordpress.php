@@ -24,6 +24,7 @@ class Patreon_Wordpress {
 	public static $current_user_lifetime_patronage = -1;
 	public static $current_user_pledge_relationship_start = -1;
 	public static $lock_or_not = array();
+	public static $admin_notices = array();
 
 	function __construct() {
 
@@ -49,6 +50,7 @@ class Patreon_Wordpress {
 		add_action( 'wp_head', array( $this, 'updatePatreonUser' ) );
 		add_action( 'init', array( $this, 'checkPatreonCreatorID' ) );
 		add_action( 'init', array( $this, 'check_creator_tiers' ) );
+		add_action( 'init', array( &$this, 'order_independent_actions_to_run_on_init_start' ), 0 );
 		add_action( 'init', array( $this, 'check_plugin_activation_date_for_existing_installs' ) );
 		add_action( 'admin_init', array( $this, 'post_credential_update_api_connectivity_check' ) );
 		add_action( 'update_option_patreon-client-id', array( $this, 'toggle_check_api_credentials_on_setting_save' ), 10, 2 );
@@ -698,6 +700,22 @@ class Patreon_Wordpress {
 			return;
 		}
 		
+		$show_site_disconnect_success_notice = get_option( 'patreon-show-site-disconnect-success-notice', false );
+
+		// Queue this message immediately after activation if not already shown
+		
+		if( $show_site_disconnect_success_notice ) {
+			
+			?>
+				 <div class="notice notice-success is-dismissible  patreon-wordpress" id="patreon_site_disconnect_success_notice">
+					<p><?php echo PATREON_SITE_DISCONNECTED_FROM_PATREON_TEXT; ?></p>
+				</div>
+			<?php	
+			
+			delete_option( 'patreon-show-site-disconnect-success-notice' );
+			
+		}		
+		
 		// Show a notice if setup was not done
 		$setup_done = get_option( 'patreon-setup_done', false );
 		
@@ -775,7 +793,7 @@ class Patreon_Wordpress {
 		if( get_option( 'patreon-wordpress-app-credentials-success', false ) ) {
 			
 			?>
-				 <div class="notice notice-success is-dismissible patreon-wordpress" id="patreon-wordpress-update-available">
+				 <div class="notice notice-success is-dismissible patreon-wordpress" id="patreon-wordpress-credentials-success">
 				 <h3>Your Patreon client details were successfully saved!</h3>
 					<p>Patreon WordPress is now ready to go and your site is connected to Patreon! You can now lock any post by using the "Patreon Level" meta box in your post editor!</p>
 				</div>
@@ -788,7 +806,7 @@ class Patreon_Wordpress {
 		if( get_option( 'patreon-wordpress-app-credentials-failure', false ) ) {
 			
 			?>
-				 <div class="notice notice-error is-dismissible patreon-wordpress" id="patreon-wordpress-update-available">
+				 <div class="notice notice-error is-dismissible patreon-wordpress" id="patreon-wordpress-credentials-failure">
 				 <h3>Sorry - couldn't connect your site to Patreon</h3>
 					<p>Patreon WordPress wasn't able to contact Patreon with the app details you provided. This may be because there is an error in the app details, or because there is something preventing proper connectivity in between your site/server and Patreon API. You can get help by visiting our support forum <a href="https://www.patreondevelopers.com/c/patreon-wordpress-plugin-support" target="_blank">here</a></p>
 				</div>
@@ -797,6 +815,25 @@ class Patreon_Wordpress {
 			delete_option( 'patreon-wordpress-app-credentials-failure' );
 			
 		}
+		
+		// Return if there are no queued notices
+		if ( count( $this->admin_notices ) == 0 ) {
+			return;
+		}
+		
+		// Iterate queued messages by any function/operation
+		
+		foreach ( $this->admin_notices as $key => $value ) {
+		
+			?>
+				 <div class="notice <?php echo $this->admin_notices[$key]['notice_classes']; ?> is-dismissible" id="patreon-wordpress-credentials-<?php echo $key; ?>">
+				 <h3><?php echo $this->admin_notices[$key]['notice_heading']; ?></h3>
+					<p><?php echo $this->admin_notices[$key]['notice_text']; ?></p>
+				</div>
+			<?php
+			
+		}
+		
 		
 	}
 	public function check_for_update($plugin_check_data) {
@@ -1646,6 +1683,51 @@ echo '<div id="patreon_setup_content"><h1 style="margin-top: 0px;">Let\'s connec
 			// update_option refuses to save entire creator info array if there are extensive formatting in tier descriptions. base64ing them circumvents this issue
 			$value = base64_encode( $value );
 		}
+		
+	}	
+	public static function order_independent_actions_to_run_on_init_start() {
+		
+		// This function runs on init at order 0, and allows any action that does not require to be run in a particular order or any other function or operation to be run. 
+
+		if ( $_REQUEST['patreon_wordpress_action'] == 'disconnect_site_from_patreon' AND is_admin() AND current_user_can( 'manage_options' ) ) {
+
+			// Admin side, user is admin level. Perform action:
+			
+			// To disconnect the site from a particular creator account, we will delete all options related to creator account, but we will leave other plugin settings and post gating values untouched
+			
+			$options_to_delete = array(
+				'patreon-custom-page-name',
+				'patreon-fetch-creator-id',
+				'patreon-creator-tiers',
+				'patreon-creator-last-name',
+				'patreon-creator-first-name',
+				'patreon-creator-full-name',
+				'patreon-creator-url',
+				'patreon-campaign-id',
+				'patreon-creators-refresh-token-expiration',
+				'patreon-creator-id',
+				'patreon-setup-wizard-last-call-result',
+				'patreon-creators-refresh-token',
+				'patreon-creators-access-token',
+				'patreon-client-secret',
+				'patreon-client-id',
+				'patreon-setup_is_being_done',
+			);
+			
+			foreach ( $options_to_delete as $key => $value ) {
+				
+				delete_option( $options_to_delete[$key] );
+				
+			}
+			
+			update_option( 'patreon-show-site-disconnect-success-notice', true );
+			
+			wp_redirect( admin_url( 'admin.php?page=patreon-plugin') );
+			exit;
+			
+			
+		}
+		
 		
 	}
 	
