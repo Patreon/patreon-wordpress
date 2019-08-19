@@ -131,6 +131,26 @@ jQuery( function( $ ) {
 		});		
 		
 	});
+	
+
+	jQuery(document).on( 'click', '.patreon_wordpress_interface_toggle', function(e) {
+		
+		e.preventDefault();
+		
+		var toggles = jQuery( this ).attr( 'toggle' );
+		console.log(toggles);
+		console.log('test');
+		var toggle_array = toggles.split(" ");
+		console.log(toggle_array);
+		toggle_array.forEach( function( toggle_id, index, toggle_array ) {
+			console.log(toggle_id);
+			var toggle_target = document.getElementById( toggle_id );
+
+			jQuery( toggle_target ).slideToggle();
+							
+		}, jQuery( this ) );
+		
+	});	
 		
 	// Only trigger if the select dropdown is actually present
 	if ( jQuery( "#patreon_level_select" ).length ) {

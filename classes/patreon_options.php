@@ -90,15 +90,24 @@ class Patreon_Options {
                                 <div class="handlediv" title="Click to toggle"><br /></div>
                                 <!-- Toggle -->
 
-                                <h2 class="handle"><span>API Settings</span></h2>
-
                                 <div class="inside">
+																		
+									<div id="patreon_options_app_details_main">
 
-                                    <p>You can find the oAuth client settings on Patreon <a href="https://www.patreon.com/platform/documentation/clients" target="_blank">here</a>.</p>
+										<h2 class="handle"><span>API Settings</span></h2>
+										
+										<p>You can find the oAuth client settings on Patreon <a href="https://www.patreon.com/platform/documentation/clients" target="_blank">here</a>.</p>																
+										<button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon-connection-details">Connection details</button> <button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon_options_app_details_disconnect patreon_options_app_details_main">Disconnect site</button>
+										
+									</div>
 									
+									<div id="patreon_options_app_details_disconnect">
 									
-									<button class="button button-primary button-large patreon-wordpress-admin-toggle" togglestatus="off" toggle="patreon-connection-details">Connection details</button> <button class="button button-primary button-large patreon-wordpress-admin-toggle" togglestatus="off" toggle="patreon-connection-details">Disconnect site</button>
-
+										We will now remove all info related to currently linked creator account from your site. Post gating values in your posts will be left untouched. After this, you will be able to connect this site to another creator account you have. Gated posts should stay gated from the nearest tier you have in the creator account you connect to this site. <br /><br />
+										<button class="button button-primary button-large patreon_wordpress_interface_toggle">Confirm disconnection</button> <button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon_options_app_details_disconnect patreon_options_app_details_main">Cancel</button>
+										
+									</div>
+									
                                     <table class="widefat" id="patreon-connection-details">
 
                                         <tr valign="top">
