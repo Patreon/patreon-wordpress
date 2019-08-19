@@ -95,8 +95,11 @@ class Patreon_Options {
                                 <div class="inside">
 
                                     <p>You can find the oAuth client settings on Patreon <a href="https://www.patreon.com/platform/documentation/clients" target="_blank">here</a>.</p>
+									
+									
+									<button class="button button-primary button-large patreon-wordpress-admin-toggle" togglestatus="off" toggle="patreon-connection-details">Connection details</button> <button class="button button-primary button-large patreon-wordpress-admin-toggle" togglestatus="off" toggle="patreon-connection-details">Disconnect site</button>
 
-                                    <table class="widefat">
+                                    <table class="widefat" id="patreon-connection-details">
 
                                         <tr valign="top">
 											<th scope="row"><strong>Redirect URI</strong></th>
