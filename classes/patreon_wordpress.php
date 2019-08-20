@@ -24,7 +24,6 @@ class Patreon_Wordpress {
 	public static $current_user_lifetime_patronage = -1;
 	public static $current_user_pledge_relationship_start = -1;
 	public static $lock_or_not = array();
-	public static $admin_notices = array();
 
 	function __construct() {
 
@@ -717,7 +716,7 @@ class Patreon_Wordpress {
 		}		
 		
 		// Show a notice if setup was not done
-		$setup_done = get_option( 'patreon-setup_done', false );
+		$setup_done = get_option( 'patreon-setup-done', false );
 		
 		// Check if this site is a v2 site - temporary until we move to make all installations v2
 		$api_version = get_option( 'patreon-installation-api-version', false );
@@ -755,23 +754,7 @@ class Patreon_Wordpress {
 			$already_showed_non_system_notice = true;
 			
 		}
-		
-		$mailing_list_notice_shown = get_option( 'patreon-mailing-list-notice-shown', false );
-
-		// Queue this message immediately after activation if not already shown
-		
-		if( !$mailing_list_notice_shown ) {
-			
-			?>
-				 <div class="notice notice-success is-dismissible  patreon-wordpress" id="patreon-mailing-list-notice-shown">
-					<p>Would you like to receive notices, tips & tricks for Patreon WordPress? <a href="https://patreonforms.typeform.com/to/dPBVp1" target="_blank">Join our mailing list here!</a></p>
-				</div>
-			<?php	
-			
-			$already_showed_non_system_notice = true;
-			
-		}
-		
+				
 		$rate_plugin_notice_shown = get_option( 'patreon-rate-plugin-notice-shown', false );
 		
 		// The below will trigger a rating notice once if it was not shown and the plugin was installed more than 37 days ago.
@@ -815,26 +798,7 @@ class Patreon_Wordpress {
 			delete_option( 'patreon-wordpress-app-credentials-failure' );
 			
 		}
-		
-		// Return if there are no queued notices
-		if ( count( $this->admin_notices ) == 0 ) {
-			return;
-		}
-		
-		// Iterate queued messages by any function/operation
-		
-		foreach ( $this->admin_notices as $key => $value ) {
-		
-			?>
-				 <div class="notice <?php echo $this->admin_notices[$key]['notice_classes']; ?> is-dismissible" id="patreon-wordpress-credentials-<?php echo $key; ?>">
-				 <h3><?php echo $this->admin_notices[$key]['notice_heading']; ?></h3>
-					<p><?php echo $this->admin_notices[$key]['notice_text']; ?></p>
-				</div>
-			<?php
-			
-		}
-		
-		
+				
 	}
 	public function check_for_update($plugin_check_data) {
 		global $wp_version, $plugin_version, $plugin_base;
@@ -871,15 +835,7 @@ class Patreon_Wordpress {
 			// Set the last notice shown date
 			self::set_last_non_system_notice_shown_date();
 		}
-		
-		// Mapping what comes from REQUEST to a given value avoids potential security problems
-		if ( $_REQUEST['notice_id'] == 'patreon-mailing-list-notice-shown' ) {
-			update_option( 'patreon-mailing-list-notice-shown', true );
-			
-			// Set the last notice shown date
-			self::set_last_non_system_notice_shown_date();
-		}
-		
+				
 		// Mapping what comes from REQUEST to a given value avoids potential security problems
 		if ( $_REQUEST['notice_id'] == 'patreon-rate-plugin-notice-shown' ) {
 			update_option( 'patreon-rate-plugin-notice-shown', true );
@@ -1397,9 +1353,9 @@ echo '<div id="patreon_setup_content"><h1 style="margin-top: 0px;">Let\'s connec
 			
 			echo '<a href="/test.html" target="_blank"><div class="patreon_success_insert"><div class="patreon_success_insert_logo"><img src="' . PATREON_PLUGIN_ASSETS . '/img/Learn-how-to-use-Patreon-WordPress.jpg" /></div><div class="patreon_success_insert_heading"><h3>Quickstart guide</h3></div><div class="patreon_success_insert_content"><br clear="both">Click here to read our quickstart guide and learn how to lock your content</div></div></a>';
 
-			echo '<a href="/test.html" target="_blank"><div class="patreon_success_insert"><div class="patreon_success_insert_logo"><img src="' . PATREON_PLUGIN_ASSETS . '/img/Patron-Plugin-Pro-120.png" /></div><div class="patreon_success_insert_heading"><h3>Patron Plugin Pro</h3></div><div class="patreon_success_insert_content"><br clear="both">Power up your integration and increase your income with premium addon Patron Plugin Pro</div></div></a>';
+			echo '<a href="https://codebard.com/patron-pro-addon-for-patreon-wordpress" target="_blank"><div class="patreon_success_insert"><div class="patreon_success_insert_logo"><img src="' . PATREON_PLUGIN_ASSETS . '/img/Patron-Plugin-Pro-120.png" /></div><div class="patreon_success_insert_heading"><h3>Patron Plugin Pro</h3></div><div class="patreon_success_insert_content"><br clear="both">Power up your integration and increase your income with premium addon Patron Plugin Pro</div></div></a>';
 			
-			echo '<a href="/test.html" target="_blank"><div class="patreon_success_insert"><div class="patreon_success_insert_logo"><img src="' . PATREON_PLUGIN_ASSETS . '/img/Patron-Button-Widgets-and-Plugin.png" /></div><div class="patreon_success_insert_heading"><h3>Patron Widgets</h3></div><div class="patreon_success_insert_content"><br clear="both">Add Patreon buttons and widgets to your site with free Widgets addon</div></div></a>';
+			echo '<a href="https://wordpress.org/plugins/patron-button-and-widgets-by-codebard/" target="_blank"><div class="patreon_success_insert"><div class="patreon_success_insert_logo"><img src="' . PATREON_PLUGIN_ASSETS . '/img/Patron-Button-Widgets-and-Plugin.png" /></div><div class="patreon_success_insert_heading"><h3>Patron Widgets</h3></div><div class="patreon_success_insert_content"><br clear="both">Add Patreon buttons and widgets to your site with free Widgets addon</div></div></a>';
 			
 			echo '</div>';
 
@@ -1441,7 +1397,7 @@ echo '<div id="patreon_setup_content"><h1 style="margin-top: 0px;">Let\'s connec
 		
 		// Check if setup was done and put up a redirect flag if not
 		
-		$patreon_setup_done = get_option( 'patreon-setup_done', false );
+		$patreon_setup_done = get_option( 'patreon-setup-done', false );
 		
 		// Check if this site is a v2 site
 		$api_version = get_option( 'patreon-installation-api-version', false );
@@ -1712,6 +1668,7 @@ echo '<div id="patreon_setup_content"><h1 style="margin-top: 0px;">Let\'s connec
 				'patreon-client-secret',
 				'patreon-client-id',
 				'patreon-setup_is_being_done',
+				'patreon-setup-done',
 			);
 			
 			foreach ( $options_to_delete as $key => $value ) {

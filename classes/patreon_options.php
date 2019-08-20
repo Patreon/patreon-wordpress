@@ -136,6 +136,10 @@ class Patreon_Options {
 											<th scope="row"><strong>Creator's Refresh Token</strong></th>
 											<td><input type="text" name="patreon-creators-refresh-token" value="<?php echo esc_attr( get_option( 'patreon-creators-refresh-token', '' ) ); ?>" class="large-text" /></td>
                                         </tr>
+                                        <tr valign="top">
+											<th scope="row"><?php submit_button( 'Update Settings', 'primary', 'submit', false ); ?></th>
+											<td></td>
+                                        </tr>
 
                                     </table>
 

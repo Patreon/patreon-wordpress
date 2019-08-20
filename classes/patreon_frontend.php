@@ -324,14 +324,15 @@ class Patreon_Frontend {
 		// Get Patreon creator tiers
 				
 		$tiers = get_option( 'patreon-creator-tiers', false );
-		
+
 		foreach( $tiers['included'] as $key => $value ) {
 			
 			// If its not a reward element, continue, just to make sure
 			
 			if(	
 				!isset( $tiers['included'][$key]['type'] )
-				OR $tiers['included'][$key]['type'] != 'reward'
+				OR ( $tiers['included'][$key]['type'] != 'reward'
+				AND $tiers['included'][$key]['type'] != 'tier' )
 			)  {
 				continue; 
 			}
@@ -348,7 +349,8 @@ class Patreon_Frontend {
 			}
 
 			if ( ( $reward['attributes']['amount_cents'] / 100 ) >= $patreon_level ) {
-				
+	
+
 				// Matching level was present, but now found. Set selected and toggle flag.
 				// selected = selected for XHTML compatibility
 				
@@ -356,7 +358,7 @@ class Patreon_Frontend {
 				$tier_title = $reward['attributes']['title'];
 				
 				if ( $tier_title == '' ) {
-					$tier_title = $reward['attributes']['description'];
+					$tier_title = base64_decode( $reward['attributes']['description'] );
 				}
 			
 				// If the title is too long, snip it
@@ -1105,7 +1107,8 @@ class Patreon_Frontend {
 			
 			if(	
 				!isset( $tiers['included'][$key]['type'] )
-				OR $tiers['included'][$key]['type'] != 'reward'
+				OR ( $tiers['included'][$key]['type'] != 'reward'
+				AND $tiers['included'][$key]['type'] != 'tier' )
 			)  {
 				continue; 
 			}
@@ -1130,7 +1133,7 @@ class Patreon_Frontend {
 				$tier_title = $reward['attributes']['title'];
 				
 				if ( $tier_title == '' ) {
-					$tier_title = $reward['attributes']['description'];
+					$tier_title = base64_decode( $reward['attributes']['description'] );
 				}
 
 				// If the title is too long, snip it

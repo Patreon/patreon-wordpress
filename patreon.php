@@ -89,7 +89,7 @@ define( "PATREON_COULDNT_ACQUIRE_USER_DETAILS", 'Sorry. Could not acquire your i
 define( "PATREON_PRETTY_PERMALINKS_NEED_TO_BE_ENABLED", 'Pretty permalinks are required for Patreon WordPress to work. Please visit <a href="'.admin_url('options-permalink.php').'" target="_blank">permalink options page</a> and set an option that is different from "Plain"' );
 define( "PATREON_ENSURE_REQUIREMENTS_MET", '<h3>Please ensure following requirements are met before starting setup:</h3>' );
 define( "PATREON_ERROR_MISSING_CREDENTIALS", 'One or more of app credentials were not received. Please try again.' );
-define( "PATREON_SETUP_INITIAL_MESSAGE", 'By connecting your site to Patreon, you can bring Patreon features to your website & post member-only content at your website to increase your patrons and monthly revenue. We will now take you to Patreon in order to automatically connect your site.' );
+define( "PATREON_SETUP_INITIAL_MESSAGE", 'By connecting your site to Patreon, you can bring Patreon features to your website & post member-only content at your website to increase your patrons and monthly revenue. We will now take you to Patreon in order to automatically connect your site. Please make sure you are logged into your creator account at Patreon before starting.' );
 define( "PATREON_SETUP_SUCCESS_MESSAGE", 'Great! Your site is now connected to Patreon!' );
 define( "PATREON_TEXT_EVERYONE", 'Everyone' );
 define( "PATREON_TEXT_ANY_PATRON", 'Any patron' );

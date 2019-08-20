@@ -445,10 +445,11 @@ class Patreon_Routing {
 								update_option('patreon-creators-refresh-token', sanitize_text_field( $creator_refresh_token ) )
 							) {
 								// All succeeded. 
-								
+
 								// Save entire return to options
 								
 								update_option( 'patreon-installation-api-version', '2' );
+								update_option( 'patreon-setup-done', true );
 								update_option( 'patreon-setup-wizard-last-call-result', $client_result );
 								
 								// Redirect to success screen:
