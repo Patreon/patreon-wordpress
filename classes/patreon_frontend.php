@@ -358,7 +358,14 @@ class Patreon_Frontend {
 				$tier_title = $reward['attributes']['title'];
 				
 				if ( $tier_title == '' ) {
-					$tier_title = base64_decode( $reward['attributes']['description'] );
+					
+					/// Detect if this is an old non bas64 desc
+					if (base64_decode($reward['attributes']['description'], true) === false) {
+						$tier_title = $reward['attributes']['description'];
+					}					
+					else {
+						$tier_title = base64_decode( $reward['attributes']['description'] );
+					}
 				}
 			
 				// If the title is too long, snip it
@@ -1133,7 +1140,14 @@ class Patreon_Frontend {
 				$tier_title = $reward['attributes']['title'];
 				
 				if ( $tier_title == '' ) {
-					$tier_title = base64_decode( $reward['attributes']['description'] );
+					
+					/// Detect if this is an old non bas64 desc
+					if (base64_decode($reward['attributes']['description'], true) === false) {
+						$tier_title = $reward['attributes']['description'];
+					}					
+					else {
+						$tier_title = base64_decode( $reward['attributes']['description'] );
+					}
 				}
 
 				// If the title is too long, snip it

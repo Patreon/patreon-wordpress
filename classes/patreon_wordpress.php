@@ -699,6 +699,10 @@ class Patreon_Wordpress {
 			return;
 		}
 		
+		if ( apply_filters( 'ptrn/suspend_notices', false ) ) {
+			return;
+		}
+		
 		$show_site_disconnect_success_notice = get_option( 'patreon-show-site-disconnect-success-notice', false );
 
 		// Queue this message immediately after activation if not already shown
@@ -1260,11 +1264,11 @@ class Patreon_Wordpress {
 			
 			// Check if redirect to setup wizard flag was set.
 			$redirect_to_setup_wizard = get_option( 'patreon-redirect_to_setup_wizard', false );
-			
+
 			// Apply filter so 3rd party addons can implement their own wizards
 			
 			$redirect_to_setup_wizard = apply_filters( 'ptrn/redirect_to_setup_override', $redirect_to_setup_wizard );
-			
+
 			if( $redirect_to_setup_wizard ) {
 				
 				// Redirect to setup wizard was set. Set necessary flags and redirect to setup wizard page
@@ -1282,7 +1286,6 @@ class Patreon_Wordpress {
 		}
 		
 	}
-
 
 	public static function setup_wizard() {
 		
@@ -1327,7 +1330,7 @@ class Patreon_Wordpress {
 
 			$api_endpoint = "https://www.patreon.com/oauth2/";	
 			
-echo '<div id="patreon_setup_content"><h1 style="margin-top: 0px;">Let\'s connect your site to Patreon!</h1><div id="patreon_setup_message">' . $setup_message . '</div>' . $requirement_notices . '<form style="display:block;" method="get" action="'. $api_endpoint .'register-client-creation"><p class="submit" style="margin-top: 10px;"><input type="submit" name="submit" id="submit" class="button button-large button-primary" value="Let\'s start!"></p>' . $config_input . '<input type="hidden" name="client_id" value="' . PATREON_PLUGIN_CLIENT_ID . '" /><input type="hidden" name="redirect_uri" value="' . site_url() . '/patreon-authorization/' . '" /><input type="hidden" name="state" value="' . urlencode( base64_encode( json_encode( $state ) ) ) . '" /><input type="hidden" name="scopes" value="w:identity.clients" /><input type="hidden" name="response_type" value="code" /></form></div>';
+			echo '<div id="patreon_setup_content"><h1 style="margin-top: 0px;">Let\'s connect your site to Patreon!</h1><div id="patreon_setup_message">' . $setup_message . '</div>' . $requirement_notices . '<form style="display:block;" method="get" action="'. $api_endpoint .'register-client-creation"><p class="submit" style="margin-top: 10px;"><input type="submit" name="submit" id="submit" class="button button-large button-primary" value="Let\'s start!"></p>' . $config_input . '<input type="hidden" name="client_id" value="' . PATREON_PLUGIN_CLIENT_ID . '" /><input type="hidden" name="redirect_uri" value="' . site_url() . '/patreon-authorization/' . '" /><input type="hidden" name="state" value="' . urlencode( base64_encode( json_encode( $state ) ) ) . '" /><input type="hidden" name="scopes" value="w:identity.clients" /><input type="hidden" name="response_type" value="code" /></form></div>';
 		
 			echo '</div>';
 

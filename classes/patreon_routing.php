@@ -450,11 +450,16 @@ class Patreon_Routing {
 								
 								update_option( 'patreon-installation-api-version', '2' );
 								update_option( 'patreon-setup-done', true );
+								update_option( 'patreon-redirect_to_setup_wizard', false );
 								update_option( 'patreon-setup-wizard-last-call-result', $client_result );
 								
-								// Redirect to success screen:
+								// Redirect to success screen
+								
+								// First apply a filter so that 3rd party addons can redirect to a custom final screen
+								
+								$setup_final_redirect = apply_filters( 'ptrn/setup_wizard_final_redirect', admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=final') );
 
-								wp_redirect( admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=final') );
+								wp_redirect( $setup_final_redirect );
 								exit;				
 								
 							}
