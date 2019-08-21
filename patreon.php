@@ -4,7 +4,7 @@
 Plugin Name: Patreon Wordpress
 Plugin URI: https://www.patreon.com/apps/wordpress
 Description: Patron-only content, directly on your website.
-Version: 1.2.8
+Version: 1.2.9
 Author: Patreon <platform@patreon.com>
 Author URI: https://patreon.com
 */
@@ -63,7 +63,7 @@ define( "PATREON_ADMIN_BYPASSES_FILTER_MESSAGE", 'This content is for Patrons on
 define( "PATREON_CREATOR_BYPASSES_FILTER_MESSAGE", 'This content is for Patrons only, it\'s not locked for you because you are logged in as the Patreon creator' );
 define( "PATREON_NO_LOCKING_LEVEL_SET_FOR_THIS_POST", 'Post is already public. If you would like to lock this post, please set a pledge level for it' );
 define( "PATREON_NO_POST_ID_TO_UNLOCK_POST", 'Sorry - could not get the post id for this locked post' );
-define( "PATREON_WORDPRESS_VERSION", '1.2.8' );
+define( "PATREON_WORDPRESS_VERSION", '1.2.9' );
 define( "PATREON_WORDPRESS_BETA_STRING", '' );
 define( "PATREON_WORDPRESS_PLUGIN_SLUG", plugin_basename( __FILE__ ) );
 define( "PATREON_PRIVACY_POLICY_ADDENDUM", '<h2>Patreon features in this website</h2>In order to enable you to use this website with Patreon services, we save certain functionally important Patreon information about you in this website if you log in with Patreon.
@@ -89,7 +89,7 @@ define( "PATREON_COULDNT_ACQUIRE_USER_DETAILS", 'Sorry. Could not acquire your i
 define( "PATREON_PRETTY_PERMALINKS_NEED_TO_BE_ENABLED", 'Pretty permalinks are required for Patreon WordPress to work. Please visit <a href="'.admin_url('options-permalink.php').'" target="_blank">permalink options page</a> and set an option that is different from "Plain"' );
 define( "PATREON_ENSURE_REQUIREMENTS_MET", '<h3>Please ensure following requirements are met before starting setup:</h3>' );
 define( "PATREON_ERROR_MISSING_CREDENTIALS", 'One or more of app credentials were not received. Please try again.' );
-define( "PATREON_SETUP_INITIAL_MESSAGE", 'By connecting your site to Patreon, you can bring Patreon features to your website & post member-only content at your website to <a href="https://blog.patreon.com/patreon-wordpress-plugin/" target="_blank" style="text-decoration: none;">increase your patrons and monthly revenue</a>. We will now take you to Patreon in order to automatically connect your site. Please make sure you are logged into your creator account at Patreon before starting.' );
+define( "PATREON_SETUP_INITIAL_MESSAGE", 'By <a href="https://support.patreon.com/hc/en-us/articles/360032404632-How-your-WordPress-site-will-be-connected-to-Patreon" target="_blank">connecting your site to Patreon</a>, you can bring Patreon features to your website & post member-only content at your website to <a href="https://blog.patreon.com/patreon-wordpress-plugin/" target="_blank" style="text-decoration: none;">increase your patrons and monthly revenue</a>. We will now take you to Patreon in order to automatically connect your site. Please make sure you are logged into your creator account at Patreon before starting.' );
 define( "PATREON_SETUP_SUCCESS_MESSAGE", 'Great! Your site is now connected to Patreon!' );
 define( "PATREON_TEXT_EVERYONE", 'Everyone' );
 define( "PATREON_TEXT_ANY_PATRON", 'Any patron' );

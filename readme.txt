@@ -3,7 +3,7 @@ Contributors: wordpressorg@patreon.com, codebard
 Tags: patreon, membership, members
 Requires at least: 4.0
 Tested up to: 5.2.2
-Stable tag: 1.2.8
+Stable tag: 1.2.9
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -89,6 +89,20 @@ It is  difficult to protect videos due the intensive bandwidth requirements of h
 
 
 == Changelog ==
+
+= 1.2.9 =
+
+* Easy setup wizard which allows new installations to easily connect to Patreon added.
+* Setup wizard kicks in after activation.
+* Informative links to answer questions about integration added to first screen of setup wizard.
+* Quickstart, addons info added to setup wizard success screen
+* All new installs will be using API v2 from now on
+* Existing installations should work with API v2 normally without disruption
+* Revamped API connection settings section in options.
+* Connection settings in options now hidden in a toggle.
+* Disconnect feature added to connection settings to allow disconnecting creator account from a site. This will allow disconnecting a site from a creator account and connecting it to another.
+* A bug with saving creator tiers with largely formatted description was fixed. Tiers should now be pulled properly for such creators.
+* Mailing list notice removed.
 
 = 1.2.8 =
 
