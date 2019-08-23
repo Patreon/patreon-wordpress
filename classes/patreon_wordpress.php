@@ -1604,7 +1604,7 @@ class Patreon_Wordpress {
 				return $a['attributes']['amount_cents'] - $b['attributes']['amount_cents'];
 			} );
 		
-			array_walk_recursive ( $creator_info, 'self::format_creator_info_array' );
+			array_walk_recursive( $creator_info, 'self::format_creator_info_array' );
 
 			update_option( 'patreon-creator-tiers',  $creator_info );
 		
@@ -1634,7 +1634,7 @@ class Patreon_Wordpress {
 		}
 		
 	}	
-	public static function format_creator_info_array( &$value, $key, $user ) {
+	public static function format_creator_info_array( &$value, $key ) {
 		
 		// Checks creator info array and formats/cleans as necessary
 				
