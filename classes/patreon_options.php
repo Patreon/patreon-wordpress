@@ -96,7 +96,22 @@ class Patreon_Options {
 										
 									<div id="patreon_options_app_details_main">
 									
-										<button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon-connection-details">Connection details</button> <button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon_options_app_details_disconnect patreon_options_app_details_main">Disconnect site</button>
+										<button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon-connection-details">Connection details</button> <?php // Immediately inserted here to not cause any funny html rendering
+										
+										if (   get_option( 'patreon-client-id', false ) 
+											&& get_option( 'patreon-client-secret', false ) 
+											&& get_option( 'patreon-creators-access-token' , false )
+											&& get_option( 'patreon-creators-refresh-token' , false )
+											&& get_option( 'patreon-client-id' , false ) != ''
+											&& get_option( 'patreon-client-secret' , false ) != ''
+											&& get_option( 'patreon-creators-access-token' , false ) != ''
+											&& get_option( 'patreon-creators-refresh-token' , false ) != ''
+										) {
+											?> <button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon_options_app_details_disconnect patreon_options_app_details_main">Disconnect site</button> <?php
+										
+										}
+										
+										?>
 										
 									</div>
 									
