@@ -97,6 +97,9 @@ define( "PATREON_TEXT_ANY_PATRON", 'Any patron' );
 define( "PATREON_PLUGIN_CLIENT_ID", '40otjXLPiUL023m_FAX5XRkRYVRF0DT62cHKH7NjyNsYYFZMYHxqzWoqbEtt-22l' );
 define( "PATREON_SITE_DISCONNECTED_FROM_PATREON_HEADING", 'Disconnection successful!' );
 define( "PATREON_SITE_DISCONNECTED_FROM_PATREON_TEXT", 'You successfully disconnected your site from Patreon. Now you can connect another creator account to your site.' );
+define( "PATREON_NO_AUTH_FOR_CLIENT_CREATION", 'We weren\'t able to get the go ahead from Patreon while attempting to connect your site. Please wait a minute and try again. If this situation persists, <a href="https://www.patreondevelopers.com/c/patreon-wordpress-plugin-support" target="_blank">contact support</a>.'  );
+define( "PATREON_NO_ACQUIRE_CLIENT_DETAILS", 'We weren\'t able to get to get the token for connecting your site to Patreon for the time being. Please wait a while and try again and <a href="https://www.patreondevelopers.com/c/patreon-wordpress-plugin-support" target="_blank">contact support</a> if this situation persists.' );
+define( "PATREON_NO_CREDENTIALS_RECEIVED", 'We weren\'t able to connect your site to Patreon because Patreon sent back empty credentials. Please wait a while and try again and <a href="https://www.patreondevelopers.com/c/patreon-wordpress-plugin-support" target="_blank">contact support</a> if this situation persists.' );
 
 include 'classes/patreon_wordpress.php';
 

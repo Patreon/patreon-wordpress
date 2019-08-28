@@ -46,6 +46,9 @@ class Patreon_Frontend {
 			'patreon_couldnt_acquire_user_details'       => PATREON_COULDNT_ACQUIRE_USER_DETAILS,
 			'pretty_permalinks_are_required'             => PATREON_PRETTY_PERMALINKS_NEED_TO_BE_ENABLED,
 			'error_missing_credentials'                  => PATREON_ERROR_MISSING_CREDENTIALS,
+			'no_auth_for_client_creation'                => PATREON_NO_AUTH_FOR_CLIENT_CREATION,
+			'failure_obtaining_credentials'              => PATREON_NO_ACQUIRE_CLIENT_DETAILS,
+			'error_missing_credentials'                  => PATREON_NO_CREDENTIALS_RECEIVED,
 		);
 		
 	}
