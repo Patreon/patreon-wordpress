@@ -3,7 +3,7 @@ Contributors: wordpressorg@patreon.com, codebard
 Tags: patreon, membership, members
 Requires at least: 4.0
 Tested up to: 5.2.2
-Stable tag: 1.3.1
+Stable tag: 1.3.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -89,6 +89,11 @@ It is  difficult to protect videos due the intensive bandwidth requirements of h
 
 
 == Changelog ==
+
+= 1.3.2 =
+
+* Corrected the valid patron footer to use proper Patreon page name or custom Patreon page name
+* Added utm parameters to Patreon page link in text over interface and valid patron footer
 
 = 1.3.1 =
 

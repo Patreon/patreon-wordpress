@@ -322,7 +322,17 @@ class Patreon_Frontend {
 		
 		// Get creator url
 		
-		$creator_url = get_option( 'patreon-creator-url', false );
+		$creator_url = get_option( 'patreon-creator-url', false );		
+		$creator_url = apply_filters( 'ptrn/creator_profile_link_in_text_over_interface', $creator_url );
+		
+		$utm_content = 'creator_profile_link_in_text_over_interface';
+		
+		$filterable_utm_params = 'utm_term=&utm_content=' . $utm_content;
+		$filterable_utm_params = apply_filters( 'ptrn/utm_params_for_creator_profile_link_in_text_over_interface', $filterable_utm_params );
+		
+		$utm_params = 'utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=' . get_option( 'patreon-campaign-id' ) . '&' . $filterable_utm_params;
+
+		$creator_url .= '?' . $utm_params;		
 		
 		// Get Patreon creator tiers
 				
@@ -1061,13 +1071,22 @@ class Patreon_Frontend {
 		$user                     = wp_get_current_user();
 		$declined                 = Patreon_Wordpress::checkDeclinedPatronage( $user );		
 		$user_patronage           = Patreon_Wordpress::getUserPatronage();						
-			
-		// Get creator full name:
-		$creator_full_name = get_option( 'patreon-creator-full-name', false );
 		
-		if ( !$creator_full_name OR $creator_full_name == '' ) {
-			$creator_full_name = 'this creator';
-		}
+		// Get the creator or page name which is going to be used for interface text
+		
+		$creator_full_name = self::make_creator_name_for_interface();
+		
+		// Add 's to make it "creator's Patreon" when placed into label
+		
+		$creator_full_name .= "'s";
+		
+		// Override entire text if the creator set a custom site/creator name string:
+				
+		$patreon_custom_page_name = get_option( 'patreon-custom-page-name', false );
+		
+		if ( $patreon_custom_page_name AND $patreon_custom_page_name != '' ) {
+			$creator_full_name = $patreon_custom_page_name;
+		}	
 		
 		// Get lock or not details if it is not given. If post id given, use it. 
 		if ( !isset( $args['lock'] ) ) {
@@ -1165,8 +1184,19 @@ class Patreon_Frontend {
 
 		}
 
-		// Get patreon creator url:
-		$creator_url = get_option( 'patreon-creator-url', false );
+		// Get creator url
+		
+		$creator_url = get_option( 'patreon-creator-url', false );		
+		$creator_url = apply_filters( 'ptrn/creator_profile_link_in_valid_patron_footer', $creator_url );
+		
+		$utm_content = 'creator_profile_link_in_valid_patron_footer';
+		
+		$filterable_utm_params = 'utm_term=&utm_content=' . $utm_content;
+		$filterable_utm_params = apply_filters( 'ptrn/utm_params_for_creator_profile_link_in_valid_patron_footer', $filterable_utm_params );
+		
+		$utm_params = 'utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=' . get_option( 'patreon-campaign-id' ) . '&' . $filterable_utm_params;
+
+		$creator_url .= '?' . $utm_params;		
 		
 	    $label = str_replace( '%%creator_link%%', $creator_url, $label );
 		$label = str_replace( '%%tier_level%%', strip_tags( $tier_title ), $label );			
