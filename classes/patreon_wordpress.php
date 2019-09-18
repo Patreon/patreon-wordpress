@@ -1289,7 +1289,7 @@ class Patreon_Wordpress {
 
 	public static function setup_wizard() {
 		
-		// Handles setup wizard screens
+		// Handles setup wizard and reconnect wizard screens
 		
 		if ( !isset( $_REQUEST['setup_stage'] ) OR $_REQUEST['setup_stage'] == '0' ) {
 			
@@ -1363,6 +1363,80 @@ class Patreon_Wordpress {
 			echo '</div>';
 
 		}
+		
+		
+		if ( isset( $_REQUEST['setup_stage'] ) AND $_REQUEST['setup_stage'] == 'reconnect_0' ) {
+			
+			$requirements_check = Patreon_Compatibility::check_requirements();
+			$requirement_notices = '';
+			
+			if ( is_array( $requirements_check ) AND count( $requirements_check ) > 0 ) {
+				$requirement_notices .= PATREON_ENSURE_REQUIREMENTS_MET;
+				foreach ( $requirements_check as $key => $value ) {
+					$requirement_notices .= '&bull; ' . Patreon_Frontend::$messages_map[$requirements_check[$key]].'<br />';
+				}
+			}
+
+			$config_info = self::collect_app_info();
+			$config_input = '';
+			
+			foreach ( $config_info as $key => $value ) {
+				$config_input .= '<input type="hidden" name="' . $key . '" value="' . $config_info[$key] . '" />';
+
+			}
+			
+			$setup_message = PATREON_SETUP_INITIAL_MESSAGE;
+			
+			if ( $_REQUEST['patreon_message'] != '' ) {
+				$setup_message = Patreon_Frontend::$messages_map[$_REQUEST['patreon_message']];
+
+			}
+
+			// Create state var needed for identifying connection attempt
+			
+			$state = array(
+				'patreon_action' => 'register_refresh_client',			
+			);
+
+			echo '<div id="patreon_setup_screen">';
+	
+			echo '<div id="patreon_setup_logo"><img src="' . PATREON_PLUGIN_ASSETS . '/img/Patreon_Logo_100.png" /></div>';
+
+			$api_endpoint = "https://www.patreon.com/oauth2/";	
+			
+			echo '<div id="patreon_setup_content"><h1 style="margin-top: 0px;">Let\'s connect your site to Patreon!</h1><div id="patreon_setup_message">' . $setup_message . '</div>' . $requirement_notices . '<form style="display:block;" method="get" action="'. $api_endpoint .'register-client-creation"><p class="submit" style="margin-top: 10px;"><input type="submit" name="submit" id="submit" class="button button-large button-primary" value="Let\'s start!"></p>' . $config_input . '<input type="hidden" name="client_id" value="' . PATREON_PLUGIN_CLIENT_ID . '" /><input type="hidden" name="redirect_uri" value="' . site_url() . '/patreon-authorization/' . '" /><input type="hidden" name="state" value="' . urlencode( base64_encode( json_encode( $state ) ) ) . '" /><input type="hidden" name="scopes" value="w:identity.clients" /><input type="hidden" name="response_type" value="code" /></form></div>';
+		
+			echo '</div>';
+
+		}
+
+		if ( isset( $_REQUEST['setup_stage'] ) AND $_REQUEST['setup_stage'] == 'reconnect_final' ) {
+
+			$setup_message = PATREON_SETUP_SUCCESS_MESSAGE;
+
+			if ( $_REQUEST['patreon_message'] != '' ) {
+				$setup_message = Patreon_Frontend::$messages_map[$_REQUEST['patreon_message']];
+			}
+
+			echo '<div id="patreon_setup_screen">';
+			echo '<div id="patreon_setup_logo"><img src="' . PATREON_PLUGIN_ASSETS . '/img/Patreon_Logo_100.png" /></div>';
+
+			echo '<div id="patreon_setup_content"><h1 style="margin-top: 5px;">Patreon WordPress is set up and ready to go!</h1><div id="patreon_setup_message">' . $setup_message . '</div>';
+			
+			echo '</div>';
+			
+			echo '<div id="patreon_success_inserts">';
+			
+			echo '<a href="https://support.patreon.com/hc/en-us/articles/360032409172-Patreon-WordPress-Quickstart" target="_blank"><div class="patreon_success_insert"><div class="patreon_success_insert_logo"><img src="' . PATREON_PLUGIN_ASSETS . '/img/Learn-how-to-use-Patreon-WordPress.jpg" /></div><div class="patreon_success_insert_heading"><h3>Quickstart guide</h3></div><div class="patreon_success_insert_content"><br clear="both">Click here to read our quickstart guide and learn how to lock your content</div></div></a>';
+
+			echo '<a href="https://codebard.com/patron-pro-addon-for-patreon-wordpress" target="_blank"><div class="patreon_success_insert"><div class="patreon_success_insert_logo"><img src="' . PATREON_PLUGIN_ASSETS . '/img/Patron-Plugin-Pro-120.png" /></div><div class="patreon_success_insert_heading"><h3>Patron Plugin Pro</h3></div><div class="patreon_success_insert_content"><br clear="both">Power up your integration and increase your income with premium addon Patron Plugin Pro</div></div></a>';
+			
+			echo '<a href="https://wordpress.org/plugins/patron-button-and-widgets-by-codebard/" target="_blank"><div class="patreon_success_insert"><div class="patreon_success_insert_logo"><img src="' . PATREON_PLUGIN_ASSETS . '/img/Patron-Button-Widgets-and-Plugin.png" /></div><div class="patreon_success_insert_heading"><h3>Patron Widgets</h3></div><div class="patreon_success_insert_content"><br clear="both">Add Patreon buttons and widgets to your site with free Widgets addon</div></div></a>';
+			
+			echo '</div>';
+
+		}
+		
 	}
 
 	public static function check_plugin_exists( $plugin_slug ) {
@@ -1673,6 +1747,33 @@ class Patreon_Wordpress {
 				'patreon-setup_is_being_done',
 				'patreon-setup-done',
 			);
+			
+			// Ask the API to delete this client:
+			
+			$creator_access_token = get_option( 'patreon-creators-access-token', false );
+			$client_id 			  = get_option( 'patreon-client-id', false );
+			
+			if ( $creator_access_token AND $client_id ) {
+				
+				// Create new api object
+				
+				$api_client = new Patreon_API( $creator_access_token );
+				
+				$params = array(
+					'data' => array(
+						'type' => 'oauth-client',
+						'parent_client_id' => PATREON_PLUGIN_CLIENT_ID,
+					)
+				);
+				
+				$client_result = $api_client->delete_client( json_encode( $params ) );
+	
+				if ( isset( $client_result['data']['type'] ) AND $client_result['data']['type'] == 'oauth-client' ) {
+					
+				}
+				
+			}
+			
 			
 			foreach ( $options_to_delete as $key => $value ) {
 				

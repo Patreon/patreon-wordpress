@@ -101,13 +101,24 @@ class Patreon_API {
 		}
 		
 		return $result;
-	}	
+	}
+	
 	public function create_refresh_client( $params ) {
 		
 		// Contacts api to create or refresh client
 		// Only uses v2 
 		
-			return $this->__get_json( "clients?include=creator_token", true, 'POST', $params );
+		return $this->__get_json( "clients?include=creator_token", true, 'POST', $params );
+	}
+	
+	public function delete_client( $params ) {
+		
+		// Contacts api to create or refresh client
+		// Only uses v2 
+		
+		$client_id 			  = get_option( 'patreon-client-id', false );
+
+		return $this->__get_json( "clients/".$client_id, true, 'DELETE', $params );
 	}
 		
 	private function __get_json( $suffix, $v2 = false, $method = 'GET', $params = false ) {		
@@ -136,6 +147,10 @@ class Patreon_API {
 		}
 		
 		if ( $method == 'POST' ) {
+			$response = wp_remote_post( $api_endpoint, $api_request );
+		}
+		
+		if ( $method == 'DELETE' ) {
 			$response = wp_remote_post( $api_endpoint, $api_request );
 		}
 		
