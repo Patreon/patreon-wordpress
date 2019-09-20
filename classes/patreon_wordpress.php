@@ -1321,7 +1321,7 @@ class Patreon_Wordpress {
 			// Create state var needed for identifying connection attempt
 			
 			$state = array(
-				'patreon_action' => 'register_refresh_client',			
+				'patreon_action' => 'connect_site',			
 			);
 
 			echo '<div id="patreon_setup_screen">';
@@ -1385,7 +1385,7 @@ class Patreon_Wordpress {
 
 			}
 			
-			$setup_message = PATREON_SETUP_INITIAL_MESSAGE;
+			$setup_message = PATREON_RECONNECT_INITIAL_MESSAGE;
 			
 			if ( $_REQUEST['patreon_message'] != '' ) {
 				$setup_message = Patreon_Frontend::$messages_map[$_REQUEST['patreon_message']];
@@ -1395,7 +1395,7 @@ class Patreon_Wordpress {
 			// Create state var needed for identifying connection attempt
 			
 			$state = array(
-				'patreon_action' => 'register_refresh_client',			
+				'patreon_action' => 'reconnect_site',			
 			);
 
 			echo '<div id="patreon_setup_screen">';
@@ -1404,7 +1404,7 @@ class Patreon_Wordpress {
 
 			$api_endpoint = "https://www.patreon.com/oauth2/";	
 			
-			echo '<div id="patreon_setup_content"><h1 style="margin-top: 0px;">Let\'s connect your site to Patreon!</h1><div id="patreon_setup_message">' . $setup_message . '</div>' . $requirement_notices . '<form style="display:block;" method="get" action="'. $api_endpoint .'register-client-creation"><p class="submit" style="margin-top: 10px;"><input type="submit" name="submit" id="submit" class="button button-large button-primary" value="Let\'s start!"></p>' . $config_input . '<input type="hidden" name="client_id" value="' . PATREON_PLUGIN_CLIENT_ID . '" /><input type="hidden" name="redirect_uri" value="' . site_url() . '/patreon-authorization/' . '" /><input type="hidden" name="state" value="' . urlencode( base64_encode( json_encode( $state ) ) ) . '" /><input type="hidden" name="scopes" value="w:identity.clients" /><input type="hidden" name="response_type" value="code" /></form></div>';
+			echo '<div id="patreon_setup_content"><h1 style="margin-top: 0px;">Reconnecting your site to Patreon</h1><div id="patreon_setup_message">' . $setup_message . '</div>' . $requirement_notices . '<form style="display:block;" method="get" action="'. $api_endpoint .'register-client-creation"><p class="submit" style="margin-top: 10px;"><input type="submit" name="submit" id="submit" class="button button-large button-primary" value="Let\'s start!"></p>' . $config_input . '<input type="hidden" name="client_id" value="' . PATREON_PLUGIN_CLIENT_ID . '" /><input type="hidden" name="redirect_uri" value="' . site_url() . '/patreon-authorization/' . '" /><input type="hidden" name="state" value="' . urlencode( base64_encode( json_encode( $state ) ) ) . '" /><input type="hidden" name="scopes" value="w:identity.clients" /><input type="hidden" name="response_type" value="code" /></form></div>';
 		
 			echo '</div>';
 
@@ -1412,7 +1412,7 @@ class Patreon_Wordpress {
 
 		if ( isset( $_REQUEST['setup_stage'] ) AND $_REQUEST['setup_stage'] == 'reconnect_final' ) {
 
-			$setup_message = PATREON_SETUP_SUCCESS_MESSAGE;
+			$setup_message = PATREON_RECONNECT_SUCCESS_MESSAGE;
 
 			if ( $_REQUEST['patreon_message'] != '' ) {
 				$setup_message = Patreon_Frontend::$messages_map[$_REQUEST['patreon_message']];
@@ -1421,7 +1421,7 @@ class Patreon_Wordpress {
 			echo '<div id="patreon_setup_screen">';
 			echo '<div id="patreon_setup_logo"><img src="' . PATREON_PLUGIN_ASSETS . '/img/Patreon_Logo_100.png" /></div>';
 
-			echo '<div id="patreon_setup_content"><h1 style="margin-top: 5px;">Patreon WordPress is set up and ready to go!</h1><div id="patreon_setup_message">' . $setup_message . '</div>';
+			echo '<div id="patreon_setup_content"><h1 style="margin-top: 5px;">Your site is now reconnected!</h1><div id="patreon_setup_message">' . $setup_message . '</div>';
 			
 			echo '</div>';
 			
@@ -1767,28 +1767,94 @@ class Patreon_Wordpress {
 				);
 				
 				$client_result = $api_client->delete_client( json_encode( $params ) );
-	
-				if ( isset( $client_result['data']['type'] ) AND $client_result['data']['type'] == 'oauth-client' ) {
+
+				if ( isset( $client_result['response']['code'] ) AND $client_result['response']['code'] == '204' ) {
+					
+					// Delete succeeded proceed with deleting local options
+					
+					foreach ( $options_to_delete as $key => $value ) {
+						delete_option( $options_to_delete[$key] );
+					}
+				
+					update_option( 'patreon-show-site-disconnect-success-notice', true );
+					
+					wp_redirect( admin_url( 'admin.php?page=patreon-plugin') );
+					exit;
 					
 				}
 				
-			}
-			
-			
-			foreach ( $options_to_delete as $key => $value ) {
-				
-				delete_option( $options_to_delete[$key] );
+				// Delete no go. Do error handling here
 				
 			}
-			
-			update_option( 'patreon-show-site-disconnect-success-notice', true );
-			
-			wp_redirect( admin_url( 'admin.php?page=patreon-plugin') );
-			exit;
 			
 			
 		}
 		
+		if ( $_REQUEST['patreon_wordpress_action'] == 'disconnect_site_from_patreon_for_reconnection' AND is_admin() AND current_user_can( 'manage_options' ) ) {
+
+			// Admin side, user is admin level. Perform action:
+			
+			// To disconnect the site from a particular creator account, we will delete all options related to creator account, but we will leave other plugin settings and post gating values untouched
+			
+			$options_to_delete = array(
+				'patreon-custom-page-name',
+				'patreon-fetch-creator-id',
+				'patreon-creator-tiers',
+				'patreon-creator-last-name',
+				'patreon-creator-first-name',
+				'patreon-creator-full-name',
+				'patreon-creator-url',
+				'patreon-campaign-id',
+				'patreon-creators-refresh-token-expiration',
+				'patreon-creator-id',
+				'patreon-setup-wizard-last-call-result',
+				'patreon-creators-refresh-token',
+				'patreon-creators-access-token',
+				'patreon-client-secret',
+				'patreon-client-id',
+				'patreon-setup_is_being_done',
+				'patreon-setup-done',
+			);
+			
+			// Ask the API to delete this client:
+			
+			$creator_access_token = get_option( 'patreon-creators-access-token', false );
+			$client_id 			  = get_option( 'patreon-client-id', false );
+
+			if ( $creator_access_token AND $client_id ) {
+				
+				// Create new api object
+				
+				$api_client = new Patreon_API( $creator_access_token );
+				
+				$params = array(
+					'data' => array(
+						'type' => 'oauth-client',
+						'parent_client_id' => PATREON_PLUGIN_CLIENT_ID,
+					)
+				);
+				
+				$client_result = $api_client->delete_client( json_encode( $params ) );
+
+				if ( isset( $client_result['response']['code'] ) AND $client_result['response']['code'] == '204' ) {
+					
+					// Delete succeeded proceed with deleting local options
+					
+					foreach ( $options_to_delete as $key => $value ) {
+						delete_option( $options_to_delete[$key] );
+					}
+					
+					// Redirect to connect wizard
+					wp_redirect( admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=reconnect_0') );
+					exit;
+				
+				}
+				
+				// If we are here, delete did not succeed. do error handling here.
+				
+			}
+
+		}
 		
 	}
 	

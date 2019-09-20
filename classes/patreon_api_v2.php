@@ -43,7 +43,7 @@ class Patreon_API {
 		return $this->__get_json( "campaigns" );
 	}
 		
-	public function fetch_creator_info( $v2 = false ) {
+	public function fetch_creator_info() {
 			
 		$api_return = $this->__get_json( "campaigns?include=creator&fields[campaign]=created_at,creation_name,discord_server_id,image_small_url,image_url,is_charged_immediately,is_monthly,is_nsfw,main_video_embed,main_video_url,one_liner,one_liner,patron_count,pay_per_name,pledge_url,published_at,summary,thanks_embed,thanks_msg,thanks_video_url,has_rss,has_sent_rss_notify,rss_feed_title,rss_artwork_url,patron_count,discord_server_id,google_analytics_id&fields[user]=about,created,email,first_name,full_name,image_url,last_name,social_connections,thumb_url,url,vanity,is_email_verified" );
 
@@ -106,9 +106,14 @@ class Patreon_API {
 	public function create_refresh_client( $params ) {
 		
 		// Contacts api to create or refresh client
-		// Only uses v2 
+		// Only uses v2
 		
-		return $this->__get_json( "clients?include=creator_token", true, 'POST', $params );
+		$args = array(
+			'method' => 'POST',
+			'params' => $params,
+		);
+		
+		return $this->__get_json( "clients?include=creator_token", $args );
 	}
 	
 	public function delete_client( $params ) {
@@ -117,13 +122,38 @@ class Patreon_API {
 		// Only uses v2 
 		
 		$client_id 			  = get_option( 'patreon-client-id', false );
+		
+		$args = array(
+			'method' => 'DELETE',
+			'params' => $params,
+			'return_result_format' => 'full',
+		);
 
-		return $this->__get_json( "clients/".$client_id, true, 'DELETE', $params );
+		return $this->__get_json( "clients/".$client_id, $args );
 	}
 		
-	private function __get_json( $suffix, $v2 = false, $method = 'GET', $params = false ) {		
+	private function __get_json( $suffix, $args = array() ) {
+		
+		// Defaults
+		
+		$method = 'GET';
+		$params = false;
+		$api_endpoint = "https://www.patreon.com/api/oauth2/v2/" . $suffix;
+		$return_result_format = 'body';
 
-		$api_endpoint = "https://www.patreon.com/api/oauth2/v2/" . $suffix;	
+		// Overrides
+		
+		if ( isset( $args['method'] ) AND $args['method'] != '' ) {
+			$method = $args['method'];
+		}
+		
+		if ( isset( $args['return_result_format'] ) AND $args['return_result_format'] != '' ) {
+			$return_result_format = $args['return_result_format'];
+		}
+		
+		if ( isset( $args['params'] ) ) {
+			$params = $args['params'];
+		}
 
 		$headers = array(
 			'Authorization' => 'Bearer ' . $this->access_token,
@@ -135,14 +165,13 @@ class Patreon_API {
 			'method'  => $method,
 		);
 
-		if ( isset( $params ) ) {
+		if ( $params ) {
 			$api_request['body'] = $params;
 			$api_request['data_format'] = 'body';
 			$api_request['headers']['content-type'] = 'application/json';
 		}
 
 		if ( $method == 'GET' ) {
-
 			$response = wp_remote_request( $api_endpoint, $api_request );
 		}
 		
@@ -164,8 +193,14 @@ class Patreon_API {
 			
 		}
 		
-		return json_decode( $response['body'], true );
+		// Return full result if full result was requested
+		if ( $return_result_format == 'full' ) {
+			return $response;
+		}
 		
+		// Return json decoded response body by default
+		return json_decode( $response['body'], true );
+
 	}
 	
 }

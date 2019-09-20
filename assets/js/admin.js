@@ -106,6 +106,14 @@ jQuery( function( $ ) {
 		window.location.replace( target );
 	});
 	
+	// Doing the below via jQuery because we have to submit some POST info inside another form. Avoided using a link inside button to account for older devices
+	
+	jQuery(document).on( 'click', '#patreon_wordpress_reconnect_to_patreon', function(e) {
+		e.preventDefault();
+		var target = jQuery(this).attr( 'target' );
+		window.location.replace( target );
+	});
+	
 	jQuery(document).on( 'click', '.patreon-wordpress-admin-toggle', function(e) {
 		
 		e.preventDefault();
@@ -146,12 +154,8 @@ jQuery( function( $ ) {
 		e.preventDefault();
 		
 		var toggles = jQuery( this ).attr( 'toggle' );
-		console.log(toggles);
-		console.log('test');
 		var toggle_array = toggles.split(" ");
-		console.log(toggle_array);
 		toggle_array.forEach( function( toggle_id, index, toggle_array ) {
-			console.log(toggle_id);
 			var toggle_target = document.getElementById( toggle_id );
 
 			jQuery( toggle_target ).slideToggle();
