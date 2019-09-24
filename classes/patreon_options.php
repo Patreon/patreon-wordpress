@@ -22,7 +22,7 @@ class Patreon_Options {
 		
         add_menu_page( 'Patreon Settings', 'Patreon Settings', 'manage_options', 'patreon-plugin', array( $this, 'patreon_plugin_setup_page' ), PATREON_PLUGIN_ASSETS . '/img/Patreon WordPress.png' );
 		add_submenu_page ( '', 'Patreon Settings', 'Patreon Settings', 'administrator', 'patreon_wordpress_setup_wizard', array('Patreon_Wordpress', 'setup_wizard'), '/img/Patreon WordPress.png' );
-		
+		add_submenu_page( null, 'Patreon WordPress Admin Message', 'Admin message', 'manage_options', 'patreon-plugin-admin-message', array( $this, 'patreon_plugin_admin_message_page' ) );
     }
 
     function patreon_plugin_register_settings() { 
@@ -96,7 +96,7 @@ class Patreon_Options {
 										
 									<div id="patreon_options_app_details_main">
 									
-										<button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon-connection-details">Connection details</button> <button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon_options_app_details_reconnect patreon_options_app_details_main">Reconnect site</button><?php // Immediately inserted here to not cause any funny html rendering
+										<button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon-connection-details">Connection details</button><?php // Immediately inserted here to not cause any funny html rendering
 										
 										if (   get_option( 'patreon-client-id', false ) 
 											&& get_option( 'patreon-client-secret', false ) 
@@ -107,7 +107,7 @@ class Patreon_Options {
 											&& get_option( 'patreon-creators-access-token' , false ) != ''
 											&& get_option( 'patreon-creators-refresh-token' , false ) != ''
 										) {
-											?> <button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon_options_app_details_disconnect patreon_options_app_details_main">Disconnect site</button> <?php
+											?> <button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon_options_app_details_reconnect patreon_options_app_details_main">Reconnect site</button> <button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon_options_app_details_disconnect patreon_options_app_details_main">Disconnect site</button> <?php
 										
 										}
 										
@@ -363,6 +363,32 @@ class Patreon_Options {
 
         </form>
 		<?php
+		
+    }
+	
+    function patreon_plugin_admin_message_page(){
+		
+		echo '<div id="patreon_setup_screen">';
+	
+			echo '<div id="patreon_setup_logo"><img src="' . PATREON_PLUGIN_ASSETS . '/img/Patreon_Logo_100.png" /></div>';
+			
+			// Put some defaults so sites with warnings on will be fine
+			$heading = 'patreon_admin_message_default_title';
+			$content = 'patreon_admin_message_default_content';
+			
+			if ( isset( $_REQUEST['patreon_admin_message_title'] ) ) {
+				$heading = $_REQUEST['patreon_admin_message_title'];
+			}
+			if ( isset( $_REQUEST['patreon_admin_message_content'] ) ) {
+				$content = $_REQUEST['patreon_admin_message_content'];
+			}
+
+			$heading = Patreon_Frontend::$messages_map[ $heading ];
+			$content = Patreon_Frontend::$messages_map[ $content ];
+			
+			echo '<div id="patreon_setup_content"><h1 style="margin-top: 0px;">' . $heading . '</h1><div id="patreon_setup_message">' . $content . '</div></div>';
+		
+			echo '</div>';
 		
     }
 	

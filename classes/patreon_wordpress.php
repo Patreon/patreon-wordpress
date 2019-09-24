@@ -1785,6 +1785,11 @@ class Patreon_Wordpress {
 				
 				// Delete no go. Do error handling here
 				
+				// We redirect to error page.
+				
+				wp_redirect( admin_url( 'admin.php?page=patreon-plugin-admin-message&patreon_admin_message_title=client_delete_error_title&patreon_admin_message_content=client_delete_error_content' ) );
+				exit;
+				
 			}
 			
 			
@@ -1851,6 +1856,11 @@ class Patreon_Wordpress {
 				}
 				
 				// If we are here, delete did not succeed. do error handling here.
+				
+				// We redirect to error page.
+				
+				wp_redirect( admin_url( 'admin.php?page=patreon-plugin-admin-message&patreon_admin_message_title=client_reconnect_delete_error_title&patreon_admin_message_content=client_reconnect_delete_error_content' ) );
+				exit;
 				
 			}
 

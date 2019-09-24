@@ -49,6 +49,12 @@ class Patreon_Frontend {
 			'no_auth_for_client_creation'                => PATREON_NO_AUTH_FOR_CLIENT_CREATION,
 			'failure_obtaining_credentials'              => PATREON_NO_ACQUIRE_CLIENT_DETAILS,
 			'error_missing_credentials'                  => PATREON_NO_CREDENTIALS_RECEIVED,
+			'patreon_admin_message_default_title'        => PATREON_ADMIN_MESSAGE_DEFAULT_TITLE,
+			'patreon_admin_message_default_content'      => PATREON_ADMIN_MESSAGE_DEFAULT_CONTENT,
+			'client_delete_error_title'                  => PATREON_ADMIN_MESSAGE_CLIENT_DELETE_ERROR_TITLE,
+			'client_delete_error_content'                => PATREON_ADMIN_MESSAGE_CLIENT_DELETE_ERROR_CONTENT,
+			'client_reconnect_delete_error_title'        => PATREON_ADMIN_MESSAGE_CLIENT_RECONNECT_DELETE_ERROR_TITLE,
+			'client_reconnect_delete_error_content'      => PATREON_ADMIN_MESSAGE_CLIENT_RECONNECT_DELETE_ERROR_CONTENT,
 		);
 		
 	}
