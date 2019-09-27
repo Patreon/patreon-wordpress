@@ -377,15 +377,17 @@ class Patreon_Wordpress {
 		}
 		
 		$expiration = get_option( 'patreon-creators-refresh-token-expiration', false );
-		
-		if ( !$expiration OR $expiration <= time() ) {
+
+		if ( !$expiration OR $expiration <= ( time() + ( 60 * 60 * 24 * 7 ) ) )	 {
+
 			if ( $tokens = self::refresh_creator_access_token() ) {
-				
+
 				update_option( 'patreon-creators-refresh-token-expiration', time() + $tokens['expires_in'] );
 				update_option( 'patreon-creators-access-token-scope', $tokens['scope'] );
 				
 				return true;
 			}
+			
 		}
 		
 		return false;
