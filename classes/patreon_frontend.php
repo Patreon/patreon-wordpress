@@ -337,8 +337,14 @@ class Patreon_Frontend {
 		$filterable_utm_params = apply_filters( 'ptrn/utm_params_for_creator_profile_link_in_text_over_interface', $filterable_utm_params );
 		
 		$utm_params = 'utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=' . get_option( 'patreon-campaign-id' ) . '&' . $filterable_utm_params;
+		
+		// Simple check to see if creator url has ? (for non vanity urls)
+		$append_with = '?';
+		if ( strpos( $creator_url, '?' ) !== false ) {
+			$append_with = '&';
+		}
 
-		$creator_url .= '?' . $utm_params;		
+		$creator_url .= $append_with . $utm_params;		
 		
 		// Get Patreon creator tiers
 				
@@ -1202,7 +1208,13 @@ class Patreon_Frontend {
 		
 		$utm_params = 'utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=' . get_option( 'patreon-campaign-id' ) . '&' . $filterable_utm_params;
 
-		$creator_url .= '?' . $utm_params;		
+		// Simple check to see if creator url has ? (for non vanity urls)
+		$append_with = '?';
+		if ( strpos( $creator_url, '?' ) !== false ) {
+			$append_with = '&';
+		}
+
+		$creator_url .= $append_with . $utm_params;			
 		
 	    $label = str_replace( '%%creator_link%%', $creator_url, $label );
 		$label = str_replace( '%%tier_level%%', strip_tags( $tier_title ), $label );			
