@@ -3,7 +3,7 @@ Contributors: wordpressorg@patreon.com, codebard
 Tags: patreon, membership, members
 Requires at least: 4.0
 Tested up to: 5.2.2
-Stable tag: 1.3.2
+Stable tag: 1.3.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -89,6 +89,13 @@ It is  difficult to protect videos due the intensive bandwidth requirements of h
 
 
 == Changelog ==
+
+= 1.3.3 =
+
+* Added Reconnection feature to allow reconnection of site to Patreon to refresh API connection
+* Updated creator access token refresh logic to start trying token refresh a week before expiration to prevent service disruptions
+* Fixed an issue where creator profile url would go to 404 if vanity url was not being used
+* Added an admin page to show messages/errors to admins during flows or other backend procedures
 
 = 1.3.2 =
 

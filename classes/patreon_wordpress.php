@@ -389,7 +389,7 @@ class Patreon_Wordpress {
 			}
 			
 		}
-		
+
 		return false;
 	}
 	public static function getPatreonCreatorID() {
