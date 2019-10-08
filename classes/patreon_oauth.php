@@ -4,8 +4,8 @@ if( !defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 class Patreon_OAuth {
 
-	private $client_id;
-	private $client_secret;
+	public $client_id;
+	public $client_secret;
 
 	public function __construct() {
 		
@@ -14,15 +14,21 @@ class Patreon_OAuth {
 		
 	}
 
-	public function get_tokens( $code, $redirect_uri ) {
+	public function get_tokens( $code, $redirect_uri, $params = array() ) {
 		
-		return $this->__update_token( array(
-			"grant_type" 	=> "authorization_code",
-			"code" 	     	=> $code,
-			"client_id"  	=> $this->client_id,
-			"client_secret" => $this->client_secret,
-			"redirect_uri"  => $redirect_uri
-		) );
+		return $this->__update_token( 
+			array_merge( 
+				array(
+
+				"grant_type" 	=> "authorization_code",
+				"code" 	     	=> $code,
+				"client_id"  	=> $this->client_id,
+				"client_secret" => $this->client_secret,
+				"redirect_uri"  => $redirect_uri
+				),
+				$params 
+			)
+		);
 		
 	}
 

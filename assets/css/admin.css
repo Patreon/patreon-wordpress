@@ -148,3 +148,129 @@
 	width: 23px;
 	height: 37px;
 }
+
+#patreon_setup_screen {
+
+	display:block;
+	clear: both;
+	margin-top:30px;
+	line-height : 1.25;
+}
+
+#patreon_setup_logo {
+
+	float:left;
+	vertical-align: top;
+	margin-right: 20px;
+	margin-bottom: 10px;
+}
+
+
+@media only screen and (max-width: 325px) {
+	
+	#patreon_setup_logo {
+		display: block;
+		float:none;
+	}
+}
+
+#patreon_setup_content form .button {
+	
+	/* Have to override WP button styles */
+	font-size: 150% !important;
+	
+}
+
+#patreon_setup_content {
+
+	display:inline-block;
+	float:left;
+	width: auto;
+	max-width: 800px;
+	font-size: 125%;
+	padding-top: 0px;
+	
+}
+
+#patreon_setup_message {
+
+	display:block;
+	margin-top: 10px;
+	margin-bottom: 10px;
+	font-size: 125%;
+}
+
+#patreon_success_inserts {
+
+	display:block;
+	clear: both;
+	margin-bottom: 10px;
+	padding-top: 20px;
+	font-size: 125%;
+}
+
+.patreon_success_insert {
+
+	display:inline-block;
+	box-sizing: border-box;
+	float: left;
+	margin: 5px;
+	padding: 20px;
+	padding-bottom: 10px;
+	background-color : #ffffff;
+	border: 1px solid #c0c0c0;
+	width : 100%;
+	max-width : 250px;	
+	height: 330px;
+}
+
+.patreon_success_insert:hover {
+	background-color : #f9f9f9;
+	cursor: pointer;
+}
+
+.patreon_success_insert_content {
+
+	display:inline-block;
+	float:left;
+}
+
+.patreon_success_insert h3 {
+	display:inline-block;
+	float:left;
+	vertical-align: top;
+	margin: 5px;
+	margin-top: 0px;
+} 
+
+.patreon_success_insert_logo {
+	display:block;
+	width: 100%;
+	text-align: center;
+	vertical-align: top;
+}
+
+.patreon_success_insert_heading {
+	display:block;
+	width: 100%;
+	margin-top: 10px;
+	vertical-align: top;
+	text-align: center;
+}
+
+.patreon_success_insert_heading h3 {
+	font-size: 24px;
+	margin-left: 0px;
+}
+
+#patreon-connection-details{
+	display:none;
+	margin-top: 20px;
+}
+
+#patreon_options_app_details_disconnect{
+	display:none;
+}
+#patreon_options_app_details_reconnect{
+	display:none;
+}

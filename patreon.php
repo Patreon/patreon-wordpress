@@ -4,7 +4,7 @@
 Plugin Name: Patreon Wordpress
 Plugin URI: https://www.patreon.com/apps/wordpress
 Description: Patron-only content, directly on your website.
-Version: 1.2.8
+Version: 1.3.3
 Author: Patreon <platform@patreon.com>
 Author URI: https://patreon.com
 */
@@ -20,6 +20,10 @@ $patreon_locked_image_cache_dir = 	$patreon_wp_uploads_dir['basedir'].'/patreon_
 if( !file_exists($patreon_locked_image_cache_dir ) ) {
 	wp_mkdir_p( $patreon_locked_image_cache_dir );
 }
+
+// Register activation hook for the plugin
+
+register_activation_hook( __FILE__, array( 'Patreon_Wordpress', 'activate' ) );
 
 define( "PATREON_PLUGIN_URL", plugin_dir_url( __FILE__ ) );
 define( "PATREON_PLUGIN_ASSETS", plugin_dir_url( __FILE__ ).'assets' );
@@ -59,7 +63,7 @@ define( "PATREON_ADMIN_BYPASSES_FILTER_MESSAGE", 'This content is for Patrons on
 define( "PATREON_CREATOR_BYPASSES_FILTER_MESSAGE", 'This content is for Patrons only, it\'s not locked for you because you are logged in as the Patreon creator' );
 define( "PATREON_NO_LOCKING_LEVEL_SET_FOR_THIS_POST", 'Post is already public. If you would like to lock this post, please set a pledge level for it' );
 define( "PATREON_NO_POST_ID_TO_UNLOCK_POST", 'Sorry - could not get the post id for this locked post' );
-define( "PATREON_WORDPRESS_VERSION", '1.2.8' );
+define( "PATREON_WORDPRESS_VERSION", '1.3.3' );
 define( "PATREON_WORDPRESS_BETA_STRING", '' );
 define( "PATREON_WORDPRESS_PLUGIN_SLUG", plugin_basename( __FILE__ ) );
 define( "PATREON_PRIVACY_POLICY_ADDENDUM", '<h2>Patreon features in this website</h2>In order to enable you to use this website with Patreon services, we save certain functionally important Patreon information about you in this website if you log in with Patreon.
@@ -82,8 +86,28 @@ define( "PATREON_TEXT_OVER_BUTTON_9", 'This content is available exclusively to 
 define( "PATREON_TEXT_OVER_BUTTON_10", 'This content is available exclusively to members of <a href="%%creator_link%%" target="_blank">%%creator%% Patreon</a> at %%tier_level%% or higher tier at the time this content was posted, or having at least $%%total_pledge%% pledged in total.' );
 define( "PATREON_TEXT_OVER_BUTTON_11", 'This content is available exclusively to members of <a href="%%creator_link%%" target="_blank">%%creator%% Patreon</a> at %%tier_level%% or higher tier at the time this content was posted.' );
 define( "PATREON_COULDNT_ACQUIRE_USER_DETAILS", 'Sorry. Could not acquire your info from Patreon. Please try again later.' );
+define( "PATREON_PRETTY_PERMALINKS_NEED_TO_BE_ENABLED", 'Pretty permalinks are required for Patreon WordPress to work. Please visit <a href="'.admin_url('options-permalink.php').'" target="_blank">permalink options page</a> and set an option that is different from "Plain"' );
+define( "PATREON_ENSURE_REQUIREMENTS_MET", '<h3>Please ensure following requirements are met before starting setup:</h3>' );
+define( "PATREON_ERROR_MISSING_CREDENTIALS", 'One or more of app credentials were not received. Please try again.' );
+define( "PATREON_SETUP_INITIAL_MESSAGE", 'By <a href="https://support.patreon.com/hc/en-us/articles/360032404632-How-your-WordPress-site-will-be-connected-to-Patreon"  style="text-decoration: none;" target="_blank">connecting your site to Patreon</a>, you can bring Patreon features to your website & post member-only content at your website to <a href="https://blog.patreon.com/patreon-wordpress-plugin/" target="_blank" style="text-decoration: none;">increase your patrons and monthly revenue</a>. We will now take you to Patreon in order to automatically connect your site. Please make sure you are logged into your creator account at Patreon before starting.' );
+define( "PATREON_SETUP_SUCCESS_MESSAGE", 'Great! Your site is now connected to Patreon!' );
+define( "PATREON_RECONNECT_SUCCESS_MESSAGE", 'Great! We successfully reconnected your site to Patreon!' );
 define( "PATREON_TEXT_EVERYONE", 'Everyone' );
 define( "PATREON_TEXT_ANY_PATRON", 'Any patron' );
+// Common identificator for WP installations - just for reference, does not do anything
+define( "PATREON_PLUGIN_CLIENT_ID", '40otjXLPiUL023m_FAX5XRkRYVRF0DT62cHKH7NjyNsYYFZMYHxqzWoqbEtt-22l' );
+define( "PATREON_SITE_DISCONNECTED_FROM_PATREON_HEADING", 'Disconnection successful!' );
+define( "PATREON_SITE_DISCONNECTED_FROM_PATREON_TEXT", 'You successfully disconnected your site from Patreon. Now you can connect another creator account to your site.' );
+define( "PATREON_NO_AUTH_FOR_CLIENT_CREATION", 'We weren\'t able to get the go ahead from Patreon while attempting to connect your site. Please wait a minute and try again. If this situation persists, <a href="https://www.patreondevelopers.com/c/patreon-wordpress-plugin-support" target="_blank">contact support</a>.'  );
+define( "PATREON_NO_ACQUIRE_CLIENT_DETAILS", 'We weren\'t able to get to get the token for connecting your site to Patreon for the time being. Please wait a while and try again and <a href="https://www.patreondevelopers.com/c/patreon-wordpress-plugin-support" target="_blank">contact support</a> if this situation persists.' );
+define( "PATREON_NO_CREDENTIALS_RECEIVED", 'We weren\'t able to connect your site to Patreon because Patreon sent back empty credentials. Please wait a while and try again and <a href="https://www.patreondevelopers.com/c/patreon-wordpress-plugin-support" target="_blank">contact support</a> if this situation persists.' );
+define( "PATREON_RECONNECT_INITIAL_MESSAGE", 'We will now reconnect your site to Patreon. This will refresh your site\'s connection and all app credentials. Patron only content in your website will be accessible to everyone until reconnection is complete. We will now take you to Patreon in order to automatically reconnect your site. Please make sure you are logged into your creator account at Patreon before starting.' );
+define( "PATREON_ADMIN_MESSAGE_DEFAULT_TITLE", 'All\'s cool' );
+define( "PATREON_ADMIN_MESSAGE_DEFAULT_CONTENT", 'Pretty much nothing to report.' );
+define( "PATREON_ADMIN_MESSAGE_CLIENT_DELETE_ERROR_TITLE", 'Sorry, couldn\'t disconnect your site' );
+define( "PATREON_ADMIN_MESSAGE_CLIENT_DELETE_ERROR_CONTENT", 'Please wait a few minutes and <a href="http://test.codebard.com/wp-admin/admin.php?page=patreon-plugin&patreon_wordpress_action=disconnect_site_from_patreon">try again</a>. If this issue persists, you can visit your <a href="https://www.patreon.com/portal/registration/register-clients" target="_blank">your app/clients page</a> and delete the app/client for this site. Then you can save empty values for details in "Connection details" tab in "Patreon settings" menu at your site. This would manually disconnect your site from Patreon. Then, you can reconnect your site to another Patreon account or to the same account.' );
+define( "PATREON_ADMIN_MESSAGE_CLIENT_RECONNECT_DELETE_ERROR_TITLE", 'Sorry, couldn\'t disconnect your site before reconnecting it' );
+define( "PATREON_ADMIN_MESSAGE_CLIENT_RECONNECT_DELETE_ERROR_CONTENT", 'Please wait a few minutes and <a href="http://test.codebard.com/wp-admin/admin.php?page=patreon-plugin&patreon_wordpress_action=disconnect_site_from_patreon_for_reconnection">try again</a>. If this issue persists, you can visit your <a href="https://www.patreon.com/portal/registration/register-clients" target="_blank">your app/clients page</a> and delete the app/client for this site. Then you can save empty values for details in "Connection details" tab in "Patreon settings" menu at your site. This would manually disconnect your site from Patreon. Then, you can reconnect your site to another Patreon account or to the same account.' );
 
 include 'classes/patreon_wordpress.php';
 

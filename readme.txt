@@ -3,7 +3,7 @@ Contributors: wordpressorg@patreon.com, codebard
 Tags: patreon, membership, members
 Requires at least: 4.0
 Tested up to: 5.2.2
-Stable tag: 1.2.8
+Stable tag: 1.3.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -89,6 +89,41 @@ It is  difficult to protect videos due the intensive bandwidth requirements of h
 
 
 == Changelog ==
+
+= 1.3.3 =
+
+* Added Reconnection feature to allow reconnection of site to Patreon to refresh API connection
+* Updated creator access token refresh logic to start trying token refresh a week before expiration to prevent service disruptions
+* Fixed an issue where creator profile url would go to 404 if vanity url was not being used
+* Added an admin page to show messages/errors to admins during flows or other backend procedures
+
+= 1.3.2 =
+
+* Corrected the valid patron footer to use proper Patreon page name or custom Patreon page name
+* Added utm parameters to Patreon page link in text over interface and valid patron footer
+
+= 1.3.1 =
+
+* Added error messages and setup re-initiation for 3 cases in which the site may not have been able to connect to Patreon
+* Made disconnect button hide itself if any of credentials is missing or empty string
+
+= 1.3.0 =
+
+* Fixed an issue with some PHP versions crashing with error when tier descriptions are considerably formatted
+
+= 1.2.9 =
+
+* Easy setup wizard which allows new installations to easily connect to Patreon added.
+* Setup wizard kicks in after activation.
+* Informative links to answer questions about integration added to first screen of setup wizard.
+* Quickstart, addons info added to setup wizard success screen
+* All new installs will be using API v2 from now on
+* Existing installations should work with API v2 normally without disruption
+* Revamped API connection settings section in options.
+* Connection settings in options now hidden in a toggle.
+* Disconnect feature added to connection settings to allow disconnecting creator account from a site. This will allow disconnecting a site from a creator account and connecting it to another.
+* A bug with saving creator tiers with largely formatted description was fixed. Tiers should now be pulled properly for such creators.
+* Mailing list notice removed.
 
 = 1.2.8 =
 

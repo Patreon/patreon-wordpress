@@ -98,6 +98,22 @@ jQuery( function( $ ) {
 		});
 	});	
 	
+	// Doing the below via jQuery because we have to submit some POST info inside another form. Avoided using a link inside button to account for older devices
+	
+	jQuery(document).on( 'click', '#patreon_wordpress_disconnect_from_patreon', function(e) {
+		e.preventDefault();
+		var target = jQuery(this).attr( 'target' );
+		window.location.replace( target );
+	});
+	
+	// Doing the below via jQuery because we have to submit some POST info inside another form. Avoided using a link inside button to account for older devices
+	
+	jQuery(document).on( 'click', '#patreon_wordpress_reconnect_to_patreon', function(e) {
+		e.preventDefault();
+		var target = jQuery(this).attr( 'target' );
+		window.location.replace( target );
+	});
+	
 	jQuery(document).on( 'click', '.patreon-wordpress-admin-toggle', function(e) {
 		
 		e.preventDefault();
@@ -131,6 +147,22 @@ jQuery( function( $ ) {
 		});		
 		
 	});
+	
+
+	jQuery(document).on( 'click', '.patreon_wordpress_interface_toggle', function(e) {
+		
+		e.preventDefault();
+		
+		var toggles = jQuery( this ).attr( 'toggle' );
+		var toggle_array = toggles.split(" ");
+		toggle_array.forEach( function( toggle_id, index, toggle_array ) {
+			var toggle_target = document.getElementById( toggle_id );
+
+			jQuery( toggle_target ).slideToggle();
+							
+		}, jQuery( this ) );
+		
+	});	
 		
 	// Only trigger if the select dropdown is actually present
 	if ( jQuery( "#patreon_level_select" ).length ) {

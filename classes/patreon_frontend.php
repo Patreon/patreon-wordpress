@@ -44,6 +44,17 @@ class Patreon_Frontend {
 			'no_patreon_action_provided_for_flow'        => PATREON_NO_FLOW_ACTION_PROVIDED,
 			'patreon_direct_unlocks_not_turned_on'       => PATREON_DIRECT_UNLOCKS_NOT_ON,
 			'patreon_couldnt_acquire_user_details'       => PATREON_COULDNT_ACQUIRE_USER_DETAILS,
+			'pretty_permalinks_are_required'             => PATREON_PRETTY_PERMALINKS_NEED_TO_BE_ENABLED,
+			'error_missing_credentials'                  => PATREON_ERROR_MISSING_CREDENTIALS,
+			'no_auth_for_client_creation'                => PATREON_NO_AUTH_FOR_CLIENT_CREATION,
+			'failure_obtaining_credentials'              => PATREON_NO_ACQUIRE_CLIENT_DETAILS,
+			'error_missing_credentials'                  => PATREON_NO_CREDENTIALS_RECEIVED,
+			'patreon_admin_message_default_title'        => PATREON_ADMIN_MESSAGE_DEFAULT_TITLE,
+			'patreon_admin_message_default_content'      => PATREON_ADMIN_MESSAGE_DEFAULT_CONTENT,
+			'client_delete_error_title'                  => PATREON_ADMIN_MESSAGE_CLIENT_DELETE_ERROR_TITLE,
+			'client_delete_error_content'                => PATREON_ADMIN_MESSAGE_CLIENT_DELETE_ERROR_CONTENT,
+			'client_reconnect_delete_error_title'        => PATREON_ADMIN_MESSAGE_CLIENT_RECONNECT_DELETE_ERROR_TITLE,
+			'client_reconnect_delete_error_content'      => PATREON_ADMIN_MESSAGE_CLIENT_RECONNECT_DELETE_ERROR_CONTENT,
 		);
 		
 	}
@@ -317,19 +328,36 @@ class Patreon_Frontend {
 		
 		// Get creator url
 		
-		$creator_url = get_option( 'patreon-creator-url', false );
+		$creator_url = get_option( 'patreon-creator-url', false );		
+		$creator_url = apply_filters( 'ptrn/creator_profile_link_in_text_over_interface', $creator_url );
+		
+		$utm_content = 'creator_profile_link_in_text_over_interface';
+		
+		$filterable_utm_params = 'utm_term=&utm_content=' . $utm_content;
+		$filterable_utm_params = apply_filters( 'ptrn/utm_params_for_creator_profile_link_in_text_over_interface', $filterable_utm_params );
+		
+		$utm_params = 'utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=' . get_option( 'patreon-campaign-id' ) . '&' . $filterable_utm_params;
+		
+		// Simple check to see if creator url has ? (for non vanity urls)
+		$append_with = '?';
+		if ( strpos( $creator_url, '?' ) !== false ) {
+			$append_with = '&';
+		}
+
+		$creator_url .= $append_with . $utm_params;		
 		
 		// Get Patreon creator tiers
 				
 		$tiers = get_option( 'patreon-creator-tiers', false );
-		
+
 		foreach( $tiers['included'] as $key => $value ) {
 			
 			// If its not a reward element, continue, just to make sure
 			
 			if(	
 				!isset( $tiers['included'][$key]['type'] )
-				OR $tiers['included'][$key]['type'] != 'reward'
+				OR ( $tiers['included'][$key]['type'] != 'reward'
+				AND $tiers['included'][$key]['type'] != 'tier' )
 			)  {
 				continue; 
 			}
@@ -346,7 +374,8 @@ class Patreon_Frontend {
 			}
 
 			if ( ( $reward['attributes']['amount_cents'] / 100 ) >= $patreon_level ) {
-				
+	
+
 				// Matching level was present, but now found. Set selected and toggle flag.
 				// selected = selected for XHTML compatibility
 				
@@ -354,7 +383,14 @@ class Patreon_Frontend {
 				$tier_title = $reward['attributes']['title'];
 				
 				if ( $tier_title == '' ) {
-					$tier_title = $reward['attributes']['description'];
+					
+					/// Detect if this is an old non bas64 desc
+					if (base64_decode($reward['attributes']['description'], true) === false) {
+						$tier_title = $reward['attributes']['description'];
+					}					
+					else {
+						$tier_title = base64_decode( $reward['attributes']['description'] );
+					}
 				}
 			
 				// If the title is too long, snip it
@@ -1047,13 +1083,22 @@ class Patreon_Frontend {
 		$user                     = wp_get_current_user();
 		$declined                 = Patreon_Wordpress::checkDeclinedPatronage( $user );		
 		$user_patronage           = Patreon_Wordpress::getUserPatronage();						
-			
-		// Get creator full name:
-		$creator_full_name = get_option( 'patreon-creator-full-name', false );
 		
-		if ( !$creator_full_name OR $creator_full_name == '' ) {
-			$creator_full_name = 'this creator';
-		}
+		// Get the creator or page name which is going to be used for interface text
+		
+		$creator_full_name = self::make_creator_name_for_interface();
+		
+		// Add 's to make it "creator's Patreon" when placed into label
+		
+		$creator_full_name .= "'s";
+		
+		// Override entire text if the creator set a custom site/creator name string:
+				
+		$patreon_custom_page_name = get_option( 'patreon-custom-page-name', false );
+		
+		if ( $patreon_custom_page_name AND $patreon_custom_page_name != '' ) {
+			$creator_full_name = $patreon_custom_page_name;
+		}	
 		
 		// Get lock or not details if it is not given. If post id given, use it. 
 		if ( !isset( $args['lock'] ) ) {
@@ -1103,7 +1148,8 @@ class Patreon_Frontend {
 			
 			if(	
 				!isset( $tiers['included'][$key]['type'] )
-				OR $tiers['included'][$key]['type'] != 'reward'
+				OR ( $tiers['included'][$key]['type'] != 'reward'
+				AND $tiers['included'][$key]['type'] != 'tier' )
 			)  {
 				continue; 
 			}
@@ -1128,7 +1174,14 @@ class Patreon_Frontend {
 				$tier_title = $reward['attributes']['title'];
 				
 				if ( $tier_title == '' ) {
-					$tier_title = $reward['attributes']['description'];
+					
+					/// Detect if this is an old non bas64 desc
+					if (base64_decode($reward['attributes']['description'], true) === false) {
+						$tier_title = $reward['attributes']['description'];
+					}					
+					else {
+						$tier_title = base64_decode( $reward['attributes']['description'] );
+					}
 				}
 
 				// If the title is too long, snip it
@@ -1143,8 +1196,25 @@ class Patreon_Frontend {
 
 		}
 
-		// Get patreon creator url:
-		$creator_url = get_option( 'patreon-creator-url', false );
+		// Get creator url
+		
+		$creator_url = get_option( 'patreon-creator-url', false );		
+		$creator_url = apply_filters( 'ptrn/creator_profile_link_in_valid_patron_footer', $creator_url );
+		
+		$utm_content = 'creator_profile_link_in_valid_patron_footer';
+		
+		$filterable_utm_params = 'utm_term=&utm_content=' . $utm_content;
+		$filterable_utm_params = apply_filters( 'ptrn/utm_params_for_creator_profile_link_in_valid_patron_footer', $filterable_utm_params );
+		
+		$utm_params = 'utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=' . get_option( 'patreon-campaign-id' ) . '&' . $filterable_utm_params;
+
+		// Simple check to see if creator url has ? (for non vanity urls)
+		$append_with = '?';
+		if ( strpos( $creator_url, '?' ) !== false ) {
+			$append_with = '&';
+		}
+
+		$creator_url .= $append_with . $utm_params;			
 		
 	    $label = str_replace( '%%creator_link%%', $creator_url, $label );
 		$label = str_replace( '%%tier_level%%', strip_tags( $tier_title ), $label );			

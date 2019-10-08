@@ -52,6 +52,7 @@ class Patreon_Routing {
 		$rules = array(
 			'patreon-authorization\/?$' => 'index.php?patreon-oauth=true',
 			'patreon-flow\/?$' => 'index.php?patreon-flow=true',
+			'patreon-setup\/?$' => 'index.php?patreon-setup=true',
 		);
 
 		$wp_rewrite->rules = $rules + (array) $wp_rewrite->rules;
@@ -301,6 +302,7 @@ class Patreon_Routing {
 			
 		}
 		
+		
 		if ( strpos( $_SERVER['REQUEST_URI'], '/patreon-authorization/' ) !== false ) {
 
 			// First slap the noindex header so search engines wont index this page:
@@ -321,9 +323,227 @@ class Patreon_Routing {
 							
 				// Check if final_redirect exists in state vars - if so, override redirect:
 	
-				if( $state['final_redirect_uri'] != '' ) {
+				if( isset( $state['final_redirect_uri'] ) AND $state['final_redirect_uri'] != '' ) {
 					$redirect = $state['final_redirect_uri'];
-				}		
+				}
+	
+				// Check if this code was sent for a site connect request
+				
+				if ( isset( $state['patreon_action'] ) AND $state['patreon_action'] == 'connect_site' ) {
+					
+					// This code was given for setup process to allow request of credentials. Go ahead:
+					
+					if ( !current_user_can( 'manage_options' ) ) {
+						// If user is not an admin, abort
+						echo 'Sorry - to connect your site to Patreon you need to be an admin user.';
+						exit;
+						
+					}
+					
+					$oauth_client = new Patreon_Oauth;
+										
+					// Set the client id to plugin wide client id one for setup process
+					
+					$oauth_client->client_id = PATREON_PLUGIN_CLIENT_ID;
+					
+					$tokens = $oauth_client->get_tokens( $wp->query_vars['code'], site_url() . '/patreon-authorization/', array( 'scopes' => 'w:identity.clients' ) );
+										
+					if ( isset( $tokens['access_token'] ) ) {
+						
+						// We got auth. Proceed with creating the client
+						
+						// Create new api object
+						
+						$api_client = new Patreon_API( $tokens['access_token'] );
+						
+						$params = array(
+							'data' => array(
+								'type' => 'oauth-client',
+								'attributes' => Patreon_Wordpress::collect_app_info(),
+							)
+						);
+						
+						$client_result = $api_client->create_refresh_client( json_encode( $params ) );
+
+						if ( isset( $client_result['data']['type'] ) AND $client_result['data']['type'] == 'oauth-client' ) {
+							
+							$client_id = $client_result['data']['id'];
+							$client_secret = $client_result['data']['attributes']['client_secret'];
+							$creator_access_token = $client_result['included'][0]['attributes']['access_token'];
+							$creator_refresh_token = $client_result['included'][0]['attributes']['refresh_token'];
+										
+							// Some error handling here - later to be updated
+							
+							if ( !isset( $client_id ) OR $client_id == '' OR
+								!isset( $client_secret ) OR $client_secret == '' OR
+								!isset( $creator_access_token ) OR $creator_access_token == '' OR
+								!isset( $creator_refresh_token ) OR $creator_refresh_token == ''		
+							)
+							{
+								// One or more of the app details is kaput. Redirect with an error message.
+								
+								wp_redirect( admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=0&patreon_message=error_missing_credentials') );
+								exit;
+								
+							}
+							
+							// All good. Update the client details locally
+							
+							
+							if ( update_option('patreon-client-id', sanitize_text_field( $client_id ) ) AND
+								update_option('patreon-client-secret', sanitize_text_field( $client_secret ) ) AND
+								update_option('patreon-creators-access-token', sanitize_text_field( $creator_access_token ) ) AND
+								update_option('patreon-creators-refresh-token', sanitize_text_field( $creator_refresh_token ) )
+							) {
+								// All succeeded. 
+
+								// Save entire return to options
+								
+								update_option( 'patreon-installation-api-version', '2' );
+								update_option( 'patreon-setup-done', true );
+								update_option( 'patreon-redirect_to_setup_wizard', false );
+								update_option( 'patreon-setup-wizard-last-call-result', $client_result );
+								
+								// Redirect to success screen
+								
+								// First apply a filter so that 3rd party addons can redirect to a custom final screen
+								
+								$setup_final_redirect = apply_filters( 'ptrn/setup_wizard_final_redirect', admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=final') );
+
+								wp_redirect( $setup_final_redirect );
+								exit;				
+								
+							}
+							
+						}
+						
+						// If we are here, something else is wrong. Come out with an error
+						
+						wp_redirect( admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=0&patreon_message=failure_obtaining_credentials') );
+						exit;
+						
+					}
+					else {
+						
+						// No auth. Error handling here.
+						
+						wp_redirect( admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=0&patreon_message=no_auth_for_client_creation') );
+						exit;
+					
+					}
+				
+				}
+				
+				// Check if this code was sent for a site reconnect request
+				// This block is separate from the site connect block to allow for potential differentiation in connect and reconnect flow
+				
+				if ( isset( $state['patreon_action'] ) AND $state['patreon_action'] == 'reconnect_site' ) {
+					
+					// This code was given for setup process to allow request of credentials. Go ahead:
+					
+					if ( !current_user_can( 'manage_options' ) ) {
+						// If user is not an admin, abort
+						echo 'Sorry - to reconnect your site to Patreon you need to be an admin user.';
+						exit;
+						
+					}
+					
+					$oauth_client = new Patreon_Oauth;
+										
+					// Set the client id to plugin wide client id one for setup process
+					
+					$oauth_client->client_id = PATREON_PLUGIN_CLIENT_ID;
+					
+					$tokens = $oauth_client->get_tokens( $wp->query_vars['code'], site_url() . '/patreon-authorization/', array( 'scopes' => 'w:identity.clients' ) );
+										
+					if ( isset( $tokens['access_token'] ) ) {
+						
+						// We got auth. Proceed with creating the client
+						
+						// Create new api object
+						
+						$api_client = new Patreon_API( $tokens['access_token'] );
+						
+						$params = array(
+							'data' => array(
+								'type' => 'oauth-client',
+								'attributes' => Patreon_Wordpress::collect_app_info(),
+							)
+						);
+						
+						$client_result = $api_client->create_refresh_client( json_encode( $params ) );
+
+						if ( isset( $client_result['data']['type'] ) AND $client_result['data']['type'] == 'oauth-client' ) {
+							
+							$client_id = $client_result['data']['id'];
+							$client_secret = $client_result['data']['attributes']['client_secret'];
+							$creator_access_token = $client_result['included'][0]['attributes']['access_token'];
+							$creator_refresh_token = $client_result['included'][0]['attributes']['refresh_token'];
+										
+							// Some error handling here - later to be updated
+							
+							if ( !isset( $client_id ) OR $client_id == '' OR
+								!isset( $client_secret ) OR $client_secret == '' OR
+								!isset( $creator_access_token ) OR $creator_access_token == '' OR
+								!isset( $creator_refresh_token ) OR $creator_refresh_token == ''		
+							)
+							{
+								// One or more of the app details is kaput. Redirect with an error message.
+								
+								wp_redirect( admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=reconnect_0&patreon_message=error_missing_credentials') );
+								exit;
+								
+							}
+							
+							// All good. Update the client details locally
+							
+							
+							if ( update_option('patreon-client-id', sanitize_text_field( $client_id ) ) AND
+								update_option('patreon-client-secret', sanitize_text_field( $client_secret ) ) AND
+								update_option('patreon-creators-access-token', sanitize_text_field( $creator_access_token ) ) AND
+								update_option('patreon-creators-refresh-token', sanitize_text_field( $creator_refresh_token ) )
+							) {
+								// All succeeded. 
+
+								// Save entire return to options
+								
+								update_option( 'patreon-installation-api-version', '2' );
+								update_option( 'patreon-setup-done', true );
+								update_option( 'patreon-redirect_to_setup_wizard', false );
+								update_option( 'patreon-setup-wizard-last-call-result', $client_result );
+								
+								// Redirect to success screen
+								
+								// First apply a filter so that 3rd party addons can redirect to a custom final screen
+								
+								$setup_final_redirect = apply_filters( 'ptrn/setup_wizard_final_redirect', admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=reconnect_final') );
+
+								wp_redirect( $setup_final_redirect );
+								exit;				
+								
+							}
+							
+						}
+						
+						// If we are here, something else is wrong. Come out with an error
+						
+						wp_redirect( admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=reconnect_0&patreon_message=failure_obtaining_credentials') );
+						exit;
+						
+						
+					}
+					else {
+						
+						// No auth. Error handling here.
+						
+						wp_redirect( admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=reconnect_0&patreon_message=no_auth_for_client_creation') );
+						exit;
+					
+						
+					}
+				
+				}
+					
 			
 				$redirect = apply_filters( 'ptrn/redirect', $redirect );		
 					
