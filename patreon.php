@@ -42,6 +42,7 @@ define( "PATREON_TEXT_UNLOCK_WITH_PATREON", 'Unlock with Patreon' );
 define( "PATREON_TEXT_UPDATE_PLEDGE", 'Update Pledge' );
 define( "PATREON_TEXT_LOCKED_POST", 'This content is available exclusively to Patreon members.' );
 define( "PATREON_TEXT_OVER_BUTTON_1", 'To view this content, you must be a member of <a href="%%creator_link%%" target="_blank">%%creator%% Patreon</a> at %%tier_level%% or higher tier' );
+define( "PATREON_TEXT_OVER_BUTTON_1A", 'To view this content, you must upgrade to %%tier_level%% or higher tier at <a href="%%creator_link%%" target="_blank">%%creator%% Patreon</a>' );
 define( "PATREON_TEXT_OVER_BUTTON_2", 'Edit your pledge to %%creator%% to $%%pledgelevel%% or more to access this content. You\'re currently pledging $%%currentpledgelevel%%.' );
 define( "PATREON_TEXT_OVER_BUTTON_3", 'Please <a href="https://www.patreon.com/settings/payment" target="_blank" ref="nofollow">update</a> your Patreon payment method to access this post.' );
 define( "PATREON_VALID_PATRON_POST_FOOTER_TEXT", 'This content is available exclusively to members of <a href="%%creator_link%%" target="_blank">%%creator%% Patreon</a> at %%tier_level%% or higher tier.' );

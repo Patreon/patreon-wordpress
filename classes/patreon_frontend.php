@@ -291,7 +291,7 @@ class Patreon_Frontend {
 		
 		if ( $args['reason'] == 'active_pledge_not_enough' ) {
 			
-			$label = PATREON_TEXT_OVER_BUTTON_1;
+			$label = PATREON_TEXT_OVER_BUTTON_1A;
 			
 			if ( isset( $args['patreon_active_patrons_only'] ) AND $args['patreon_active_patrons_only'] == 1 ) {
 				$label = PATREON_TEXT_OVER_BUTTON_8;
