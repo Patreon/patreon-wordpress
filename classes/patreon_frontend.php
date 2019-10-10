@@ -432,7 +432,7 @@ class Patreon_Frontend {
 		// Add 's to make it "creator's Patreon" when placed into label
 		
 		$creator_full_name .= "'s";
-		
+
 		// Override entire text if the creator set a custom site/creator name string:
 				
 		$patreon_custom_page_name = get_option( 'patreon-custom-page-name', false );
@@ -456,7 +456,11 @@ class Patreon_Frontend {
 		if( $args AND is_array( $args ) AND !isset( $args['lock'] ) ) {
 			$args = $lock_or_not + $args;
 		}
-				
+		
+		if ( $args['reason'] == 'user_not_logged_in' ) {
+			$label = PATREON_TEXT_UNDER_BUTTON_2;
+		}
+		
 		if ( $args['reason'] == 'not_a_patron' ) {
 			$label = PATREON_TEXT_UNDER_BUTTON_2;
 		}
@@ -476,13 +480,21 @@ class Patreon_Frontend {
 		$post_total_patronage_level = '';
 		if( isset( $args['post_total_patronage_level'] ) ) {
 			$post_total_patronage_level = $args['post_total_patronage_level'];
-		}		
-			
+		}
+
+		$flow_link = self::patreonMakeCacheableFlowLink();
+		
+		// Change with login link if user is not logged in - this gives non logged in patrons an easy way to login/refresh the content without having to go to pledge flow again
+		
+		if ( $args['reason'] == 'user_not_logged_in' ) {
+			$flow_link = self::patreonMakeCacheableLoginLink();
+		}
+		
 		$label = str_replace( '%%creator%%', $creator_full_name, $label );
 		$label = str_replace( '%%pledgelevel%%', $patreon_level, $label );
-		$label = str_replace( '%%flow_link%%', self::patreonMakeCacheableFlowLink(), $label );
+		$label = str_replace( '%%flow_link%%', $flow_link, $label );
 		$label = str_replace( '%%total_pledge%%', $post_total_patronage_level, $label );
-	
+
 		return apply_filters( 'ptrn/label_text_under_universal_button', $label, $args['reason'], $user_logged_into_patreon, $is_patron, $patreon_level, $state, $args);
 		
 	}
@@ -836,7 +848,7 @@ class Patreon_Frontend {
 			}
 		}
 		
-		$href = self::patreonMakeCacheableLoginLink( $client_id );
+		$href = self::patreonMakeCacheableLoginLink();
 
 		return apply_filters( 'ptrn/login_button', '<a href="' . $href . '" class="ptrn-login"><div class="patreon-responsive-button-wrapper"><div class="patreon-responsive-button"><img class="patreon_logo" src="' . PATREON_PLUGIN_ASSETS . '/img/patreon-logomark-on-coral.svg" alt=""> ' . $login_label . '</div></div></a>', $href );
 
@@ -1262,7 +1274,7 @@ class Patreon_Frontend {
 		if ( isset( $_REQUEST['patreon-msg'] ) && $_REQUEST['patreon-msg'] == 'login_with_patreon' ) {
 			$button .= '<p class="patreon-msg">You can now login with your WordPress username/password.</p>';
 		} else {
-			$button .= apply_filters( 'ptrn/login_button', '<a href="' . self::patreonMakeCacheableLoginLink( $client_id ) . '" class="ptrn-button"><img src="' . $log_in_img . '" width="272" height="42" /></a>' );
+			$button .= apply_filters( 'ptrn/login_button', '<a href="' . self::patreonMakeCacheableLoginLink() . '" class="ptrn-button"><img src="' . $log_in_img . '" width="272" height="42" /></a>' );
 		}
 		return $button;
 		
