@@ -2,8 +2,8 @@
 Contributors: wordpressorg@patreon.com, codebard
 Tags: patreon, membership, members
 Requires at least: 4.0
-Tested up to: 5.2.2
-Stable tag: 1.3.3
+Tested up to: 5.2.3
+Stable tag: 1.3.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -89,6 +89,13 @@ It is  difficult to protect videos due the intensive bandwidth requirements of h
 
 
 == Changelog ==
+
+= 1.3.4 =
+
+* Gated post interface now shows refresh link to non logged in visitors. This allows existing patrons to easily refresh the content or login as opposed to being sent to plegdge flow
+* Updated interface message that is shown to non-qualifying patrons. These patrons will now be shown a message asking them to ugprade their tier as opposed to just showing them the default message. 
+* Added 2 links to setup wizard to allow creators to easily log in or register at Patreon as a creator before starting setup
+* Added utm params to existing links
 
 = 1.3.3 =
 
