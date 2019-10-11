@@ -44,7 +44,7 @@ class Patron_Metabox {
 	
 		$current_user = wp_get_current_user();
 			
-		$label    = 'Require the below membership tier or higher to view this post. (Makes entire post patron only)  <a href="https://www.patreondevelopers.com/t/patreon-wordpress-locking-options-guide/1135#heading--section-1" target="_blank">(?)</a>';
+		$label    = 'Require the below membership tier or higher to view this post. (Makes entire post patron only)  <a href="https://www.patreondevelopers.com/t/patreon-wordpress-locking-options-guide/1135#heading--section-1?utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=post_locking_metabox_link_1&utm_term=" target="_blank">(?)</a>';
 		$readonly = '';
 		
 		if ( !get_option( 'patreon-creator-id', false ) ) {
@@ -82,7 +82,7 @@ class Patron_Metabox {
 		<div <?php echo $advanced_post_options_toggle_status_display ?>id="patreon-wordpress-advanced-options-toggle">
 		<?php
 		
-			$label    = 'Require the below precise $ monthly membership or over to view this post. (optional - overrides the above select box when used)  <a href="https://www.patreondevelopers.com/t/patreon-wordpress-locking-options-guide/1135#heading--section-1" target="_blank">(?)</a>';
+			$label    = 'Require the below precise $ monthly membership or over to view this post. (optional - overrides the above select box when used)  <a href="https://www.patreondevelopers.com/t/patreon-wordpress-locking-options-guide/1135#heading--section-1?utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=post_locking_metabox_link_2&utm_term=" target="_blank">(?)</a>';
 			$readonly = '';		
 		
 			if ( !get_option( 'patreon-creator-id', false ) ) {
@@ -101,7 +101,7 @@ class Patron_Metabox {
 		
 			<?php
 			
-			$label    = 'Require an active pledge at the time of this post’s creation to view this post. (optional) <a href="https://www.patreondevelopers.com/t/patreon-wordpress-locking-options-guide/1135#heading--section-2" target="_blank">(?)</a>';
+			$label    = 'Require an active pledge at the time of this post’s creation to view this post. (optional) <a href="https://www.patreondevelopers.com/t/patreon-wordpress-locking-options-guide/1135#heading--section-2?utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=post_locking_metabox_link_3&utm_term=" target="_blank">(?)</a>';
 			$readonly = '';
 			
 			if ( !get_option( 'patreon-creator-id', false ) ) {
@@ -120,7 +120,7 @@ class Patron_Metabox {
 
 			<?php
 			
-			$label    = 'Require a lifetime pledge amount greater than this amount to view this post. (optional) <a href="https://www.patreondevelopers.com/t/patreon-wordpress-locking-options-guide/1135#heading--section-3" target="_blank">(?)</a>';
+			$label    = 'Require a lifetime pledge amount greater than this amount to view this post. (optional) <a href="https://www.patreondevelopers.com/t/patreon-wordpress-locking-options-guide/1135#heading--section-3?utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=post_locking_metabox_link_4&utm_term=" target="_blank">(?)</a>';
 			$readonly = '';
 			
 			if ( !get_option( 'patreon-creator-id', false ) ) {

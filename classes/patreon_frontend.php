@@ -336,7 +336,15 @@ class Patreon_Frontend {
 		$filterable_utm_params = 'utm_term=&utm_content=' . $utm_content;
 		$filterable_utm_params = apply_filters( 'ptrn/utm_params_for_creator_profile_link_in_text_over_interface', $filterable_utm_params );
 		
-		$utm_params = 'utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=' . get_option( 'patreon-campaign-id' ) . '&' . $filterable_utm_params;
+		// Set default for content url
+		$content_url = site_url();
+		
+		// Override if content url exists
+		if ( $post ) {
+			$content_url = get_permalink( $post );
+		}
+		
+		$utm_params = 'utm_source=' . urlencode( $content_url ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=' . get_option( 'patreon-campaign-id' ) . '&' . $filterable_utm_params;
 		
 		// Simple check to see if creator url has ? (for non vanity urls)
 		$append_with = '?';
@@ -711,7 +719,15 @@ class Patreon_Frontend {
 		$filterable_utm_params = 'utm_term=&utm_content=' . $utm_content;
 		$filterable_utm_params = apply_filters( 'ptrn/utm_params_for_patron_link', $filterable_utm_params );
 		
-		$utm_params = 'utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=' . get_option( 'patreon-campaign-id' ) . '&' . $filterable_utm_params;
+		// Set default for content url
+		$content_url = site_url();
+		
+		// Override if content url exists
+		if ( $post ) {
+			$content_url = get_permalink( $post );
+		}		
+		
+		$utm_params = 'utm_source=' . urlencode( $content_url ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=' . get_option( 'patreon-campaign-id' ) . '&' . $filterable_utm_params;
 
 		return $href . '&' . $utm_params;
 		
@@ -804,7 +820,16 @@ class Patreon_Frontend {
 		$href                  = apply_filters( 'ptrn/login_link', $href );
 		$filterable_utm_params = 'utm_term=&utm_content=login_button';
 		$filterable_utm_params = apply_filters( 'ptrn/utm_params_for_login_link', $filterable_utm_params );
-		$utm_params            = 'utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=' . get_option( 'patreon-campaign-id' ) . '&' . $filterable_utm_params;
+		
+		// Set default for content url
+		$content_url = site_url();
+		
+		// Override if content url exists
+		if ( $post ) {
+			$content_url = get_permalink( $post );
+		}		
+		
+		$utm_params            = 'utm_source=' . urlencode( $content_url ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=' . get_option( 'patreon-campaign-id' ) . '&' . $filterable_utm_params;
 		
 		return $href . '&' . $utm_params;
 	}
@@ -1206,7 +1231,21 @@ class Patreon_Frontend {
 		$filterable_utm_params = 'utm_term=&utm_content=' . $utm_content;
 		$filterable_utm_params = apply_filters( 'ptrn/utm_params_for_creator_profile_link_in_valid_patron_footer', $filterable_utm_params );
 		
-		$utm_params = 'utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=' . get_option( 'patreon-campaign-id' ) . '&' . $filterable_utm_params;
+		global $post;
+		
+		if ( isset( $args['post_id'] ) ) {
+			$post  = get_post( $args['post_id'] );
+		}
+		
+		// Set default for content url
+		$content_url = site_url();
+		
+		// Override if content url exists
+		if ( $post ) {
+			$content_url = get_permalink( $post );
+		}			
+		
+		$utm_params = 'utm_source=' . urlencode( $content_url ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=' . get_option( 'patreon-campaign-id' ) . '&' . $filterable_utm_params;
 
 		// Simple check to see if creator url has ? (for non vanity urls)
 		$append_with = '?';
