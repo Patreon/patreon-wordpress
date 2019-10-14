@@ -47,6 +47,8 @@ class Patron_Metabox {
 		$label    = 'Require the below membership tier or higher to view this post. (Makes entire post patron only)  <a href="https://www.patreondevelopers.com/t/patreon-wordpress-locking-options-guide/1135#heading--section-1?utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=post_locking_metabox_link_1&utm_term=" target="_blank">(?)</a>';
 		$readonly = '';
 		
+		$disabled = '';
+		
 		if ( !get_option( 'patreon-creator-id', false ) ) {
 			
 			$label    = 'Post locking won\'t work without Creator ID. Please confirm you have it <a href="'.admin_url( "?page=patreon-plugin ").'">here</a>';

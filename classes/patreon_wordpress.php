@@ -697,7 +697,7 @@ class Patreon_Wordpress {
 	
 		// Skip showing any notice if setup is being done
 		
-		if ( $_REQUEST['page'] == 'patreon_wordpress_setup_wizard' ) {
+		if ( isset( $_REQUEST['page'] ) AND $_REQUEST['page'] == 'patreon_wordpress_setup_wizard' ) {
 			return;
 		}
 		
@@ -1724,7 +1724,7 @@ class Patreon_Wordpress {
 		
 		// This function runs on init at order 0, and allows any action that does not require to be run in a particular order or any other function or operation to be run. 
 
-		if ( $_REQUEST['patreon_wordpress_action'] == 'disconnect_site_from_patreon' AND is_admin() AND current_user_can( 'manage_options' ) ) {
+		if ( isset( $_REQUEST['patreon_wordpress_action'] ) AND $_REQUEST['patreon_wordpress_action'] == 'disconnect_site_from_patreon' AND is_admin() AND current_user_can( 'manage_options' ) ) {
 
 			// Admin side, user is admin level. Perform action:
 			
@@ -1797,7 +1797,7 @@ class Patreon_Wordpress {
 			
 		}
 		
-		if ( $_REQUEST['patreon_wordpress_action'] == 'disconnect_site_from_patreon_for_reconnection' AND is_admin() AND current_user_can( 'manage_options' ) ) {
+		if ( isset( $_REQUEST['patreon_wordpress_action'] ) AND $_REQUEST['patreon_wordpress_action'] == 'disconnect_site_from_patreon_for_reconnection' AND is_admin() AND current_user_can( 'manage_options' ) ) {
 
 			// Admin side, user is admin level. Perform action:
 			
