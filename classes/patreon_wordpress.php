@@ -169,7 +169,13 @@ class Patreon_Wordpress {
 			
 			/* all the details you want to update on wordpress user account */
 			update_user_meta( $user->ID, 'patreon_user', $user_response['data']['attributes']['vanity'] );
-			update_user_meta( $user->ID, 'patreon_created', $user_response['data']['attributes']['created'] );
+
+			$patreon_created = '';
+			if ( isset( $user_response['data']['attributes']['created'] ) ) {
+				$patreon_created = $user_response['data']['attributes']['created'];
+			}
+
+			update_user_meta( $user->ID, 'patreon_created', $patreon_created );
 			update_user_meta( $user->ID, 'user_firstname', $user_response['data']['attributes']['first_name'] );
 			update_user_meta( $user->ID, 'user_lastname', $user_response['data']['attributes']['last_name'] );
 			
@@ -1315,7 +1321,7 @@ class Patreon_Wordpress {
 			
 			$setup_message = PATREON_SETUP_INITIAL_MESSAGE;
 			
-			if ( $_REQUEST['patreon_message'] != '' ) {
+			if ( isset( $_REQUEST['patreon_message'] ) AND $_REQUEST['patreon_message'] != '' ) {
 				$setup_message = Patreon_Frontend::$messages_map[$_REQUEST['patreon_message']];
 
 			}
@@ -1343,7 +1349,7 @@ class Patreon_Wordpress {
 
 			$setup_message = PATREON_SETUP_SUCCESS_MESSAGE;
 
-			if ( $_REQUEST['patreon_message'] != '' ) {
+			if ( isset( $_REQUEST['patreon_message'] ) AND $_REQUEST['patreon_message'] != '' ) {
 				$setup_message = Patreon_Frontend::$messages_map[$_REQUEST['patreon_message']];
 			}
 
@@ -1389,7 +1395,7 @@ class Patreon_Wordpress {
 			
 			$setup_message = PATREON_RECONNECT_INITIAL_MESSAGE;
 			
-			if ( $_REQUEST['patreon_message'] != '' ) {
+			if ( isset( $_REQUEST['patreon_message'] ) AND $_REQUEST['patreon_message'] != '' ) {
 				$setup_message = Patreon_Frontend::$messages_map[$_REQUEST['patreon_message']];
 
 			}
@@ -1416,7 +1422,7 @@ class Patreon_Wordpress {
 
 			$setup_message = PATREON_RECONNECT_SUCCESS_MESSAGE;
 
-			if ( $_REQUEST['patreon_message'] != '' ) {
+			if ( isset( $_REQUEST['patreon_message'] ) AND $_REQUEST['patreon_message'] != '' ) {
 				$setup_message = Patreon_Frontend::$messages_map[$_REQUEST['patreon_message']];
 			}
 

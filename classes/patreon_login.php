@@ -16,7 +16,13 @@ class Patreon_Login {
 		update_user_meta($user_id, 'patreon_user', $user_response['data']['attributes']['vanity']);
 		update_user_meta($user_id, 'patreon_user_id', $user_response['data']['id']);
 		update_user_meta($user_id, 'patreon_last_logged_in', time());
-		update_user_meta($user_id, 'patreon_created', $user_response['data']['attributes']['created']);
+		
+		$patreon_created = '';
+		if ( isset( $user_response['data']['attributes']['created'] ) ) {
+			$patreon_created = $user_response['data']['attributes']['created'];
+		}
+
+		update_user_meta($user_id, 'patreon_created', $patreon_created);
 		update_user_meta($user_id, 'patreon_token_minted', microtime());
 		update_user_meta($user_id, 'patreon_token_expires_in', $tokens['expires_in']);
 		
