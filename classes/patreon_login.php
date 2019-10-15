@@ -229,7 +229,7 @@ class Patreon_Login {
 		
 		// At this point lets do a check for existing email if the email is going to be imported:
 		
-		if ( $user_response['data']['attributes']['is_email_verified'] ) {
+		if ( isset( $user_response['data']['attributes']['is_email_verified'] ) AND $user_response['data']['attributes']['is_email_verified'] ) {
 			$check_user_email = $user_response['data']['attributes']['email'];
 		}		
 		
