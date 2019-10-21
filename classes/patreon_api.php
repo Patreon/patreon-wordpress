@@ -9,6 +9,35 @@ if( !defined( 'ABSPATH' ) ) {
 
 $api_version = get_option( 'patreon-installation-api-version', false );
 
+// Override api version even if the site is v1 in case delete / reconnect actions are requested. This is temporary until we have something on API side which will allow v1 sites to just reconnect to v2
+
+if ( isset( $_REQUEST['patreon_wordpress_action'] ) AND $_REQUEST['patreon_wordpress_action'] == 'disconnect_site_from_patreon' AND is_admin() ) {
+	
+	// We repeat below code because we want it to be available !only! during reconnect/disconnect actions
+		
+	if(!function_exists('wp_get_current_user')) {
+		include(ABSPATH . "wp-includes/pluggable.php"); 
+	}
+	
+	if ( current_user_can( 'manage_options' ) ) {
+		$api_version = '2';
+	}
+}
+
+if ( isset( $_REQUEST['patreon_wordpress_action'] ) AND $_REQUEST['patreon_wordpress_action'] == 'disconnect_site_from_patreon_for_reconnection' AND is_admin() ) {
+
+	// We repeat below code because we want it to be available !only! during reconnect/disconnect actions
+		
+	if(!function_exists('wp_get_current_user')) {
+		include(ABSPATH . "wp-includes/pluggable.php"); 
+	}
+	
+	if ( current_user_can( 'manage_options' ) ) {
+		$api_version = '2';
+	}
+}
+
+
 if ( $api_version AND $api_version == '2' ) {
 	
 	// Include the v2 version of this class and return

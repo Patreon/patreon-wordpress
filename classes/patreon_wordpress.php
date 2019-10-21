@@ -1760,6 +1760,22 @@ class Patreon_Wordpress {
 			
 			$creator_access_token = get_option( 'patreon-creators-access-token', false );
 			$client_id 			  = get_option( 'patreon-client-id', false );
+				
+			// Exceptions until v1 v2 transition is complete
+
+			if ( isset( $_REQUEST['patreon_wordpress_action'] ) AND $_REQUEST['patreon_wordpress_action'] == 'disconnect_site_from_patreon'  ) {
+				update_option( 'patreon-installation-api-version', '2' );
+				update_option( 'patreon-can-use-api-v2', true );
+				wp_redirect( admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=reconnect_0') );
+				exit;
+			}
+
+			if ( isset( $_REQUEST['patreon_wordpress_action'] ) AND $_REQUEST['patreon_wordpress_action'] == 'disconnect_site_from_patreon_for_reconnection' ) {
+				update_option( 'patreon-installation-api-version', '2' );
+				update_option( 'patreon-can-use-api-v2', true );
+				wp_redirect( admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=reconnect_0') );
+				exit;
+			}	
 			
 			if ( $creator_access_token AND $client_id ) {
 				
@@ -1833,6 +1849,23 @@ class Patreon_Wordpress {
 			
 			$creator_access_token = get_option( 'patreon-creators-access-token', false );
 			$client_id 			  = get_option( 'patreon-client-id', false );
+					
+			// Exceptions until v1 v2 transition is complete
+
+			if ( isset( $_REQUEST['patreon_wordpress_action'] ) AND $_REQUEST['patreon_wordpress_action'] == 'disconnect_site_from_patreon' ) {
+				update_option( 'patreon-installation-api-version', '2' );
+				update_option( 'patreon-can-use-api-v2', true );
+				wp_redirect( admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=reconnect_0') );
+				exit;
+			}
+
+			if ( isset( $_REQUEST['patreon_wordpress_action'] ) AND $_REQUEST['patreon_wordpress_action'] == 'disconnect_site_from_patreon_for_reconnection' ) {
+				update_option( 'patreon-installation-api-version', '2' );
+				update_option( 'patreon-can-use-api-v2', true );
+				wp_redirect( admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=reconnect_0') );
+				exit;
+			}			
+			
 
 			if ( $creator_access_token AND $client_id ) {
 				
