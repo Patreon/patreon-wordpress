@@ -3,7 +3,7 @@ Contributors: wordpressorg@patreon.com, codebard
 Tags: patreon, membership, members
 Requires at least: 4.0
 Tested up to: 5.2.4
-Stable tag: 1.3.5
+Stable tag: 1.3.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -89,6 +89,10 @@ It is  difficult to protect videos due the intensive bandwidth requirements of h
 
 
 == Changelog ==
+
+= 1.3.6 =
+
+* Allowed existing sites using v1 to upgrade to v2 by using reconnect/disconnect/setup functions. This also fixes the PHP error these sites may have encountered if they attempted that upgrade.
 
 = 1.3.5 =
 
