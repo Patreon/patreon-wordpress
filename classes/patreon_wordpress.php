@@ -1766,8 +1766,16 @@ class Patreon_Wordpress {
 			$api_version = get_option( 'patreon-installation-api-version' );
 
 			if ( $api_version == '1' ) {
+
+				// Delete override - proceed with deleting local options
+				
+				foreach ( $options_to_delete as $key => $value ) {
+					delete_option( $options_to_delete[$key] );
+				}
+				
 				update_option( 'patreon-installation-api-version', '2' );
 				update_option( 'patreon-can-use-api-v2', true );
+				
 				wp_redirect( admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=reconnect_0') );
 				exit;
 			}
@@ -1852,8 +1860,16 @@ class Patreon_Wordpress {
 			$api_version = get_option( 'patreon-installation-api-version' );
 
 			if ( $api_version == '1' ) {
+
+				// Delete override - proceed with deleting local options
+				
+				foreach ( $options_to_delete as $key => $value ) {
+					delete_option( $options_to_delete[$key] );
+				}
+				
 				update_option( 'patreon-installation-api-version', '2' );
-				update_option( 'patreon-can-use-api-v2', true );
+				update_option( 'patreon-can-use-api-v2', true );				
+								
 				wp_redirect( admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=reconnect_0') );
 				exit;
 			}			
