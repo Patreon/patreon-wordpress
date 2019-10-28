@@ -9,7 +9,7 @@ if( !defined( 'ABSPATH' ) ) {
 
 class Patreon_API {
 
-	private $access_token;
+	public $access_token;
 
 	public function __construct( $access_token ) {
 		$this->access_token = $access_token;
@@ -132,7 +132,7 @@ class Patreon_API {
 		return $this->__get_json( "clients/".$client_id, $args );
 	}
 		
-	private function __get_json( $suffix, $args = array() ) {
+	public function __get_json( $suffix, $args = array() ) {
 		
 		// Defaults
 		

@@ -48,7 +48,7 @@ else {
 	
 	class Patreon_API {
 
-		private $access_token;
+		public $access_token;
 
 		public function __construct( $access_token ) {
 			$this->access_token = $access_token;
@@ -139,7 +139,7 @@ else {
 			
 		}
 
-		private function __get_json( $suffix, $v2 = false ) {		
+		public function __get_json( $suffix, $v2 = false ) {		
 
 			$api_endpoint = "https://api.patreon.com/oauth2/api/" . $suffix;
 
