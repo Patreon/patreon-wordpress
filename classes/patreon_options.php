@@ -21,8 +21,12 @@ class Patreon_Options {
     function patreon_plugin_setup(){
 		
         add_menu_page( 'Patreon Settings', 'Patreon Settings', 'manage_options', 'patreon-plugin', array( $this, 'patreon_plugin_setup_page' ), PATREON_PLUGIN_ASSETS . '/img/Patreon WordPress.png' );
+
 		add_submenu_page ( '', 'Patreon Settings', 'Patreon Settings', 'administrator', 'patreon_wordpress_setup_wizard', array('Patreon_Wordpress', 'setup_wizard'), '/img/Patreon WordPress.png' );
 		add_submenu_page( null, 'Patreon WordPress Admin Message', 'Admin message', 'manage_options', 'patreon-plugin-admin-message', array( $this, 'patreon_plugin_admin_message_page' ) );
+
+		add_submenu_page( 'patreon-plugin', 'Patreon WordPress Health Check', 'Health check', 'manage_options', 'patreon-plugin-health', array( $this, 'patreon_plugin_health_check_page' ) );
+
     }
 
     function patreon_plugin_register_settings() { 
@@ -389,6 +393,108 @@ class Patreon_Options {
 			echo '<div id="patreon_setup_content"><h1 style="margin-top: 0px;">' . $heading . '</h1><div id="patreon_setup_message">' . $content . '</div></div>';
 		
 			echo '</div>';
+			
+	}
+	
+    function patreon_plugin_health_check_page(){
+
+		?>
+		<div class="patreon_admin_health_content_section">
+			<h1>Health check of your Patreon integration</h1>
+			Below are settings or issues which may affect your Patreon integration. Please check the recommendations and implement them to have your integration function better. You can get help for any of these items <a href="https://www.patreondevelopers.com/c/patreon-wordpress-plugin-support" target="_blank">by visiting our support forum</a> and posting a thread. 
+			<br><br>
+			You can <a href="" id="patreon_copy_health_check_output">click here</a> to copy the output of this page to share with support team or post it in the forum. <div id="patreon_copied"></div>
+			
+		</div>
+		<?php
+		
+		if ( count( Patreon_Compatibility::$site_health_info ) == 0 ) {
+		?>
+		
+		<div class="patreon_admin_health_content_box">
+		<h2>Your Patreon integration health is great!</h2>
+		</div>
+		
+		<?php
+			
+		}
+		
+		if ( count( Patreon_Compatibility::$site_health_info ) > 0 ) {
+			
+			$health_info = Patreon_Compatibility::$site_health_info;
+			
+			// Sort according to priority
+			
+			usort( $health_info, function($a, $b ) {
+				return $a['order'] - $b['order'];
+			} );
+			
+			// Add last 50 connection errors at the end.
+			
+	
+			foreach ( $health_info as $key => $value ) {
+			?>
+			
+				<div class="patreon_admin_health_content_box patreon_toggle_admin_sections" target=".patreon_admin_health_content_box_hidden">
+				<h3><?php echo $health_info[$key]['heading'] ?><span class="dashicons dashicons-arrow-down-alt2 patreon_setting_section_toggle_icon"></span></h3>
+				<div class="patreon_admin_health_content_box_hidden"><?php echo $health_info[$key]['notice'] ?></div>
+				</div>
+			
+			<?php
+		
+			}
+		
+			
+		}
+
+		// Print out the last 50 connection errors if they exist
+		?>
+		
+		<div class="patreon_admin_health_content_box patreon_toggle_admin_sections" target=".patreon_admin_health_content_box_hidden">
+			<h3><?php echo PATREON_LAST_50_CONNECTION_ERRORS_HEADING ?><span class="dashicons dashicons-arrow-down-alt2 patreon_setting_section_toggle_icon"></span></h3>
+			<div class="patreon_admin_health_content_box_hidden"><?php echo PATREON_LAST_50_CONNECTION_ERRORS ?>
+				<?php 
+					$last_50_conn_errors = get_option( 'patreon-last-50-conn-errors', array() );
+					
+					if ( count( $last_50_conn_errors ) > 0 ) {
+						
+						foreach ( $last_50_conn_errors as $key => $value ) {
+							
+				
+							$days = abs( time() - $last_50_conn_errors[$key]['date']  ) / 86400 ;
+
+							echo '<br /><br /><b>' . round( $days, 2 ) . ' days ago</b><br /><br />';
+							echo $last_50_conn_errors[$key]['error'];
+							
+						}
+
+					}
+					else {
+						echo '<br />No recent connection errors<br />';
+					}
+				?>
+			</div>
+			</div>
+			
+		<?php
+		
+				
+		// Output a hidden, non formatted version of the health info to be used by the users to c/p to support
+		?>
+		
+		<div id="patreon_health_check_output_for_support">
+			<?php			
+			
+			foreach ( $health_info as $key => $value ) {
+			 echo "\r\n";
+			 echo '# '.$health_info[$key]['heading'].' #';
+			 echo "\r\n";
+			 echo str_replace( '<h3>', "\r\n# ", str_replace( '</h3>', " #\r\n", $health_info[$key]['notice'] ) );			
+			}
+		?>
+		</div>
+		
+		<?php
 		
     }
 	

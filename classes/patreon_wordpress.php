@@ -783,6 +783,18 @@ class Patreon_Wordpress {
 			$already_showed_non_system_notice = true;
 			
 		}
+		
+		// This will trigger only when critical or important issues are detected by the compatibility class
+
+		if( Patreon_Compatibility::$toggle_warning AND $_REQUEST['page'] != 'patreon-plugin-health' ) {
+
+			?>
+				 <div class="notice notice-error patreon-wordpress" id="patreon-critical-issues">
+					<p>There are important issues affecting your Patreon integration. Please visit <a href="<?php echo admin_url( 'admin.php?page=patreon-plugin-health' ) ?>">health check page</a> to see the issues and solutions.</p>
+				</div>
+			<?php	
+			
+		}
 
 		// This is a plugin system info notice. 
 		if( get_option( 'patreon-wordpress-app-credentials-success', false ) ) {
@@ -1447,12 +1459,23 @@ class Patreon_Wordpress {
 		
 	}
 
-	public static function check_plugin_exists( $plugin_slug ) {
+	public static function check_plugin_exists( $plugin_dir ) {
+
 		// Simple function to check if a plugin is installed (may be active, or not active) in the WP instalation
 		
-		// Plugin slug is the wp's plugin dir together with the plugin's file which has the plugin header
+		// Plugin dir is the wp's plugin dir together with the plugin's dir
 
-		if ( file_exists( WP_PLUGIN_DIR . '/' . $plugin_slug ) ) {
+		if ( file_exists( WP_PLUGIN_DIR . '/' . $plugin_dir ) ) {
+			return true;			
+		}
+	}
+	
+	public static function check_plugin_active( $full_plugin_slug ) {
+		// Simple function to check if a plugin is installed (may be active, or not active) in the WP instalation
+		
+		// Plugin slug is the plugin dir together with the plugin's file which has the plugin header
+
+		if ( is_plugin_active(  $full_plugin_slug ) ) {
 			return true;			
 		}
 	}
@@ -1917,4 +1940,35 @@ class Patreon_Wordpress {
 		
 	}
 	
+	public static function log_connection_error( $error = false ) {
+		
+		if ( !$error ) {
+			return;
+		}
+	
+		// Get the last 50 connection errors log
+		// Init in case it does not exist, get value if exists - will return empty array if it does not exist.
+		
+		$last_50_conn_errors = get_option( 'patreon-last-50-conn-errors', array() );
+		
+		// If array is 50 or longer, pop it
+		
+		if( count( $last_50_conn_errors ) >= 50 ) {
+			array_pop( $last_50_conn_errors );
+		}
+
+		// Add the error message to last 50 connection errors with time
+		
+		array_unshift ( 
+			$last_50_conn_errors,
+			array (
+				'date'  => time(),
+				'error' => $error
+			)
+		);
+		
+		// Update option
+		update_option( 'patreon-last-50-conn-errors', $last_50_conn_errors );
+
+	}
 }

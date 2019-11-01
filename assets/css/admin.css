@@ -274,3 +274,52 @@
 #patreon_options_app_details_reconnect{
 	display:none;
 }
+.patreon_admin_health_content_box {
+	
+	display: block;
+	margin: 20px;
+	margin-left: 0px;
+	background-color: #ffffff;
+	padding:20px;
+	max-width: 800px;
+	width: 100%;
+	font-size: 115%;
+	
+}
+
+.patreon_admin_health_content_box > h3:first-of-type {
+	margin-top: 0px;
+}
+
+.patreon_admin_health_content_section {
+	
+	display: block;
+	margin: 20px;
+	margin-left: 0px;
+	padding:20px;
+	padding-left: 0px;
+	max-width: 800px;
+	width: 100%;
+	font-size: 125%;
+	font-weight: bold;
+}
+
+.patreon_admin_health_content_section h1 {
+	margin-top: 0px;
+	font-size: 150%;
+}
+
+.patreon_admin_health_content_box_hidden {
+	display: none;
+}
+
+.patreon_setting_section_toggle_icon {
+	font-size: 24px;
+	margin-left: 20px;
+}
+#patreon_health_check_output_for_support {
+	display: none;
+}
+#patreon_copied {
+	margin-top: 10px;
+}
