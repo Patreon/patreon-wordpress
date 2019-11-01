@@ -139,7 +139,6 @@ else {
 			
 		}
 
-<<<<<<< HEAD
 		public function __get_json( $suffix, $v2 = false ) {		
 
 			$api_endpoint = "https://api.patreon.com/oauth2/api/" . $suffix;
