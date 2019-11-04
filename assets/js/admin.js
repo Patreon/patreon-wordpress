@@ -211,7 +211,6 @@ jQuery( function( $ ) {
 		
 		jQuery( '#footer-thankyou' ).remove();
 		var patreon_target = jQuery( this ).parent('.patreon_admin_health_content_box').find( jQuery( this ).attr( 'target' ) );
-		console.log(patreon_target.attr('class'));
         e.preventDefault();
 		if ( jQuery( this ).find( 'span:first' ).hasClass( 'dashicons-arrow-down-alt2' ) ) {
 			jQuery( this ).find( 'span:first' ).removeClass( 'dashicons-arrow-down-alt2' );

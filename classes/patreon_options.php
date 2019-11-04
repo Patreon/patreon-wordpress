@@ -469,7 +469,7 @@ class Patreon_Options {
 
 					}
 					else {
-						echo '<br />No recent connection errors<br />';
+						echo '<br /><br />No recent connection errors<br />';
 					}
 				?>
 			</div>

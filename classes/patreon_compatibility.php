@@ -104,7 +104,7 @@ class Patreon_Compatibility {
 
 		$toggle_warning = false;
 		
-		if ( !$super_cache_enabled ) {
+		if ( !is_plugin_active( 'wp-super-cache/wp-cache.php' ) OR !$super_cache_enabled ) {
 			// WP Super Cache is not on. bail out
 			return;
 		}
