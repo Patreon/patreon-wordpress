@@ -198,7 +198,7 @@ class Patreon_API {
 
 		// Log the connection as having error if the return is not 200
 		
-		if ( isset( $response['response']['code'] ) AND $response['response']['code'] != '200' )  {
+		if ( isset( $response['response']['code'] ) AND $response['response']['code'] != '200' AND $response['response']['code'] != '201' )  {
 			Patreon_Wordpress::log_connection_error( 'Response code: ' . $response['response']['code'] . ' Response :' . $response['body'] );
 		}	
 		

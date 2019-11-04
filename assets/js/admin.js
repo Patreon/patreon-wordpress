@@ -204,9 +204,14 @@ jQuery( function( $ ) {
 	});
 	
 	jQuery( ".patreon_toggle_admin_sections" ).on( 'click', function (e) {
-		if ( jQuery( e.target ).hasClass( 'patreon_setting_section_help_icon' ) ) return;
+		
+		if ( jQuery( e.target ).hasClass( 'patreon_setting_section_help_icon' ) ) { 
+			return 
+		};
+		
 		jQuery( '#footer-thankyou' ).remove();
-		var patreon_target = jQuery( this ).find( jQuery( this ).attr( 'target' ) );
+		var patreon_target = jQuery( this ).parent('.patreon_admin_health_content_box').find( jQuery( this ).attr( 'target' ) );
+		console.log(patreon_target.attr('class'));
         e.preventDefault();
 		if ( jQuery( this ).find( 'span:first' ).hasClass( 'dashicons-arrow-down-alt2' ) ) {
 			jQuery( this ).find( 'span:first' ).removeClass( 'dashicons-arrow-down-alt2' );
@@ -221,7 +226,6 @@ jQuery( function( $ ) {
 	
 	jQuery( '#patreon_copy_health_check_output' ).on( 'click', function (e) {
 		e.preventDefault();
-		console.log('here');
 		// Some of below is from stack https://stackoverflow.com/questions/23048550/how-to-copy-a-divs-content-to-clipboard-without-flash
 		var textarea = document.createElement( 'textarea' );
 		  textarea.id = 'patreon_temp_element'

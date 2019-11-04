@@ -786,7 +786,7 @@ class Patreon_Wordpress {
 		
 		// This will trigger only when critical or important issues are detected by the compatibility class
 
-		if( Patreon_Compatibility::$toggle_warning AND $_REQUEST['page'] != 'patreon-plugin-health' ) {
+		if( Patreon_Compatibility::$toggle_warning AND ( !isset( $_REQUEST['page'] ) OR $_REQUEST['page'] != 'patreon-plugin-health' ) ) {
 
 			?>
 				 <div class="notice notice-error patreon-wordpress" id="patreon-critical-issues">

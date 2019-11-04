@@ -435,23 +435,22 @@ class Patreon_Options {
 			foreach ( $health_info as $key => $value ) {
 			?>
 			
-				<div class="patreon_admin_health_content_box patreon_toggle_admin_sections" target=".patreon_admin_health_content_box_hidden">
-				<h3><?php echo $health_info[$key]['heading'] ?><span class="dashicons dashicons-arrow-down-alt2 patreon_setting_section_toggle_icon"></span></h3>
-				<div class="patreon_admin_health_content_box_hidden"><?php echo $health_info[$key]['notice'] ?></div>
+				<div class="patreon_admin_health_content_box">
+					<div class="patreon_toggle_admin_sections" target=".patreon_admin_health_content_box_hidden"><h3><?php echo $health_info[$key]['heading'] ?><span class="dashicons dashicons-arrow-down-alt2 patreon_setting_section_toggle_icon"></span></h3></div>
+					<div class="patreon_admin_health_content_box_hidden"><?php echo $health_info[$key]['notice'] ?></div>
 				</div>
 			
 			<?php
 		
 			}
 		
-			
 		}
 
 		// Print out the last 50 connection errors if they exist
 		?>
 		
-		<div class="patreon_admin_health_content_box patreon_toggle_admin_sections" target=".patreon_admin_health_content_box_hidden">
-			<h3><?php echo PATREON_LAST_50_CONNECTION_ERRORS_HEADING ?><span class="dashicons dashicons-arrow-down-alt2 patreon_setting_section_toggle_icon"></span></h3>
+		<div class="patreon_admin_health_content_box">
+			<div class="patreon_toggle_admin_sections" target=".patreon_admin_health_content_box_hidden"><h3><?php echo PATREON_LAST_50_CONNECTION_ERRORS_HEADING ?><span class="dashicons dashicons-arrow-down-alt2 patreon_setting_section_toggle_icon"></span></h3></div>
 			<div class="patreon_admin_health_content_box_hidden"><?php echo PATREON_LAST_50_CONNECTION_ERRORS ?>
 				<?php 
 					$last_50_conn_errors = get_option( 'patreon-last-50-conn-errors', array() );
@@ -484,12 +483,13 @@ class Patreon_Options {
 		
 		<div id="patreon_health_check_output_for_support">
 			<?php			
-			
-			foreach ( $health_info as $key => $value ) {
-			 echo "\r\n";
-			 echo '# '.$health_info[$key]['heading'].' #';
-			 echo "\r\n";
-			 echo str_replace( '<h3>', "\r\n# ", str_replace( '</h3>', " #\r\n", $health_info[$key]['notice'] ) );			
+			if ( isset( $health_info ) AND is_array( $health_info ) AND count( $health_info ) > 0 ) {
+				foreach ( $health_info as $key => $value ) {
+				 echo "\r\n";
+				 echo '# '.$health_info[$key]['heading'].' #';
+				 echo "\r\n";
+				 echo str_replace( '<h3>', "\r\n# ", str_replace( '</h3>', " #\r\n", $health_info[$key]['notice'] ) );			
+				}
 			}
 		?>
 		</div>

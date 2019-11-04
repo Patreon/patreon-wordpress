@@ -92,23 +92,29 @@ class Patreon_Compatibility {
 		}
 		// Bail out if WP super cache is not active
 		if ( !Patreon_Wordpress::check_plugin_active( 'wp-super-cache/wp-cache.php' ) ) {
-			return;			
+			return;
 		}
 		
 		// Wp super cache loads its options into globals
 		global $wp_cache_not_logged_in;
 		global $wp_cache_make_known_anon;
+		global $super_cache_enabled;
 	
 		// echo admin_url('options-general.php?page=wpsupercache');
 
 		$toggle_warning = false;
+		
+		if ( !$super_cache_enabled ) {
+			// WP Super Cache is not on. bail out
+			return;
+		}
 		
 		// Check for cache not logged in being not set - if its not set, logged in users are served cached files
 		
 		if ( !$wp_cache_not_logged_in ) {
 	
 			self::$toggle_warning = true;
-
+			
 			self::$site_health_info['wp_super_cache_caches_pages_for_known_users'] = array(
 				'notice' => PATREON_WP_SUPER_CACHE_LOGGED_IN_USERS_ENABLED,
 				'heading' => PATREON_WP_SUPER_CACHE_LOGGED_IN_USERS_ENABLED_HEADING,
