@@ -786,10 +786,10 @@ class Patreon_Wordpress {
 		
 		// This will trigger only when critical or important issues are detected by the compatibility class
 
-		if( Patreon_Compatibility::$toggle_warning AND ( !isset( $_REQUEST['page'] ) OR $_REQUEST['page'] != 'patreon-plugin-health' ) ) {
+		if( Patreon_Compatibility::$toggle_warning AND self::check_days_after_last_system_notice( 7 ) AND ( !isset( $_REQUEST['page'] ) OR $_REQUEST['page'] != 'patreon-plugin-health' ) ) {
 
 			?>
-				 <div class="notice notice-error patreon-wordpress" id="patreon-critical-issues">
+				 <div class="notice notice-error patreon-wordpress is-dismissible" id="patreon-critical-issues">
 					<p>There are important issues affecting your Patreon integration. Please visit <a href="<?php echo admin_url( 'admin.php?page=patreon-plugin-health' ) ?>">health check page</a> to see the issues and solutions.</p>
 				</div>
 			<?php	
@@ -859,13 +859,21 @@ class Patreon_Wordpress {
 			// Set the last notice shown date
 			self::set_last_non_system_notice_shown_date();
 		}
-				
+
 		// Mapping what comes from REQUEST to a given value avoids potential security problems
 		if ( $_REQUEST['notice_id'] == 'patreon-rate-plugin-notice-shown' ) {
 			update_option( 'patreon-rate-plugin-notice-shown', true );
 			
 			// Set the last notice shown date
 			self::set_last_non_system_notice_shown_date();
+		}
+		
+		// Mapping what comes from REQUEST to a given value avoids potential security problems
+		if ( $_REQUEST['notice_id'] == 'patreon-critical-issues' ) {
+			update_option( 'patreon-critical-issues', true );
+			
+			// Set the last notice shown date
+			self::set_last_system_notice_shown_date();
 		}
 		
 	}
@@ -1515,11 +1523,27 @@ class Patreon_Wordpress {
 			update_option( 'patreon-redirect_to_setup_wizard', true );
 		}
 		
-	}	
+	}
+	
 	public static function check_days_after_last_non_system_notice( $days ) {
 		// Calculates if $days many days passed after last non system notice was showed. Used in deciding if and when to show admin wide notices
 		
 		$last_non_system_notice_shown_date = get_option( 'patreon-last-non-system-notice-shown-date', 0 );
+		
+		// Calculate if $days days passed since last notice was shown		
+		if ( ( time() - $last_non_system_notice_shown_date ) > ( $days * 24 * 3600 ) ) {
+			// More than $days days. Set flag
+			return true;
+		}
+
+		return false;
+		
+	}
+	
+	public static function check_days_after_last_system_notice( $days ) {
+		// Calculates if $days many days passed after last non system notice was showed. Used in deciding if and when to show admin wide notices
+		
+		$last_non_system_notice_shown_date = get_option( 'patreon-last-system-notice-shown-date', 0 );
 		
 		// Calculate if $days days passed since last notice was shown		
 		if ( ( time() - $last_non_system_notice_shown_date ) > ( $days * 24 * 3600 ) ) {
@@ -1546,6 +1570,7 @@ class Patreon_Wordpress {
 		return false;
 			
 	}
+	
 	public static function set_last_non_system_notice_shown_date() {
 		
 		// Sets the last non system notice shown date to now whenever called. Used for decicing when to show admin wide notices that are not related to functionality. 
@@ -1553,8 +1578,15 @@ class Patreon_Wordpress {
 		update_option( 'patreon-last-non-system-notice-shown-date', time() );
 			
 	}
-
 	
+	public static function set_last_system_notice_shown_date() {
+		
+		// Sets the last non system notice shown date to now whenever called. Used for decicing when to show admin wide notices that are not related to functionality. 
+		
+		update_option( 'patreon-last-system-notice-shown-date', time() );
+			
+	}
+
 	public static function populate_patreon_level_select_from_ajax() {
 		// This function accepts the ajax request from the metabox and calls the relevant function to populate the tiers select
 		

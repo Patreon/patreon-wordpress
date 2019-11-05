@@ -98,13 +98,11 @@ class Patreon_Compatibility {
 		// Wp super cache loads its options into globals
 		global $wp_cache_not_logged_in;
 		global $wp_cache_make_known_anon;
-		global $super_cache_enabled;
-	
-		// echo admin_url('options-general.php?page=wpsupercache');
+		global $cache_enabled;
 
 		$toggle_warning = false;
 		
-		if ( !is_plugin_active( 'wp-super-cache/wp-cache.php' ) OR !$super_cache_enabled ) {
+		if ( !is_plugin_active( 'wp-super-cache/wp-cache.php' ) OR !$cache_enabled ) {
 			// WP Super Cache is not on. bail out
 			return;
 		}

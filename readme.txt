@@ -4,7 +4,7 @@ Tags: patreon, membership, members
 Requires at least: 4.0
 Requires PHP: 5.3
 Tested up to: 5.2.1
-Stable tag: 1.3.7
+Stable tag: 1.3.8
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -71,6 +71,10 @@ It is  difficult to protect videos due the intensive bandwidth requirements of h
 
 == Upgrade Notice ==
 
+= 1.3.8 = 
+
+Added a health check page that allows you to see the health of your Patreon integration
+
 = 1.3.7 = 
 
 Minor internal feature update
@@ -118,6 +122,12 @@ Not at all - you can post different content totally independently at your site a
 Nothing will be changed at your site - the plugin will just connect your site to Patreon to allow communication in between your site and Patreon.
 
 == Changelog ==
+
+= 1.3.8 =
+
+* Added a health check page that shows the health of Patreon integration
+* Added compatibility checks for permalink settings and WP Super Cache settings
+* Critical issues with the integration are shown in dismissable notice that shows up on a 7 day basis when dismissed
 
 = 1.3.7 =
 
