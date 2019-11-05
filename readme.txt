@@ -128,6 +128,7 @@ Nothing will be changed at your site - the plugin will just connect your site to
 * Added a health check page that shows the health of Patreon integration
 * Added compatibility checks for permalink settings and WP Super Cache settings
 * Critical issues with the integration are shown in dismissable notice that shows up on a 7 day basis when dismissed
+* Removed the transitional image locking option check code now that it is not needed
 
 = 1.3.7 =
 

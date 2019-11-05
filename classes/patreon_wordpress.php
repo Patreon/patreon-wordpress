@@ -64,7 +64,6 @@ class Patreon_Wordpress {
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueueAdminScripts' ) );
 		add_action( 'upgrader_process_complete', 'Patreon_Wordpress::AfterUpdateActions', 10, 2 );
 		add_action( 'admin_notices', array( $this, 'AdminMessages' ) );
-		add_action( 'init', array( $this, 'transitionalImageOptionCheck' ) );
 		add_action( 'admin_init', array( $this, 'add_privacy_policy_section' ), 20 ) ;
 		add_action( 'admin_init', array( $this, 'check_setup' ), 5 ) ;
 		add_filter( 'pre_set_site_transient_update_plugins', array( $this, 'check_for_update' ) );
@@ -670,27 +669,6 @@ class Patreon_Wordpress {
 			
 		}
 		
-	}
-	public static function transitionalImageOptionCheck() {
-	
-		// This function is to enable a smooth transition for image locking option. It may be deleted in a few minor versions.
-		
-		// Check if transitional option is saved:
-		
-		if( !get_option( 'patreon-image-option-transition-done',false ) ) {
-		
-			// Doesnt exist.
-			
-			// Remove the htaccess rule
-			
-			Patreon_Protect::removePatreonRewriteRules();
-			
-			// This just disabled the image feature until it is 
-			
-			update_option( 'patreon-image-option-transition-done', true );
-			
-		}
-
 	}
 	public static function add_privacy_policy_section() {
 
