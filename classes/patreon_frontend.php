@@ -159,6 +159,10 @@ class Patreon_Frontend {
 				$button_args['redirect'] = $args['redirect'];
 				
 			}
+						
+			if ( is_feed() ) {
+				$button_args['is_feed'] = true;
+			}
 			
 			$universal_button	   = self::patreonMakeUniversalButton( $patreon_level, false, false, false, $button_args );
 			$universal_button 	   = apply_filters( 'ptrn/final_state_universal_button', '<div class="patreon-universal-button">' . $universal_button . '</div>', $patreon_level, $post );
@@ -166,6 +170,10 @@ class Patreon_Frontend {
 			$text_over_universal_button  = apply_filters( 'ptrn/final_state_label_over_universal_button', self::getLabelOverUniversalButton( $patreon_level, $args ), $patreon_level, $post );
 			
 			$text_under_universal_button = apply_filters( 'ptrn/final_state_label_under_universal_button', self::getLabelUnderUniversalButton( $patreon_level, false, false, $args ), $patreon_level, $post );
+						
+			if ( is_feed() ) {
+				$text_under_universal_button = PATREON_FEED_ACTION_TEXT;
+			}
 			
 			// Wrap all of them in a responsive div
 			
@@ -599,12 +607,15 @@ class Patreon_Frontend {
 			$flow_link_args['redirect'] = $args['redirect'];
 			$flow_link_args['post_id'] = $args['post_id'];
 			
-		}		
-			
-		$href       = self::patreonMakeCacheableFlowLink( $post, $flow_link_args );
+		}
 		
+		$href       = self::patreonMakeCacheableFlowLink( $post, $flow_link_args );
 		$label_text = self::patreonMakeUniversalButtonLabel();
 		$button     = self::patreonMakeUniversalButtonImage( $label_text );
+		
+		if ( isset( $args['is_feed'] ) ) {
+			return '';
+		}
 		
 		return apply_filters( 'ptrn/patron_button', '<a href="' . $href . '">' . $button . '</a>', $min_cents );		
 		
