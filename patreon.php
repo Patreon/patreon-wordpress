@@ -118,7 +118,7 @@ define( "PATREON_PRETTY_PERMALINKS_ARE_OFF_HEADING", 'Pretty permalinks are turn
 define( "PATREON_PRETTY_PERMALINKS_ARE_OFF", 'Pretty permalinks are off in your WP installation. This would cause content unlock flows to fail when the user is returning from Patreon.<h3>Solution</h3>Please visit <a target="_blank" href="' . admin_url( 'options-permalink.php' ) . '">permalink settings page</a> and select any option other than "Plain" and click "Save Changes". Please note that this will change the link structure of your site.' );
 define( "PATREON_LAST_50_CONNECTION_ERRORS", 'These are the last 50 connection issues encountered by your site when contacting Patreon API. These are here for general info on health of the connection of your WP site to Patreon API. They only constitute an error if there are a lot of recent ones. Healthiest integrations should have a number of them (up to 50) in the long run.' );
 define( "PATREON_LAST_50_CONNECTION_ERRORS_HEADING", 'Last 50 connection errors' );
-define( "PATREON_FEED_ACTION_TEXT", ' - Click Read more to unlock this content at the source' );
+define( "PATREON_FEED_ACTION_TEXT", ' - Click "Read more" to unlock this content at the source' );
 
 include 'classes/patreon_wordpress.php';
 
