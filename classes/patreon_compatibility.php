@@ -14,7 +14,7 @@ class Patreon_Compatibility {
 	function __construct() {
 		
 		add_action( 'init', array( $this, 'set_cache_exceptions' ) );
-		add_action( 'init', array( $this, 'set_do_not_cache_flag_for_gated_content' ) );
+		add_action( 'wp', array( $this, 'set_do_not_cache_flag_for_gated_content' ) );
 		add_action( 'admin_init', array( $this, 'check_wp_super_cache_settings' ) );
 		add_action( 'admin_init', array( $this, 'check_permalinks' ) );
 		
@@ -143,10 +143,10 @@ class Patreon_Compatibility {
 	}	
 	public function set_do_not_cache_flag_for_gated_content() {
 		
-		// This function checks if a singular content is being displayed and sets the do not cache flag if the content is gated. This is to help prevent caching plugins from caching this content. 
-		
+		// This function checks if a singular content is being displayed and sets the do not cache flag if the content is gated. This is to help prevent caching plugins from caching this content.
+
 		global $post;
-		
+
 		// Bail out if no post object present
 		if ( !$post ) {
 			return;
