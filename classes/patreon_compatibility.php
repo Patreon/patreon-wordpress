@@ -144,6 +144,12 @@ class Patreon_Compatibility {
 	public function set_do_not_cache_flag_for_gated_content() {
 		
 		// This function checks if a singular content is being displayed and sets the do not cache flag if the content is gated. This is to help prevent caching plugins from caching this content.
+		
+		// Check if we are to try preventing caching of gated content
+		
+		if ( get_option( 'patreon-prevent-caching-gated-content', 'yes' ) != 'yes' ) {
+			return;
+		}
 
 		global $post;
 
@@ -156,7 +162,7 @@ class Patreon_Compatibility {
 		if ( !is_singular() ) {
 			return;
 		}
-		
+
 		// We are here, it means that this is singular content. Check if it is meant to be gated
 		
 		$gate_content = false;
