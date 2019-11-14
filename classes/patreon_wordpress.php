@@ -15,6 +15,7 @@ class Patreon_Wordpress {
 	private static $Patron_Metabox;
 	private static $Patron_Compatibility;
 	private static $Patreon_User_Profiles;
+	private static $Patreon_Admin_Pointers;
 	public static $current_user_pledge_amount = -1;
 	public static $current_user_patronage_declined = -1;
 	public static $current_user_is_patron = -1;
@@ -37,15 +38,24 @@ class Patreon_Wordpress {
 		include 'patreon_user_profiles.php';
 		include 'patreon_protect.php';
 		include 'patreon_compatibility.php';
+		include 'patreon_admin_pointers.php';
 
-		self::$Patreon_Routing       = new Patreon_Routing;
-		self::$Patreon_Frontend      = new Patreon_Frontend;
-		self::$Patreon_Options       = new Patreon_Options;
-		self::$Patron_Metabox        = new Patron_Metabox;
-		self::$Patreon_User_Profiles = new Patreon_User_Profiles;
-		self::$Patreon_Protect       = new Patreon_Protect;
-		self::$Patron_Compatibility  = new Patreon_Compatibility;
-
+		self::$Patreon_Routing        = new Patreon_Routing;
+		self::$Patreon_Frontend       = new Patreon_Frontend;
+		
+		if ( is_admin() ) {
+			self::$Patreon_Options        = new Patreon_Options;
+			self::$Patron_Metabox         = new Patron_Metabox;
+		}
+		
+		self::$Patreon_User_Profiles  = new Patreon_User_Profiles;
+		self::$Patreon_Protect        = new Patreon_Protect;
+		self::$Patron_Compatibility   = new Patreon_Compatibility;
+		
+		if ( is_admin() ) {
+			self::$Patreon_Admin_Pointers = new Patreon_Admin_Pointers;	
+		}
+		
 		add_action( 'wp_head', array( $this, 'updatePatreonUser' ) );
 		add_action( 'init', array( $this, 'checkPatreonCreatorID' ) );
 		add_action( 'init', array( $this, 'check_creator_tiers' ) );
@@ -623,6 +633,7 @@ class Patreon_Wordpress {
 	}
 	public static function enqueueAdminScripts() {
 		
+		wp_enqueue_script( 'patreon-admin-js', PATREON_PLUGIN_ASSETS . '/js/admin.js', array( 'jquery' ), PATREON_WORDPRESS_VERSION, true );
 		wp_enqueue_script( 'patreon-admin-js', PATREON_PLUGIN_ASSETS . '/js/admin.js', array( 'jquery' ), PATREON_WORDPRESS_VERSION, true );
 
 	}
