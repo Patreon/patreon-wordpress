@@ -22,7 +22,8 @@ class Patreon_Options {
 		
         add_menu_page( 'Patreon Settings', 'Patreon Settings', 'manage_options', 'patreon-plugin', array( $this, 'patreon_plugin_setup_page' ), PATREON_PLUGIN_ASSETS . '/img/Patreon WordPress.png' );
 
-		add_submenu_page ( '', 'Patreon Settings', 'Patreon Settings', 'administrator', 'patreon_wordpress_setup_wizard', array('Patreon_Wordpress', 'setup_wizard'), '/img/Patreon WordPress.png' );
+		add_submenu_page( '', 'Patreon Settings', 'Patreon Settings', 'administrator', 'patreon_wordpress_setup_wizard', array('Patreon_Wordpress', 'setup_wizard') );
+		
 		add_submenu_page( null, 'Patreon WordPress Admin Message', 'Admin message', 'manage_options', 'patreon-plugin-admin-message', array( $this, 'patreon_plugin_admin_message_page' ) );
 
 		add_submenu_page( 'patreon-plugin', 'Patreon WordPress Health Check', 'Health check', 'manage_options', 'patreon-plugin-health', array( $this, 'patreon_plugin_health_check_page' ) );
