@@ -52,6 +52,7 @@ class Patreon_Options {
         register_setting( 'patreon-options', 'patreon-lock-entire-site' );
         register_setting( 'patreon-options', 'patreon-custom-universal-banner' );
         register_setting( 'patreon-options', 'patreon-custom-page-name' );
+        register_setting( 'patreon-options', 'patreon-prevent-caching-gated-content' );
 		
     }
 	
@@ -270,6 +271,32 @@ class Patreon_Options {
 											</th>
 											<td>
 												<input type="text" name="patreon-custom-page-name" value="<?php echo get_option( 'patreon-custom-page-name' ); ?>" />
+											</td>
+                                        </tr>
+
+                                        <tr valign="top">
+											<th scope="row">
+												<strong>Prevent caching of gated content</strong>
+												<div class="patreon-options-info">If on, PW will try to prevent gated content from being cached in order to prevent users from seeing cached gated content despite they already unlocked the gated content. Recommended: on</div>
+											</th>
+											<td>
+												<?php
+																									
+													$prevent_caching_checked = '';
+													$do_not_prevent_caching_checked = '';
+													
+													if ( get_option( 'patreon-prevent-caching-gated-content', 'yes' ) == 'yes' ) {
+														$prevent_caching_checked = " checked";
+													}
+													else {
+														$do_not_prevent_caching_checked = " checked";
+													}
+												
+												?>
+												<select name="patreon-prevent-caching-gated-content">
+													<option value="yes" <?php echo $prevent_caching_checked; ?>>Yes</option>
+													<option value="no" <?php echo $do_not_prevent_caching_checked; ?>>No</option>
+												</select>
 											</td>
                                         </tr>
 
