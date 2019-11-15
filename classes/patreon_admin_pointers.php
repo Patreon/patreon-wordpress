@@ -86,7 +86,7 @@ class Patreon_Admin_Pointers {
 			'options' => array(
 				'content' => sprintf( '<h3> %s </h3> <p> %s </p>',
 			'New Patreon setting',
-					'Your Patreon integration now tries to prevent caching of your gated content. This helps users to access content they unlock easier by preventing them from seeing cached locked version of your content. If you need to turn off this feature you can set "Prevent caching of gated content" option to "No".'
+					'Your Patreon integration now tries to prevent caching of your gated content. This will help users to access the content they unlocked easily instead of still seeing the locked version that was cached. If you need to turn off this feature you can set "Prevent caching of gated content" option to "No".'
 				),
 				'position' => array( 'edge' => 'top', 'align' => 'middle' )
 			)
