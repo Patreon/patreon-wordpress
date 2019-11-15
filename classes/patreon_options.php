@@ -278,7 +278,7 @@ class Patreon_Options {
                                         <tr valign="top">
 											<th scope="row">
 												<strong>Prevent caching of gated content</strong>
-												<div class="patreon-options-info">If on, PW will try to prevent gated content from being cached in order to prevent users from seeing cached gated content despite they already unlocked the gated content. Recommended: on</div>
+												<div class="patreon-options-info">If Yes, PW will try to prevent gated content from being cached in order to prevent users from still seeing cached version of gated content after unlocking it. Recommended: Yes</div>
 											</th>
 											<td>
 												<?php

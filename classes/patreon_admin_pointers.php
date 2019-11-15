@@ -14,7 +14,7 @@ class Patreon_Admin_Pointers {
 	public function __construct() {
 		
 		add_action( 'admin_enqueue_scripts',  array( $this, 'load_pointers' ) );
-		add_filter( 'patreon-admin-pointers-dashboard', array( &$this, 'widgets_pointer' ) );
+		add_filter( 'patreon-admin-pointers-dashboard', array( &$this, 'cache_option_pointer' ) );
 	}
 	
 	public function load_pointers( $hook_suffix ) {
@@ -69,14 +69,24 @@ class Patreon_Admin_Pointers {
 	
 	// Pointers start here
 	
-	public function widgets_pointer( $pointers ) {
+	public function cache_option_pointer( $pointers ) {
+		
+		// We want this pointer to appear only for existing installations at the date of publication of this version (1.3.9). 2 months after release of this version, this pointer can be removed.
+		
+		$plugin_activated =	get_option( 'patreon-plugin-first-activated' );
+		
+		// If the plugin activation was not before release date of this version, bail out. Time nudged 5 hours ahead to make sure
+		
+		if ( $plugin_activated > 1573870261 ) {
+			return;
+		}
 		
 		$pointers['patreon_test_pointer'] = array(
-			'target' => '#menu-appearance',
+			'target' => '#toplevel_page_patreon-plugin',
 			'options' => array(
 				'content' => sprintf( '<h3> %s </h3> <p> %s </p>',
-					'Pointer Title',
-					'Pointer Message'
+			'New Patreon setting',
+					'Your Patreon integration now tries to prevent caching of your gated content. This helps users to access content they unlock easier by preventing them from seeing cached locked version of your content. If you need to turn off this feature you can set "Prevent caching of gated content" option to "No".'
 				),
 				'position' => array( 'edge' => 'top', 'align' => 'middle' )
 			)

@@ -3,8 +3,8 @@ Contributors: wordpressorg@patreon.com, codebard
 Tags: patreon, membership, members
 Requires at least: 4.0
 Requires PHP: 5.3
-Tested up to: 5.2.1
-Stable tag: 1.3.8
+Tested up to: 5.3
+Stable tag: 1.3.9
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -71,6 +71,10 @@ It is  difficult to protect videos due the intensive bandwidth requirements of h
 
 == Upgrade Notice ==
 
+= 1.3.9 = 
+
+PW now prevents caching of gated content to make sure unlocked content unlocks
+
 = 1.3.8 = 
 
 Added a health check page that allows you to see the health of your Patreon integration
@@ -122,6 +126,14 @@ Not at all - you can post different content totally independently at your site a
 Nothing will be changed at your site - the plugin will just connect your site to Patreon to allow communication in between your site and Patreon.
 
 == Changelog ==
+
+= 1.3.9 =
+
+* Plugin will now try preventing caching of gated content. This will help users to access the content they unlocked instead of still seeing the cached locked version. Has option to turn on/off
+* Added admin pointers to help users navigate plugin related info
+* Added admin pointer for new cache option
+* Formatted gated content feed items to have proper html
+* Fixed WP 5.3 causing add_submenu_page parameter notice
 
 = 1.3.8 =
 
