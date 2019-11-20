@@ -597,7 +597,19 @@ class Patreon_Protect {
 			return;
 		}
 		
+		// Check if htaccess exists, bail out if not
+		
+		if ( !file_exists( ABSPATH . '.htaccess' ) ) {
+			return;
+		}
+				
 		$htaccess = file_get_contents( ABSPATH . '.htaccess' );
+		
+		// First remove the rules.
+		
+		self::removePatreonRewriteRules();
+		
+		// Move on to adding the rules, this will refresh the rules as well
 		
 		$upload_locations = wp_upload_dir();
 
@@ -617,6 +629,12 @@ RewriteRule ^" . $upload_dir . "/(.*)$ index.php?patreon_action=serve_patron_onl
 		
 	}
 	public static function removePatreonRewriteRules() {
+		
+		// Check if htaccess exists, bail out if not
+		
+		if ( !file_exists( ABSPATH . '.htaccess' ) ) {
+			return;
+		}		
 		
 		$htaccess = file_get_contents( ABSPATH . '.htaccess' );
 		

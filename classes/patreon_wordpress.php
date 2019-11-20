@@ -81,8 +81,7 @@ class Patreon_Wordpress {
 		add_action( 'wp_ajax_patreon_wordpress_toggle_option', array( $this, 'toggle_option' ), 10, 1 );
 		add_action( 'wp_ajax_patreon_wordpress_populate_patreon_level_select', array( $this, 'populate_patreon_level_select_from_ajax' ), 10, 1 );
 		add_action( 'plugin_action_links_' . PATREON_WORDPRESS_PLUGIN_SLUG, array( $this, 'add_plugin_action_links' ), 10, 1 );
-
-
+		
 	}
 	public static function getPatreonUser( $user ) {
 
@@ -1512,6 +1511,34 @@ class Patreon_Wordpress {
 			update_option( 'patreon-redirect_to_setup_wizard', true );
 		}
 		
+		// Check and add rewrite rules for image/file locking if enabled and not present. Will check if .htaccess exists, will check if rules are present, add if not and refresh if so
+		
+		Patreon_Protect::addPatreonRewriteRules();
+		
+	}
+	
+	public static function deactivate() {
+		
+		// Kicks in after deactivation of the plugin and does necessary actions
+		
+		// Remove Image/file protection related htaccess rules if they were added
+		
+		remove_action( 'generate_rewrite_rules', array( 'Patreon_Routing', 'add_rewrite_rules' ) );
+
+		// Check if the string is present in the file:
+		
+		if ( file_exists( ABSPATH . '.htaccess' ) ) {
+
+			if ( strpos( file_get_contents( ABSPATH . '.htaccess' ), '# BEGIN Patreon WordPress Image Protection' ) !== false  ) {
+				
+				global $wp_rewrite;
+				Patreon_Protect::removePatreonRewriteRules();
+				$wp_rewrite->flush_rules();
+				
+			}
+			
+		} 
+
 	}
 	
 	public static function check_days_after_last_non_system_notice( $days ) {
