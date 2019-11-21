@@ -641,6 +641,11 @@ RewriteRule ^" . $upload_dir . "/(.*)$ index.php?patreon_action=serve_patron_onl
 		$start_marker = '# BEGIN Patreon WordPress Image Protection';
 		$end_marker   = '# END Patreon WordPress';
 		
+		// Check if rules are in htaccess
+		if ( strpos( $htaccess, $start_marker ) === false  ) {
+			return;
+		}
+		
 		$start = strpos( $htaccess, $start_marker );
 		$end   = strpos( $htaccess, $end_marker );
 		

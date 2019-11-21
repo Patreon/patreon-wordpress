@@ -1525,20 +1525,10 @@ class Patreon_Wordpress {
 		
 		remove_action( 'generate_rewrite_rules', array( 'Patreon_Routing', 'add_rewrite_rules' ) );
 
-		// Check if the string is present in the file:
+		// Remove htaccess rules if they are in
 		
-		if ( file_exists( ABSPATH . '.htaccess' ) ) {
-
-			if ( strpos( file_get_contents( ABSPATH . '.htaccess' ), '# BEGIN Patreon WordPress Image Protection' ) !== false  ) {
-				
-				global $wp_rewrite;
-				Patreon_Protect::removePatreonRewriteRules();
-				$wp_rewrite->flush_rules();
-				
-			}
-			
-		} 
-
+		Patreon_Protect::removePatreonRewriteRules();
+		
 	}
 	
 	public static function check_days_after_last_non_system_notice( $days ) {
