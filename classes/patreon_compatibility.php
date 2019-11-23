@@ -174,8 +174,24 @@ class Patreon_Compatibility {
 		}
 		
 		if ( $gate_content ) {
-			// Content is set to be gated. Pop the do not cache flag
+			
+			// General caching plugin define  - Prevents caching of non cached pages
 			define( 'DONOTCACHEPAGE', true );
+			
+			// WP Super Cache - disables cache for already cached pages
+			define( 'WPSC_SERVE_DISABLED', true );
+			
+			// W3 Total Cache - do not minify JS in gated page
+			define( 'DONOTMINIFY', true );
+			
+			// W3 Total Caache - Do not serve gated page from CDN
+			define( 'DONOTCDN', true );
+			
+			// W3 Total Cache - Do not use object cache for gated page
+			define( 'DONOTCACHCEOBJECT', true );
+			
+			// Litespeed Cache - Equal to DONOTCACHEPAGE flag
+			define('LSCACHE_NO_CACHE', true);
 		}
 		
 	}
