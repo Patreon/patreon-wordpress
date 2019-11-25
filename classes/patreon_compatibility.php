@@ -17,6 +17,8 @@ class Patreon_Compatibility {
 		add_action( 'wp', array( $this, 'set_do_not_cache_flag_for_gated_content' ) );
 		add_action( 'admin_init', array( $this, 'check_wp_super_cache_settings' ) );
 		add_action( 'admin_init', array( $this, 'check_permalinks' ) );
+		// Hook to template_redirect filter so the $post object will be ready before sending headers - add_headers hook wont work
+		add_filter( 'template_redirect', array( $this, 'modify_headers' ), 99 );
 		
 	}
 
@@ -195,4 +197,46 @@ class Patreon_Compatibility {
 		}
 		
 	}
+	public function modify_headers() {
+		
+		// This function checks if a singular content is being displayed and sets cache control headers if the content is gated. This is to help prevent caching of this content.
+		
+		// Check if we are to try preventing caching of gated content
+		
+		if ( get_option( 'patreon-prevent-caching-gated-content', 'yes' ) != 'yes' ) {
+			return;
+		}
+
+		global $post;
+
+		// Bail out if no post object present
+		if ( !$post ) {
+			return;
+		}
+
+		// Bail out if not a singular page/post
+		if ( !is_singular() ) {
+			return;
+		}
+
+		// We are here, it means that this is singular content. Check if it is meant to be gated
+		
+		$gate_content = false;
+		
+		$lock_or_not = Patreon_Wordpress::lock_or_not( $post->ID );
+
+		if ( isset( $lock_or_not['lock'] ) ) {
+			$gate_content = $lock_or_not['lock'];			
+		}
+
+		if ( $gate_content ) {
+			
+			// Set the content to be revalidated if 30 seconds passed since the request and to only be cached by browsers/devices
+
+			header( "Cache-control: private, max-age=30, no-cache" );
+		
+		}
+		
+	}
+	
 }

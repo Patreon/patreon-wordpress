@@ -16,13 +16,6 @@ class Patreon_Routing {
 		
 	}
 
-	public static function activate() {
-		
-		global $wp_rewrite;
-		$wp_rewrite->flush_rules();
-		
-	}
-
 	function force_rewrite_rules() {
 		
 		global $wp_rewrite;

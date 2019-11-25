@@ -1515,6 +1515,9 @@ class Patreon_Wordpress {
 		
 		Patreon_Protect::addPatreonRewriteRules();
 		
+		global $wp_rewrite;
+		$wp_rewrite->flush_rules();
+		
 	}
 	
 	public static function deactivate() {
@@ -1528,6 +1531,9 @@ class Patreon_Wordpress {
 		// Remove htaccess rules if they are in
 		
 		Patreon_Protect::removePatreonRewriteRules();
+		
+		global $wp_rewrite;
+		$wp_rewrite->flush_rules();
 		
 	}
 	
