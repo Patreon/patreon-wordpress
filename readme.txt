@@ -4,7 +4,7 @@ Tags: patreon, membership, members
 Requires at least: 4.0
 Requires PHP: 5.3
 Tested up to: 5.3
-Stable tag: 1.3.9
+Stable tag: 1.4.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -126,6 +126,14 @@ Not at all - you can post different content totally independently at your site a
 Nothing will be changed at your site - the plugin will just connect your site to Patreon to allow communication in between your site and Patreon.
 
 == Changelog ==
+
+= 1.4.0 =
+
+* Added no-cache HTTP header to prevent caching of gated content
+* More efficient and smooth addition/removal of image locking feature related htaccess rules
+* Universal deactivate function
+* Rewrite rules flushed upon activate/deactivate
+* Added filter for raw text of label over interface button
 
 = 1.3.9 =
 
