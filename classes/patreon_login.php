@@ -229,6 +229,9 @@ class Patreon_Login {
 		
 		// At this point lets do a check for existing email if the email is going to be imported:
 		
+		// Default email to random complex string so get_user_by search will fail if email doesnt come from Patreon. SHA256
+		$check_user_email = 'F01F2C59D413DB4B63882B0F25EB5FDD621946A99F6A2D6C2F8D26C1D600584F';
+		
 		if ( isset( $user_response['data']['attributes']['is_email_verified'] ) AND $user_response['data']['attributes']['is_email_verified'] ) {
 			$check_user_email = $user_response['data']['attributes']['email'];
 		}		
