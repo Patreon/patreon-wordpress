@@ -84,7 +84,7 @@ class Patron_Metabox {
 		<div <?php echo $advanced_post_options_toggle_status_display ?>id="patreon-wordpress-advanced-options-toggle">
 		<?php
 		
-			$label    = 'Require the below precise $ monthly membership or over to view this post. (optional - overrides the above select box when used)  <a href="https://www.patreondevelopers.com/t/patreon-wordpress-locking-options-guide/1135#heading--section-1?utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=post_locking_metabox_link_2&utm_term=" target="_blank">(?)</a>';
+			$label    = 'Require the below precise $ monthly membership or over to view this post. (optional - overrides the above select box when used)  <a href="https://www.patreondevelopers.com/t/patreon-wordpress-locking-options-guide/1135#heading--section-11?utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=post_locking_metabox_link_2&utm_term=" target="_blank">(?)</a>';
 			$readonly = '';		
 		
 			if ( !get_option( 'patreon-creator-id', false ) ) {

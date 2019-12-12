@@ -903,7 +903,10 @@ class Patreon_Wordpress {
 	}
 	
 	public static function check_api_connection() {
+		
 		// Just attempts to connect to API with given credentials, and returns result
+		
+		// Currently can verify only if creator's access token and refresh token are false. If the access token is false and refresh token is not, the system already refreshes the access token automatically. If only refresh token is false, then the existing correct access token will check true. In future a better check should be implemented
 		
 		$api_client    = new Patreon_API( get_option( 'patreon-creators-access-token' , false ) );
         $creator_response  = $api_client->fetch_creator_info();
