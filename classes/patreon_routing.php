@@ -265,7 +265,6 @@ class Patreon_Routing {
 						'post_level' => $post_level,
 						'patreon_level' => $patreon_level,
 						'state' => $state,
-						'state' => $state,
 						'user' => wp_get_current_user(),
 					);
 					
