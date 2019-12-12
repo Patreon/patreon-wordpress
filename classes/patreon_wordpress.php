@@ -648,6 +648,8 @@ class Patreon_Wordpress {
 		// Check if this plugin was updated:
 		if ( $options['action'] == 'update' && $options['type'] == 'plugin' ) {
 			
+			$got_updated = false;
+			
 			if( isset( $options['plugins'] ) ) {
 				
 				// Multi plugin update. Iterate:
