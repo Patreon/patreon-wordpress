@@ -160,9 +160,10 @@ class Patron_Metabox {
 
 	function patreon_plugin_save_post_class_meta( $post_id, $post ) {
 
-		if ( !isset( $_POST['patreon_metabox_nonce'] ) || !wp_verify_nonce( $_POST['patreon_metabox_nonce'], basename( __FILE__ ) ) )
+		if ( !isset( $_POST['patreon_metabox_nonce'] ) || !wp_verify_nonce( $_POST['patreon_metabox_nonce'], basename( __FILE__ ) ) ) {
 			return $post_id;
-
+		}
+	
 		$post_type = get_post_type_object( $post->post_type );
 
 		if ( !current_user_can( $post_type->cap->edit_post, $post_id ) ) {
@@ -178,7 +179,7 @@ class Patron_Metabox {
 		$patreon_level = get_post_meta( $post_id, 'patreon-level', true );
 		
 		// Now, an exception for the old metabox which was moved to patreon-level-exact - if it is different from the value already saved or from 0, override the select box with its value since it would mean a specific override initiated by user.
-		
+
 		if( isset( $_POST['patreon-level-exact'] ) && is_numeric( $_POST['patreon-level-exact'] ) ) {
 			
 			if ( $_POST['patreon-level-exact'] != $patreon_level ) {
@@ -188,7 +189,7 @@ class Patron_Metabox {
 		}
 		
 		update_post_meta( $post_id, 'patreon-level', $new_patreon_level );
-
+		
 		// Handles active patrons only toggle
 		if ( isset( $_POST['patreon-active-patrons-only']) && $_POST['patreon-active-patrons-only'] != '') {
 			update_post_meta( $post_id, 'patreon-active-patrons-only', 1 );
@@ -203,20 +204,7 @@ class Patron_Metabox {
 			$new_patreon_lifetime_patronage_level = 0;
 		}
 
-		$patreon_lifetime_patronage_level = get_post_meta( $post_id, 'patreon-total-patronage-level', true );
-
-		if ( $new_patreon_lifetime_patronage_level && $patreon_lifetime_patronage_level == '' ) {
-			
-			add_post_meta( $post_id, 'patreon-total-patronage-level', $new_patreon_lifetime_patronage_level, true );
-			
-		} else if ( ( $new_patreon_lifetime_patronage_level || $new_patreon_lifetime_patronage_level == 0 || $new_patreon_lifetime_patronage_level == '0') && $new_patreon_lifetime_patronage_level != $patreon_lifetime_patronage_level ) {
-
-			update_post_meta( $post_id, 'patreon-total-patronage-level', $new_patreon_lifetime_patronage_level );
-
-		} else if ( $new_patreon_lifetime_patronage_level == '' && $patreon_level ) {
-			delete_post_meta( $post_id, 'patreon-total-patronage-level', $patreon_lifetime_patronage_level );
-		}
+		update_post_meta( $post_id, 'patreon-total-patronage-level', $new_patreon_lifetime_patronage_level );
 		
-		$patreon_lifetime_patronage_level = get_post_meta( $post_id, 'patreon-total-patronage-level', true );
 	}
 }
