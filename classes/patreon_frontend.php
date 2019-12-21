@@ -268,7 +268,7 @@ class Patreon_Frontend {
 				
 				if ( isset( $args['patreon_active_patrons_only'] ) AND $args['patreon_active_patrons_only'] == 1 ) {
 					// Double condition - has both active patron and total patronage conditions. Override text
-					$label = PATREON_TEXT_OVER_BUTTON_10;
+					$label = PATREON_TEXT_OVER_BUTTON_13;
 				}
 			}			
 			
@@ -322,7 +322,7 @@ class Patreon_Frontend {
 			$label = PATREON_TEXT_OVER_BUTTON_8;
 			
 			if( isset( $args['post_total_patronage_level'] ) AND $args['post_total_patronage_level'] > 0 ) {
-				$label   = PATREON_TEXT_OVER_BUTTON_10;
+				$label   = PATREON_TEXT_OVER_BUTTON_14;
 			}
 			
 		}
@@ -1178,7 +1178,7 @@ class Patreon_Frontend {
 		
 		if( isset( $args['post_total_patronage_level'] ) AND $args['post_total_patronage_level'] > 0 ) {
 			
-			$label   = PATREON_TEXT_OVER_BUTTON_9;
+			$label   = PATREON_TEXT_OVER_BUTTON_12;
 			
 			// Double condition - override the text
 			if ( isset( $args['patreon_active_patrons_only'] ) AND $args['patreon_active_patrons_only'] == 1 ) {
