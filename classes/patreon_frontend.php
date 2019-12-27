@@ -264,7 +264,7 @@ class Patreon_Frontend {
 			}
 			
 			if( isset( $args['post_total_patronage_level'] ) AND $args['post_total_patronage_level'] > 0 ) {
-				$label   = PATREON_TEXT_OVER_BUTTON_9;
+				$label   = PATREON_TEXT_OVER_BUTTON_12;
 				
 				if ( isset( $args['patreon_active_patrons_only'] ) AND $args['patreon_active_patrons_only'] == 1 ) {
 					// Double condition - has both active patron and total patronage conditions. Override text

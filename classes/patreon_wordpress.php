@@ -530,7 +530,11 @@ class Patreon_Wordpress {
 		$pledge_days   = false;
 		$user_response = self::getPatreonUser( $user );
 		
-		return strtotime( $user_response['included'][0]['attributes']['pledge_relationship_start'] );
+		if ( isset( $user_response['included'][0]['attributes']['pledge_relationship_start'] ) ) {
+			return strtotime( $user_response['included'][0]['attributes']['pledge_relationship_start'] );			
+		}
+		
+		return 0;
 		
 	}
 	public static function get_user_lifetime_patronage( $user = false ) {
