@@ -194,6 +194,13 @@ class Patreon_Compatibility {
 			
 			// Litespeed Cache - Equal to DONOTCACHEPAGE flag
 			define('LSCACHE_NO_CACHE', true);
+			
+			// WP Fastest Cache compatibility - prevents page from being served from cache.
+			
+			if ( $this->check_if_plugin_active( 'wp-fastest-cache/wpFastestCache.php' ) ) {
+				wpfc_exclude_current_page();
+			}
+			
 		}
 		
 	}
@@ -236,6 +243,39 @@ class Patreon_Compatibility {
 			header( "Cache-control: private, max-age=30, no-cache" );
 		
 		}
+		
+	}
+	public function check_if_plugin_active( $plugin_slug ) {
+		
+		// This function is used for checking for plugins without using is_plugin_active() or get_plugins() functions and having to include plugin.php WP include at early hooks. 
+				
+		// Including plugin.php at early hooks may cause issues with other plugins which include that WP file.  functions due to the fact that if we include wp-admin/includes/plugin.php at an early hook like wp hook, it may cause issues with other plugins which may be including that file.
+		
+		// Check if file exists in plugins folder first.
+		
+		if ( !file_exists( WP_PLUGIN_DIR . '/' . $plugin_slug ) ) {
+			
+			// Not even installed. Bail out
+			return false;			
+			
+		}
+		
+		// At this point we know plugin is installed. Check if it is active
+		
+		$active_plugins = get_option( 'active_plugins' );
+		
+		// Iterate and check for matching slug
+		
+		foreach ( $active_plugins as $key => $value ) {
+			if ( $active_plugins[$key] == $plugin_slug ) {
+				// Matches, active. Return true
+				return true;
+			}
+		}
+		
+		// Here and no matching slug. Plugin is not active.
+		
+		return false;
 		
 	}
 	
