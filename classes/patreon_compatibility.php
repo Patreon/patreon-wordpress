@@ -197,7 +197,7 @@ class Patreon_Compatibility {
 			
 			// WP Fastest Cache compatibility - prevents page from being served from cache.
 			
-			if ( $this->check_if_plugin_active( 'wp-fastest-cache/wpFastestCache.php' ) ) {
+			if ( $this->check_if_plugin_active( 'wp-fastest-cache/wpFastestCache.php' ) AND function_exists( 'wpfc_exclude_current_page' ) ) {
 				wpfc_exclude_current_page();
 			}
 			
