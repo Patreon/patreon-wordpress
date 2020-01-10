@@ -103,6 +103,8 @@ class Patreon_Frontend {
 			return $override_interface['interface'];			
 		}
 		
+		$post = false;
+		
 		// Get the post from post id if it is supplied
 		if ( isset( $args['post_id'] ) ) {
 			$post = get_post( $args['post_id'] );			
@@ -560,10 +562,10 @@ class Patreon_Frontend {
 						
 		if ( isset( $args['direct_unlock'] ) ) {
 			
-			unset($post);
+			$post = false;
 			
 			// Set the post to the id if it is given:
-			if ( $args['post_id'] != '' ) {
+			if ( isset( $args['post_id'] ) AND $args['post_id'] != '' ) {
 				$post = get_post( $args['post_id'] );
 			}
 		
@@ -607,7 +609,10 @@ class Patreon_Frontend {
 			// If direct unlock request is given, set cacheable flow link vars.
 			$flow_link_args['direct_unlock'] = $args['direct_unlock'];
 			$flow_link_args['redirect'] = $args['redirect'];
-			$flow_link_args['post_id'] = $args['post_id'];
+			
+			if ( isset( $args['post_id'] ) ) {
+				$flow_link_args['post_id'] = $args['post_id'];
+			}
 			
 		}
 		
@@ -1040,7 +1045,10 @@ class Patreon_Frontend {
 		if ( !$post_id ) {
 			
 			global $post;
-			$post_id = $post->ID;
+			
+			if ( isset( $post ) AND is_object( $post ) ) {			
+				$post_id = $post->ID;
+			}
 			
 		}
 		
@@ -1400,6 +1408,13 @@ class Patreon_Frontend {
 		// Return the value
 		
 		return $creator_interface_name;
+	}
+	public static function gate_custom_content( $patreon_level ) {
+		
+		// This function gates any part of a WP website using $ level. It is a wrapper function that is to be used as an easy version of custom locking code
+		
+		
+		
 	}
 	
 }

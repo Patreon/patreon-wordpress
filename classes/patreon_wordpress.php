@@ -1083,7 +1083,7 @@ class Patreon_Wordpress {
 		// Enables 3rd party plugins to modify the post types excluded from locking
 		$exclude = apply_filters( 'ptrn/filter_excluded_posts', $exclude );
 
-		if ( in_array( get_post_type( $post->ID ), $exclude ) ) {
+		if ( isset( $post->ID ) AND in_array( get_post_type( $post->ID ), $exclude ) ) {
 			
 			return self::add_to_lock_or_not_results( $post_id, apply_filters( 
 					'ptrn/lock_or_not', 
@@ -1105,8 +1105,12 @@ class Patreon_Wordpress {
 		
 		// Check if specific level is given for this post:
 		
-		$post_level = get_post_meta( $post->ID, 'patreon-level', true );
+		$post_level = '';
 		
+		if ( isset( $post->ID ) ) {
+			$post_level = get_post_meta( $post->ID, 'patreon-level', true );
+		}
+				
 		// get post meta returns empty if no value is found. If so, set the value to 0.
 		
 		if ( $post_level == '' ) {
