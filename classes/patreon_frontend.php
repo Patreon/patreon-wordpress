@@ -1436,8 +1436,9 @@ class Patreon_Frontend {
 		// If the user has less patronage than $patreon_level, or declined, and is not an admin-level user, lock the post.
 
 		if ( ( $user_patronage < ( $patreon_level * 100) OR $declined ) AND !current_user_can( 'manage_options' ) ) {
-						// Generate the unlock interface wherever it is
-			 return Patreon_Frontend::displayPatreonCampaignBanner(
+			
+			// Generate the unlock interface wherever it is
+			return Patreon_Frontend::displayPatreonCampaignBanner(
 				$patreon_level, 
 				array( 'direct_unlock' => $patreon_level, 
 					   'redirect' => $redir                                                
