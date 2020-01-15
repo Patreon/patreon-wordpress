@@ -276,6 +276,10 @@
 	display:none;
 }
 
+#patreon_options_app_details_connect{
+	display:none;
+}
+
 .patreon_admin_health_content_box {
 	
 	display: block;

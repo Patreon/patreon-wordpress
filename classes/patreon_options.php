@@ -104,6 +104,18 @@ class Patreon_Options {
 									
 										<button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon-connection-details">Connection details</button><?php // Immediately inserted here to not cause any funny html rendering
 										
+										if (   
+											( !get_option( 'patreon-client-id', false ) OR get_option( 'patreon-client-id' , false ) == '' ) AND
+											( !get_option( 'patreon-client-secret', false ) OR get_option( 'patreon-client-secret' , false ) == '' ) AND
+											( !get_option( 'patreon-creators-access-token', false ) OR get_option( 'patreon-creators-access-token' , false ) == '' ) AND
+											( !get_option( 'patreon-creators-refresh-token', false ) OR get_option( 'patreon-creators-refresh-token' , false ) == '' )
+										) {
+											?> <button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon_options_app_details_connect patreon_options_app_details_main">Connect site</button> 
+											<?php
+										
+										}
+																			
+										
 										if (   get_option( 'patreon-client-id', false ) 
 											&& get_option( 'patreon-client-secret', false ) 
 											&& get_option( 'patreon-creators-access-token' , false )
@@ -121,6 +133,12 @@ class Patreon_Options {
 										
 									</div>
 									
+									<div id="patreon_options_app_details_connect">
+								
+										We will now connect your site to Patreon by running connection wizard. Before starting, please make sure you deleted any existing app for this site in <a href="https://www.patreon.com/portal/registration/register-clients" target="_blank">this page at Patreon</a><br /><br />
+										<button id="patreon_wordpress_reconnect_to_patreon" class="button button-primary button-large" target="<?php echo admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=0' ); ?>">Start connection wizard</button> <button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon_options_app_details_connect patreon_options_app_details_main">Cancel</button>
+										
+									</div>
 									<div id="patreon_options_app_details_reconnect">
 								
 										We will now reconnect your site to Patreon. This will refresh your site's connection to Patreon. Your settings and content gating values will remain unchanged. Patron only content will become accessible to everyone until you finish reconnecting your site to Patreon.<br /><br />
