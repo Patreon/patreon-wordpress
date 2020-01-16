@@ -58,16 +58,27 @@ class Patreon_OAuth {
 		);
 
 		$response = wp_remote_post( $api_endpoint, $api_request );
-		
+				
 		if ( is_wp_error( $response ) ) {
 			
 			$result                    = array( 'error' => $response->get_error_message() );
 			$GLOBALS['patreon_notice'] = $response->get_error_message();
+			
+			Patreon_Wordpress::log_connection_error( $GLOBALS['patreon_notice'] );
+			
 			return $result;
 			
-		}	
-		
+		}
+
 		$response_decoded = json_decode( $response['body'], true );
+		
+		// Log the connection as having error if the return is not 200
+		
+		if ( isset( $response['response']['code'] ) AND $response['response']['code'] != '200' )  {
+			
+			Patreon_Wordpress::log_connection_error( 'Response code: ' . $response['response']['code'] . ' Response :' . $response['body'] );
+			
+		}
 		
 		if ( is_array( $response_decoded ) ) {
 			return $response_decoded;

@@ -16,7 +16,13 @@ class Patreon_Login {
 		update_user_meta($user_id, 'patreon_user', $user_response['data']['attributes']['vanity']);
 		update_user_meta($user_id, 'patreon_user_id', $user_response['data']['id']);
 		update_user_meta($user_id, 'patreon_last_logged_in', time());
-		update_user_meta($user_id, 'patreon_created', $user_response['data']['attributes']['created']);
+		
+		$patreon_created = '';
+		if ( isset( $user_response['data']['attributes']['created'] ) ) {
+			$patreon_created = $user_response['data']['attributes']['created'];
+		}
+
+		update_user_meta($user_id, 'patreon_created', $patreon_created);
 		update_user_meta($user_id, 'patreon_token_minted', microtime());
 		update_user_meta($user_id, 'patreon_token_expires_in', $tokens['expires_in']);
 		
@@ -223,7 +229,10 @@ class Patreon_Login {
 		
 		// At this point lets do a check for existing email if the email is going to be imported:
 		
-		if ( $user_response['data']['attributes']['is_email_verified'] ) {
+		// Default email to random complex string so get_user_by search will fail if email doesnt come from Patreon. SHA256
+		$check_user_email = 'F01F2C59D413DB4B63882B0F25EB5FDD621946A99F6A2D6C2F8D26C1D600584F';
+		
+		if ( isset( $user_response['data']['attributes']['is_email_verified'] ) AND $user_response['data']['attributes']['is_email_verified'] ) {
 			$check_user_email = $user_response['data']['attributes']['email'];
 		}		
 		

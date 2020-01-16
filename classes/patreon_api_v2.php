@@ -9,7 +9,7 @@ if( !defined( 'ABSPATH' ) ) {
 
 class Patreon_API {
 
-	private $access_token;
+	public $access_token;
 
 	public function __construct( $access_token ) {
 		$this->access_token = $access_token;
@@ -132,7 +132,7 @@ class Patreon_API {
 		return $this->__get_json( "clients/".$client_id, $args );
 	}
 		
-	private function __get_json( $suffix, $args = array() ) {
+	public function __get_json( $suffix, $args = array() ) {
 		
 		// Defaults
 		
@@ -189,9 +189,18 @@ class Patreon_API {
 			
 			$result                    = array( 'error' => $response->get_error_message() );
 			$GLOBALS['patreon_notice'] = $response->get_error_message();
+			
+			Patreon_Wordpress::log_connection_error( $GLOBALS['patreon_notice'] );
+			
 			return $result;
 			
 		}
+
+		// Log the connection as having error if the return is not 200
+		
+		if ( isset( $response['response']['code'] ) AND $response['response']['code'] != '200' AND $response['response']['code'] != '201' )  {
+			Patreon_Wordpress::log_connection_error( 'Response code: ' . $response['response']['code'] . ' Response :' . $response['body'] );
+		}	
 		
 		// Return full result if full result was requested
 		if ( $return_result_format == 'full' ) {

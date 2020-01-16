@@ -21,8 +21,13 @@ class Patreon_Options {
     function patreon_plugin_setup(){
 		
         add_menu_page( 'Patreon Settings', 'Patreon Settings', 'manage_options', 'patreon-plugin', array( $this, 'patreon_plugin_setup_page' ), PATREON_PLUGIN_ASSETS . '/img/Patreon WordPress.png' );
-		add_submenu_page ( '', 'Patreon Settings', 'Patreon Settings', 'administrator', 'patreon_wordpress_setup_wizard', array('Patreon_Wordpress', 'setup_wizard'), '/img/Patreon WordPress.png' );
+
+		add_submenu_page( '', 'Patreon Settings', 'Patreon Settings', 'administrator', 'patreon_wordpress_setup_wizard', array('Patreon_Wordpress', 'setup_wizard') );
+		
 		add_submenu_page( null, 'Patreon WordPress Admin Message', 'Admin message', 'manage_options', 'patreon-plugin-admin-message', array( $this, 'patreon_plugin_admin_message_page' ) );
+
+		add_submenu_page( 'patreon-plugin', 'Patreon WordPress Health Check', 'Health check', 'manage_options', 'patreon-plugin-health', array( $this, 'patreon_plugin_health_check_page' ) );
+
     }
 
     function patreon_plugin_register_settings() { 
@@ -48,6 +53,7 @@ class Patreon_Options {
         register_setting( 'patreon-options', 'patreon-lock-entire-site' );
         register_setting( 'patreon-options', 'patreon-custom-universal-banner' );
         register_setting( 'patreon-options', 'patreon-custom-page-name' );
+        register_setting( 'patreon-options', 'patreon-prevent-caching-gated-content' );
 		
     }
 	
@@ -98,6 +104,18 @@ class Patreon_Options {
 									
 										<button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon-connection-details">Connection details</button><?php // Immediately inserted here to not cause any funny html rendering
 										
+										if (   
+											( !get_option( 'patreon-client-id', false ) OR get_option( 'patreon-client-id' , false ) == '' ) AND
+											( !get_option( 'patreon-client-secret', false ) OR get_option( 'patreon-client-secret' , false ) == '' ) AND
+											( !get_option( 'patreon-creators-access-token', false ) OR get_option( 'patreon-creators-access-token' , false ) == '' ) AND
+											( !get_option( 'patreon-creators-refresh-token', false ) OR get_option( 'patreon-creators-refresh-token' , false ) == '' )
+										) {
+											?> <button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon_options_app_details_connect patreon_options_app_details_main">Connect site</button> 
+											<?php
+										
+										}
+																			
+										
 										if (   get_option( 'patreon-client-id', false ) 
 											&& get_option( 'patreon-client-secret', false ) 
 											&& get_option( 'patreon-creators-access-token' , false )
@@ -115,6 +133,12 @@ class Patreon_Options {
 										
 									</div>
 									
+									<div id="patreon_options_app_details_connect">
+								
+										We will now connect your site to Patreon by running connection wizard. Before starting, please make sure you deleted any existing app for this site in <a href="https://www.patreon.com/portal/registration/register-clients" target="_blank">this page at Patreon</a><br /><br />
+										<button id="patreon_wordpress_reconnect_to_patreon" class="button button-primary button-large" target="<?php echo admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=0' ); ?>">Start connection wizard</button> <button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon_options_app_details_connect patreon_options_app_details_main">Cancel</button>
+										
+									</div>
 									<div id="patreon_options_app_details_reconnect">
 								
 										We will now reconnect your site to Patreon. This will refresh your site's connection to Patreon. Your settings and content gating values will remain unchanged. Patron only content will become accessible to everyone until you finish reconnecting your site to Patreon.<br /><br />
@@ -133,7 +157,7 @@ class Patreon_Options {
 
                                         <tr valign="top">
 											<th scope="row"><strong></strong></th>
-											<td>You can find the oAuth client settings on Patreon <a href="https://www.patreon.com/platform/documentation/clients" target="_blank">here</a></td>
+											<td>You can find the app settings at Patreon <a href="https://www.patreon.com/platform/documentation/clients?utm_source=<?php urlencode( site_url() ) ?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=settings_screen_app_settings_link&utm_term=" target="_blank">here</a></td>
                                         </tr>
                                         <tr valign="top">
 											<th scope="row"><strong>Redirect URI</strong></th>
@@ -269,6 +293,32 @@ class Patreon_Options {
 											</td>
                                         </tr>
 
+                                        <tr valign="top">
+											<th scope="row">
+												<strong>Prevent caching of gated content</strong>
+												<div class="patreon-options-info">If Yes, PW will try to prevent gated content from being cached in order to prevent users from still seeing cached version of gated content after unlocking it. Recommended: Yes</div>
+											</th>
+											<td>
+												<?php
+																									
+													$prevent_caching_checked = '';
+													$do_not_prevent_caching_checked = '';
+													
+													if ( get_option( 'patreon-prevent-caching-gated-content', 'yes' ) == 'yes' ) {
+														$prevent_caching_checked = " checked";
+													}
+													else {
+														$do_not_prevent_caching_checked = " checked";
+													}
+												
+												?>
+												<select name="patreon-prevent-caching-gated-content">
+													<option value="yes" <?php echo $prevent_caching_checked; ?>>Yes</option>
+													<option value="no" <?php echo $do_not_prevent_caching_checked; ?>>No</option>
+												</select>
+											</td>
+                                        </tr>
+
                                     </table>
 
                                 </div>
@@ -302,8 +352,8 @@ class Patreon_Options {
 									<p>Patreon Wordpress developed by Patreon</p>
 
                                     <p><strong>SUPPORT &amp; TECHNICAL HELP</strong> <br>
-                                    We actively support this plugin on our <a href="https://www.patreondevelopers.com/c/patreon-wordpress-plugin-support" target="_blank">Patreon Wordpress Support Forum</a>.</p>
-                                    <p><strong>DOCUMENTATION</strong> <br>Technical documentation and code examples available @ <a href="https://patreon.com/apps/wordpress" target="_blank">https://patreon.com/apps/wordpress</a></p>
+                                    We actively support this plugin on our <a href="https://www.patreondevelopers.com/c/patreon-wordpress-plugin-support?utm_source=<?php urlencode( site_url() ) ?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=settings_screen_support_link&utm_term=" target="_blank">Patreon Wordpress Support Forum</a>.</p>
+                                    <p><strong>DOCUMENTATION</strong> <br>Technical documentation and code examples available @ <a href="https://patreon.com/apps/wordpress?utm_source=<?php urlencode( site_url() ) ?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=settings_screen_about_patreon_wordpress_link&utm_term=" target="_blank">https://patreon.com/apps/wordpress</a></p>
                                 </div>
 								<!-- .inside -->
 
@@ -320,7 +370,7 @@ class Patreon_Options {
                                <div class="inside">
 									<p><strong>Patron Pro</strong></p>
 
-                                    <p>Get Patron Pro addon for Patreon WordPress to increase your patrons and pledges!</p><p>Enjoy powerful features like partial post locking, sneak peeks, advanced locking methods, login lock, vip users and more.<br /><br /><a href="https://codebard.com/patron-pro-addon-for-patreon-wordpress" target="_blank">Check out all features here</a></p>
+                                    <p>Get Patron Pro addon for Patreon WordPress to increase your patrons and pledges!</p><p>Enjoy powerful features like partial post locking, sneak peeks, advanced locking methods, login lock, vip users and more.<br /><br /><a href="https://codebard.com/patron-pro-addon-for-patreon-wordpress?utm_source=<?php urlencode( site_url() ) ?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=settings_screen_patron_pro_link&utm_term=" target="_blank">Check out all features here</a></p>
                                 </div>
 								<!-- .inside -->
 
@@ -335,7 +385,7 @@ class Patreon_Options {
                                 <h2 class="hndle">GDPR compliance</h2>
 
                                <div class="inside">
-									<p>Please visit <a href="<?php echo admin_url('tools.php?wp-privacy-policy-guide=1#wp-privacy-policy-guide-patreon-wordpress'); ?>">the new WordPress privacy policy recommendation page</a> and copy & paste the section related to Patreon WordPress to your privacy policy page.<br><br>You can read our easy tutorial for GDPR compliance with Patreon WordPress <a href="https://patreon.zendesk.com/hc/en-us/articles/360004198011" target="_blank">by visiting our GDPR help page</a></p>
+									<p>Please visit <a href="<?php echo admin_url('tools.php?wp-privacy-policy-guide=1#wp-privacy-policy-guide-patreon-wordpress'); ?>">the new WordPress privacy policy recommendation page</a> and copy & paste the section related to Patreon WordPress to your privacy policy page.<br><br>You can read our easy tutorial for GDPR compliance with Patreon WordPress <a href="https://patreon.zendesk.com/hc/en-us/articles/360004198011?utm_source=<?php urlencode( site_url() ) ?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=settings_screen_gdpr_info_link&utm_term=" target="_blank">by visiting our GDPR help page</a></p>
                                 </div>
 								<!-- .inside -->
 
@@ -389,6 +439,108 @@ class Patreon_Options {
 			echo '<div id="patreon_setup_content"><h1 style="margin-top: 0px;">' . $heading . '</h1><div id="patreon_setup_message">' . $content . '</div></div>';
 		
 			echo '</div>';
+			
+	}
+	
+    function patreon_plugin_health_check_page(){
+
+		?>
+		<div class="patreon_admin_health_content_section">
+			<h1>Health check of your Patreon integration</h1>
+			Below are settings or issues which may affect your Patreon integration. Please check the recommendations and implement them to have your integration function better. You can get help for any of these items <a href="https://www.patreondevelopers.com/c/patreon-wordpress-plugin-support" target="_blank">by visiting our support forum</a> and posting a thread. 
+			<br><br>
+			You can <a href="" id="patreon_copy_health_check_output">click here</a> to copy the output of this page to share with support team or post it in the forum. <div id="patreon_copied"></div>
+			
+		</div>
+		<?php
+		
+		if ( count( Patreon_Compatibility::$site_health_info ) == 0 ) {
+		?>
+		
+		<div class="patreon_admin_health_content_box">
+		<h2>Your Patreon integration health is great!</h2>
+		</div>
+		
+		<?php
+			
+		}
+		
+		if ( count( Patreon_Compatibility::$site_health_info ) > 0 ) {
+			
+			$health_info = Patreon_Compatibility::$site_health_info;
+			
+			// Sort according to priority
+			
+			usort( $health_info, function($a, $b ) {
+				return $a['order'] - $b['order'];
+			} );
+			
+			// Add last 50 connection errors at the end.
+			
+	
+			foreach ( $health_info as $key => $value ) {
+			?>
+			
+				<div class="patreon_admin_health_content_box">
+					<div class="patreon_toggle_admin_sections" target=".patreon_admin_health_content_box_hidden"><h3><?php echo $health_info[$key]['heading'] ?><span class="dashicons dashicons-arrow-down-alt2 patreon_setting_section_toggle_icon"></span></h3></div>
+					<div class="patreon_admin_health_content_box_hidden"><?php echo $health_info[$key]['notice'] ?></div>
+				</div>
+			
+			<?php
+		
+			}
+		
+		}
+
+		// Print out the last 50 connection errors if they exist
+		?>
+		
+		<div class="patreon_admin_health_content_box">
+			<div class="patreon_toggle_admin_sections" target=".patreon_admin_health_content_box_hidden"><h3><?php echo PATREON_LAST_50_CONNECTION_ERRORS_HEADING ?><span class="dashicons dashicons-arrow-down-alt2 patreon_setting_section_toggle_icon"></span></h3></div>
+			<div class="patreon_admin_health_content_box_hidden"><?php echo PATREON_LAST_50_CONNECTION_ERRORS ?>
+				<?php 
+					$last_50_conn_errors = get_option( 'patreon-last-50-conn-errors', array() );
+					
+					if ( count( $last_50_conn_errors ) > 0 ) {
+						
+						foreach ( $last_50_conn_errors as $key => $value ) {
+							
+				
+							$days = abs( time() - $last_50_conn_errors[$key]['date']  ) / 86400 ;
+
+							echo '<br /><br /><b>' . round( $days, 2 ) . ' days ago</b><br /><br />';
+							echo $last_50_conn_errors[$key]['error'];
+							
+						}
+
+					}
+					else {
+						echo '<br /><br />No recent connection errors<br />';
+					}
+				?>
+			</div>
+			</div>
+			
+		<?php
+		
+				
+		// Output a hidden, non formatted version of the health info to be used by the users to c/p to support
+		?>
+		
+		<div id="patreon_health_check_output_for_support">
+			<?php			
+			if ( isset( $health_info ) AND is_array( $health_info ) AND count( $health_info ) > 0 ) {
+				foreach ( $health_info as $key => $value ) {
+				 echo "\r\n";
+				 echo '# '.$health_info[$key]['heading'].' #';
+				 echo "\r\n";
+				 echo str_replace( '<h3>', "\r\n# ", str_replace( '</h3>', " #\r\n", $health_info[$key]['notice'] ) );			
+				}
+			}
+		?>
+		</div>
+		
+		<?php
 		
     }
 	

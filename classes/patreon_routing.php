@@ -16,21 +16,6 @@ class Patreon_Routing {
 		
 	}
 
-	public static function activate() {
-		
-		global $wp_rewrite;
-		$wp_rewrite->flush_rules();
-		
-	}
-
-	public static function deactivate() {
-		
-		remove_action( 'generate_rewrite_rules', 'add_rewrite_rules' );
-		global $wp_rewrite;
-		$wp_rewrite->flush_rules();
-		
-	}
-
 	function force_rewrite_rules() {
 		
 		global $wp_rewrite;
@@ -122,16 +107,6 @@ class Patreon_Routing {
 				$final_redirect = wp_login_url();
 				
 				if( isset( $wp->query_vars['patreon-direct-unlock'] ) ) {
-					
-					if( !( isset($GLOBALS['patreon_enable_direct_unlocks']) AND $GLOBALS['patreon_enable_direct_unlocks'] )
-					) {
-						
-						// No locking level set for this content or the site. No point in locking. Redirect to post.
-						$final_redirect = add_query_arg( 'patreon_message', 'patreon_direct_unlocks_not_turned_on', $final_redirect );
-						wp_redirect( $final_redirect );
-						
-						exit;	
-					}					
 					
 					$patreon_level = $wp->query_vars['patreon-direct-unlock'];
 					$redirect = base64_decode( urldecode( $wp->query_vars['patreon-redirect'] ) );
@@ -243,18 +218,7 @@ class Patreon_Routing {
 						$link_interface_item = 'image_unlock_button';
 						
 					}
-		
-					if( $patreon_level == 0  
-						AND !( isset($GLOBALS['patreon_enable_direct_unlocks']) AND $GLOBALS['patreon_enable_direct_unlocks'] )
-					) {
-						
-						// No locking level set for this content or the site. No point in locking. Redirect to post.
-						$final_redirect = add_query_arg( 'patreon_message', 'patreon_no_locking_level_set_for_this_post', $final_redirect );
-						wp_redirect( $final_redirect );
-						
-						exit;	
-					}
-					
+
 					$client_id = get_option( 'patreon-client-id', false );
 				
 					if( !$client_id ) {
@@ -279,7 +243,6 @@ class Patreon_Routing {
 						'post' => $post,
 						'post_level' => $post_level,
 						'patreon_level' => $patreon_level,
-						'state' => $state,
 						'state' => $state,
 						'user' => wp_get_current_user(),
 					);

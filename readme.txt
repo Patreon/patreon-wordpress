@@ -1,38 +1,43 @@
-=== Plugin Name ===
+=== Patreon WordPress ===
 Contributors: wordpressorg@patreon.com, codebard
 Tags: patreon, membership, members
 Requires at least: 4.0
-Tested up to: 5.2.2
-Stable tag: 1.3.3
+Requires PHP: 5.4
+Tested up to: 5.3.2
+Stable tag: 1.4.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Serve patron-only posts - directly on your WordPress website.
+Connect your WordPress site and your Patreon to increase your patrons and pledges!
 
-== Description ==
+With Patreon WordPress, you can bring Patreon features to your WordPress website and integrate them to make them work together. You can even easily start posting patron-only content at your WordPress site and encourage your visitors to become your patrons to unlock your content.
 
-When a patron pledges, they can then head over to www.yourwordpresssite.com and click your “Unlock with Patreon” button to let the site know they are a patron. When you create content on WordPress you will be given the option to limit it to only paying patrons.
+You can lock any single post or all of your posts! You can also lock any custom post type. Your visitors can log into your site via Patreon, making it easier for them to use your site in addition to accessing your locked content.
 
-This plugin is maintained by Patreon. For advanced features, you can find additional premium WordPress plugins in this directory.
+Read how Lawless French increased their income <a href="https://blog.patreon.com/patreon-wordpress-plugin" target="_blank">50% in just 3 months using Patreon WordPress</a>.
 
-Read an in-depth review of this free plugin and how to <a href="https://www.elegantthemes.com/blog/tips-tricks/how-to-create-a-patreon-membership-site-on-wordpress" target="_blank">combine Patreon and WordPress part of your membership business</a> on Elegant Themes
+This plugin is developed and maintained by Patreon. 
 
-### FEATURES FOR CREATORS
+= FEATURES FOR CREATORS =
 
-- Choose a minimum pledge amount necessary to see a particular post
-- Alternatively, set a minimum pledge amount to see all posts.
+- Choose one of your tiers or a minimum pledge amount necessary to access a post or custom post
+- All patrons with pledge at or above that minimum tier will be able to access your post
+- Visitors who are not your patrons can click the "Unlock with Patreon" button on the locked post to pledge to you and access content
+- Visitors will be automatically redirected to Patreon, pledge to you and come back to your site to original unlocked post
+- Plugin will automatically log in Patreon users
+- Alternatively, you can set a minimum pledge amount to see all posts
 - Set custom HTML that non-patrons see instead of the post, prompting them to become a patron
 
-*<b>You can post entirely independently on your WordPress site from your Patreon page.*</b> There is no need for WordPress and Patreon posts to correspond to one another in content or in locked status. The choice is up to you as a creator.
+> *<b>You can post entirely independently on your WordPress site from your Patreon page.*</b> There is no need for WordPress and Patreon posts to correspond to one another in content or in locked status. The choice is up to you as a creator.
 
-Got ideas? Suggest them to the developer community on our <a href="https://www.patreondevelopers.com/t/wordpress-plugin-feature-ideas/215">Patreon WordPress Ideas Thread</a>
+Got ideas? Post them on our [Patreon WordPress Ideas Thread](https://www.patreondevelopers.com/t/wordpress-plugin-feature-ideas/215)
 
-### FEATURES FOR PATRONS
+= FEATURES FOR PATRONS =
 
-- This plugin adds a “Unlock with Patreon” button to every locked post.
-- “Unlock with Patreon” takes care of everything: whether they’re not yet a patron, need to upgrade their pledge, or already pledging enough, we’ll guide them through the process and back to your content
+- This plugin adds a "Unlock with Patreon" button to every post you lock.
+- "Unlock with Patreon" takes care of everything: whether they’re not yet a patron, need to upgrade their pledge, or already pledging enough, we’ll guide them through the process and back to your content
 
-### FEATURES FOR DEVELOPERS
+= FEATURES FOR DEVELOPERS =
 
 - Extend this free basic WordPress plugin with your own inter-operable plugins that install side by side.
 - Rapidly develop patron-only WordPress features without initial overhead
@@ -40,55 +45,187 @@ Got ideas? Suggest them to the developer community on our <a href="https://www.p
 
 Learn more in our [developer portal](https://www.patreon.com/portal).
 
-### PRICING
+= PRICING =
 
 This plugin is provided by Patreon for free.
 
-== Installation ==
-
-## Install the Patreon WordPress Plugin
+= Install the Patreon WordPress Plugin =
 
 1. Install & activate the plugin
-2. Click on ‘Patreon Settings’ to view the options page. It will look something like the below, copy the ‘Redirect URI‘ into the clip board and keep for the next step.
-![](https://c5.patreon.com/external/platform/wordpress-client.png)
-3. This plugin requires that you enable "pretty permalinks." (ie /page-name/ as opposed to ?pid=36). You can do this from the WordPress admin interface, visit Settings > Permalinks and choose any format aside from "Plain."
+2. The setup wizard will kick in, helping you to easily connect your WordPress site and Patreon in only two clicks
+3. That's it!
 
-## Generate API Credentials on Patreon.com
+Your plugin is now set up and you can start making your posts patron only!
 
-1. Ensure you are logged into Patreon, using your creator account. When it comes to testing this out you will want to have two Patreon accounts, one that acts as a patron and one being the content creator. The OAuth client needs to be created on your content creating account.
-2. Visit the [oAuth client page here](https://www.patreon.com/portal/registration/register-clients) and click "Create Client", fill out the form and add in an image URL for the icon that will appear to users when they are connecting to your website.
-3. Note the field for ‘Redirect URI‘, this should still be in your clipboard from the previous steps – if not copy/paste it exactly as it appears on the WordPress admin Patreon Settings page.
-4. Click the ‘Create Client’ button, and you should now see the new client in the list.
-5. Click the downward facing caret on the right side to expose additional information about the client
-6. You should see something like this
-![](https://c5.patreon.com/external/platform/wordpress-install-ss5.png)
-(The keys in the image are fake, doctored for this screenshot.)
+= Gating Posts =
 
-## Paste Your Credentials into WordPress
+When posting a new post or editing an existing post (or a custom post type) you will see a dropdown in the right hand column titled "Patreon Level".
 
-1. Copy and paste the Client ID and Client Secret from this page into the matching fields on the ‘Patreon Settings’ page.
-2. Copy the Client ID, Client Secret, Access Token, and Refresh Token from the top of this page into the WordPress admin Patreon Settings page.
-3. Hit ‘Update Settings’ at the bottom of the page.
-4. IMPORTANT FINAL STEP: In your WordPress admin ‘Settings’ -> ‘Permalinks’ section, click ‘Save’. This ensures your rewrite rules are flushed.
+This box shows a dropdown of your Patreon tiers. When you select a Patreon tier and then update the post, visitors will need to be your patrons from that tier level or above to be able to access that post.
 
-You should now be up and running with the Patreon WordPress plugin!
+To make a locked post public again, just choose "Everyone" from the select box and update your post.
 
-## Protecting Posts
-
-When editing a post (or a custom post type) you will see a meta box in the right column titled ‘Patreon Level’.
-
-This box contains a text field that lets you specify a minimum contribution level in dollars. This could be $1 or $1.40 or even $10000. This is entirely up to you.
-
-![](https://c5.patreon.com/external/platform/wordpress_protecting_posts_pages.png)
-
-It defaults to $0 even if left empty.
-
-## Protecting Videos
+= Protecting Videos =
 
 It is  difficult to protect videos due the intensive bandwidth requirements of hosting video  and having to rely on third parties such as Youtube or Vimeo. Youtube allows you to set videos to ‘private’ but Vimeo offers extra controls by only allowing videos to be played on specific domains. Visit this guide to [protecting your video content with Vimeo](https://help.vimeo.com/hc/en-us/articles/224817847-Privacy-settings-overview).
 
+== Upgrade Notice ==
+
+= 1.4.4 =
+
+* Added a simple way for custom gating any part of a WP site using a single function. This will allow easier gating of any part of a site via theme files.
+* Removed the formerly required 'patreon_enable_direct_unlocks' global var requirement for custom gating since now its not needed.
+* Added a 'Connect site' button to show when all Patreon connection detail fields are empty. This will allow reconnecting sites to Patreon using connection wizard.
+
+= 1.4.3 =
+
+* Added compatbility for WP Fastest Cache - now plugin will tell WP Fastest Cache to not serve a post/page from cache if the post/page is a gated one. This should make content unlocking process for patrons better in sites using WP Fastest Cache
+
+= 1.4.2 =
+
+* Updated gated post interface text to be more informative. Now non-qualifying patrons should see the reason why they dont qualify for access to a gated post
+* Fixed a minor PHP notice that non-patron Patreon users saw when they viewed a gated post after logging into WP site via Patreon
+
+= 1.4.1 =
+
+* Post meta saving code simplified
+* Help link updated
+* Credential check after credential save got minor enhancements
+* Set a default email to make sure email check fails when a user doesnt have an email verified at Patreon
+* A notice that appeared during plugin update check was fixed
+* A duplicate state var was removed
+
+= 1.4.0 =
+
+Added no-cache HTTP header to prevent caching of gated content
+More efficient and smooth addition/removal of image locking feature related htaccess rules
+Universal deactivate function
+Rewrite rules flushed upon activate/deactivate
+Added filter for raw text of label over interface button
+
+= 1.3.9 =
+
+PW now prevents caching of gated content to make sure unlocked content unlocks
+
+= 1.3.8 = 
+
+Added a health check page that allows you to see the health of your Patreon integration
+
+= 1.3.7 = 
+
+Minor internal feature update
+
+== Installation ==
+
+1. Install & activate the plugin
+2. The setup wizard will kick in, helping you to easily connect your WordPress site and Patreon in only two clicks
+3. That's it!
+
+== Screenshots ==
+
+1. An example gated patron-only post
+2. Example permission screen when a site user unlocks a post
+3. Example unlocked patron-only post
+
+== Frequently Asked Questions ==
+
+= Does it work with any theme? =
+
+Patreon WordPress works with any theme.
+
+= Does it work with this particular plugin? =
+
+Patreon WordPress should not affect functioning of any of your other plugins. Patreon WordPress sticks to WP coding standards and would play nice with any other plugin that does the same.
+
+= Does it work with this particular membership plugin? =
+
+Yes, you can use Patreon WordPress side by side with any other membership plugin.
+
+= Does it work with WooCommerce? =
+
+You can easily install and use Patreon WordPress alongside WooCommerce at the same time.
+
+= Do my patrons get charged again if they unlock a post on my site? = 
+
+Your patrons do not get charged again if they unlock any post on your site via the 'Unlock with Patreon' button. The plugin just checks if they are qualifying patrons, and if so, it lets them access your content.
+
+= Do my posts at my site and Patreon need to be the same? =
+
+Not at all - you can post different content totally independently at your site and Patreon.
+
+= Will anything be changed at my site after I install the plugin? =
+
+Nothing will be changed at your site - the plugin will just connect your site to Patreon to allow communication in between your site and Patreon.
 
 == Changelog ==
+
+= 1.4.4 =
+
+* Added a simple way for custom gating any part of a WP site using a single function. This will allow easier gating of any part of a site via theme files.
+* Removed the formerly required 'patreon_enable_direct_unlocks' global var requirement for custom gating since now its not needed.
+* Added a 'Connect site' button to show when all Patreon connection detail fields are empty. This will allow reconnecting sites to Patreon using connection wizard.
+
+= 1.4.3 =
+
+* Added compatbility for WP Fastest Cache - now plugin will tell WP Fastest Cache to not serve a post/page from cache if the post/page is a gated one. This should make content unlocking process for patrons better in sites using WP Fastest Cache
+
+= 1.4.2 =
+
+* Updated gated post interface text to be more informative. Now non-qualifying patrons should see the reason why they dont qualify for access to a post
+* Fixed a minor PHP notice that non-patron Patreon users saw when they viewed a gated post after logging into WP site via Patreon
+
+= 1.4.1 =
+
+* Post meta saving code simplified
+* Help link updated
+* Credential check after credential save got minor enhancements
+* Set a default email to make sure email check fails when a user doesnt have an email verified at Patreon
+* A notice that appeared during plugin update check was fixed
+* A duplicate state var was removed
+
+= 1.4.0 =
+
+* Added no-cache HTTP header to prevent caching of gated content
+* More efficient and smooth addition/removal of image locking feature related htaccess rules
+* Universal deactivate function
+* Rewrite rules flushed upon activate/deactivate
+* Added filter for raw text of label over interface button
+
+= 1.3.9 =
+
+* Plugin will now try preventing caching of gated content. This will help users to access the content they unlocked instead of still seeing the cached locked version. Has option to turn on/off
+* Added admin pointers to help users navigate plugin related info
+* Added admin pointer for new cache option
+* Formatted gated content feed items to have proper html
+* Fixed WP 5.3 causing add_submenu_page parameter notice
+
+= 1.3.8 =
+
+* Added a health check page that shows the health of Patreon integration
+* Added compatibility checks for permalink settings and WP Super Cache settings
+* Critical issues with the integration are shown in dismissable notice that shows up on a 7 day basis when dismissed
+* Removed the transitional image locking option check code now that it is not needed
+
+= 1.3.7 =
+
+* Readme updated, screenshots added, Faq added
+* Made __get_json function and token var in API class public so 3rd party addons and class extenders can access and use them
+
+= 1.3.6 =
+
+* Allowed existing sites using v1 to upgrade to v2 by using reconnect/disconnect/setup functions. This also fixes the PHP error these sites may have encountered if they attempted that upgrade.
+
+= 1.3.5 =
+
+* Addressed various PHP warnings and notices which may have appeared in websites that have warnings and notices turned on
+* Fixed missing default app icon
+
+= 1.3.4 =
+
+* Gated post interface now shows refresh link to non logged in visitors. This allows existing patrons to easily refresh the content or login as opposed to being sent to plegdge flow
+* Updated interface message that is shown to non-qualifying patrons. These patrons will now be shown a message asking them to ugprade their tier as opposed to just showing them the default message. 
+* Added 2 links to setup wizard to allow creators to easily log in or register at Patreon as a creator before starting setup
+* Added utm params to existing links
 
 = 1.3.3 =
 
@@ -131,7 +268,7 @@ It is  difficult to protect videos due the intensive bandwidth requirements of h
 
 = 1.2.7 =
 
-* Locked posts now show your Patreon page name instead of full name. Added an option in settings to override the page/creator name. The order for deciding what name to show is as follows: Custom name if set in settings -> Patreon page name if exists -> First name -> 'this creator' default text if all fails. 
+* Locked posts now show your Patreon page name instead of full name. Added an option in settings to override the page/creator name. The order for deciding what name to show is as follows: Custom name if set in settings -> Patreon page name if exists -> First name -> 'this creator' default text if all fails.
 
 = 1.2.6 =
 

@@ -15,6 +15,7 @@ class Patreon_Wordpress {
 	private static $Patron_Metabox;
 	private static $Patron_Compatibility;
 	private static $Patreon_User_Profiles;
+	private static $Patreon_Admin_Pointers;
 	public static $current_user_pledge_amount = -1;
 	public static $current_user_patronage_declined = -1;
 	public static $current_user_is_patron = -1;
@@ -37,15 +38,24 @@ class Patreon_Wordpress {
 		include 'patreon_user_profiles.php';
 		include 'patreon_protect.php';
 		include 'patreon_compatibility.php';
+		include 'patreon_admin_pointers.php';
 
-		self::$Patreon_Routing       = new Patreon_Routing;
-		self::$Patreon_Frontend      = new Patreon_Frontend;
-		self::$Patreon_Options       = new Patreon_Options;
-		self::$Patron_Metabox        = new Patron_Metabox;
-		self::$Patreon_User_Profiles = new Patreon_User_Profiles;
-		self::$Patreon_Protect       = new Patreon_Protect;
-		self::$Patron_Compatibility  = new Patreon_Compatibility;
-
+		self::$Patreon_Routing        = new Patreon_Routing;
+		self::$Patreon_Frontend       = new Patreon_Frontend;
+		
+		if ( is_admin() ) {
+			self::$Patreon_Options        = new Patreon_Options;
+			self::$Patron_Metabox         = new Patron_Metabox;
+		}
+		
+		self::$Patreon_User_Profiles  = new Patreon_User_Profiles;
+		self::$Patreon_Protect        = new Patreon_Protect;
+		self::$Patron_Compatibility   = new Patreon_Compatibility;
+		
+		if ( is_admin() ) {
+			self::$Patreon_Admin_Pointers = new Patreon_Admin_Pointers;	
+		}
+		
 		add_action( 'wp_head', array( $this, 'updatePatreonUser' ) );
 		add_action( 'init', array( $this, 'checkPatreonCreatorID' ) );
 		add_action( 'init', array( $this, 'check_creator_tiers' ) );
@@ -64,7 +74,6 @@ class Patreon_Wordpress {
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueueAdminScripts' ) );
 		add_action( 'upgrader_process_complete', 'Patreon_Wordpress::AfterUpdateActions', 10, 2 );
 		add_action( 'admin_notices', array( $this, 'AdminMessages' ) );
-		add_action( 'init', array( $this, 'transitionalImageOptionCheck' ) );
 		add_action( 'admin_init', array( $this, 'add_privacy_policy_section' ), 20 ) ;
 		add_action( 'admin_init', array( $this, 'check_setup' ), 5 ) ;
 		add_filter( 'pre_set_site_transient_update_plugins', array( $this, 'check_for_update' ) );
@@ -72,8 +81,7 @@ class Patreon_Wordpress {
 		add_action( 'wp_ajax_patreon_wordpress_toggle_option', array( $this, 'toggle_option' ), 10, 1 );
 		add_action( 'wp_ajax_patreon_wordpress_populate_patreon_level_select', array( $this, 'populate_patreon_level_select_from_ajax' ), 10, 1 );
 		add_action( 'plugin_action_links_' . PATREON_WORDPRESS_PLUGIN_SLUG, array( $this, 'add_plugin_action_links' ), 10, 1 );
-
-
+		
 	}
 	public static function getPatreonUser( $user ) {
 
@@ -169,7 +177,13 @@ class Patreon_Wordpress {
 			
 			/* all the details you want to update on wordpress user account */
 			update_user_meta( $user->ID, 'patreon_user', $user_response['data']['attributes']['vanity'] );
-			update_user_meta( $user->ID, 'patreon_created', $user_response['data']['attributes']['created'] );
+
+			$patreon_created = '';
+			if ( isset( $user_response['data']['attributes']['created'] ) ) {
+				$patreon_created = $user_response['data']['attributes']['created'];
+			}
+
+			update_user_meta( $user->ID, 'patreon_created', $patreon_created );
 			update_user_meta( $user->ID, 'user_firstname', $user_response['data']['attributes']['first_name'] );
 			update_user_meta( $user->ID, 'user_lastname', $user_response['data']['attributes']['last_name'] );
 			
@@ -516,7 +530,11 @@ class Patreon_Wordpress {
 		$pledge_days   = false;
 		$user_response = self::getPatreonUser( $user );
 		
-		return strtotime( $user_response['included'][0]['attributes']['pledge_relationship_start'] );
+		if ( isset( $user_response['included'][0]['attributes']['pledge_relationship_start'] ) ) {
+			return strtotime( $user_response['included'][0]['attributes']['pledge_relationship_start'] );			
+		}
+		
+		return 0;
 		
 	}
 	public static function get_user_lifetime_patronage( $user = false ) {
@@ -619,6 +637,7 @@ class Patreon_Wordpress {
 	public static function enqueueAdminScripts() {
 		
 		wp_enqueue_script( 'patreon-admin-js', PATREON_PLUGIN_ASSETS . '/js/admin.js', array( 'jquery' ), PATREON_WORDPRESS_VERSION, true );
+		wp_enqueue_script( 'patreon-admin-js', PATREON_PLUGIN_ASSETS . '/js/admin.js', array( 'jquery' ), PATREON_WORDPRESS_VERSION, true );
 
 	}
 	public static function AfterUpdateActions( $upgrader_object, $options = false ) {
@@ -632,6 +651,8 @@ class Patreon_Wordpress {
 		
 		// Check if this plugin was updated:
 		if ( $options['action'] == 'update' && $options['type'] == 'plugin' ) {
+			
+			$got_updated = false;
 			
 			if( isset( $options['plugins'] ) ) {
 				
@@ -665,27 +686,6 @@ class Patreon_Wordpress {
 		}
 		
 	}
-	public static function transitionalImageOptionCheck() {
-	
-		// This function is to enable a smooth transition for image locking option. It may be deleted in a few minor versions.
-		
-		// Check if transitional option is saved:
-		
-		if( !get_option( 'patreon-image-option-transition-done',false ) ) {
-		
-			// Doesnt exist.
-			
-			// Remove the htaccess rule
-			
-			Patreon_Protect::removePatreonRewriteRules();
-			
-			// This just disabled the image feature until it is 
-			
-			update_option( 'patreon-image-option-transition-done', true );
-			
-		}
-
-	}
 	public static function add_privacy_policy_section() {
 
 		wp_add_privacy_policy_content( 'Patreon WordPress', PATREON_PRIVACY_POLICY_ADDENDUM );
@@ -697,7 +697,7 @@ class Patreon_Wordpress {
 	
 		// Skip showing any notice if setup is being done
 		
-		if ( $_REQUEST['page'] == 'patreon_wordpress_setup_wizard' ) {
+		if ( isset( $_REQUEST['page'] ) AND $_REQUEST['page'] == 'patreon_wordpress_setup_wizard' ) {
 			return;
 		}
 		
@@ -753,7 +753,7 @@ class Patreon_Wordpress {
 
 			?>
 				<div class="notice notice-success is-dismissible patreon-wordpress" id="patreon-addon-upsell-shown"><img class="addon_upsell" src="<?php echo PATREON_PLUGIN_ASSETS ?>/img/Patron-Plugin-Pro-128.png" style="float:left; margin-right: 20px;" alt="Patron Plugin Pro" />
-					<p><h2 style="margin-top: 0px; font-size: 150%; font-weight: bold;">Boost your pledges and patrons at Patreon with Patron Pro!</h2><div style="font-size: 125% !important">Get Patron Pro third party addon for Patreon WordPress to increase your patrons and pledges! Enjoy powerful features like partial post locking, sneak peeks, advanced locking methods, login lock, vip users and more.<br /><br /><a href="https://codebard.com/patron-pro-addon-for-patreon-wordpress" target="_blank">Check out all features here</a></div></p>
+					<p><h2 style="margin-top: 0px; font-size: 150%; font-weight: bold;">Boost your pledges and patrons at Patreon with Patron Pro!</h2><div style="font-size: 125% !important">Get Patron Pro third party addon for Patreon WordPress to increase your patrons and pledges! Enjoy powerful features like partial post locking, sneak peeks, advanced locking methods, login lock, vip users and more.<br /><br /><a href="https://codebard.com/patron-pro-addon-for-patreon-wordpress?utm_source=<?php urlencode( site_url() ) ?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=patreon_wordpress_addon_upsell_notice_patron_pro&utm_term=" target="_blank">Check out all features here</a></div></p>
 				</div>
 			<?php	
 			
@@ -770,11 +770,23 @@ class Patreon_Wordpress {
 
 			?>
 				 <div class="notice notice-info is-dismissible patreon-wordpress" id="patreon-rate-plugin-notice-shown">
-					<p>Did Patreon WordPress help your site? Help creators like yourself find out about it <a href="https://wordpress.org/support/plugin/patreon-connect/reviews/#new-post" target="_blank">by giving us a good rating!</a></p>
+					<p>Did Patreon WordPress help your site? Help creators like yourself find out about it <a href="https://wordpress.org/support/plugin/patreon-connect/reviews/#new-post?utm_source=<?php urlencode( site_url() ) ?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=patreon_wordpress_review_infobox_link&utm_term=" target="_blank">by giving us a good rating!</a></p>
 				</div>
 			<?php	
 
 			$already_showed_non_system_notice = true;
+			
+		}
+		
+		// This will trigger only when critical or important issues are detected by the compatibility class
+
+		if( Patreon_Compatibility::$toggle_warning AND self::check_days_after_last_system_notice( 7 ) AND ( !isset( $_REQUEST['page'] ) OR $_REQUEST['page'] != 'patreon-plugin-health' ) ) {
+
+			?>
+				 <div class="notice notice-error patreon-wordpress is-dismissible" id="patreon-critical-issues">
+					<p>There are important issues affecting your Patreon integration. Please visit <a href="<?php echo admin_url( 'admin.php?page=patreon-plugin-health' ) ?>">health check page</a> to see the issues and solutions.</p>
+				</div>
+			<?php	
 			
 		}
 
@@ -797,7 +809,7 @@ class Patreon_Wordpress {
 			?>
 				 <div class="notice notice-error is-dismissible patreon-wordpress" id="patreon-wordpress-credentials-failure">
 				 <h3>Sorry - couldn't connect your site to Patreon</h3>
-					<p>Patreon WordPress wasn't able to contact Patreon with the app details you provided. This may be because there is an error in the app details, or because there is something preventing proper connectivity in between your site/server and Patreon API. You can get help by visiting our support forum <a href="https://www.patreondevelopers.com/c/patreon-wordpress-plugin-support" target="_blank">here</a></p>
+					<p>Patreon WordPress wasn't able to contact Patreon with the app details you provided. This may be because there is an error in the app details, or because there is something preventing proper connectivity in between your site/server and Patreon API. You can get help by visiting our support forum <a href="https://www.patreondevelopers.com/c/patreon-wordpress-plugin-support?utm_source=<?php urlencode( site_url() ) ?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=connection_details_not_correct_admin_notice_link&utm_term=" target="_blank">here</a></p>
 				</div>
 			<?php
 			
@@ -841,13 +853,21 @@ class Patreon_Wordpress {
 			// Set the last notice shown date
 			self::set_last_non_system_notice_shown_date();
 		}
-				
+
 		// Mapping what comes from REQUEST to a given value avoids potential security problems
 		if ( $_REQUEST['notice_id'] == 'patreon-rate-plugin-notice-shown' ) {
 			update_option( 'patreon-rate-plugin-notice-shown', true );
 			
 			// Set the last notice shown date
 			self::set_last_non_system_notice_shown_date();
+		}
+		
+		// Mapping what comes from REQUEST to a given value avoids potential security problems
+		if ( $_REQUEST['notice_id'] == 'patreon-critical-issues' ) {
+			update_option( 'patreon-critical-issues', true );
+			
+			// Set the last notice shown date
+			self::set_last_system_notice_shown_date();
 		}
 		
 	}
@@ -887,15 +907,18 @@ class Patreon_Wordpress {
 	}
 	
 	public static function check_api_connection() {
+		
 		// Just attempts to connect to API with given credentials, and returns result
 		
+		// Currently can verify only if creator's access token and refresh token are false. If the access token is false and refresh token is not, the system already refreshes the access token automatically. If only refresh token is false, then the existing correct access token will check true. In future a better check should be implemented
+		
 		$api_client    = new Patreon_API( get_option( 'patreon-creators-access-token' , false ) );
-        $user_response = $api_client->fetch_creator_info();
+        $creator_response  = $api_client->fetch_creator_info();
 		
 		$creator_access = false;
 		$client_access = false;
 		
-		if ( isset( $user_response['included'][0]['id'] ) AND $user_response['included'][0]['id'] != '' ) {
+		if ( isset( $creator_response ['included'][0]['id'] ) AND $creator_response ['included'][0]['id'] != '' ) {
 			// Got creator id. Credentials must be valid
 			
 			// Success - set flag
@@ -907,7 +930,7 @@ class Patreon_Wordpress {
 
 		// Try to do a creator's token refresh
 	
-		if ( $tokens = self::refresh_creator_access_token() ) {
+		if ( !$creator_access AND $tokens = self::refresh_creator_access_token() ) {
 			
 			update_option( 'patreon-creators-refresh-token-expiration', time() + $tokens['expires_in'] );
 			update_option( 'patreon-creators-access-token-scope', $tokens['scope'] );
@@ -915,9 +938,9 @@ class Patreon_Wordpress {
 			// Try again:
 			
 			$api_client    = new Patreon_API( get_option( 'patreon-creators-access-token' , false ) );
-			$user_response = $api_client->fetch_creator_info();
+			$creator_response  = $api_client->fetch_creator_info();
 			
-			if ( isset( $user_response['included'][0]['id'] ) AND $user_response['included'][0]['id'] != '' ) {
+			if ( isset( $creator_response ['included'][0]['id'] ) AND $creator_response ['included'][0]['id'] != '' ) {
 				
 				// Got creator id. Credentials must be valid
 				// Success - set flag
@@ -925,7 +948,7 @@ class Patreon_Wordpress {
 				$creator_access = true;
 				
 			}			
-			
+		
 		}
 		
 		// Here some check for client id and secret may be entered in future - currently only checks creator access token 
@@ -990,7 +1013,7 @@ class Patreon_Wordpress {
 		}
 		
 		$links = array_merge( array(
-			'<a href="https://codebard.com/patron-pro-addon-for-patreon-wordpress" target="_blank">Upgrade to Pro</a>',
+			'<a href="https://codebard.com/patron-pro-addon-for-patreon-wordpress?utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=plugin_listing_addon_upsell_link&utm_term=" target="_blank">Upgrade to Pro</a>',
 		), $links );
 		return $links;
 		
@@ -1060,7 +1083,7 @@ class Patreon_Wordpress {
 		// Enables 3rd party plugins to modify the post types excluded from locking
 		$exclude = apply_filters( 'ptrn/filter_excluded_posts', $exclude );
 
-		if ( in_array( get_post_type( $post->ID ), $exclude ) ) {
+		if ( isset( $post->ID ) AND in_array( get_post_type( $post->ID ), $exclude ) ) {
 			
 			return self::add_to_lock_or_not_results( $post_id, apply_filters( 
 					'ptrn/lock_or_not', 
@@ -1082,8 +1105,12 @@ class Patreon_Wordpress {
 		
 		// Check if specific level is given for this post:
 		
-		$post_level = get_post_meta( $post->ID, 'patreon-level', true );
+		$post_level = '';
 		
+		if ( isset( $post->ID ) ) {
+			$post_level = get_post_meta( $post->ID, 'patreon-level', true );
+		}
+				
 		// get post meta returns empty if no value is found. If so, set the value to 0.
 		
 		if ( $post_level == '' ) {
@@ -1315,7 +1342,7 @@ class Patreon_Wordpress {
 			
 			$setup_message = PATREON_SETUP_INITIAL_MESSAGE;
 			
-			if ( $_REQUEST['patreon_message'] != '' ) {
+			if ( isset( $_REQUEST['patreon_message'] ) AND $_REQUEST['patreon_message'] != '' ) {
 				$setup_message = Patreon_Frontend::$messages_map[$_REQUEST['patreon_message']];
 
 			}
@@ -1343,7 +1370,7 @@ class Patreon_Wordpress {
 
 			$setup_message = PATREON_SETUP_SUCCESS_MESSAGE;
 
-			if ( $_REQUEST['patreon_message'] != '' ) {
+			if ( isset( $_REQUEST['patreon_message'] ) AND $_REQUEST['patreon_message'] != '' ) {
 				$setup_message = Patreon_Frontend::$messages_map[$_REQUEST['patreon_message']];
 			}
 
@@ -1356,11 +1383,11 @@ class Patreon_Wordpress {
 			
 			echo '<div id="patreon_success_inserts">';
 			
-			echo '<a href="https://support.patreon.com/hc/en-us/articles/360032409172-Patreon-WordPress-Quickstart" target="_blank"><div class="patreon_success_insert"><div class="patreon_success_insert_logo"><img src="' . PATREON_PLUGIN_ASSETS . '/img/Learn-how-to-use-Patreon-WordPress.jpg" /></div><div class="patreon_success_insert_heading"><h3>Quickstart guide</h3></div><div class="patreon_success_insert_content"><br clear="both">Click here to read our quickstart guide and learn how to lock your content</div></div></a>';
+			echo '<a href="https://support.patreon.com/hc/en-us/articles/360032409172-Patreon-WordPress-Quickstart?utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=setup_wizard_screen_3_quickstart_article_link&utm_term=" target="_blank"><div class="patreon_success_insert"><div class="patreon_success_insert_logo"><img src="' . PATREON_PLUGIN_ASSETS . '/img/Learn-how-to-use-Patreon-WordPress.jpg" /></div><div class="patreon_success_insert_heading"><h3>Quickstart guide</h3></div><div class="patreon_success_insert_content"><br clear="both">Click here to read our quickstart guide and learn how to lock your content</div></div></a>';
 
-			echo '<a href="https://codebard.com/patron-pro-addon-for-patreon-wordpress" target="_blank"><div class="patreon_success_insert"><div class="patreon_success_insert_logo"><img src="' . PATREON_PLUGIN_ASSETS . '/img/Patron-Plugin-Pro-120.png" /></div><div class="patreon_success_insert_heading"><h3>Patron Plugin Pro</h3></div><div class="patreon_success_insert_content"><br clear="both">Power up your integration and increase your income with premium addon Patron Plugin Pro</div></div></a>';
+			echo '<a href="https://codebard.com/patron-pro-addon-for-patreon-wordpress?utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=setup_wizard_screen_3_patron_pro_pitch_link&utm_term=" target="_blank"><div class="patreon_success_insert"><div class="patreon_success_insert_logo"><img src="' . PATREON_PLUGIN_ASSETS . '/img/Patron-Plugin-Pro-120.png" /></div><div class="patreon_success_insert_heading"><h3>Patron Plugin Pro</h3></div><div class="patreon_success_insert_content"><br clear="both">Power up your integration and increase your income with premium addon Patron Plugin Pro</div></div></a>';
 			
-			echo '<a href="https://wordpress.org/plugins/patron-button-and-widgets-by-codebard/" target="_blank"><div class="patreon_success_insert"><div class="patreon_success_insert_logo"><img src="' . PATREON_PLUGIN_ASSETS . '/img/Patron-Button-Widgets-and-Plugin.png" /></div><div class="patreon_success_insert_heading"><h3>Patron Widgets</h3></div><div class="patreon_success_insert_content"><br clear="both">Add Patreon buttons and widgets to your site with free Widgets addon</div></div></a>';
+			echo '<a href="https://wordpress.org/plugins/patron-button-and-widgets-by-codebard/?utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=setup_wizard_screen_3_patron_button_wp_repo_link&utm_term=" target="_blank"><div class="patreon_success_insert"><div class="patreon_success_insert_logo"><img src="' . PATREON_PLUGIN_ASSETS . '/img/Patron-Button-Widgets-and-Plugin.png" /></div><div class="patreon_success_insert_heading"><h3>Patron Widgets</h3></div><div class="patreon_success_insert_content"><br clear="both">Add Patreon buttons and widgets to your site with free Widgets addon</div></div></a>';
 			
 			echo '</div>';
 
@@ -1389,7 +1416,7 @@ class Patreon_Wordpress {
 			
 			$setup_message = PATREON_RECONNECT_INITIAL_MESSAGE;
 			
-			if ( $_REQUEST['patreon_message'] != '' ) {
+			if ( isset( $_REQUEST['patreon_message'] ) AND $_REQUEST['patreon_message'] != '' ) {
 				$setup_message = Patreon_Frontend::$messages_map[$_REQUEST['patreon_message']];
 
 			}
@@ -1416,7 +1443,7 @@ class Patreon_Wordpress {
 
 			$setup_message = PATREON_RECONNECT_SUCCESS_MESSAGE;
 
-			if ( $_REQUEST['patreon_message'] != '' ) {
+			if ( isset( $_REQUEST['patreon_message'] ) AND $_REQUEST['patreon_message'] != '' ) {
 				$setup_message = Patreon_Frontend::$messages_map[$_REQUEST['patreon_message']];
 			}
 
@@ -1429,11 +1456,11 @@ class Patreon_Wordpress {
 			
 			echo '<div id="patreon_success_inserts">';
 			
-			echo '<a href="https://support.patreon.com/hc/en-us/articles/360032409172-Patreon-WordPress-Quickstart" target="_blank"><div class="patreon_success_insert"><div class="patreon_success_insert_logo"><img src="' . PATREON_PLUGIN_ASSETS . '/img/Learn-how-to-use-Patreon-WordPress.jpg" /></div><div class="patreon_success_insert_heading"><h3>Quickstart guide</h3></div><div class="patreon_success_insert_content"><br clear="both">Click here to read our quickstart guide and learn how to lock your content</div></div></a>';
+			echo '<a href="https://support.patreon.com/hc/en-us/articles/360032409172-Patreon-WordPress-Quickstart?utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=setup_wizard_screen_3_quickstart_insert&utm_term=" target="_blank"><div class="patreon_success_insert"><div class="patreon_success_insert_logo"><img src="' . PATREON_PLUGIN_ASSETS . '/img/Learn-how-to-use-Patreon-WordPress.jpg" /></div><div class="patreon_success_insert_heading"><h3>Quickstart guide</h3></div><div class="patreon_success_insert_content"><br clear="both">Click here to read our quickstart guide and learn how to lock your content</div></div></a>';
 
-			echo '<a href="https://codebard.com/patron-pro-addon-for-patreon-wordpress" target="_blank"><div class="patreon_success_insert"><div class="patreon_success_insert_logo"><img src="' . PATREON_PLUGIN_ASSETS . '/img/Patron-Plugin-Pro-120.png" /></div><div class="patreon_success_insert_heading"><h3>Patron Plugin Pro</h3></div><div class="patreon_success_insert_content"><br clear="both">Power up your integration and increase your income with premium addon Patron Plugin Pro</div></div></a>';
+			echo '<a href="https://codebard.com/patron-pro-addon-for-patreon-wordpress?utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=setup_wizard_screen_3_patron_pro_upsell&utm_term=" target="_blank"><div class="patreon_success_insert"><div class="patreon_success_insert_logo"><img src="' . PATREON_PLUGIN_ASSETS . '/img/Patron-Plugin-Pro-120.png" /></div><div class="patreon_success_insert_heading"><h3>Patron Plugin Pro</h3></div><div class="patreon_success_insert_content"><br clear="both">Power up your integration and increase your income with premium addon Patron Plugin Pro</div></div></a>';
 			
-			echo '<a href="https://wordpress.org/plugins/patron-button-and-widgets-by-codebard/" target="_blank"><div class="patreon_success_insert"><div class="patreon_success_insert_logo"><img src="' . PATREON_PLUGIN_ASSETS . '/img/Patron-Button-Widgets-and-Plugin.png" /></div><div class="patreon_success_insert_heading"><h3>Patron Widgets</h3></div><div class="patreon_success_insert_content"><br clear="both">Add Patreon buttons and widgets to your site with free Widgets addon</div></div></a>';
+			echo '<a href="https://wordpress.org/plugins/patron-button-and-widgets-by-codebard/?utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=setup_wizard_screen_3_patron_button_upsell&utm_term=" target="_blank"><div class="patreon_success_insert"><div class="patreon_success_insert_logo"><img src="' . PATREON_PLUGIN_ASSETS . '/img/Patron-Button-Widgets-and-Plugin.png" /></div><div class="patreon_success_insert_heading"><h3>Patron Widgets</h3></div><div class="patreon_success_insert_content"><br clear="both">Add Patreon buttons and widgets to your site with free Widgets addon</div></div></a>';
 			
 			echo '</div>';
 
@@ -1441,12 +1468,23 @@ class Patreon_Wordpress {
 		
 	}
 
-	public static function check_plugin_exists( $plugin_slug ) {
+	public static function check_plugin_exists( $plugin_dir ) {
+
 		// Simple function to check if a plugin is installed (may be active, or not active) in the WP instalation
 		
-		// Plugin slug is the wp's plugin dir together with the plugin's file which has the plugin header
+		// Plugin dir is the wp's plugin dir together with the plugin's dir
 
-		if ( file_exists( WP_PLUGIN_DIR . '/' . $plugin_slug ) ) {
+		if ( file_exists( WP_PLUGIN_DIR . '/' . $plugin_dir ) ) {
+			return true;			
+		}
+	}
+	
+	public static function check_plugin_active( $full_plugin_slug ) {
+		// Simple function to check if a plugin is installed (may be active, or not active) in the WP instalation
+		
+		// Plugin slug is the plugin dir together with the plugin's file which has the plugin header
+
+		if ( is_plugin_active(  $full_plugin_slug ) ) {
 			return true;			
 		}
 	}
@@ -1486,11 +1524,51 @@ class Patreon_Wordpress {
 			update_option( 'patreon-redirect_to_setup_wizard', true );
 		}
 		
-	}	
+		// Check and add rewrite rules for image/file locking if enabled and not present. Will check if .htaccess exists, will check if rules are present, add if not and refresh if so
+		
+		Patreon_Protect::addPatreonRewriteRules();
+		
+		global $wp_rewrite;
+		$wp_rewrite->flush_rules();
+		
+	}
+	
+	public static function deactivate() {
+		
+		// Kicks in after deactivation of the plugin and does necessary actions
+		
+		// Remove Image/file protection related htaccess rules if they were added
+		
+		remove_action( 'generate_rewrite_rules', array( 'Patreon_Routing', 'add_rewrite_rules' ) );
+
+		// Remove htaccess rules if they are in
+		
+		Patreon_Protect::removePatreonRewriteRules();
+		
+		global $wp_rewrite;
+		$wp_rewrite->flush_rules();
+		
+	}
+	
 	public static function check_days_after_last_non_system_notice( $days ) {
 		// Calculates if $days many days passed after last non system notice was showed. Used in deciding if and when to show admin wide notices
 		
 		$last_non_system_notice_shown_date = get_option( 'patreon-last-non-system-notice-shown-date', 0 );
+		
+		// Calculate if $days days passed since last notice was shown		
+		if ( ( time() - $last_non_system_notice_shown_date ) > ( $days * 24 * 3600 ) ) {
+			// More than $days days. Set flag
+			return true;
+		}
+
+		return false;
+		
+	}
+	
+	public static function check_days_after_last_system_notice( $days ) {
+		// Calculates if $days many days passed after last non system notice was showed. Used in deciding if and when to show admin wide notices
+		
+		$last_non_system_notice_shown_date = get_option( 'patreon-last-system-notice-shown-date', 0 );
 		
 		// Calculate if $days days passed since last notice was shown		
 		if ( ( time() - $last_non_system_notice_shown_date ) > ( $days * 24 * 3600 ) ) {
@@ -1517,6 +1595,7 @@ class Patreon_Wordpress {
 		return false;
 			
 	}
+	
 	public static function set_last_non_system_notice_shown_date() {
 		
 		// Sets the last non system notice shown date to now whenever called. Used for decicing when to show admin wide notices that are not related to functionality. 
@@ -1524,8 +1603,15 @@ class Patreon_Wordpress {
 		update_option( 'patreon-last-non-system-notice-shown-date', time() );
 			
 	}
-
 	
+	public static function set_last_system_notice_shown_date() {
+		
+		// Sets the last non system notice shown date to now whenever called. Used for decicing when to show admin wide notices that are not related to functionality. 
+		
+		update_option( 'patreon-last-system-notice-shown-date', time() );
+			
+	}
+
 	public static function populate_patreon_level_select_from_ajax() {
 		// This function accepts the ajax request from the metabox and calls the relevant function to populate the tiers select
 		
@@ -1724,7 +1810,7 @@ class Patreon_Wordpress {
 		
 		// This function runs on init at order 0, and allows any action that does not require to be run in a particular order or any other function or operation to be run. 
 
-		if ( $_REQUEST['patreon_wordpress_action'] == 'disconnect_site_from_patreon' AND is_admin() AND current_user_can( 'manage_options' ) ) {
+		if ( isset( $_REQUEST['patreon_wordpress_action'] ) AND $_REQUEST['patreon_wordpress_action'] == 'disconnect_site_from_patreon' AND is_admin() AND current_user_can( 'manage_options' ) ) {
 
 			// Admin side, user is admin level. Perform action:
 			
@@ -1754,6 +1840,27 @@ class Patreon_Wordpress {
 			
 			$creator_access_token = get_option( 'patreon-creators-access-token', false );
 			$client_id 			  = get_option( 'patreon-client-id', false );
+				
+			// Exceptions until v1 v2 transition is complete
+			
+			$api_version = get_option( 'patreon-installation-api-version' );
+
+			if ( $api_version == '1' ) {
+
+				// Delete override - proceed with deleting local options
+				
+				foreach ( $options_to_delete as $key => $value ) {
+					delete_option( $options_to_delete[$key] );
+				}
+				
+				update_option( 'patreon-installation-api-version', '2' );
+				update_option( 'patreon-can-use-api-v2', true );
+				
+				wp_redirect( admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=reconnect_0') );
+				exit;
+			}
+			
+			// Exceptions EOF
 			
 			if ( $creator_access_token AND $client_id ) {
 				
@@ -1797,7 +1904,7 @@ class Patreon_Wordpress {
 			
 		}
 		
-		if ( $_REQUEST['patreon_wordpress_action'] == 'disconnect_site_from_patreon_for_reconnection' AND is_admin() AND current_user_can( 'manage_options' ) ) {
+		if ( isset( $_REQUEST['patreon_wordpress_action'] ) AND $_REQUEST['patreon_wordpress_action'] == 'disconnect_site_from_patreon_for_reconnection' AND is_admin() AND current_user_can( 'manage_options' ) ) {
 
 			// Admin side, user is admin level. Perform action:
 			
@@ -1827,6 +1934,26 @@ class Patreon_Wordpress {
 			
 			$creator_access_token = get_option( 'patreon-creators-access-token', false );
 			$client_id 			  = get_option( 'patreon-client-id', false );
+					
+			// Exceptions until v1 v2 transition is complete
+
+			$api_version = get_option( 'patreon-installation-api-version' );
+
+			if ( $api_version == '1' ) {
+
+				// Delete override - proceed with deleting local options
+				
+				foreach ( $options_to_delete as $key => $value ) {
+					delete_option( $options_to_delete[$key] );
+				}
+				
+				update_option( 'patreon-installation-api-version', '2' );
+				update_option( 'patreon-can-use-api-v2', true );				
+								
+				wp_redirect( admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=reconnect_0') );
+				exit;
+			}			
+			// Exceptions EOF
 
 			if ( $creator_access_token AND $client_id ) {
 				
@@ -1870,4 +1997,35 @@ class Patreon_Wordpress {
 		
 	}
 	
+	public static function log_connection_error( $error = false ) {
+		
+		if ( !$error ) {
+			return;
+		}
+	
+		// Get the last 50 connection errors log
+		// Init in case it does not exist, get value if exists - will return empty array if it does not exist.
+		
+		$last_50_conn_errors = get_option( 'patreon-last-50-conn-errors', array() );
+		
+		// If array is 50 or longer, pop it
+		
+		if( count( $last_50_conn_errors ) >= 50 ) {
+			array_pop( $last_50_conn_errors );
+		}
+
+		// Add the error message to last 50 connection errors with time
+		
+		array_unshift ( 
+			$last_50_conn_errors,
+			array (
+				'date'  => time(),
+				'error' => $error
+			)
+		);
+		
+		// Update option
+		update_option( 'patreon-last-50-conn-errors', $last_50_conn_errors );
+
+	}
 }

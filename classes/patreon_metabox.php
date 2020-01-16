@@ -44,8 +44,10 @@ class Patron_Metabox {
 	
 		$current_user = wp_get_current_user();
 			
-		$label    = 'Require the below membership tier or higher to view this post. (Makes entire post patron only)  <a href="https://www.patreondevelopers.com/t/patreon-wordpress-locking-options-guide/1135#heading--section-1" target="_blank">(?)</a>';
+		$label    = 'Require the below membership tier or higher to view this post. (Makes entire post patron only)  <a href="https://www.patreondevelopers.com/t/patreon-wordpress-locking-options-guide/1135#heading--section-1?utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=post_locking_metabox_link_1&utm_term=" target="_blank">(?)</a>';
 		$readonly = '';
+		
+		$disabled = '';
 		
 		if ( !get_option( 'patreon-creator-id', false ) ) {
 			
@@ -82,7 +84,7 @@ class Patron_Metabox {
 		<div <?php echo $advanced_post_options_toggle_status_display ?>id="patreon-wordpress-advanced-options-toggle">
 		<?php
 		
-			$label    = 'Require the below precise $ monthly membership or over to view this post. (optional - overrides the above select box when used)  <a href="https://www.patreondevelopers.com/t/patreon-wordpress-locking-options-guide/1135#heading--section-1" target="_blank">(?)</a>';
+			$label    = 'Require the below precise $ monthly membership or over to view this post. (optional - overrides the above select box when used)  <a href="https://www.patreondevelopers.com/t/patreon-wordpress-locking-options-guide/1135#heading--section-11?utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=post_locking_metabox_link_2&utm_term=" target="_blank">(?)</a>';
 			$readonly = '';		
 		
 			if ( !get_option( 'patreon-creator-id', false ) ) {
@@ -101,7 +103,7 @@ class Patron_Metabox {
 		
 			<?php
 			
-			$label    = 'Require an active pledge at the time of this post’s creation to view this post. (optional) <a href="https://www.patreondevelopers.com/t/patreon-wordpress-locking-options-guide/1135#heading--section-2" target="_blank">(?)</a>';
+			$label    = 'Require an active pledge at the time of this post’s creation to view this post. (optional) <a href="https://www.patreondevelopers.com/t/patreon-wordpress-locking-options-guide/1135#heading--section-2?utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=post_locking_metabox_link_3&utm_term=" target="_blank">(?)</a>';
 			$readonly = '';
 			
 			if ( !get_option( 'patreon-creator-id', false ) ) {
@@ -120,7 +122,7 @@ class Patron_Metabox {
 
 			<?php
 			
-			$label    = 'Require a lifetime pledge amount greater than this amount to view this post. (optional) <a href="https://www.patreondevelopers.com/t/patreon-wordpress-locking-options-guide/1135#heading--section-3" target="_blank">(?)</a>';
+			$label    = 'Require a lifetime pledge amount greater than this amount to view this post. (optional) <a href="https://www.patreondevelopers.com/t/patreon-wordpress-locking-options-guide/1135#heading--section-3?utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=post_locking_metabox_link_4&utm_term=" target="_blank">(?)</a>';
 			$readonly = '';
 			
 			if ( !get_option( 'patreon-creator-id', false ) ) {
@@ -158,9 +160,10 @@ class Patron_Metabox {
 
 	function patreon_plugin_save_post_class_meta( $post_id, $post ) {
 
-		if ( !isset( $_POST['patreon_metabox_nonce'] ) || !wp_verify_nonce( $_POST['patreon_metabox_nonce'], basename( __FILE__ ) ) )
+		if ( !isset( $_POST['patreon_metabox_nonce'] ) || !wp_verify_nonce( $_POST['patreon_metabox_nonce'], basename( __FILE__ ) ) ) {
 			return $post_id;
-
+		}
+	
 		$post_type = get_post_type_object( $post->post_type );
 
 		if ( !current_user_can( $post_type->cap->edit_post, $post_id ) ) {
@@ -176,7 +179,7 @@ class Patron_Metabox {
 		$patreon_level = get_post_meta( $post_id, 'patreon-level', true );
 		
 		// Now, an exception for the old metabox which was moved to patreon-level-exact - if it is different from the value already saved or from 0, override the select box with its value since it would mean a specific override initiated by user.
-		
+
 		if( isset( $_POST['patreon-level-exact'] ) && is_numeric( $_POST['patreon-level-exact'] ) ) {
 			
 			if ( $_POST['patreon-level-exact'] != $patreon_level ) {
@@ -186,7 +189,7 @@ class Patron_Metabox {
 		}
 		
 		update_post_meta( $post_id, 'patreon-level', $new_patreon_level );
-
+		
 		// Handles active patrons only toggle
 		if ( isset( $_POST['patreon-active-patrons-only']) && $_POST['patreon-active-patrons-only'] != '') {
 			update_post_meta( $post_id, 'patreon-active-patrons-only', 1 );
@@ -201,20 +204,7 @@ class Patron_Metabox {
 			$new_patreon_lifetime_patronage_level = 0;
 		}
 
-		$patreon_lifetime_patronage_level = get_post_meta( $post_id, 'patreon-total-patronage-level', true );
-
-		if ( $new_patreon_lifetime_patronage_level && $patreon_lifetime_patronage_level == '' ) {
-			
-			add_post_meta( $post_id, 'patreon-total-patronage-level', $new_patreon_lifetime_patronage_level, true );
-			
-		} else if ( ( $new_patreon_lifetime_patronage_level || $new_patreon_lifetime_patronage_level == 0 || $new_patreon_lifetime_patronage_level == '0') && $new_patreon_lifetime_patronage_level != $patreon_lifetime_patronage_level ) {
-
-			update_post_meta( $post_id, 'patreon-total-patronage-level', $new_patreon_lifetime_patronage_level );
-
-		} else if ( $new_patreon_lifetime_patronage_level == '' && $patreon_level ) {
-			delete_post_meta( $post_id, 'patreon-total-patronage-level', $patreon_lifetime_patronage_level );
-		}
+		update_post_meta( $post_id, 'patreon-total-patronage-level', $new_patreon_lifetime_patronage_level );
 		
-		$patreon_lifetime_patronage_level = get_post_meta( $post_id, 'patreon-total-patronage-level', true );
 	}
 }

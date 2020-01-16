@@ -9,6 +9,35 @@ if( !defined( 'ABSPATH' ) ) {
 
 $api_version = get_option( 'patreon-installation-api-version', false );
 
+// Override api version even if the site is v1 in case delete / reconnect actions are requested. This is temporary until we have something on API side which will allow v1 sites to just reconnect to v2
+
+if ( isset( $_REQUEST['patreon_wordpress_action'] ) AND $_REQUEST['patreon_wordpress_action'] == 'disconnect_site_from_patreon' AND is_admin() ) {
+	
+	// We repeat below code because we want it to be available !only! during reconnect/disconnect actions
+		
+	if(!function_exists('wp_get_current_user')) {
+		include(ABSPATH . "wp-includes/pluggable.php"); 
+	}
+	
+	if ( current_user_can( 'manage_options' ) ) {
+		$api_version = '2';
+	}
+}
+
+if ( isset( $_REQUEST['patreon_wordpress_action'] ) AND $_REQUEST['patreon_wordpress_action'] == 'disconnect_site_from_patreon_for_reconnection' AND is_admin() ) {
+
+	// We repeat below code because we want it to be available !only! during reconnect/disconnect actions
+		
+	if(!function_exists('wp_get_current_user')) {
+		include(ABSPATH . "wp-includes/pluggable.php"); 
+	}
+	
+	if ( current_user_can( 'manage_options' ) ) {
+		$api_version = '2';
+	}
+}
+
+
 if ( $api_version AND $api_version == '2' ) {
 	
 	// Include the v2 version of this class and return
@@ -19,7 +48,7 @@ else {
 	
 	class Patreon_API {
 
-		private $access_token;
+		public $access_token;
 
 		public function __construct( $access_token ) {
 			$this->access_token = $access_token;
@@ -110,7 +139,7 @@ else {
 			
 		}
 
-		private function __get_json( $suffix, $v2 = false ) {		
+		public function __get_json( $suffix, $v2 = false ) {		
 
 			$api_endpoint = "https://api.patreon.com/oauth2/api/" . $suffix;
 
@@ -135,9 +164,18 @@ else {
 				
 				$result                    = array( 'error' => $response->get_error_message() );
 				$GLOBALS['patreon_notice'] = $response->get_error_message();
+				
+				Patreon_Wordpress::log_connection_error( $GLOBALS['patreon_notice'] );
+				
 				return $result;
 				
 			}
+			
+			// Log the connection as having error if the return is not 200
+			
+			if ( isset( $response['response']['code'] ) AND $response['response']['code'] != '200' AND $response['response']['code'] != '201' ) {
+				Patreon_Wordpress::log_connection_error( 'Response code: ' . $response['response']['code'] . ' Response :' . $response['body'] );
+			}	
 			
 			return json_decode( $response['body'], true );
 			

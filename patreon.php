@@ -4,7 +4,7 @@
 Plugin Name: Patreon Wordpress
 Plugin URI: https://www.patreon.com/apps/wordpress
 Description: Patron-only content, directly on your website.
-Version: 1.3.3
+Version: 1.4.4
 Author: Patreon <platform@patreon.com>
 Author URI: https://patreon.com
 */
@@ -25,6 +25,10 @@ if( !file_exists($patreon_locked_image_cache_dir ) ) {
 
 register_activation_hook( __FILE__, array( 'Patreon_Wordpress', 'activate' ) );
 
+// Register activation hook for the plugin
+
+register_deactivation_hook( __FILE__, array( 'Patreon_Wordpress', 'deactivate' ) );
+
 define( "PATREON_PLUGIN_URL", plugin_dir_url( __FILE__ ) );
 define( "PATREON_PLUGIN_ASSETS", plugin_dir_url( __FILE__ ).'assets' );
 define( "PATREON_PLUGIN_ASSETS_DIR", plugin_dir_path( __FILE__ ).'assets' );
@@ -41,13 +45,14 @@ define( "PATREON_TEXT_UPGRADE_PLEDGE", 'Upgrade Pledge' );
 define( "PATREON_TEXT_UNLOCK_WITH_PATREON", 'Unlock with Patreon' );
 define( "PATREON_TEXT_UPDATE_PLEDGE", 'Update Pledge' );
 define( "PATREON_TEXT_LOCKED_POST", 'This content is available exclusively to Patreon members.' );
-define( "PATREON_TEXT_OVER_BUTTON_1", 'To view this content, you must be a member of <a href="%%creator_link%%" target="_blank">%%creator%% Patreon</a> at %%tier_level%% or higher tier' );
+define( "PATREON_TEXT_OVER_BUTTON_1", 'To view this content, you must be a member of <b><a href="%%creator_link%%" target="_blank">%%creator%% Patreon</a> at $%%pledgelevel%%</b> or more' );
+define( "PATREON_TEXT_OVER_BUTTON_1A", 'To view this content, you must upgrade your tier to <b>$%%pledgelevel%% or higher at <a href="%%creator_link%%" target="_blank">%%creator%% Patreon</a></b>. Upgrade below to unlock this content.' );
 define( "PATREON_TEXT_OVER_BUTTON_2", 'Edit your pledge to %%creator%% to $%%pledgelevel%% or more to access this content. You\'re currently pledging $%%currentpledgelevel%%.' );
-define( "PATREON_TEXT_OVER_BUTTON_3", 'Please <a href="https://www.patreon.com/settings/payment" target="_blank" ref="nofollow">update</a> your Patreon payment method to access this post.' );
-define( "PATREON_VALID_PATRON_POST_FOOTER_TEXT", 'This content is available exclusively to members of <a href="%%creator_link%%" target="_blank">%%creator%% Patreon</a> at %%tier_level%% or higher tier.' );
+define( "PATREON_TEXT_OVER_BUTTON_3", 'Please <a href="https://www.patreon.com/settings/payment?utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=declined_payment_info_link&utm_term=" target="_blank" ref="nofollow">update</a> your Patreon payment method to access this content.' );
+define( "PATREON_VALID_PATRON_POST_FOOTER_TEXT", 'This content is available exclusively to members of <b><a href="%%creator_link%%" target="_blank">%%creator%% Patreon</a> at $%%pledgelevel%%</b> or more.' );
 define( "PATREON_TEXT_UNDER_BUTTON_1", '' );
-define( "PATREON_TEXT_UNDER_BUTTON_2", 'Already a Patreon member? <a href="%%flow_link%%" rel="nofollow">Refresh</a> to access this post.' );
-define( "PATREON_TEXT_UNDER_BUTTON_3", 'Already updated? <a href="%%flow_link%%" rel="nofollow">Refresh</a> to access this post.' );
+define( "PATREON_TEXT_UNDER_BUTTON_2", 'Already a qualifying Patreon member? <a href="%%flow_link%%" rel="nofollow">Refresh</a> to access this content.' );
+define( "PATREON_TEXT_UNDER_BUTTON_3", 'Already updated? <a href="%%flow_link%%" rel="nofollow">Refresh</a> to access this content.' );
 define( "PATREON_CANT_LOGIN_STRICT_OAUTH", 'Sorry, couldn\'t log you in with Patreon because you have to be logged in to '.get_bloginfo('NAME').' first' );
 define( "PATREON_LOGIN_WITH_WORDPRESS_NOW", 'You can now login with your wordpress username/password.' );
 define( "PATREON_CANT_LOGIN_NONCES_DONT_MATCH", 'Sorry. Aborted Patreon login for security because security cookies dont match.' );
@@ -63,7 +68,7 @@ define( "PATREON_ADMIN_BYPASSES_FILTER_MESSAGE", 'This content is for Patrons on
 define( "PATREON_CREATOR_BYPASSES_FILTER_MESSAGE", 'This content is for Patrons only, it\'s not locked for you because you are logged in as the Patreon creator' );
 define( "PATREON_NO_LOCKING_LEVEL_SET_FOR_THIS_POST", 'Post is already public. If you would like to lock this post, please set a pledge level for it' );
 define( "PATREON_NO_POST_ID_TO_UNLOCK_POST", 'Sorry - could not get the post id for this locked post' );
-define( "PATREON_WORDPRESS_VERSION", '1.3.3' );
+define( "PATREON_WORDPRESS_VERSION", '1.4.4' );
 define( "PATREON_WORDPRESS_BETA_STRING", '' );
 define( "PATREON_WORDPRESS_PLUGIN_SLUG", plugin_basename( __FILE__ ) );
 define( "PATREON_PRIVACY_POLICY_ADDENDUM", '<h2>Patreon features in this website</h2>In order to enable you to use this website with Patreon services, we save certain functionally important Patreon information about you in this website if you log in with Patreon.
@@ -73,23 +78,26 @@ These include your Patreon user id, Patreon username, your first, last names and
 If you request that your data be deleted from this website, this data will also be deleted and Patreon functionality will not work. You would need to register on this website and log in to this website with Patreon again in order to re-populate this data and have Patreon functionality working again.' );
 define( "PATREON_NO_CODE_RECEIVED_FROM_PATREON", "Sorry -  No authorization code received from Patreon." );
 define( "PATREON_NO_FLOW_ACTION_PROVIDED", "Nothing to do since no Patreon action was requested." );
-define( "PATREON_DIRECT_UNLOCKS_NOT_ON", 'In order to use this feature, direct unlocks need to be turned on. Please refer to <a href="https://www.patreon.com/apps/wordpress">the developer documentation</a>. ' );
+define( "PATREON_DIRECT_UNLOCKS_NOT_ON", 'In order to use this feature, direct unlocks need to be turned on. Please refer to <a href="https://www.patreon.com/apps/wordpress?utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=direct_unlock_setting_notification_link&utm_term=">the developer documentation</a>. ' );
 define( "PATREON_TEXT_LOCKED_POST_ACTIVE_PATRONS", 'while having been active patrons on %%post_date%%' );
 define( "PATREON_TEXT_LOCKED_POST_ACTIVE_PATRONS_WITH_TOTAL_PLEDGE", 'or Patrons with total pledge of $%%total_pledge%%' );
 define( "PATREON_CONTRIBUTION_REQUIRED_STOP_MARK", '!' );
 define( "PATREON_TEXT_OVER_BUTTON_4", ' while having been active patrons on %%post_date%%' );
 define( "PATREON_TEXT_OVER_BUTTON_5", ' or Patrons with total $%%total_pledge%% or more pledge' );
 define( "PATREON_TEXT_OVER_BUTTON_6", ' on Patreon' );
-define( "PATREON_TEXT_OVER_BUTTON_7", 'This content is available exclusively to members of <a href="%%creator_link%%" target="_blank">%%creator%% Patreon</a> at the time this content was posted. <a href="%%flow_link%%" rel="nofollow">Become a patron</a> to get exclusive content like this in the future.' );
-define( "PATREON_TEXT_OVER_BUTTON_8", 'This content is available exclusively to members of <a href="%%creator_link%%" target="_blank">%%creator%% Patreon</a> at the time this content was posted. <a href="%%flow_link%%" rel="nofollow">Become a patron</a> to get exclusive content like this in the future.' );
-define( "PATREON_TEXT_OVER_BUTTON_9", 'This content is available exclusively to members of <a href="%%creator_link%%" target="_blank">%%creator%% Patreon</a> at %%tier_level%% or higher tier, or having at least $%%total_pledge%% pledged in total.' );
-define( "PATREON_TEXT_OVER_BUTTON_10", 'This content is available exclusively to members of <a href="%%creator_link%%" target="_blank">%%creator%% Patreon</a> at %%tier_level%% or higher tier at the time this content was posted, or having at least $%%total_pledge%% pledged in total.' );
-define( "PATREON_TEXT_OVER_BUTTON_11", 'This content is available exclusively to members of <a href="%%creator_link%%" target="_blank">%%creator%% Patreon</a> at %%tier_level%% or higher tier at the time this content was posted.' );
+define( "PATREON_TEXT_OVER_BUTTON_7", 'This content is available exclusively to members of <a href="%%creator_link%%" target="_blank">%%creator%% Patreon</a> at the time of posting. <b><a href="%%flow_link%%" rel="nofollow">Become a patron at $%%pledgelevel%% or more</a></b> to get exclusive content like this in the future.' );
+define( "PATREON_TEXT_OVER_BUTTON_8", 'This content is available exclusively to members of <a href="%%creator_link%%" target="_blank">%%creator%% Patreon</a> at the time of posting.  Your account does not fulfill the requirements. Become a patron to get exclusive content like this in the future.' );
+define( "PATREON_TEXT_OVER_BUTTON_9", 'This content is available exclusively to members of <a href="%%creator_link%%" target="_blank">%%creator%% Patreon</a> at %%tier_level%% or higher tier, or having at least $%%total_pledge%% pledged in total. Upgrade below to unlock this content.' );
+define( "PATREON_TEXT_OVER_BUTTON_10", 'This content is available exclusively to members of <b><a href="%%creator_link%%" target="_blank">%%creator%% Patreon</a></b> <b>at %%tier_level%%</b> or higher tier at the time this content was posted, or having at least $%%total_pledge%% pledged in total.' );
+define( "PATREON_TEXT_OVER_BUTTON_11", 'This content is available exclusively to members <b>at %%tier_level%%</b> or higher tier <b>at <a href="%%creator_link%%" target="_blank">%%creator%% Patreon</a></b> at the time this content was posted.' );
+define( "PATREON_TEXT_OVER_BUTTON_12", 'This content is available exclusively to members of <a href="%%creator_link%%" target="_blank">%%creator%% Patreon</a> at %%tier_level%% or higher tier, or having at least $%%total_pledge%% pledged in total.' );
+define( "PATREON_TEXT_OVER_BUTTON_13", 'This content is available exclusively to members of <a href="%%creator_link%%" target="_blank">%%creator%% Patreon</a> at %%tier_level%% or higher tier at the time this content was posted, or having at least $%%total_pledge%% pledged in total.' );
+define( "PATREON_TEXT_OVER_BUTTON_14", 'This content is available exclusively to members of <a href="%%creator_link%%" target="_blank">%%creator%% Patreon</a> at %%tier_level%% or higher tier at the time this content was posted, or having at least $%%total_pledge%% pledged in total. Your account currently does not qualify.' );
 define( "PATREON_COULDNT_ACQUIRE_USER_DETAILS", 'Sorry. Could not acquire your info from Patreon. Please try again later.' );
 define( "PATREON_PRETTY_PERMALINKS_NEED_TO_BE_ENABLED", 'Pretty permalinks are required for Patreon WordPress to work. Please visit <a href="'.admin_url('options-permalink.php').'" target="_blank">permalink options page</a> and set an option that is different from "Plain"' );
 define( "PATREON_ENSURE_REQUIREMENTS_MET", '<h3>Please ensure following requirements are met before starting setup:</h3>' );
 define( "PATREON_ERROR_MISSING_CREDENTIALS", 'One or more of app credentials were not received. Please try again.' );
-define( "PATREON_SETUP_INITIAL_MESSAGE", 'By <a href="https://support.patreon.com/hc/en-us/articles/360032404632-How-your-WordPress-site-will-be-connected-to-Patreon"  style="text-decoration: none;" target="_blank">connecting your site to Patreon</a>, you can bring Patreon features to your website & post member-only content at your website to <a href="https://blog.patreon.com/patreon-wordpress-plugin/" target="_blank" style="text-decoration: none;">increase your patrons and monthly revenue</a>. We will now take you to Patreon in order to automatically connect your site. Please make sure you are logged into your creator account at Patreon before starting.' );
+define( "PATREON_SETUP_INITIAL_MESSAGE", 'By <a href="https://support.patreon.com/hc/en-us/articles/360032404632-How-your-WordPress-site-will-be-connected-to-Patreon?utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=setup_wizard_screen_1_how_to_connect_website_to_patreon_link&utm_term="  style="text-decoration: none;" target="_blank">connecting your site to Patreon</a>, you can bring Patreon features to your website & post member-only content at your website to <a href="https://blog.patreon.com/patreon-wordpress-plugin/?utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=setup_wizard_screen_1_link_patreon_blog_article_for_patreon_wordpress&utm_term=" target="_blank" style="text-decoration: none;">increase your patrons and monthly revenue</a>. We will now take you to Patreon in order to automatically connect your site. Please make sure you are <a href="https://www.patreon.com/login?utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=setup_wizard_screen_1_creator_login_link&utm_term=" target="_blank"  style="text-decoration: none;">logged in</a> to your creator account at Patreon before starting, or <a href="https://www.patreon.com/signup?ru=%2Fcreate?utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=setup_wizard_screen_1_creator_signup_link&utm_term=" target="_blank" style="text-decoration: none;">register here</a> if you don\'t already have a creator account.' );
 define( "PATREON_SETUP_SUCCESS_MESSAGE", 'Great! Your site is now connected to Patreon!' );
 define( "PATREON_RECONNECT_SUCCESS_MESSAGE", 'Great! We successfully reconnected your site to Patreon!' );
 define( "PATREON_TEXT_EVERYONE", 'Everyone' );
@@ -98,16 +106,26 @@ define( "PATREON_TEXT_ANY_PATRON", 'Any patron' );
 define( "PATREON_PLUGIN_CLIENT_ID", '40otjXLPiUL023m_FAX5XRkRYVRF0DT62cHKH7NjyNsYYFZMYHxqzWoqbEtt-22l' );
 define( "PATREON_SITE_DISCONNECTED_FROM_PATREON_HEADING", 'Disconnection successful!' );
 define( "PATREON_SITE_DISCONNECTED_FROM_PATREON_TEXT", 'You successfully disconnected your site from Patreon. Now you can connect another creator account to your site.' );
-define( "PATREON_NO_AUTH_FOR_CLIENT_CREATION", 'We weren\'t able to get the go ahead from Patreon while attempting to connect your site. Please wait a minute and try again. If this situation persists, <a href="https://www.patreondevelopers.com/c/patreon-wordpress-plugin-support" target="_blank">contact support</a>.'  );
-define( "PATREON_NO_ACQUIRE_CLIENT_DETAILS", 'We weren\'t able to get to get the token for connecting your site to Patreon for the time being. Please wait a while and try again and <a href="https://www.patreondevelopers.com/c/patreon-wordpress-plugin-support" target="_blank">contact support</a> if this situation persists.' );
-define( "PATREON_NO_CREDENTIALS_RECEIVED", 'We weren\'t able to connect your site to Patreon because Patreon sent back empty credentials. Please wait a while and try again and <a href="https://www.patreondevelopers.com/c/patreon-wordpress-plugin-support" target="_blank">contact support</a> if this situation persists.' );
+define( "PATREON_NO_AUTH_FOR_CLIENT_CREATION", 'We weren\'t able to get the go ahead from Patreon while attempting to connect your site. Please wait a minute and try again. If this situation persists, <a href="https://www.patreondevelopers.com/c/patreon-wordpress-plugin-support?utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=no_auth_for_client_creation_warning_link&utm_term=" target="_blank">contact support</a>.'  );
+define( "PATREON_NO_ACQUIRE_CLIENT_DETAILS", 'We weren\'t able to get to get the token for connecting your site to Patreon for the time being. Please wait a while and try again and <a href="https://www.patreondevelopers.com/c/patreon-wordpress-plugin-support?utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=client_details_not_acquired_info_link&utm_term=" target="_blank">contact support</a> if this situation persists.' );
+define( "PATREON_NO_CREDENTIALS_RECEIVED", 'We weren\'t able to connect your site to Patreon because Patreon sent back empty credentials. Please wait a while and try again and <a href="https://www.patreondevelopers.com/c/patreon-wordpress-plugin-support?utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=no_credentials_received_info_link&utm_term=" target="_blank">contact support</a> if this situation persists.' );
 define( "PATREON_RECONNECT_INITIAL_MESSAGE", 'We will now reconnect your site to Patreon. This will refresh your site\'s connection and all app credentials. Patron only content in your website will be accessible to everyone until reconnection is complete. We will now take you to Patreon in order to automatically reconnect your site. Please make sure you are logged into your creator account at Patreon before starting.' );
 define( "PATREON_ADMIN_MESSAGE_DEFAULT_TITLE", 'All\'s cool' );
 define( "PATREON_ADMIN_MESSAGE_DEFAULT_CONTENT", 'Pretty much nothing to report.' );
 define( "PATREON_ADMIN_MESSAGE_CLIENT_DELETE_ERROR_TITLE", 'Sorry, couldn\'t disconnect your site' );
-define( "PATREON_ADMIN_MESSAGE_CLIENT_DELETE_ERROR_CONTENT", 'Please wait a few minutes and <a href="http://test.codebard.com/wp-admin/admin.php?page=patreon-plugin&patreon_wordpress_action=disconnect_site_from_patreon">try again</a>. If this issue persists, you can visit your <a href="https://www.patreon.com/portal/registration/register-clients" target="_blank">your app/clients page</a> and delete the app/client for this site. Then you can save empty values for details in "Connection details" tab in "Patreon settings" menu at your site. This would manually disconnect your site from Patreon. Then, you can reconnect your site to another Patreon account or to the same account.' );
+define( "PATREON_ADMIN_MESSAGE_CLIENT_DELETE_ERROR_CONTENT", 'Please wait a few minutes and <a href="http://test.codebard.com/wp-admin/admin.php?page=patreon-plugin&patreon_wordpress_action=disconnect_site_from_patreon">try again</a>. If this issue persists, you can visit your <a href="https://www.patreon.com/portal/registration/register-clients?utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=client_delete_error_info_link&utm_term=" target="_blank">your app/clients page</a> and delete the app/client for this site. Then you can save empty values for details in "Connection details" tab in "Patreon settings" menu at your site. This would manually disconnect your site from Patreon. Then, you can reconnect your site to another Patreon account or to the same account.' );
 define( "PATREON_ADMIN_MESSAGE_CLIENT_RECONNECT_DELETE_ERROR_TITLE", 'Sorry, couldn\'t disconnect your site before reconnecting it' );
-define( "PATREON_ADMIN_MESSAGE_CLIENT_RECONNECT_DELETE_ERROR_CONTENT", 'Please wait a few minutes and <a href="http://test.codebard.com/wp-admin/admin.php?page=patreon-plugin&patreon_wordpress_action=disconnect_site_from_patreon_for_reconnection">try again</a>. If this issue persists, you can visit your <a href="https://www.patreon.com/portal/registration/register-clients" target="_blank">your app/clients page</a> and delete the app/client for this site. Then you can save empty values for details in "Connection details" tab in "Patreon settings" menu at your site. This would manually disconnect your site from Patreon. Then, you can reconnect your site to another Patreon account or to the same account.' );
+define( "PATREON_TEXT_YOU_HAVE_NO_REWARDS_IN_THIS_CAMPAIGN", 'You have no tiers in this campaign' );
+define( "PATREON_ADMIN_MESSAGE_CLIENT_RECONNECT_DELETE_ERROR_CONTENT", 'Please wait a few minutes and <a href="http://test.codebard.com/wp-admin/admin.php?page=patreon-plugin&patreon_wordpress_action=disconnect_site_from_patreon_for_reconnection">try again</a>. If this issue persists, you can visit your <a href="https://www.patreon.com/portal/registration/register-clients?utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=client_reconnect_delete_error_info_link&utm_term=" target="_blank">your app/clients page</a> and delete the app/client for this site. Then you can save empty values for details in "Connection details" tab in "Patreon settings" menu at your site. This would manually disconnect your site from Patreon. Then, you can reconnect your site to another Patreon account or to the same account.' );
+define( "PATREON_WP_SUPER_CACHE_LOGGED_IN_USERS_ENABLED_HEADING", 'WP Super Cache caches pages for logged in users' );
+define( "PATREON_WP_SUPER_CACHE_LOGGED_IN_USERS_ENABLED", 'This could cause logged in patrons to see a content they unlocked still as locked because they may be served a cached version of the page.<h3>Solution</h3>Please visit <a target="_blank" href="' . admin_url( 'options-general.php?page=wpsupercache&tab=settings' ) . '">this WP Super Cache settings page</a> and turn the option <b>"Disable caching for visitors who have a cookie set in their browser."</b> or <b>"Disable caching for logged in visitors. (Recommended)"</b> on and click "Update Status" button to save WP Super Cache settings' );
+define( "PATREON_WP_SUPER_CACHE_MAKE_KNOWN_ANON_ENABLED_HEADING", 'WP Super Cache caches treats logged in users as anonymous' );
+define( "PATREON_WP_SUPER_CACHE_MAKE_KNOWN_ANON_ENABLED", 'This could cause logged in patrons to be treated anonymous and cause them to get served a cached version of the unlocked content, therefore preventing them from accessing the content they unlocked.<h3>Solution</h3>Please visit <a target="_blank" href="' . admin_url( 'options-general.php?page=wpsupercache&tab=settings' ) . '">this WP Super Cache settings page</a> and turn the option <b>"Make known users anonymous so they’re served supercached static files."</b> off and click "Update Status" button to save WP Super Cache settings' );
+define( "PATREON_PRETTY_PERMALINKS_ARE_OFF_HEADING", 'Pretty permalinks are turned off' );
+define( "PATREON_PRETTY_PERMALINKS_ARE_OFF", 'Pretty permalinks are off in your WP installation. This would cause content unlock flows to fail when the user is returning from Patreon.<h3>Solution</h3>Please visit <a target="_blank" href="' . admin_url( 'options-permalink.php' ) . '">permalink settings page</a> and select any option other than "Plain" and click "Save Changes". Please note that this will change the link structure of your site.' );
+define( "PATREON_LAST_50_CONNECTION_ERRORS", 'These are the last 50 connection issues encountered by your site when contacting Patreon API. These are here for general info on health of the connection of your WP site to Patreon API. They only constitute an error if there are a lot of recent ones. Healthiest integrations should have a number of them (up to 50) in the long run.' );
+define( "PATREON_LAST_50_CONNECTION_ERRORS_HEADING", 'Last 50 connection errors' );
+define( "PATREON_FEED_ACTION_TEXT", ' - Click "Read more" to unlock this content at the source' );
 
 include 'classes/patreon_wordpress.php';
 

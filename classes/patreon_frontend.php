@@ -68,7 +68,7 @@ class Patreon_Frontend {
 	function patreonEnqueueAdminCss() {
 		
 		wp_register_style( 'patreon-wordpress-admin-css', PATREON_PLUGIN_ASSETS . '/css/admin.css', false );
-		wp_enqueue_style( 'patreon-wordpress-admin-css', PATREON_PLUGIN_ASSETS . '/css/admin.css' );
+		wp_enqueue_style( 'patreon-wordpress-admin-css', PATREON_PLUGIN_ASSETS . '/css/admin.css', PATREON_WORDPRESS_VERSION );
 		
 	}
 	function patreonEnqueueCss() {
@@ -102,6 +102,8 @@ class Patreon_Frontend {
 		if ( is_array( $override_interface ) AND isset( $override_interface['override'] ) ) {
 			return $override_interface['interface'];			
 		}
+		
+		$post = false;
 		
 		// Get the post from post id if it is supplied
 		if ( isset( $args['post_id'] ) ) {
@@ -159,6 +161,10 @@ class Patreon_Frontend {
 				$button_args['redirect'] = $args['redirect'];
 				
 			}
+						
+			if ( is_feed() ) {
+				$button_args['is_feed'] = true;
+			}
 			
 			$universal_button	   = self::patreonMakeUniversalButton( $patreon_level, false, false, false, $button_args );
 			$universal_button 	   = apply_filters( 'ptrn/final_state_universal_button', '<div class="patreon-universal-button">' . $universal_button . '</div>', $patreon_level, $post );
@@ -166,6 +172,10 @@ class Patreon_Frontend {
 			$text_over_universal_button  = apply_filters( 'ptrn/final_state_label_over_universal_button', self::getLabelOverUniversalButton( $patreon_level, $args ), $patreon_level, $post );
 			
 			$text_under_universal_button = apply_filters( 'ptrn/final_state_label_under_universal_button', self::getLabelUnderUniversalButton( $patreon_level, false, false, $args ), $patreon_level, $post );
+						
+			if ( is_feed() ) {
+				$text_under_universal_button = PATREON_FEED_ACTION_TEXT;
+			}
 			
 			// Wrap all of them in a responsive div
 			
@@ -256,11 +266,11 @@ class Patreon_Frontend {
 			}
 			
 			if( isset( $args['post_total_patronage_level'] ) AND $args['post_total_patronage_level'] > 0 ) {
-				$label   = PATREON_TEXT_OVER_BUTTON_9;
+				$label   = PATREON_TEXT_OVER_BUTTON_12;
 				
 				if ( isset( $args['patreon_active_patrons_only'] ) AND $args['patreon_active_patrons_only'] == 1 ) {
 					// Double condition - has both active patron and total patronage conditions. Override text
-					$label = PATREON_TEXT_OVER_BUTTON_10;
+					$label = PATREON_TEXT_OVER_BUTTON_13;
 				}
 			}			
 			
@@ -291,7 +301,7 @@ class Patreon_Frontend {
 		
 		if ( $args['reason'] == 'active_pledge_not_enough' ) {
 			
-			$label = PATREON_TEXT_OVER_BUTTON_1;
+			$label = PATREON_TEXT_OVER_BUTTON_1A;
 			
 			if ( isset( $args['patreon_active_patrons_only'] ) AND $args['patreon_active_patrons_only'] == 1 ) {
 				$label = PATREON_TEXT_OVER_BUTTON_8;
@@ -314,7 +324,7 @@ class Patreon_Frontend {
 			$label = PATREON_TEXT_OVER_BUTTON_8;
 			
 			if( isset( $args['post_total_patronage_level'] ) AND $args['post_total_patronage_level'] > 0 ) {
-				$label   = PATREON_TEXT_OVER_BUTTON_10;
+				$label   = PATREON_TEXT_OVER_BUTTON_14;
 			}
 			
 		}
@@ -336,7 +346,15 @@ class Patreon_Frontend {
 		$filterable_utm_params = 'utm_term=&utm_content=' . $utm_content;
 		$filterable_utm_params = apply_filters( 'ptrn/utm_params_for_creator_profile_link_in_text_over_interface', $filterable_utm_params );
 		
-		$utm_params = 'utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=' . get_option( 'patreon-campaign-id' ) . '&' . $filterable_utm_params;
+		// Set default for content url
+		$content_url = site_url();
+		
+		// Override if content url exists
+		if ( $post ) {
+			$content_url = get_permalink( $post );
+		}
+		
+		$utm_params = 'utm_source=' . urlencode( $content_url ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=' . get_option( 'patreon-campaign-id' ) . '&' . $filterable_utm_params;
 		
 		// Simple check to see if creator url has ? (for non vanity urls)
 		$append_with = '?';
@@ -405,6 +423,8 @@ class Patreon_Frontend {
 
 		}
 		
+		$label = apply_filters( 'ptrn/label_text_over_universal_button_raw', $label, $args['reason'], $user_logged_into_patreon, $is_patron, $args, $post, $creator_full_name, $patreon_level, $post_total_patronage_level, $creator_url, strip_tags( $tier_title ), self::patreonMakeCacheableFlowLink( $post ) );
+		
 		$label = str_replace( '%%creator_link%%', $creator_url, $label );
 		$label = str_replace( '%%creator%%', $creator_full_name, $label );
 		$label = str_replace( '%%pledgelevel%%', $patreon_level, $label );
@@ -432,7 +452,7 @@ class Patreon_Frontend {
 		// Add 's to make it "creator's Patreon" when placed into label
 		
 		$creator_full_name .= "'s";
-		
+
 		// Override entire text if the creator set a custom site/creator name string:
 				
 		$patreon_custom_page_name = get_option( 'patreon-custom-page-name', false );
@@ -456,7 +476,11 @@ class Patreon_Frontend {
 		if( $args AND is_array( $args ) AND !isset( $args['lock'] ) ) {
 			$args = $lock_or_not + $args;
 		}
-				
+		
+		if ( $args['reason'] == 'user_not_logged_in' ) {
+			$label = PATREON_TEXT_UNDER_BUTTON_2;
+		}
+		
 		if ( $args['reason'] == 'not_a_patron' ) {
 			$label = PATREON_TEXT_UNDER_BUTTON_2;
 		}
@@ -476,13 +500,21 @@ class Patreon_Frontend {
 		$post_total_patronage_level = '';
 		if( isset( $args['post_total_patronage_level'] ) ) {
 			$post_total_patronage_level = $args['post_total_patronage_level'];
-		}		
-			
+		}
+
+		$flow_link = self::patreonMakeCacheableFlowLink();
+		
+		// Change with login link if user is not logged in - this gives non logged in patrons an easy way to login/refresh the content without having to go to pledge flow again
+		
+		if ( $args['reason'] == 'user_not_logged_in' ) {
+			$flow_link = self::patreonMakeCacheableLoginLink();
+		}
+		
 		$label = str_replace( '%%creator%%', $creator_full_name, $label );
 		$label = str_replace( '%%pledgelevel%%', $patreon_level, $label );
-		$label = str_replace( '%%flow_link%%', self::patreonMakeCacheableFlowLink(), $label );
+		$label = str_replace( '%%flow_link%%', $flow_link, $label );
 		$label = str_replace( '%%total_pledge%%', $post_total_patronage_level, $label );
-	
+
 		return apply_filters( 'ptrn/label_text_under_universal_button', $label, $args['reason'], $user_logged_into_patreon, $is_patron, $patreon_level, $state, $args);
 		
 	}
@@ -530,10 +562,10 @@ class Patreon_Frontend {
 						
 		if ( isset( $args['direct_unlock'] ) ) {
 			
-			unset($post);
+			$post = false;
 			
 			// Set the post to the id if it is given:
-			if ( $args['post_id'] != '' ) {
+			if ( isset( $args['post_id'] ) AND $args['post_id'] != '' ) {
 				$post = get_post( $args['post_id'] );
 			}
 		
@@ -577,14 +609,20 @@ class Patreon_Frontend {
 			// If direct unlock request is given, set cacheable flow link vars.
 			$flow_link_args['direct_unlock'] = $args['direct_unlock'];
 			$flow_link_args['redirect'] = $args['redirect'];
-			$flow_link_args['post_id'] = $args['post_id'];
 			
-		}		
+			if ( isset( $args['post_id'] ) ) {
+				$flow_link_args['post_id'] = $args['post_id'];
+			}
 			
-		$href       = self::patreonMakeCacheableFlowLink( $post, $flow_link_args );
+		}
 		
+		$href       = self::patreonMakeCacheableFlowLink( $post, $flow_link_args );
 		$label_text = self::patreonMakeUniversalButtonLabel();
 		$button     = self::patreonMakeUniversalButtonImage( $label_text );
+		
+		if ( isset( $args['is_feed'] ) ) {
+			return '';
+		}
 		
 		return apply_filters( 'ptrn/patron_button', '<a href="' . $href . '">' . $button . '</a>', $min_cents );		
 		
@@ -711,7 +749,15 @@ class Patreon_Frontend {
 		$filterable_utm_params = 'utm_term=&utm_content=' . $utm_content;
 		$filterable_utm_params = apply_filters( 'ptrn/utm_params_for_patron_link', $filterable_utm_params );
 		
-		$utm_params = 'utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=' . get_option( 'patreon-campaign-id' ) . '&' . $filterable_utm_params;
+		// Set default for content url
+		$content_url = site_url();
+		
+		// Override if content url exists
+		if ( $post ) {
+			$content_url = get_permalink( $post );
+		}		
+		
+		$utm_params = 'utm_source=' . urlencode( $content_url ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=' . get_option( 'patreon-campaign-id' ) . '&' . $filterable_utm_params;
 
 		return $href . '&' . $utm_params;
 		
@@ -804,7 +850,16 @@ class Patreon_Frontend {
 		$href                  = apply_filters( 'ptrn/login_link', $href );
 		$filterable_utm_params = 'utm_term=&utm_content=login_button';
 		$filterable_utm_params = apply_filters( 'ptrn/utm_params_for_login_link', $filterable_utm_params );
-		$utm_params            = 'utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=' . get_option( 'patreon-campaign-id' ) . '&' . $filterable_utm_params;
+		
+		// Set default for content url
+		$content_url = site_url();
+		
+		// Override if content url exists
+		if ( $post ) {
+			$content_url = get_permalink( $post );
+		}		
+		
+		$utm_params            = 'utm_source=' . urlencode( $content_url ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=' . get_option( 'patreon-campaign-id' ) . '&' . $filterable_utm_params;
 		
 		return $href . '&' . $utm_params;
 	}
@@ -836,7 +891,7 @@ class Patreon_Frontend {
 			}
 		}
 		
-		$href = self::patreonMakeCacheableLoginLink( $client_id );
+		$href = self::patreonMakeCacheableLoginLink();
 
 		return apply_filters( 'ptrn/login_button', '<a href="' . $href . '" class="ptrn-login"><div class="patreon-responsive-button-wrapper"><div class="patreon-responsive-button"><img class="patreon_logo" src="' . PATREON_PLUGIN_ASSETS . '/img/patreon-logomark-on-coral.svg" alt=""> ' . $login_label . '</div></div></a>', $href );
 
@@ -990,7 +1045,10 @@ class Patreon_Frontend {
 		if ( !$post_id ) {
 			
 			global $post;
-			$post_id = $post->ID;
+			
+			if ( isset( $post ) AND is_object( $post ) ) {			
+				$post_id = $post->ID;
+			}
 			
 		}
 		
@@ -1128,7 +1186,7 @@ class Patreon_Frontend {
 		
 		if( isset( $args['post_total_patronage_level'] ) AND $args['post_total_patronage_level'] > 0 ) {
 			
-			$label   = PATREON_TEXT_OVER_BUTTON_9;
+			$label   = PATREON_TEXT_OVER_BUTTON_12;
 			
 			// Double condition - override the text
 			if ( isset( $args['patreon_active_patrons_only'] ) AND $args['patreon_active_patrons_only'] == 1 ) {
@@ -1206,7 +1264,21 @@ class Patreon_Frontend {
 		$filterable_utm_params = 'utm_term=&utm_content=' . $utm_content;
 		$filterable_utm_params = apply_filters( 'ptrn/utm_params_for_creator_profile_link_in_valid_patron_footer', $filterable_utm_params );
 		
-		$utm_params = 'utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=' . get_option( 'patreon-campaign-id' ) . '&' . $filterable_utm_params;
+		global $post;
+		
+		if ( isset( $args['post_id'] ) ) {
+			$post  = get_post( $args['post_id'] );
+		}
+		
+		// Set default for content url
+		$content_url = site_url();
+		
+		// Override if content url exists
+		if ( $post ) {
+			$content_url = get_permalink( $post );
+		}			
+		
+		$utm_params = 'utm_source=' . urlencode( $content_url ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=' . get_option( 'patreon-campaign-id' ) . '&' . $filterable_utm_params;
 
 		// Simple check to see if creator url has ? (for non vanity urls)
 		$append_with = '?';
@@ -1262,7 +1334,7 @@ class Patreon_Frontend {
 		if ( isset( $_REQUEST['patreon-msg'] ) && $_REQUEST['patreon-msg'] == 'login_with_patreon' ) {
 			$button .= '<p class="patreon-msg">You can now login with your WordPress username/password.</p>';
 		} else {
-			$button .= apply_filters( 'ptrn/login_button', '<a href="' . self::patreonMakeCacheableLoginLink( $client_id ) . '" class="ptrn-button"><img src="' . $log_in_img . '" width="272" height="42" /></a>' );
+			$button .= apply_filters( 'ptrn/login_button', '<a href="' . self::patreonMakeCacheableLoginLink() . '" class="ptrn-button"><img src="' . $log_in_img . '" width="272" height="42" /></a>' );
 		}
 		return $button;
 		
@@ -1336,6 +1408,49 @@ class Patreon_Frontend {
 		// Return the value
 		
 		return $creator_interface_name;
+	}
+	public static function gate_custom_content( $patreon_level, $args = array() ) {
+		
+		// This function gates any part of a WP website using $ level. It is a wrapper function that is to be used as an easy version of custom locking code
+
+		// Custom lock
+		
+		$user = wp_get_current_user();
+		
+		if ( isset( $args['user'] ) AND $args['user'] AND is_object( $args['user'] ) ) {
+			$user = $args['user'];
+		}
+		
+		// Check how much patronage the user has
+		$user_patronage = Patreon_Wordpress::getUserPatronage( $user );
+		
+		// Check if user is a patron whose payment is declined
+		$declined = Patreon_Wordpress::checkDeclinedPatronage( $user );
+		
+		// Set where we want to have the user land at - this can be anything. The below code sets it to this exact page. This page may be a category page, search page, a custom page url with custom parameters - anything
+		
+		global $wp;
+		
+		$redir = home_url( add_query_arg( $_GET, $wp->request ) );
+		
+		// If the user has less patronage than $patreon_level, or declined, and is not an admin-level user, lock the post.
+
+		if ( ( $user_patronage < ( $patreon_level * 100) OR $declined ) AND !current_user_can( 'manage_options' ) ) {
+			
+			// Generate the unlock interface wherever it is
+			return Patreon_Frontend::displayPatreonCampaignBanner(
+				$patreon_level, 
+				array( 'direct_unlock' => $patreon_level, 
+					   'redirect' => $redir                                                
+				)
+			); 
+			// the first param and direct_unlock param set the unlock value for this interface. Both need to be provided and be the same
+		}
+		
+		// Here. Then patron is valid. Return false.
+		return false;
+		
+		
 	}
 	
 }
