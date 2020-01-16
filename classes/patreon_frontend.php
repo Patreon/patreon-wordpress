@@ -1450,7 +1450,40 @@ class Patreon_Frontend {
 		// Here. Then patron is valid. Return false.
 		return false;
 		
+	}
+		
+	public static function hide_ad_for_patrons( $patreon_level, $ad = '', $args = array() ) {
+		
+		// This function allows show/hiding any part of a WP website using $ level. It is a wrapper function that is to be used as an easy version of custom locking code
+
+		// Custom lock
+		
+		$user = wp_get_current_user();
+		
+		if ( isset( $args['user'] ) AND $args['user'] AND is_object( $args['user'] ) ) {
+			$user = $args['user'];
+		}
+		
+		// Check how much patronage the user has
+		$user_patronage = Patreon_Wordpress::getUserPatronage( $user );
+		
+		// Check if user is a patron whose payment is declined
+		$declined = Patreon_Wordpress::checkDeclinedPatronage( $user );
+		
+		// Set where we want to have the user land at - this can be anything. The below code sets it to this exact page. This page may be a category page, search page, a custom page url with custom parameters - anything
+		
+		global $wp;
+		
+		$redir = home_url( add_query_arg( $_GET, $wp->request ) );
+		
+		// If the user has less patronage than $patreon_level, or declined, and is not an admin-level user, lock the post.
+
+		if ( ( $user_patronage < ( $patreon_level * 100) OR $declined ) AND !current_user_can( 'manage_options' ) ) {
+			return $ad;
+		}
+		
+		// Here. Then patron is valid. Return false.
+		return '';
 		
 	}
-	
 }
