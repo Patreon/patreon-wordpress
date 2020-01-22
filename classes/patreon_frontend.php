@@ -1341,7 +1341,16 @@ class Patreon_Frontend {
 	}
 	public static function LoginButtonShortcode( $args ) {
 		
-		if ( !is_user_logged_in() ) {
+		// Check if this user connected his/her account to Patreon
+		
+		$user = wp_get_current_user();
+		$user_patreon_id = '';
+		
+		if ( $user AND isset( $user->ID ) ) {
+			$user_patreon_id = get_user_meta( $user->ID, 'patreon_user_id', true );
+		}
+
+		if ( !is_user_logged_in() OR ( is_user_logged_in() AND $user_patreon_id == '' ) ) {
 			return Patreon_Frontend::showPatreonLoginButton();
 		}
 		

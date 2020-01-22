@@ -80,11 +80,16 @@ class Patreon_User_Profiles {
 	}
 
 	function prevent_email_change( $errors, $update, $user ) {
+		
+		if ( $user AND isset ( $user->ID ) ) {
+			
+			$old = get_user_by( 'id', $user->ID );
 
-		$old = get_user_by( 'id', $user->ID );
-
-		if( $user->user_email != $old->user_email   && ( !current_user_can( 'create_users' ) ) )
-			$user->user_email = $old->user_email;
+			if( $user->user_email != $old->user_email   && ( !current_user_can( 'create_users' ) ) ) {
+				$user->user_email = $old->user_email;
+			}
+			
+		}
 		
 	}
 	
