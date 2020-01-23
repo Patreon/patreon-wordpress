@@ -2030,3 +2030,4 @@ class Patreon_Wordpress {
 
 	}
 }
+

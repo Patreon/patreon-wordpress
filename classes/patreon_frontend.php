@@ -1495,4 +1495,15 @@ class Patreon_Frontend {
 		return '';
 		
 	}
+	
+	public function login_widget() {
+		
+		// Displays a conditional Patreon login widget
+		
+		echo 'Yes';
+		
+		
+	}
+	
+	
 }
