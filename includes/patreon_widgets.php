@@ -10,7 +10,7 @@ class patreon_wordpress_login_widget extends WP_Widget {
     public function __construct() {
 		
         parent::__construct(
-            'patreon_wordpress_login_widget_2', // Base ID
+            'patreon_wordpress_login_widget', // Base ID
              PATREON_LOGIN_WIDGET_NAME, // Name
             array( 'description' => PATREON_LOGIN_WIDGET_DESC ) // Args
         );
@@ -32,8 +32,7 @@ class patreon_wordpress_login_widget extends WP_Widget {
 		
 		echo $message;
 			
-		// echo $Patreon_Frontend->login_widget();
-		echo '###';
+		echo Patreon_Frontend::login_widget();
 		
 		echo $after_widget;
 		
@@ -52,7 +51,7 @@ class patreon_wordpress_login_widget extends WP_Widget {
 		
 		global $Patreon_Frontend;
 	
-		$instance   = wp_parse_args( (array) $instance, array( 'title' => 'Patreon Login Widget', 'message'=> '' ) );
+		$instance   = wp_parse_args( (array) $instance, array( 'title' => 'Login with Patreon', 'message'=> '' ) );
         $title 		= esc_attr( $instance['title'] );
         $message	= esc_attr( $instance['message'] );
 		

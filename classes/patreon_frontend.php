@@ -1496,11 +1496,23 @@ class Patreon_Frontend {
 		
 	}
 	
-	public function login_widget() {
+	public static function login_widget() {
 		
 		// Displays a conditional Patreon login widget
 		
-		echo 'Yes';
+		$user = wp_get_current_user();
+		$user_patreon_id = '';
+		
+		if ( $user AND isset( $user->ID ) ) {
+			$user_patreon_id = get_user_meta( $user->ID, 'patreon_user_id', true );
+		}
+
+		if ( !is_user_logged_in() OR ( is_user_logged_in() AND $user_patreon_id == '' ) ) {
+			return Patreon_Frontend::showPatreonLoginButton();
+		}
+		
+		// User logged in and has Patreon connected. Display logout link.
+		return 'Logout link';
 		
 		
 	}
