@@ -126,8 +126,10 @@ define( "PATREON_PRETTY_PERMALINKS_ARE_OFF", 'Pretty permalinks are off in your 
 define( "PATREON_LAST_50_CONNECTION_ERRORS", 'These are the last 50 connection issues encountered by your site when contacting Patreon API. These are here for general info on health of the connection of your WP site to Patreon API. They only constitute an error if there are a lot of recent ones. Healthiest integrations should have a number of them (up to 50) in the long run.' );
 define( "PATREON_LAST_50_CONNECTION_ERRORS_HEADING", 'Last 50 connection errors' );
 define( "PATREON_FEED_ACTION_TEXT", ' - Click "Read more" to unlock this content at the source' );
-define( "PATREON_LOGIN_WIDGET_NAME", 'Patreon login widget' );
-define( "PATREON_LOGIN_WIDGET_DESC", 'Display a "Login with Patreon" button and have your users login with Patreon. For logged in users who dont have their Patreon account linked, it shows a "Connect your Patreon" button. Hides itself for logged in users with connected Patreon accounts.' );
+define( "PATREON_LOGIN_WIDGET_NAME", 'Login with Patreon' );
+define( "PATREON_LOGIN_WIDGET_DESC", 'Have your users login with Patreon or connect their Patreon account.' );
+define( "PATREON_LOGIN_WIDGET_LOGOUT", 'You are logged in. %%click_here%% to logout.' );
+define( "PATREON_CLICK_HERE", 'Click here' );
 
 require( 'classes/patreon_wordpress.php' );
 

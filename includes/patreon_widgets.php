@@ -29,9 +29,10 @@ class patreon_wordpress_login_widget extends WP_Widget {
 		if ( $title ) {
 			echo $before_title . $title . $after_title; 
 		}
+		if ( isset( $message ) AND $message != '' ) {
+			echo '<p>'. $message . '</p>';
+		}
 		
-		echo $message;
-			
 		echo Patreon_Frontend::login_widget();
 		
 		echo $after_widget;
@@ -61,12 +62,11 @@ class patreon_wordpress_login_widget extends WP_Widget {
           <input class="widefat" id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" type="text" value="<?php echo $title; ?>" />
         </p>
 		<p>
-          <label for="<?php echo $this->get_field_id( 'message' ); ?>"><?php echo '#####'; ?></label> 
+          <label for="<?php echo $this->get_field_id( 'message' ); ?>"><?php echo 'Message over login button - optional'; ?></label> 
           <input class="widefat" id="<?php echo $this->get_field_id( 'message' ); ?>" name="<?php echo $this->get_field_name( 'message' ); ?>" type="text" value="<?php echo $message ?>" />
         </p>
 		<p>
-          <?php // echo $Patreon_Frontend->login_widget(); ?>
-          <?php echo '###'; ?>
+          <?php echo Patreon_Frontend::login_widget(); ?>
         </p>		
 		
         <?php 

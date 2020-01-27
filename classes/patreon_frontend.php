@@ -1314,9 +1314,28 @@ class Patreon_Frontend {
 		echo '<div style="display:inline-block;width : 100%; text-align: center;">' . self::showPatreonLoginButton() . '</div>';
 		
 	}
-	public static function showPatreonLoginButton() {
+	public static function showPatreonLoginButton( $args = array() ) {
 
+		// Set default login image
 		$log_in_img = PATREON_PLUGIN_ASSETS . '/img/patreon login@1x.png';
+		
+		$user = wp_get_current_user();
+		$user_patreon_id = '';
+		
+		if ( $user AND isset( $user->ID ) ) {
+			$user_patreon_id = get_user_meta( $user->ID, 'patreon_user_id', true );
+		}		
+		
+		if ( is_user_logged_in() AND $user_patreon_id == '' ) {
+			// Logged in user without a connected Patreon account. Show connect button
+			$log_in_img = PATREON_PLUGIN_ASSETS . '/img/patreon connect@1x.png';			
+		}
+		
+		// Override image if argument given
+		if ( isset( $args['img'] ) ) {
+			$log_in_img = $args['img'];
+		}
+				
 		$client_id  = get_option( 'patreon-client-id', false );
 
 		if ( $client_id == false ) {
@@ -1507,13 +1526,17 @@ class Patreon_Frontend {
 			$user_patreon_id = get_user_meta( $user->ID, 'patreon_user_id', true );
 		}
 
-		if ( !is_user_logged_in() OR ( is_user_logged_in() AND $user_patreon_id == '' ) ) {
+		if ( !is_user_logged_in() ) {
+			return Patreon_Frontend::showPatreonLoginButton();
+		}
+		
+		if ( is_user_logged_in() AND $user_patreon_id == '' ) {
+			// WP logged in user with potentially unconnected Patreon account. Show connect button and any other specific info (if needed in future) - login button function will take care of showing the connect version of the image
 			return Patreon_Frontend::showPatreonLoginButton();
 		}
 		
 		// User logged in and has Patreon connected. Display logout link.
-		return 'Logout link';
-		
+		return str_replace( '%%click_here%%', '<a href="'. wp_logout_url( get_permalink() ) .'">'. PATREON_CLICK_HERE . '</a>', PATREON_LOGIN_WIDGET_LOGOUT );		
 		
 	}
 	
