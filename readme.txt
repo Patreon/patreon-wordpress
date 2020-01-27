@@ -4,7 +4,7 @@ Tags: patreon, membership, members
 Requires at least: 4.0
 Requires PHP: 5.4
 Tested up to: 5.3.2
-Stable tag: 1.4.4
+Stable tag: 1.4.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -70,6 +70,17 @@ To make a locked post public again, just choose "Everyone" from the select box a
 It is  difficult to protect videos due the intensive bandwidth requirements of hosting video  and having to rely on third parties such as Youtube or Vimeo. Youtube allows you to set videos to ‘private’ but Vimeo offers extra controls by only allowing videos to be played on specific domains. Visit this guide to [protecting your video content with Vimeo](https://help.vimeo.com/hc/en-us/articles/224817847-Privacy-settings-overview).
 
 == Upgrade Notice ==
+
+= 1.4.5 =
+
+* Added a simple way for hiding ads using a single function. This will allow creators to hide ads for their patrons in any part of their WP site
+* Added a login widget that site admins can put in the sidebar or other widget areas of their site. It allows users to login via Patreon, and shows 'Connect your Patreon' version of the login button for WP users who dont have a connected Patreon account. Allows optional message and also shows a logout link.
+* Made [patreon_login_button] shortcode allow connecting one's Patreon account if logged in. Shows 'Connect your Patreon' version in such cases
+* Added a 'Connect your Patreon' button
+* Patreon_Frontend::showPatreonLoginButton function now shows alternative 'Connect your Patreon' version of login image in all login forms
+* Patreon_Frontend::showPatreonLoginButton now accepts args
+* Patreon_Frontend::showPatreonLoginButton now allows override of login image via args
+* Added parameters to make_tiers_select function to allow skipping updating creator tiers from Patreon via arguments
 
 = 1.4.4 =
 
@@ -158,6 +169,17 @@ Not at all - you can post different content totally independently at your site a
 Nothing will be changed at your site - the plugin will just connect your site to Patreon to allow communication in between your site and Patreon.
 
 == Changelog ==
+
+= 1.4.5 =
+
+* Added a simple way for hiding ads using a single function. This will allow creators to hide ads for their patrons in any part of their WP site
+* Added a login widget that site admins can put in the sidebar or other widget areas of their site. It allows users to login via Patreon, and shows 'Connect your Patreon' version of the login button for WP users who dont have a connected Patreon account. Allows optional message and also shows a logout link.
+* Made [patreon_login_button] shortcode allow connecting one's Patreon account if logged in. Shows 'Connect your Patreon' version in such cases
+* Added a 'Connect your Patreon' button
+* Patreon_Frontend::showPatreonLoginButton function now shows alternative 'Connect your Patreon' version of login image in all login forms
+* Patreon_Frontend::showPatreonLoginButton now accepts args
+* Patreon_Frontend::showPatreonLoginButton now allows override of login image via args
+* Added parameters to make_tiers_select function to allow skipping updating creator tiers from Patreon via arguments
 
 = 1.4.4 =
 

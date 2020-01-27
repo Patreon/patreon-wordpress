@@ -49,10 +49,8 @@ class patreon_wordpress_login_widget extends WP_Widget {
  
     /** @see WP_Widget::form -- do not rename this */
     function form( $instance ) {
-		
-		global $Patreon_Frontend;
-	
-		$instance   = wp_parse_args( (array) $instance, array( 'title' => 'Login with Patreon', 'message'=> '' ) );
+			
+		$instance   = wp_parse_args( (array) $instance, array( 'title' => PATREON_LOGIN_WIDGET_NAME, 'message'=> '' ) );
         $title 		= esc_attr( $instance['title'] );
         $message	= esc_attr( $instance['message'] );
 		
