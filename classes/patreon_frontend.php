@@ -1229,8 +1229,11 @@ class Patreon_Frontend {
 				// selected = selected for XHTML compatibility
 				
 				// Use title if it exists, description if it does not.
-				$tier_title = $reward['attributes']['title'];
 				
+				if ( isset( $reward['attributes']['title'] ) ) {
+					$tier_title = $reward['attributes']['title'];
+				}
+								
 				if ( $tier_title == '' ) {
 					
 					/// Detect if this is an old non bas64 desc

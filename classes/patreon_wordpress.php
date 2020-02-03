@@ -7,15 +7,15 @@ if ( !defined( 'WPINC' ) ) {
 
 class Patreon_Wordpress {
 
-	private static $Patreon_Routing;
-	private static $Patreon_Frontend;
-	private static $Patreon_Posts;
-	private static $Patreon_Protect;
-	private static $Patreon_Options;
-	private static $Patron_Metabox;
-	private static $Patron_Compatibility;
-	private static $Patreon_User_Profiles;
-	private static $Patreon_Admin_Pointers;
+	public static $patreon_routing;
+	public static $patreon_frontend;
+	public static $patreon_posts;
+	public static $patreon_protect;
+	public static $patreon_options;
+	public static $patron_metabox;
+	public static $patreon_compatibility;
+	public static $patreon_user_profiles;
+	public static $patreon_admin_pointers;
 	public static $current_user_pledge_amount = -1;
 	public static $current_user_patronage_declined = -1;
 	public static $current_user_is_patron = -1;
@@ -28,32 +28,32 @@ class Patreon_Wordpress {
 
 	function __construct() {
 
-		include 'patreon_login.php';
-		include 'patreon_routing.php';
-		include 'patreon_frontend.php';
-		include 'patreon_api.php';
-		include 'patreon_oauth.php';
-		include 'patreon_options.php';
-		include 'patreon_metabox.php';
-		include 'patreon_user_profiles.php';
-		include 'patreon_protect.php';
-		include 'patreon_compatibility.php';
-		include 'patreon_admin_pointers.php';
+		include_once( 'patreon_login.php' );
+		include_once( 'patreon_routing.php' );
+		include_once( 'patreon_frontend.php' );
+		include_once( 'patreon_api.php' );
+		include_once( 'patreon_oauth.php' );
+		include_once( 'patreon_options.php' );
+		include_once( 'patreon_metabox.php' );
+		include_once( 'patreon_user_profiles.php' );
+		include_once( 'patreon_protect.php' );
+		include_once( 'patreon_compatibility.php' );
+		include_once( 'patreon_admin_pointers.php' );
 
-		self::$Patreon_Routing        = new Patreon_Routing;
-		self::$Patreon_Frontend       = new Patreon_Frontend;
+		self::$patreon_routing        = new Patreon_Routing;
+		self::$patreon_frontend       = new Patreon_Frontend;
 		
 		if ( is_admin() ) {
-			self::$Patreon_Options        = new Patreon_Options;
-			self::$Patron_Metabox         = new Patron_Metabox;
+			self::$patreon_options    = new Patreon_Options;
+			self::$patron_metabox     = new Patron_Metabox;
 		}
 		
-		self::$Patreon_User_Profiles  = new Patreon_User_Profiles;
-		self::$Patreon_Protect        = new Patreon_Protect;
-		self::$Patron_Compatibility   = new Patreon_Compatibility;
+		self::$patreon_user_profiles  = new Patreon_User_Profiles;
+		self::$patreon_protect        = new Patreon_Protect;
+		self::$patreon_compatibility  = new Patreon_Compatibility;
 		
 		if ( is_admin() ) {
-			self::$Patreon_Admin_Pointers = new Patreon_Admin_Pointers;	
+			self::$patreon_admin_pointers = new Patreon_Admin_Pointers;	
 		}
 		
 		add_action( 'wp_head', array( $this, 'updatePatreonUser' ) );
