@@ -1032,7 +1032,7 @@ class Patreon_Frontend {
 		
 	}
 	public static function protectContentFromUsers( $content, $post_id = false ) {
-		
+				
 		// This function receives content and optionally post id.
 		
 		// If content is received but no post id, the function acts to lock the existing post. In this case it can be hooked to the_content filter
@@ -1052,6 +1052,11 @@ class Patreon_Frontend {
 			
 		}
 		
+		$tier = Patreon_Wordpress::$patreon_compatibility->match_pmp_tier(5);
+		
+		echo $tier;
+		echo '#####';
+			
 		// Allow addons to override this function - this will bypass this function, but also will allow addons to apply this function's filters in their own gating function to keep compatibility with other addons
 		
 		$override_content_filtering = array();

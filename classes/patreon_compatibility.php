@@ -279,4 +279,58 @@ class Patreon_Compatibility {
 		
 	}
 	
+	public function match_pmp_tier( $patreon_level, $args = array() ) {
+		
+		// Takes a $ level, matches that to the nearest highest Paid Memberships Pro level and returns the id of that tier
+		
+		if ( !$this->check_if_plugin_active( 'paid-memberships-pro/paid-memberships-pro.php' ) ) {
+			
+			// Bail out if PMP is not active
+			
+			return false;
+			
+		}
+		
+		// Get all membership levels
+		
+		$pmp_levels = pmpro_getAllLevels( true );
+		
+		// Iterate membership levels if any exists, and find matching level
+		
+		
+		if ( is_array( $pmp_levels ) AND count( $pmp_levels ) > 0 )  {
+
+			foreach( $pmp_levels as $key => $value ) {
+				
+				$pmp_level = $pmp_levels[$key];
+		
+				// If its not a reward element, continue, just to make sure
+				
+				if(
+					!isset( $pmp_level->cycle_period )
+					OR $pmp_level->cycle_period != 'Month'
+				)  {
+					
+					// Not a monthly cycle. Continue
+					continue; 
+				}
+				
+				if ( $pmp_level->billing_amount >= $patreon_level ) {
+					
+					// Matching level found return id of the tier
+					
+					return $pmp_level->id;
+					
+				}
+				
+			}
+			
+		}
+		
+		// Here and no result - no tier found.
+		
+		return false;
+		
+	}
+	
 }
