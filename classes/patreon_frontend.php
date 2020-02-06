@@ -398,7 +398,10 @@ class Patreon_Frontend {
 				// selected = selected for XHTML compatibility
 				
 				// Use title if it exists, description if it does not.
-				$tier_title = $reward['attributes']['title'];
+				
+				if ( isset( $reward['attributes']['title'] ) ) {
+					$tier_title = $reward['attributes']['title'];
+				}
 				
 				if ( $tier_title == '' ) {
 					
@@ -1052,11 +1055,6 @@ class Patreon_Frontend {
 			
 		}
 		
-		$tier = Patreon_Wordpress::$patreon_compatibility->match_pmp_tier(5);
-		
-		echo $tier;
-		echo '#####';
-			
 		// Allow addons to override this function - this will bypass this function, but also will allow addons to apply this function's filters in their own gating function to keep compatibility with other addons
 		
 		$override_content_filtering = array();

@@ -19,6 +19,7 @@ class Patreon_Compatibility {
 		add_action( 'admin_init', array( $this, 'check_permalinks' ) );
 		// Hook to template_redirect filter so the $post object will be ready before sending headers - add_headers hook wont work
 		add_filter( 'template_redirect', array( $this, 'modify_headers' ), 99 );
+		add_filter( 'ptrn/lock_or_not', array( $this, 'lock_for_other_membership_plugins' ), 10, 4 );
 		
 	}
 
@@ -299,6 +300,8 @@ class Patreon_Compatibility {
 		
 		
 		if ( is_array( $pmp_levels ) AND count( $pmp_levels ) > 0 )  {
+			
+			$matching_levels = array();
 
 			foreach( $pmp_levels as $key => $value ) {
 				
@@ -319,10 +322,15 @@ class Patreon_Compatibility {
 					
 					// Matching level found return id of the tier
 					
-					return $pmp_level->id;
+					$matching_levels[] = $pmp_level->id;
 					
 				}
 				
+			}
+			
+			// If there are matching PMP levels, return them
+			if ( count( $matching_levels ) > 0 ) {
+				return $matching_levels;
 			}
 			
 		}
@@ -332,5 +340,108 @@ class Patreon_Compatibility {
 		return false;
 		
 	}
+	
+	public function lock_for_other_membership_plugins( $lock_or_not, $post_id, $declined, $user ) {
+		
+		// This function gates content if content was gated with a membership plugin other than PW
+				
+		// 
+		
+		// Bail out if no lock or not info given
+				
+		// Check for PMP
+		
+		if ( $this->check_if_plugin_active( 'paid-memberships-pro/paid-memberships-pro.php' ) ) {
+			
+			// PMP active. Check if content is gated with PW
+			
+			if ( $lock_or_not['lock'] ) {
+				
+				// Gated with PW. Check if user has matching PMP levels.
+				
+				$matching_pmp_levels = Patreon_Wordpress::$patreon_compatibility->match_pmp_tier( $lock_or_not['patreon_level'] );
+				
+				if ( $matching_pmp_levels ) {
+					// User has matching levels. Check if any of them match the levels assigned to this post.
+					
+					
+					
+					
+				}
+				
+				return $lock_or_not;
+				
+			}
+			
+			// Check if content is gated with PMP and if the user has access:
+			
+			$user_has_pmp_access = pmpro_has_membership_access( $post_id );
+
+			if ( !$user_has_pmp_access ) {
+				
+				// User doesnt have access. This means that the content is gated and user does not qualify. Modify lock or not result and return to have it gated with our interface_exists
+				
+				// Now check if user has a matching Patreon level
+				
+				
+				
+				$lock_or_not['lock'] = true;
+				$lock_or_not['patreon_level'] = 5;
+				
+			}
+		
+		}
+		
+		return $lock_or_not;
+	}
+	
+	public function get_pmp_post_membership_levels( $post_id = false ) {
+		
+		// Gets membership levels assigned to a post or post category
+		
+		// No post id. Return false
+		if ( !$post_id ) {
+			return false;
+		}
+		
+		$post = get_post( $post_id );
+		
+		if ( !$post OR !is_object( $post ) ) {
+			return false;
+		}
+		
+
+		if(isset($post->post_type) && $post->post_type == "post")
+		{
+			$post_categories = wp_get_post_categories($post->ID);
+
+			if(!$post_categories)
+			{
+				//just check for entries in the memberships_pages table
+				$sqlQuery = "SELECT m.id, m.name FROM $wpdb->pmpro_memberships_pages mp LEFT JOIN $wpdb->pmpro_membership_levels m ON mp.membership_id = m.id WHERE mp.page_id = '" . $post->ID . "'";
+			}
+			else
+			{
+				//are any of the post categories associated with membership levels? also check the memberships_pages table
+				$sqlQuery = "(SELECT m.id, m.name FROM $wpdb->pmpro_memberships_categories mc LEFT JOIN $wpdb->pmpro_membership_levels m ON mc.membership_id = m.id WHERE mc.category_id IN(" . implode(",", $post_categories) . ") AND m.id IS NOT NULL) UNION (SELECT m.id, m.name FROM $wpdb->pmpro_memberships_pages mp LEFT JOIN $wpdb->pmpro_membership_levels m ON mp.membership_id = m.id WHERE mp.page_id = '" . $post->ID . "')";
+			}
+		}
+		else
+		{
+			//are any membership levels associated with this page?
+			$sqlQuery = "SELECT m.id, m.name FROM $wpdb->pmpro_memberships_pages mp LEFT JOIN $wpdb->pmpro_membership_levels m ON mp.membership_id = m.id WHERE mp.page_id = '" . $post->ID . "'";
+		}
+
+
+		$post_membership_levels = $wpdb->get_results($sqlQuery);
+
+		$post_membership_levels_ids = array();
+		$post_membership_levels_names = array();		
+		
+		
+		
+	}
+	
+	
 	
 }
