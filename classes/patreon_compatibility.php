@@ -19,7 +19,7 @@ class Patreon_Compatibility {
 		add_action( 'admin_init', array( $this, 'check_permalinks' ) );
 		// Hook to template_redirect filter so the $post object will be ready before sending headers - add_headers hook wont work
 		add_filter( 'template_redirect', array( $this, 'modify_headers' ), 99 );
-		add_filter( 'ptrn/lock_or_not', array( $this, 'lock_for_other_membership_plugins' ), 10, 4 );
+		add_filter( 'ptrn/lock_or_not', array( $this, 'lock_for_pmp' ), 10, 4 );
 		
 	}
 
@@ -280,7 +280,7 @@ class Patreon_Compatibility {
 		
 	}
 	
-	public function match_pmp_tier( $patreon_level, $args = array() ) {
+	public function match_pmp_tiers( $patreon_level, $args = array() ) {
 		
 		// Takes a $ level, matches that to the nearest highest Paid Memberships Pro level and returns the id of that tier
 		
@@ -341,63 +341,117 @@ class Patreon_Compatibility {
 		
 	}
 	
-	public function lock_for_other_membership_plugins( $lock_or_not, $post_id, $declined, $user ) {
+	public function lock_for_pmp( $lock_or_not, $post_id, $declined, $user ) {
 		
-		// This function gates content if content was gated with a membership plugin other than PW
-				
-		// 
-		
+		// This function decides to gate or show content if PMP is installed
+						
 		// Bail out if no lock or not info given
 				
 		// Check for PMP
 		
-		if ( $this->check_if_plugin_active( 'paid-memberships-pro/paid-memberships-pro.php' ) ) {
+		if ( !$this->check_if_plugin_active( 'paid-memberships-pro/paid-memberships-pro.php' ) ) {
+			// Pmp not active. Just return
+			return $lock_or_not;
 			
-			// PMP active. Check if content is gated with PW
-			
-			if ( $lock_or_not['lock'] ) {
-				
-				// Gated with PW. Check if user has matching PMP levels.
-				
-				$matching_pmp_levels = Patreon_Wordpress::$patreon_compatibility->match_pmp_tier( $lock_or_not['patreon_level'] );
-				
-				if ( $matching_pmp_levels ) {
-					// User has matching levels. Check if any of them match the levels assigned to this post.
-					
-					
-					
-					
-				}
-				
-				return $lock_or_not;
-				
-			}
-			
-			// Check if content is gated with PMP and if the user has access:
-			
-			$user_has_pmp_access = pmpro_has_membership_access( $post_id );
+		}
+		
+		// If the post is not gated by either PW or PMP, skip
+		
+		if ( !( $lock_or_not['lock'] OR !pmpro_has_membership_access( $post_id ) ) ) {	
+			return $lock_or_not;
+		}
+		
+		// If user is not logged in, skip
+		
+		if ( !is_user_logged_in() ) {
+			return $lock_or_not;
+		}
 
-			if ( !$user_has_pmp_access ) {
-				
-				// User doesnt have access. This means that the content is gated and user does not qualify. Modify lock or not result and return to have it gated with our interface_exists
-				
-				// Now check if user has a matching Patreon level
-				
-				
-				
-				$lock_or_not['lock'] = true;
-				$lock_or_not['patreon_level'] = 5;
+		$user_qualifies = false;
+		
+		// Get pmp levels assigned to post.
+		$post_membership_level_ids = $this->get_pmp_post_membership_level_ids( $post_id );
+		
+		// Get PMP levels user has
+		$user_pmp_levels = pmpro_getMembershipLevelsForUser( $user->ID );
+		
+		// Get user Patreon pledge if exists
+		$user_patreon_level = Patreon_Wordpress::getUserPatronage( $user );
+		
+		$user_patreon_pledge_matching_pmp_levels = array();
+		
+		// If user has any Patreon pledge, get matching pmp levels
+		if ( $user_patreon_level > 0 ) {
+			$user_patreon_pledge_matching_pmp_levels = $this->match_pmp_tiers( $user_patreon_level );
+		}
+		
+		// Get matching PMP levels for this post's Patreon level.
+		
+		$post_patreon_matching_pmp_levels = $this->match_pmp_tiers( $lock_or_not['patreon_level'] );
+		
+		// Check if content is gated with PMP and if the user has access:
+		
+		$user_has_pmp_access = pmpro_has_membership_access( $post_id );				
+		
+		// Case 1 - User has access via PMP
+		
+		if ( $user_has_pmp_access ) {
+		
+			$lock_or_not['lock'] = false;
+			$lock_or_not['patreon_level'] = ;
+			
+		}
+		
+		// Case 2 - User has pmp levels. Post doesnt have pmp levels.
+		
+		if( count( $user_pmp_levels ) > 0 AND count( $post_membership_level_ids ) == 0 ) {
+			
+			// Check if user's pmp level has any level that matches the levels that match Patreon
+								
+			if( count( $user_patreon_pledge_matching_pmp_levels ) > 0 AND count( array_intersect( $user_patreon_pledge_matching_pmp_levels, $post_membership_level_ids ) ) > 0 ) {
+				// User has a PMP level that matches the PMP level assigned to the post user qualifies
+				$user_qualifies = true;
+				$reason = 'user_has_pmp_level_matching_post_level';
+			}
+		
+		}				
+	
+		// Case 3 - User does not have pmp levels. Post has pmp levels. User has pmp levels matched from Patreon
+		
+		if( count( $user_patreon_pledge_matching_pmp_levels ) > 0 AND count( $user_pmp_levels ) == 0 AND count( $post_membership_level_ids ) > 0 ) {
+			
+			// Check if user has a matching pmp level over the Patreon pledge
+		
+			if( count( $user_patreon_pledge_matching_pmp_levels ) > 0 && count( array_intersect( $user_patreon_pledge_matching_pmp_levels, $post_membership_level_ids ) ) > 0 ) {
+									
+				$user_qualifies = true;
+				$reason = 'user_has_pmp_level_matching_post_level';
 				
 			}
 		
 		}
 		
+		
+		
+		
+		
+		if ( $user_qualifies ) {
+			
+			$lock_or_not['lock'] = false;
+			$lock_or_not['reason'] = 'user_qualifies_for_pmp_via_patreon';
+			
+			
+		}
+		
+		
 		return $lock_or_not;
 	}
 	
-	public function get_pmp_post_membership_levels( $post_id = false ) {
+	public function get_pmp_post_membership_level_ids( $post_id = false ) {
 		
 		// Gets membership levels assigned to a post or post category
+		
+		// Taken from PMP free version
 		
 		// No post id. Return false
 		if ( !$post_id ) {
@@ -410,24 +464,19 @@ class Patreon_Compatibility {
 			return false;
 		}
 		
-
-		if(isset($post->post_type) && $post->post_type == "post")
-		{
+		if(isset($post->post_type) && $post->post_type == "post") {
 			$post_categories = wp_get_post_categories($post->ID);
 
-			if(!$post_categories)
-			{
+			if(!$post_categories) {
 				//just check for entries in the memberships_pages table
 				$sqlQuery = "SELECT m.id, m.name FROM $wpdb->pmpro_memberships_pages mp LEFT JOIN $wpdb->pmpro_membership_levels m ON mp.membership_id = m.id WHERE mp.page_id = '" . $post->ID . "'";
 			}
-			else
-			{
+			else {
 				//are any of the post categories associated with membership levels? also check the memberships_pages table
 				$sqlQuery = "(SELECT m.id, m.name FROM $wpdb->pmpro_memberships_categories mc LEFT JOIN $wpdb->pmpro_membership_levels m ON mc.membership_id = m.id WHERE mc.category_id IN(" . implode(",", $post_categories) . ") AND m.id IS NOT NULL) UNION (SELECT m.id, m.name FROM $wpdb->pmpro_memberships_pages mp LEFT JOIN $wpdb->pmpro_membership_levels m ON mp.membership_id = m.id WHERE mp.page_id = '" . $post->ID . "')";
 			}
 		}
-		else
-		{
+		else {
 			//are any membership levels associated with this page?
 			$sqlQuery = "SELECT m.id, m.name FROM $wpdb->pmpro_memberships_pages mp LEFT JOIN $wpdb->pmpro_membership_levels m ON mp.membership_id = m.id WHERE mp.page_id = '" . $post->ID . "'";
 		}
@@ -435,13 +484,19 @@ class Patreon_Compatibility {
 
 		$post_membership_levels = $wpdb->get_results($sqlQuery);
 
-		$post_membership_levels_ids = array();
-		$post_membership_levels_names = array();		
+		$post_membership_level_ids = array();	
 		
+		if ( $post_membership_levels ) {
 		
+			foreach($post_membership_levels as $level) {
+				$post_membership_level_ids[] = $level->id;
+			}
+		
+		}
+		
+		return $post_membership_level_ids;
 		
 	}
-	
 	
 	
 }
