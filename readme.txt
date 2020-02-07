@@ -74,6 +74,9 @@ It is  difficult to protect videos due the intensive bandwidth requirements of h
 = 1.4.6 =
 
 * Made variables that hold subclasses public instead of private to allow custom site mods and 3rd party plugins to be able to use them
+* Turned subclass includers to include_once to allow custom site mods and 3rd party plugins to include and use them if needed
+* Made subclass variable names uniform
+* Subclass variable name which had the word patron instead of patreon was fixed. Lowercase
 * Retry links in site disconnect and reconnect error messages fixed. They were pointing to disposable test site
 
 = 1.4.5 =
@@ -178,6 +181,9 @@ Nothing will be changed at your site - the plugin will just connect your site to
 = 1.4.6 =
 
 * Made variables that hold subclasses public instead of private to allow custom site mods and 3rd party plugins to be able to use them
+* Turned subclass includers to include_once to allow custom site mods and 3rd party plugins to include and use them if needed
+* Made subclass variable names uniform
+* Subclass variable name which had the word patron instead of patreon was fixed. Lowercase
 * Retry links in site disconnect and reconnect error messages fixed. They were pointing to disposable test site
 
 = 1.4.5 =
