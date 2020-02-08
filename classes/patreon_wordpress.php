@@ -1257,7 +1257,9 @@ class Patreon_Wordpress {
 			'user_total_historical_pledge' => $user_lifetime_patronage,
 		);
 		
-		return apply_filters( 'ptrn/lock_or_not', self::add_to_lock_or_not_results( $post_id, $result) , $post_id, $declined, $user );
+		$result = apply_filters( 'ptrn/lock_or_not', $result , $post_id, $declined, $user );
+		
+		return self::add_to_lock_or_not_results( $post_id, $result);
 		
 	}
 
@@ -2029,5 +2031,59 @@ class Patreon_Wordpress {
 		update_option( 'patreon-last-50-conn-errors', $last_50_conn_errors );
 
 	}
+	
+	public static function is_content_gated_with_pw( $post_id ) {
+		
+		// Checks if a post is gated with PW
+				
+		$post = get_post( $post_id );
+
+		// Take into account excluded posts.
+		
+		$exclude = array(
+		);
+		
+		// Enables 3rd party plugins to modify the post types excluded from locking
+		$exclude = apply_filters( 'ptrn/filter_excluded_posts', $exclude );
+
+		if ( isset( $post->ID ) AND in_array( get_post_type( $post->ID ), $exclude ) ) {
+			// Excluded from gating. Therefore return false
+			return false;
+		}
+		
+		// First check if entire site is locked, get the level for locking.
+		
+		$patreon_level = get_option( 'patreon-lock-entire-site', false );
+		
+		// Check if specific level is given for this post:
+		
+		$post_level = '';
+		
+		if ( isset( $post->ID ) ) {
+			$post_level = get_post_meta( $post->ID, 'patreon-level', true );
+		}
+				
+		// get post meta returns empty if no value is found. If so, set the value to 0.
+		
+		if ( $post_level == '' ) {
+			$post_level = 0;				
+		}
+
+		// Check if both post level and site lock level are set to 0 or nonexistent. If so return normal content.
+		
+		if ( $post_level == 0 
+			&& ( !$patreon_level
+				|| $patreon_level == 0 )
+		) {
+			// Post is public
+			return false;			
+		}		
+		
+		// If we are at this point, it means the post is gated with PW. Return true.
+		return true;
+		
+	}
+	
+	
 }
 
