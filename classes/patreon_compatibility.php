@@ -646,14 +646,16 @@ class Patreon_Compatibility {
 		
 		if ( !$lock_or_not['lock'] ) {
 			return $lock_or_not;
-			
-			
 		}
 		
 		// At this point, it means the post is gated with PW and user does not have access.
 		
 		// Check if post is gated with PMP and if user has access.
 		
+		$hasaccess = false;
+		
+		// Temporarily remove filter we attached to PMP so it wont cause infinite loop
+		remove_filter( 'pmpro_has_membership_access_filter', array($this, 'override_pmp_gating_with_pw'), 10 );
 		
 		$hasaccess = pmpro_has_membership_access( $post_id, $user->ID );
 		
@@ -664,7 +666,11 @@ class Patreon_Compatibility {
 			$lock_or_not['reason'] = 'valid_patron';
 			
 			return $lock_or_not;
-		}		
+		}
+		
+		// Re-add pmp filter:
+		
+		add_filter( 'pmpro_has_membership_access_filter', array($this, 'override_pmp_gating_with_pw'), 10, 4 );
 		
 		// Catch all - return as it is
 
