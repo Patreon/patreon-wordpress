@@ -337,3 +337,33 @@
 #patreon_copied {
 	margin-top: 10px;
 }
+
+#patreon_level_select_wrapper{
+	width: 100%;
+	white-space: nowrap;
+	-webkit-transform-style: preserve-3d;
+	-moz-transform-style: preserve-3d;
+	transform-style: preserve-3d;	
+}
+
+#patreon_level_select_wrapper img {
+	position: relative;
+	top: 50%;
+	transform: translateY(-50%);
+	filter:progid:DXImageTransform.Microsoft.Alpha(opacity=70);
+	-moz-opacity: 0.7;
+	opacity: 0.7;	
+}
+
+#patreon_level_select_wrapper img:hover {
+	cursor: pointer;
+	filter:progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+	-moz-opacity: 1;
+	opacity: 1;
+}
+
+#patreon_level_select_wrapper select {
+	position: relative;
+	top: 50%;
+	transform: translateY(-50%);
+}
