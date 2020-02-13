@@ -1647,12 +1647,7 @@ class Patreon_Wordpress {
 		}
 		
 		// This function makes a select box with rewards and reward ids from creator's campaign to be used in post locking and site locking
-		
-		// First force an update of creator tiers from the api in case they were changed.
-		if ( !isset( $args['skip_tier_update_from_api'] ) ) {
-			self::update_creator_tiers_from_api();
-		}
-		
+				
 		// Get updated tiers from db
 		$creator_tiers = get_option( 'patreon-creator-tiers', false );
 
