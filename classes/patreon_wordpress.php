@@ -1630,6 +1630,10 @@ class Patreon_Wordpress {
 			exit;
 		}
 		
+		// Update creator tiers from api
+		
+		Patreon_Wordpress::update_creator_tiers_from_api();
+		
 		$post = get_post( $_REQUEST['pw_post_id'] );
 				
 		echo Patreon_Wordpress::make_tiers_select( $post );
