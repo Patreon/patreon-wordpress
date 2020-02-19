@@ -46,7 +46,7 @@ jQuery( function( $ ) {
 			}
 		});	
 	});
-	
+	/*
 	// Need to bind to event after tinymce is initialized - so we hook to all tinymce instances after a timeout
 	setTimeout( function () {
 		
@@ -84,7 +84,47 @@ jQuery( function( $ ) {
 			});
 		}
 	}, 1000);
+*/
 
+
+jQuery(document).ready(function(){
+	
+	// Need to bind to event after tinymce is initialized - so we hook to all tinymce instances after a timeout
+	setTimeout( function () {
+		
+		if( typeof tinyMCE === 'undefined' ) {
+			return;
+		}
+		for ( var i = 0; i < tinyMCE.editors.length; i++ ) {
+			
+			tinyMCE.editors[i].on( 'click', function ( e ) {
+				
+				if( e.target.nodeName = 'img' ) {
+					var resizer = jQuery(document).find( '#mceResizeHandlese' );
+					console.log(jQuery('#mceResizeHandlese'));
+					var $ = tinyMCE.dom.DomQuery;
+					var clicked_image_inside_frame_offset = jQuery(e.target).offset();
+										
+					// Get the clicked image inside iframe
+					var clicked_image = jQuery(e.target);
+					var clicked_image_width = clicked_image.width();
+					
+					console.log(clicked_image_width);
+					console.log(clicked_image_inside_frame_offset);
+					// Remove the added attribute
+					
+					jQuery( '#patreon-image-toolbar' ).css({
+							position : 'absolute',
+							top: clicked_image_inside_frame_offset.top + 20 + "px",
+							left: clicked_image_inside_frame_offset.left + clicked_image_width + 10 + "px"
+						});
+						jQuery( '#patreon-image-toolbar' ).show();
+						console.log(jQuery( '#patreon-image-toolbar' ).offset());
+					}
+			});
+		}
+	}, 1000);
+});
 	jQuery(document).on( 'click', '.patreon-wordpress .notice-dismiss', function(e) {
 
 		jQuery.ajax({

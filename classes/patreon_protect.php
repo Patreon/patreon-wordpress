@@ -19,7 +19,7 @@ class Patreon_Protect {
 			add_action( "wp_ajax_patreon_make_attachment_pledge_editor", array( $this, "makeAttachmentPledgeEditor" ) );
 			add_action( 'wp_ajax_nopriv_patreon_catch_image_click', 'Patreon_Protect::CatchImageClick' );
 			add_action( 'wp_ajax_patreon_catch_image_click', 'Patreon_Protect::CatchImageClick' );
-			add_action( 'admin_footer', 'Patreon_Protect::addImageToolbar' );
+			add_action( 'in_admin_footer', 'Patreon_Protect::addImageToolbar' );
 			add_action( 'admin_head', 'Patreon_Protect::addCustomCSSinAdmin' );
 			
 		}
@@ -834,6 +834,11 @@ RewriteRule ^" . $upload_dir . "/(.*)$ index.php?patreon_action=serve_patron_onl
 	public static function addImageToolbar() {
 		
 		// Adds the hidden floating image toolbar
+
+		$screen = get_current_screen();
+		if ( $screen->parent_base != 'edit' ) {
+			return;
+		}
 		
 		?>
 		
@@ -842,7 +847,7 @@ RewriteRule ^" . $upload_dir . "/(.*)$ index.php?patreon_action=serve_patron_onl
 		</div>
 
 		<?php
-		
+	
 	}
 	public static function checkPatronPledgeForImage( $attachment_id, $user = false ) {
 	
