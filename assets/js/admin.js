@@ -89,6 +89,7 @@ jQuery( function( $ ) {
 
 jQuery(document).ready(function(){
 	
+	// Gutenberg variant - interim solution
 	// Need to bind to event after tinymce is initialized - so we hook to all tinymce instances after a timeout
 	setTimeout( function () {
 		
@@ -99,9 +100,9 @@ jQuery(document).ready(function(){
 			
 			tinyMCE.editors[i].on( 'click', function ( e ) {
 				
-				if( e.target.nodeName = 'img' ) {
+				if( e.target.nodeName == 'IMG' ) {
 					var resizer = jQuery(document).find( '#mceResizeHandlese' );
-					console.log(jQuery('#mceResizeHandlese'));
+					
 					var $ = tinyMCE.dom.DomQuery;
 					var clicked_image_inside_frame_offset = jQuery(e.target).offset();
 										
@@ -109,18 +110,26 @@ jQuery(document).ready(function(){
 					var clicked_image = jQuery(e.target);
 					var clicked_image_width = clicked_image.width();
 					
-					console.log(clicked_image_width);
-					console.log(clicked_image_inside_frame_offset);
 					// Remove the added attribute
+					
+						jQuery( '<div id="patreon-image-toolbar"><div id="patreon-image-lock-icon"><img src="' + pw_admin_js.patreon_wordpress_assets_url + '/img/patreon-image-lock-icon.png" /></div></div>' ).appendTo("body");
 					
 					jQuery( '#patreon-image-toolbar' ).css({
 							position : 'absolute',
 							top: clicked_image_inside_frame_offset.top + 20 + "px",
-							left: clicked_image_inside_frame_offset.left + clicked_image_width + 10 + "px"
-						});
-						jQuery( '#patreon-image-toolbar' ).show();
-						console.log(jQuery( '#patreon-image-toolbar' ).offset());
+							left: clicked_image_inside_frame_offset.left + clicked_image_width + 10 + "px",
+					});
+					jQuery( '#patreon-image-lock-icon' ).css({
+						border: '1px solid #c0c0c0'
+					});
+					jQuery( '#patreon-image-toolbar' ).show();
+				}
+				
+				if( e.target.nodeName != 'IMG' OR ) {
+					if ( jQuery(document).find( '#patreon-image-toolbar' ).length ) {
+						jQuery(document).find( '#patreon-image-toolbar' ).hide();
 					}
+				}
 			});
 		}
 	}, 1000);

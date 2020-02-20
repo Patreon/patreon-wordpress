@@ -137,7 +137,7 @@
 }
 
 #patreon-image-lock-icon:hover {
-	border: 1px solid #575c5e;
+	border: 1px solid #575c5e !important;
 	cursor: pointer;
 }
 

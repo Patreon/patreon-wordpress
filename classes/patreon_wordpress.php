@@ -637,7 +637,7 @@ class Patreon_Wordpress {
 	public static function enqueueAdminScripts() {
 		
 		wp_enqueue_script( 'patreon-admin-js', PATREON_PLUGIN_ASSETS . '/js/admin.js', array( 'jquery' ), PATREON_WORDPRESS_VERSION, true );
-		wp_enqueue_script( 'patreon-admin-js', PATREON_PLUGIN_ASSETS . '/js/admin.js', array( 'jquery' ), PATREON_WORDPRESS_VERSION, true );
+		wp_localize_script( 'patreon-admin-js', 'pw_admin_js', array( 'patreon_wordpress_assets_url' => PATREON_PLUGIN_ASSETS, ) );
 
 	}
 	public static function AfterUpdateActions( $upgrader_object, $options = false ) {
