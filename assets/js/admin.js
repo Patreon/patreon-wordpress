@@ -125,7 +125,7 @@ jQuery(document).ready(function(){
 					jQuery( '#patreon-image-toolbar' ).show();
 				}
 				
-				if( e.target.nodeName != 'IMG' OR ) {
+				if( e.target.nodeName != 'IMG' ) {
 					if ( jQuery(document).find( '#patreon-image-toolbar' ).length ) {
 						jQuery(document).find( '#patreon-image-toolbar' ).hide();
 					}
