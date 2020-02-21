@@ -1322,6 +1322,15 @@ class Patreon_Wordpress {
 		
 		if ( !isset( $_REQUEST['setup_stage'] ) OR $_REQUEST['setup_stage'] == '0' ) {
 			
+			// Nuke the api version setting in the api so v1 sites can reconnect to v2
+			
+			// Delete all potential instances of api version
+			delete_option( 'patreon-installation-api-version' );
+			
+			// Set it to v2
+			
+			update_option( 'patreon-installation-api-version', '2' );
+			
 			$requirements_check = Patreon_Compatibility::check_requirements();
 			$requirement_notices = '';
 			
