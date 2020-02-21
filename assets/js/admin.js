@@ -4,34 +4,62 @@ jQuery( function( $ ) {
 		
 		jQuery( document ).on( 'click', '#patreon-image-lock-icon', function( e ) {
 			
-			var image_classes = tinymce.editors[0].selection.getNode().className.split(' ');
-			var arrayLength = image_classes.length;
-			
-			for ( var i = 0; i < arrayLength; i++ ) {
-				if ( image_classes[i].indexOf( 'wp-image-' ) !== -1 ) {
-					var attachment_id = image_classes[i].replace( "wp-image-", "" );
-				}
-			}		
+			var attachment_id = jQuery(this).attr('pw_attachment_id');
 
-			tb_show( 'Patron only image', "#TB_inline?width=350&height=150&inlineId=mygallery-form", false );
+			var image_lock_icon = jQuery( document ).find( '#patreon-image-toolbar' );
+			pos_x = jQuery( image_lock_icon ).attr('place_modal_x');
+			pos_y = jQuery( image_lock_icon ).attr('place_modal_y');
 			
-			jQuery( document ).find( '#TB_window' ).width( TB_WIDTH ).height( TB_HEIGHT ).css( 'margin-left', - TB_WIDTH / 2 );
-			
+			console.log(pos_x);
+			console.log(pos_y);
+	
 			data = { 
 				action: "patreon_make_attachment_pledge_editor",
 				patreon_attachment_id: attachment_id
-			};     
-			jQuery.ajax({
-				url: ajaxurl,
-				data: data,
-				dataType: 'html',
-				type: 'post',
+			};
+		
+			jQuery.ajax( ajaxurl, {
+				type: "POST",
+				dataType : 'html',
+				data: {
+					action: "patreon_make_attachment_pledge_editor",
+					patreon_attachment_id: attachment_id
+				},
 				success: function(response) {
-					jQuery( document ).find( '#TB_window' ).html( response );
-				}
-			});
+					console.log(response);
+					console.log('####');
+					jQuery( response ).appendTo("body");
+					
+					var image_locker = jQuery( document ).find( '#patreon_image_lock_modal' );
+					
+					image_locker.css({
+						display : 'block',
+						top: pos_y + "px",
+						left: pos_x + "px"
+					});
+				},
+			});			
+			
 		})
 	}, 1000 );
+	
+	// Centers image lock interface modal on window resize
+	jQuery( window ).resize(function() {
+		
+		if ( jQuery( document ).find( '#patreon_image_lock_modal' ).length ) {
+
+			var image_locker = jQuery( document ).find( '#patreon_image_lock_modal' );
+			pos_x = ( jQuery( document ).width() / 2 ) - ( image_locker.width() /2 );
+			pos_y = ( jQuery( document ).height() / 2 ) - ( image_locker.height() /2 );
+					
+			image_locker.css({
+				top: pos_y + "px",
+				left: pos_x + "px"
+			});
+	
+		}
+		
+	});	
 	
 	jQuery( document ).on( 'submit', '#patreon_attachment_patreon_level_form', function( e ) {
 		e.preventDefault();
@@ -112,7 +140,7 @@ jQuery(document).ready(function(){
 					
 					// Remove the added attribute
 					
-						jQuery( '<div id="patreon-image-toolbar"><div id="patreon-image-lock-icon"><img src="' + pw_admin_js.patreon_wordpress_assets_url + '/img/patreon-image-lock-icon.png" /></div></div>' ).appendTo("body");
+					jQuery( '<div id="patreon-image-toolbar"><div id="patreon-image-lock-icon"><img src="' + pw_admin_js.patreon_wordpress_assets_url + '/img/patreon-image-lock-icon.png" /></div></div>' ).appendTo("body");
 					
 					jQuery( '#patreon-image-toolbar' ).css({
 							position : 'absolute',
@@ -122,7 +150,27 @@ jQuery(document).ready(function(){
 					jQuery( '#patreon-image-lock-icon' ).css({
 						border: '1px solid #c0c0c0'
 					});
-					jQuery( '#patreon-image-toolbar' ).show();
+					
+					// Make attachment id
+					
+					var image_classes = e.target.className.split(' ');
+					var arrayLength = image_classes.length;
+					
+					for ( var i = 0; i < arrayLength; i++ ) {
+						if ( image_classes[i].indexOf( 'wp-image-' ) !== -1 ) {
+							var attachment_id = image_classes[i].replace( "wp-image-", "" );
+						}
+					}
+				
+					pos = jQuery( e.target ).offset();
+					offset_x = jQuery( e.target ).width();
+					offset_y = jQuery( e.target ).height();
+										
+					jQuery( '#patreon-image-lock-icon' ).attr('pw_attachment_id', attachment_id);
+					jQuery( document ).find(  '#patreon-image-toolbar' ).attr('place_modal_x', pos.left - (offset_x / 2 ));
+					jQuery( document ).find(  '#patreon-image-toolbar' ).attr('place_modal_y', pos.top);
+					jQuery( document ).find(  '#patreon-image-toolbar' ).show();
+					
 				}
 				
 				if( e.target.nodeName != 'IMG' ) {
@@ -295,5 +343,12 @@ jQuery(document).ready(function(){
 		});	
 		
 	});
+	
+	jQuery.fn.pw_screen_center = function () {
+		this.css("position","absolute");
+		this.css("top", Math.max(0, ((jQuery(window).height() - $(this).outerHeight()) / 2) + jQuery(window).scrollTop()) + "px");
+		this.css("left", Math.max(0, ((jQuery(window).width() - $(this).outerWidth()) / 2) + jQuery(window).scrollLeft()) + "px");
+		return this;
+	}	
 	
 });
