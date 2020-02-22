@@ -9,34 +9,64 @@ jQuery( function( $ ) {
 			var image_lock_icon = jQuery( document ).find( '#patreon-image-toolbar' );
 			pos_x = jQuery( image_lock_icon ).attr('place_modal_x');
 			pos_y = jQuery( image_lock_icon ).attr('place_modal_y');
+			pw_image_source = jQuery( image_lock_icon ).attr('pw_image_source');
 			
-			console.log(pos_x);
-			console.log(pos_y);
-	
-			data = { 
-				action: "patreon_make_attachment_pledge_editor",
-				patreon_attachment_id: attachment_id
-			};
-		
 			jQuery.ajax( ajaxurl, {
 				type: "POST",
 				dataType : 'html',
 				data: {
 					action: "patreon_make_attachment_pledge_editor",
-					patreon_attachment_id: attachment_id
+					patreon_attachment_id: attachment_id,
+					pw_image_source: pw_image_source,
+				},
+				beforeSend: function(e) {
 				},
 				success: function(response) {
-					console.log(response);
-					console.log('####');
-					jQuery( response ).appendTo("body");
+					
+					if ( jQuery( document ).find( '#patreon_image_lock_modal' ).length ) {
+						// Remove modal if it exists
+						jQuery( document ).find( '#patreon_image_lock_modal' ).remove();				
+					}
+					
+					modal = '<div id="patreon_image_lock_modal" class="patreon_image_lock_modal">' + response + '</div>';
+					
+					// Add the fresh
+					jQuery( modal ).appendTo("body");
 					
 					var image_locker = jQuery( document ).find( '#patreon_image_lock_modal' );
 					
-					image_locker.css({
-						display : 'block',
-						top: pos_y + "px",
-						left: pos_x + "px"
-					});
+					// if not tinymce and gutenberg editor is here
+					
+					if( jQuery( document ).find( '#editor' ).length ) {
+										
+						pos_x = pos_x - ( image_locker.width() /2 );
+						pos_y = pos_y - ( image_locker.height() /2 );
+						
+						image_locker.css({
+							display : 'block',
+							top: pos_y + "px",
+							left: pos_x + "px"
+						});
+					
+						
+					}
+					if( typeof tinymce !== 'undefined' && jQuery( document ).find( '#editor' ).length == 0 ) {
+						// Tinymce, not gutenberg
+						// Place at the center of the screen with scroll
+						
+						pos_x = ( jQuery(window).width() / 2 ) - ( image_locker.width() /2 );
+						pos_y = ( jQuery(window).height() / 2 ) - ( image_locker.height() /2 ) + jQuery(window).scrollTop();
+								
+						image_locker.css({
+							display : 'block',
+							top: pos_y + "px",
+							left: pos_x + "px"
+						});
+						
+						
+					}
+							
+					
 				},
 			});			
 			
@@ -48,9 +78,8 @@ jQuery( function( $ ) {
 		
 		if ( jQuery( document ).find( '#patreon_image_lock_modal' ).length ) {
 
-			var image_locker = jQuery( document ).find( '#patreon_image_lock_modal' );
-			pos_x = ( jQuery( document ).width() / 2 ) - ( image_locker.width() /2 );
-			pos_y = ( jQuery( document ).height() / 2 ) - ( image_locker.height() /2 );
+			pos_x = ( jQuery(window).width() / 2 ) - ( image_locker.width() /2 );
+			pos_y = ( jQuery(window).height() / 2 ) - ( image_locker.height() /2 ) + jQuery(window).scrollTop();
 					
 			image_locker.css({
 				top: pos_y + "px",
@@ -59,7 +88,7 @@ jQuery( function( $ ) {
 	
 		}
 		
-	});	
+	});
 	
 	jQuery( document ).on( 'submit', '#patreon_attachment_patreon_level_form', function( e ) {
 		e.preventDefault();
@@ -68,120 +97,120 @@ jQuery( function( $ ) {
 			data: jQuery( '#patreon_attachment_patreon_level_form' ).serialize(),
 			dataType: 'html',
 			type: 'post',
+			beforeSend: function(e) {
+				jQuery( document ).find( '#patreon_image_locking_interface_message' ).html('Updating...');
+			},
 			success: function( response ) {
-				jQuery( document ).find( '#TB_window' ).empty();
-				jQuery( document ).find( '#TB_window' ).html(response);
+				jQuery( document ).find( '#patreon_image_lock_modal' ).html(response);
 			}
 		});	
 	});
-	/*
-	// Need to bind to event after tinymce is initialized - so we hook to all tinymce instances after a timeout
-	setTimeout( function () {
+	
+// Hook to image click events for classic editor below
+
+setTimeout( function () {
+	
+	if( typeof tinymce === 'undefined' || jQuery( document ).find( '#editor' ).length) {
+		return;
+	}
+	for ( var i = 0; i < tinymce.editors.length; i++ ) {
 		
-		if( typeof tinymce === 'undefined' ) {
-			return;
-		}
-		for ( var i = 0; i < tinymce.editors.length; i++ ) {
+		tinymce.editors[i].on( 'click', function ( e ) {
 			
-			tinymce.editors[i].on( 'click', function ( e ) {
+			if( e.target.nodeName = 'img' ) {
 				
-				if( e.target.nodeName = 'img' ) {
-					
-					var $ = tinymce.dom.DomQuery;
-					var tinymce_iframe_offset = jQuery( '#content_ifr' ).offset();
-					var clicked_image_inside_frame_offset = $( e.target ).offset();
-					
-					// Add a special attribute to easily find the item because tinymce's domquery doesnt have functions to get width of the relevant element - we have to get it from jquery from outside the iframe. 
-					
-					$( e.target ).attr( 'data-patreon-selected-image', '1' );
-					
-					// Get the clicked image inside iframe
-					var clicked_image = jQuery( '#content_ifr' ).contents().find( '[data-patreon-selected-image="1"]' );
-					var clicked_image_width = clicked_image.width();
-					
-					// Remove the added attribute
-					$( e.target ).removeAttr( 'data-patreon-selected-image' );
-					
-					
-					jQuery( '#patreon-image-toolbar' ).css({
-							position : 'absolute',
-							top: tinymce_iframe_offset.top + clicked_image_inside_frame_offset.top + 20 + "px",
-							left: tinymce_iframe_offset.left + clicked_image_inside_frame_offset.left + clicked_image_width + 10 + "px"
-						}).show();
-					}
-			});
-		}
-	}, 1000);
-*/
+				var $ = tinymce.dom.DomQuery;
+				var tinymce_iframe_offset = jQuery( '#content_ifr' ).offset();
+				var clicked_image_inside_frame_offset = $( e.target ).offset();
+				
+				// Add a special attribute to easily find the item because tinymce's domquery doesnt have functions to get width of the relevant element - we have to get it from jquery from outside the iframe. 
+				
+				$( e.target ).attr( 'data-patreon-selected-image', '1' );
+				
+				// Get the clicked image inside iframe
+				var clicked_image = jQuery( '#content_ifr' ).contents().find( '[data-patreon-selected-image="1"]' );
+				var pw_image_source = clicked_image.attr('src');
+				var clicked_image_width = clicked_image.width();
+				
+				// Remove the added attribute
+				$( e.target ).removeAttr( 'data-patreon-selected-image' );
+				
+				// if done out of this context of tinymce, the placement goes haywire so this code to show the lock icon is repeated here
+				
+				jQuery( '<div id="patreon-image-toolbar"><div id="patreon-image-lock-icon"><img src="' + pw_admin_js.patreon_wordpress_assets_url + '/img/patreon-image-lock-icon.png" /></div></div>' ).appendTo("body");
+				
+				jQuery( '#patreon-image-lock-icon' ).css({
+					border: '1px solid #c0c0c0'
+				});
+			
+				jQuery( '#patreon-image-toolbar' ).css({
+						position : 'absolute',
+						top: tinymce_iframe_offset.top + clicked_image_inside_frame_offset.top + 20 + "px",
+						left: tinymce_iframe_offset.left + clicked_image_inside_frame_offset.left + clicked_image_width + 10 + "px"
+				}).show();
+				
+				
+				jQuery( document ).find(  '#patreon-image-toolbar' ).attr('place_modal_x', tinymce_iframe_offset.top + clicked_image_inside_frame_offset.top );
+				jQuery( document ).find(  '#patreon-image-toolbar' ).attr('place_modal_y', tinymce_iframe_offset.left + clicked_image_inside_frame_offset.left + clicked_image_width + 10);
+				jQuery( document ).find(  '#patreon-image-toolbar' ).attr('pw_image_source', pw_image_source);
+				jQuery( document ).find(  '#patreon-image-toolbar' ).show();	
+				
+				
+			}
+				
+		});
+	}
+}, 1000);
 
 
 jQuery(document).ready(function(){
 	
 	// Gutenberg variant - interim solution
 	// Need to bind to event after tinymce is initialized - so we hook to all tinymce instances after a timeout
-	setTimeout( function () {
+	
+	jQuery(document).on( 'click', '#editor img', function(e) {
 		
-		if( typeof tinyMCE === 'undefined' ) {
-			return;
-		}
-		for ( var i = 0; i < tinyMCE.editors.length; i++ ) {
-			
-			tinyMCE.editors[i].on( 'click', function ( e ) {
-				
-				if( e.target.nodeName == 'IMG' ) {
-					var resizer = jQuery(document).find( '#mceResizeHandlese' );
-					
-					var $ = tinyMCE.dom.DomQuery;
-					var clicked_image_inside_frame_offset = jQuery(e.target).offset();
-										
-					// Get the clicked image inside iframe
-					var clicked_image = jQuery(e.target);
-					var clicked_image_width = clicked_image.width();
-					
-					// Remove the added attribute
-					
-					jQuery( '<div id="patreon-image-toolbar"><div id="patreon-image-lock-icon"><img src="' + pw_admin_js.patreon_wordpress_assets_url + '/img/patreon-image-lock-icon.png" /></div></div>' ).appendTo("body");
-					
-					jQuery( '#patreon-image-toolbar' ).css({
-							position : 'absolute',
-							top: clicked_image_inside_frame_offset.top + 20 + "px",
-							left: clicked_image_inside_frame_offset.left + clicked_image_width + 10 + "px",
-					});
-					jQuery( '#patreon-image-lock-icon' ).css({
-						border: '1px solid #c0c0c0'
-					});
-					
-					// Make attachment id
-					
-					var image_classes = e.target.className.split(' ');
-					var arrayLength = image_classes.length;
-					
-					for ( var i = 0; i < arrayLength; i++ ) {
-						if ( image_classes[i].indexOf( 'wp-image-' ) !== -1 ) {
-							var attachment_id = image_classes[i].replace( "wp-image-", "" );
-						}
-					}
-				
-					pos = jQuery( e.target ).offset();
-					offset_x = jQuery( e.target ).width();
-					offset_y = jQuery( e.target ).height();
-										
-					jQuery( '#patreon-image-lock-icon' ).attr('pw_attachment_id', attachment_id);
-					jQuery( document ).find(  '#patreon-image-toolbar' ).attr('place_modal_x', pos.left - (offset_x / 2 ));
-					jQuery( document ).find(  '#patreon-image-toolbar' ).attr('place_modal_y', pos.top);
-					jQuery( document ).find(  '#patreon-image-toolbar' ).show();
-					
-				}
-				
-				if( e.target.nodeName != 'IMG' ) {
-					if ( jQuery(document).find( '#patreon-image-toolbar' ).length ) {
-						jQuery(document).find( '#patreon-image-toolbar' ).hide();
-					}
-				}
-			});
-		}
-	}, 1000);
+		pw_launch_image_lock_toolbar( jQuery(this),e.pageX,e.pageY );
+		
+	});	
+
 });
+
+function pw_launch_image_lock_toolbar(image_var, pos_x, pos_y) {
+	
+	var image = jQuery(image_var);
+	var clicked_image_inside_frame_offset = image.offset();
+	var clicked_image_inside_frame_pos = image.position();
+	var clicked_image_width = image.width();
+	var clicked_image_height = image.height();
+							
+	// Remove the added attribute
+	
+	jQuery( '<div id="patreon-image-toolbar"><div id="patreon-image-lock-icon"><img src="' + pw_admin_js.patreon_wordpress_assets_url + '/img/patreon-image-lock-icon.png" /></div></div>' ).appendTo("body");
+	
+	jQuery( '#patreon-image-toolbar' ).css({
+			position : 'absolute',
+			top: pos_y + "px",
+			left: pos_x + "px",
+	});
+	
+	jQuery( '#patreon-image-lock-icon' ).css({
+		border: '1px solid #c0c0c0'
+	});
+	
+	jQuery( document ).find(  '#patreon-image-toolbar' ).attr('place_modal_x', clicked_image_inside_frame_pos.left + clicked_image_inside_frame_offset.left + ( clicked_image_width / 2 )  );
+	jQuery( document ).find(  '#patreon-image-toolbar' ).attr('place_modal_y', clicked_image_inside_frame_offset.top);
+	jQuery( document ).find(  '#patreon-image-toolbar' ).attr('pw_image_source', image.attr('src'));
+	jQuery( document ).find(  '#patreon-image-toolbar' ).show();	
+
+}
+
+
+	jQuery(document).on( 'click', '.patreon_image_lock_modal_close', function(e) {
+		e.preventDefault();
+		jQuery( document ).find( '#patreon_image_lock_modal' ).hide();
+	});	
+	
 	jQuery(document).on( 'click', '.patreon-wordpress .notice-dismiss', function(e) {
 
 		jQuery.ajax({

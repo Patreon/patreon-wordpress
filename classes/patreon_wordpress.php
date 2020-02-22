@@ -83,6 +83,9 @@ class Patreon_Wordpress {
 		add_action( 'plugin_action_links_' . PATREON_WORDPRESS_PLUGIN_SLUG, array( $this, 'add_plugin_action_links' ), 10, 1 );
 		add_action( "wp_ajax_patreon_make_attachment_pledge_editor", array( self::$patreon_protect , "makeAttachmentPledgeEditor" ) );
 		add_action( "wp_ajax_nopriv_patreon_make_attachment_pledge_editor", array( self::$patreon_protect , "makeAttachmentPledgeEditor" ) );
+		add_action( "wp_ajax_patreon_save_attachment_patreon_level", array( self::$patreon_protect , "saveAttachmentLevel" ) );
+		add_action( "wp_ajax_nopriv_patreon_save_attachment_patreon_level", array( self::$patreon_protect , "saveAttachmentLevel" ) );
+				
 		
 	}
 	public static function getPatreonUser( $user ) {
