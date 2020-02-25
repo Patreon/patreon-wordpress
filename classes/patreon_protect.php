@@ -17,8 +17,6 @@ class Patreon_Protect {
 			add_filter( 'the_content', array( $this, 'ParseContentForProtectedImages' ), PHP_INT_MAX-4);
 			add_action( 'wp_ajax_nopriv_patreon_catch_image_click', 'Patreon_Protect::CatchImageClick' );
 			add_action( 'wp_ajax_patreon_catch_image_click', 'Patreon_Protect::CatchImageClick' );
-			add_action( 'in_admin_footer', 'Patreon_Protect::addImageToolbar' );
-			add_action( 'admin_head', 'Patreon_Protect::addCustomCSSinAdmin' );
 			
 		}
 		// Only image-reader is left always on for backward compatibility in case a user already has images linked directly - it can be put into the conditional block above in later versios 
@@ -717,6 +715,13 @@ RewriteRule ^" . $upload_dir . "/(.*)$ index.php?patreon_action=serve_patron_onl
 				$message = 'Can not find attachment id.  Cannot lock.';
 			}
 			
+		}
+		
+		// Check if image locking is enabled
+		
+		if ( !get_option( 'patreon-enable-file-locking', false ) ) {
+			// Give a message if the image locking feature is not enabled
+			$message = 'Image locking is not enabled in <a href="'. admin_url( 'admin.php?page=patreon-plugin' ) . '" target="_blank">settings</a>. Locking will not work';
 		}
 
 		$patreon_level = get_post_meta( $attachment_id, 'patreon_level', true );
