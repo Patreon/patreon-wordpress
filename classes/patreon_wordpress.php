@@ -1325,6 +1325,8 @@ class Patreon_Wordpress {
 		
 		// Handles setup wizard and reconnect wizard screens
 		
+		$setup_message = PATREON_SETUP_INITIAL_MESSAGE;
+		
 		if ( !isset( $_REQUEST['setup_stage'] ) OR $_REQUEST['setup_stage'] == '0' ) {
 			
 			$requirements_check = Patreon_Compatibility::check_requirements();
@@ -1336,7 +1338,45 @@ class Patreon_Wordpress {
 					$requirement_notices .= '&bull; ' . Patreon_Frontend::$messages_map[$requirements_check[$key]].'<br />';
 				}
 			}
+			
+			// Delete v1 related details in case a v1 site owner initiated setup wizard for whatsoever reason
+			if ( get_option( 'patreon-installation-api-version', false ) == '1' ) {
+					
+				$options_to_delete = array(
+					'patreon-custom-page-name',
+					'patreon-fetch-creator-id',
+					'patreon-creator-tiers',
+					'patreon-creator-last-name',
+					'patreon-creator-first-name',
+					'patreon-creator-full-name',
+					'patreon-creator-url',
+					'patreon-campaign-id',
+					'patreon-creators-refresh-token-expiration',
+					'patreon-creator-id',
+					'patreon-setup-wizard-last-call-result',
+					'patreon-creators-refresh-token',
+					'patreon-creators-access-token',
+					'patreon-client-secret',
+					'patreon-client-id',
+					'patreon-setup_is_being_done',
+					'patreon-setup-done',
+				);				
 
+				// Delete override - proceed with deleting local options
+				
+				foreach ( $options_to_delete as $key => $value ) {
+					delete_option( $options_to_delete[$key] );
+				}
+				
+				update_option( 'patreon-installation-api-version', '2' );
+				update_option( 'patreon-can-use-api-v2', true );
+				
+				// Set custom setup message telling old v1 install users to delete their client at clients page before starting setup
+				
+				$setup_message = PATREON_ADMIN_MESSAGE_V1_CLIENT_ATTEMPTING_V2_SETUP;
+				
+			}			
+			
 			$config_info = self::collect_app_info();
 			$config_input = '';
 			
@@ -1344,9 +1384,7 @@ class Patreon_Wordpress {
 				$config_input .= '<input type="hidden" name="' . $key . '" value="' . $config_info[$key] . '" />';
 
 			}
-			
-			$setup_message = PATREON_SETUP_INITIAL_MESSAGE;
-			
+						
 			if ( isset( $_REQUEST['patreon_message'] ) AND $_REQUEST['patreon_message'] != '' ) {
 				$setup_message = Patreon_Frontend::$messages_map[$_REQUEST['patreon_message']];
 
@@ -2033,5 +2071,6 @@ class Patreon_Wordpress {
 		update_option( 'patreon-last-50-conn-errors', $last_50_conn_errors );
 
 	}
+
 }
 
