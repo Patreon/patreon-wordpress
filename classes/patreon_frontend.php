@@ -398,7 +398,10 @@ class Patreon_Frontend {
 				// selected = selected for XHTML compatibility
 				
 				// Use title if it exists, description if it does not.
-				$tier_title = $reward['attributes']['title'];
+				
+				if ( isset( $reward['attributes']['title'] ) ) {
+					$tier_title = $reward['attributes']['title'];
+				}
 				
 				if ( $tier_title == '' ) {
 					
@@ -1032,7 +1035,7 @@ class Patreon_Frontend {
 		
 	}
 	public static function protectContentFromUsers( $content, $post_id = false ) {
-		
+				
 		// This function receives content and optionally post id.
 		
 		// If content is received but no post id, the function acts to lock the existing post. In this case it can be hooked to the_content filter
