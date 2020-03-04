@@ -28,6 +28,8 @@ This plugin is developed and maintained by Patreon.
 - Alternatively, you can set a minimum pledge amount to see all posts
 - Set custom HTML that non-patrons see instead of the post, prompting them to become a patron
 - Patreon WordPress is compatible with Paid Memberships Pro - you can gate your content with either plugin
+- Patreon pledges are matched with Paid Memberships Pro monthly memberships - works out of the box with no changes
+- Any Patreon patron or Paid Memberships Pro member who qualifies for content via either plugin will access content
 
 > *<b>You can post entirely independently on your WordPress site from your Patreon page.*</b> There is no need for WordPress and Patreon posts to correspond to one another in content or in locked status. The choice is up to you as a creator.
 
