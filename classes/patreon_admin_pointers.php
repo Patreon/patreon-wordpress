@@ -15,6 +15,7 @@ class Patreon_Admin_Pointers {
 		
 		add_action( 'admin_enqueue_scripts',  array( $this, 'load_pointers' ) );
 		add_filter( 'patreon-admin-pointers-dashboard', array( &$this, 'cache_option_pointer' ) );
+		add_filter( 'patreon-admin-pointers-dashboard', array( &$this, 'pmp_compatibility_pointer' ) );
 	}
 	
 	public function load_pointers( $hook_suffix ) {
@@ -91,7 +92,46 @@ class Patreon_Admin_Pointers {
 				'position' => array( 'edge' => 'top', 'align' => 'middle' )
 			)
 		);
+		if ( $plugin_activated > 1583330333 ) {
+			return;
+		}
+		
+		$pointers['pmp_compatibility'] = array(
+			'target' => '#toplevel_page_patreon-plugin',
+			'options' => array(
+				'content' => sprintf( '<h3> %s </h3> <p> %s </p>',
+			'Patreon WordPress is now compatible with Paid Memberships Pro',
+					'You can now use Patreon WordPress to gate content alongside Paid Memberships Pro. You can gate content with PW, PMP, or both, using monthly subscriptions/pledges. Any qualifying Patreon patron or PMP member can unlock content gated with either plugin.'
+				),
+				'position' => array( 'edge' => 'top', 'align' => 'middle' )
+			)
+		);
 		return $pointers;
+	}
+	
+	public function pmp_compatibility_pointer( $pointers ) {
+		
+		// We want this pointer to appear only for existing installations 
+		
+		$plugin_activated =	get_option( 'patreon-plugin-first-activated' );
+		
+		if ( $plugin_activated > 1583330333 ) {
+			return;
+		}
+		
+		$pointers['pmp_compatibility'] = array(
+			'target' => '#toplevel_page_patreon-plugin',
+			'options' => array(
+				'content' => sprintf( '<h3> %s </h3> <p> %s </p>',
+			'Patreon WordPress is now compatible with Paid Memberships Pro',
+					'You can now use Patreon WordPress to gate content alongside Paid Memberships Pro. You can gate content with PW, PMP, or both. Any qualifying Patreon patron or PMP monthly member can unlock content gated with either plugin.'
+				),
+				'position' => array( 'edge' => 'top', 'align' => 'middle' )
+			)
+		);
+		
+		return $pointers;
+		
 	}
 	
 	
