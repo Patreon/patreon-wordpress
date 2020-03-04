@@ -115,16 +115,17 @@ class Patreon_Admin_Pointers {
 		
 		$plugin_activated =	get_option( 'patreon-plugin-first-activated' );
 		
-		if ( $plugin_activated > 1583330333 ) {
+		// Set to appear to installations completed until a week after date of this commit
+		if ( $plugin_activated > 1583884800 ) {
 			return;
 		}
 		
 		$pointers['pmp_compatibility'] = array(
-			'target' => '#toplevel_page_patreon-plugin',
+			'target' => '#menu-posts',
 			'options' => array(
 				'content' => sprintf( '<h3> %s </h3> <p> %s </p>',
 			'Patreon WordPress is now compatible with Paid Memberships Pro',
-					'You can now use Patreon WordPress to gate content alongside Paid Memberships Pro. You can gate content with PW, PMP, or both. Any qualifying Patreon patron or PMP monthly member can unlock content gated with either plugin.'
+					'You can now use Patreon WordPress to gate posts alongside Paid Memberships Pro. You can gate content with PW, PMP, or both. Any qualifying Patreon patron or PMP monthly member can unlock content gated with either plugin.'
 				),
 				'position' => array( 'edge' => 'top', 'align' => 'middle' )
 			)
