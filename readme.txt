@@ -27,6 +27,7 @@ This plugin is developed and maintained by Patreon.
 - Plugin will automatically log in Patreon users
 - Alternatively, you can set a minimum pledge amount to see all posts
 - Set custom HTML that non-patrons see instead of the post, prompting them to become a patron
+- Patreon WordPress is compatible with Paid Memberships Pro - you can gate your content with either plugin
 
 > *<b>You can post entirely independently on your WordPress site from your Patreon page.*</b> There is no need for WordPress and Patreon posts to correspond to one another in content or in locked status. The choice is up to you as a creator.
 
