@@ -1362,6 +1362,7 @@ class Patreon_Wordpress {
 					'patreon-client-id',
 					'patreon-setup_is_being_done',
 					'patreon-setup-done',
+					'patreon-currency-sign',
 				);				
 
 				// Delete override - proceed with deleting local options
@@ -1879,6 +1880,7 @@ class Patreon_Wordpress {
 				'patreon-client-id',
 				'patreon-setup_is_being_done',
 				'patreon-setup-done',
+				'patreon-currency-sign',
 			);
 			
 			// Ask the API to delete this client:
@@ -1973,6 +1975,7 @@ class Patreon_Wordpress {
 				'patreon-client-id',
 				'patreon-setup_is_being_done',
 				'patreon-setup-done',
+				'patreon-currency-sign',
 			);
 			
 			// Ask the API to delete this client:

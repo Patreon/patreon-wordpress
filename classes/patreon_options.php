@@ -54,6 +54,7 @@ class Patreon_Options {
         register_setting( 'patreon-options', 'patreon-custom-universal-banner' );
         register_setting( 'patreon-options', 'patreon-custom-page-name' );
         register_setting( 'patreon-options', 'patreon-prevent-caching-gated-content' );
+        register_setting( 'patreon-options', 'patreon-currency-sign' );
 		
     }
 	
@@ -315,6 +316,53 @@ class Patreon_Options {
 												<select name="patreon-prevent-caching-gated-content">
 													<option value="yes" <?php echo $prevent_caching_checked; ?>>Yes</option>
 													<option value="no" <?php echo $do_not_prevent_caching_checked; ?>>No</option>
+												</select>
+											</td>
+                                        </tr>
+                                        <tr valign="top">
+											<th scope="row">
+												<strong>Currency sign</strong>
+												<div class="patreon-options-info">You can set the currency sign to match your campaign currency here. This will be used in gated posts to show the pledge amount needed to unlock the post</div>
+											</th>
+											<td>
+												<?php
+													
+													// Iterating through all cases here to not provide 3 choices by showing current/default as a 4th selection choice in select box
+													
+													$currency_sign = '$';
+													
+													$currency_dollar_selected = '';
+													$currency_euro_selected = '';
+													$currency_pound_selected = '';
+													
+													$saved_currency_sign = get_option( 'patreon-currency-sign', false );
+											
+													if ( $saved_currency_sign ) {
+														// Currency set. Set the sign to value from db
+														$currency_sign = $saved_currency_sign;
+													}
+													
+													// Set whichever currency is set as selected
+													if ( $currency_sign == '$' ) {
+														$currency_dollar_selected = " selected";
+													}
+													
+													// Set whichever currency is set as selected
+													if ( $currency_sign == '€' ) {
+														$currency_euro_selected = " selected";
+													}
+													
+													// Set whichever currency is set as selected
+													if ( $currency_sign == '£' ) {
+														$currency_pound_selected = " selected";
+													}
+													
+												
+												?>
+												<select name="patreon-currency-sign">
+													<option value="$" <?php echo $currency_dollar_selected; ?>>$</option>
+													<option value="€" <?php echo $currency_euro_selected; ?>>€</option>
+													<option value="£" <?php echo $currency_pound_selected; ?>>£</option>
 												</select>
 											</td>
                                         </tr>
