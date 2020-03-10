@@ -125,7 +125,7 @@ class Patreon_Admin_Pointers {
 			'options' => array(
 				'content' => sprintf( '<h3> %s </h3> <p> %s </p>',
 			'Patreon WordPress is now compatible with Paid Memberships Pro',
-					'You can now use Patreon WordPress to gate posts alongside Paid Memberships Pro. You can gate content with PW, PMP, or both. Any qualifying Patreon patron or PMP monthly member can unlock content gated with either plugin.'
+					'You can now use Patreon WordPress to gate posts alongside Paid Memberships Pro. You can gate content with PW, PMP, or both. Any qualifying Patreon patron or PMP monthly member can unlock content gated with either plugin. Read details here <a href="https://www.patreondevelopers.com/t/patreon-wordpress-is-now-compatible-with-paid-memberships-pro/2823" target="_blank">here</a>.'
 				),
 				'position' => array( 'edge' => 'top', 'align' => 'middle' )
 			)
