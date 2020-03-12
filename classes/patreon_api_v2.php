@@ -102,6 +102,27 @@ class Patreon_API {
 		
 		return $result;
 	}
+
+	public function get_posts( $campaign_id = false) {
+		
+		// Gets posts of relevant campaign
+		
+		if ( !$campaign_id ) {			
+			$campaign_id = get_option( 'patreon-campaign-id', false );
+		}
+		
+		if ( $campaign_id ) {
+			return $this->__get_json( 'campaigns/'. $campaign_id .'/posts' );
+		}
+		
+		return false;
+		
+	}
+		
+	public function get_post( $post_id ) {
+		return $this->__get_json( 'posts/' . $post_id . '?fields[post]=title,content,is_paid,is_public,published_at,url,embed_data,embed_url,app_id,app_status' );
+	}
+		
 	
 	public function create_refresh_client( $params ) {
 		
