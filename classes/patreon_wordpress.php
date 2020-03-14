@@ -16,6 +16,7 @@ class Patreon_Wordpress {
 	public static $patreon_compatibility;
 	public static $patreon_user_profiles;
 	public static $patreon_admin_pointers;
+	public static $patreon_content_sync;
 	public static $current_user_pledge_amount = -1;
 	public static $current_user_patronage_declined = -1;
 	public static $current_user_is_patron = -1;
@@ -39,6 +40,7 @@ class Patreon_Wordpress {
 		include_once( 'patreon_protect.php' );
 		include_once( 'patreon_compatibility.php' );
 		include_once( 'patreon_admin_pointers.php' );
+		include_once( 'patreon_content_sync.php' );
 
 		self::$patreon_routing        = new Patreon_Routing;
 		self::$patreon_frontend       = new Patreon_Frontend;
@@ -55,6 +57,8 @@ class Patreon_Wordpress {
 		if ( is_admin() ) {
 			self::$patreon_admin_pointers = new Patreon_Admin_Pointers;	
 		}
+		
+		self::$patreon_admin_pointers = new Patreon_Content_Sync;	
 		
 		add_action( 'wp_head', array( $this, 'updatePatreonUser' ) );
 		add_action( 'init', array( $this, 'checkPatreonCreatorID' ) );

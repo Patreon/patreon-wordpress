@@ -9,8 +9,6 @@ if( !defined( 'ABSPATH' ) ) {
 
 class Patreon_Admin_Pointers {
 
-	public $access_token;
-
 	public function __construct() {
 		
 		add_action( 'admin_enqueue_scripts',  array( $this, 'load_pointers' ) );
