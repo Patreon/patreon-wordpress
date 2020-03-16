@@ -58,7 +58,7 @@ class Patreon_Wordpress {
 			self::$patreon_admin_pointers = new Patreon_Admin_Pointers;	
 		}
 		
-		self::$patreon_admin_pointers = new Patreon_Content_Sync;	
+		self::$patreon_content_sync = new Patreon_Content_Sync;	
 		
 		add_action( 'wp_head', array( $this, 'updatePatreonUser' ) );
 		add_action( 'init', array( $this, 'checkPatreonCreatorID' ) );
