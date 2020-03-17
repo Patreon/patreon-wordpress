@@ -27,10 +27,7 @@ class Patreon_Login {
 		update_user_meta( $user_id, 'patreon_token_expires_in', $tokens['expires_in'] );
 		update_user_meta( $user_id, 'patreon_latest_patron_info', $user_response );
 		update_user_meta( $user_id, 'patreon_latest_patron_info_timestamp', time() );
-		echo '<pre>';
-		print_r($user_response);
-		echo '</pre>';
-		wp_die();
+
 		$user = get_user_by( 'ID', $user_id );
 
 		// Below filter vars and the following filter allows plugin devs to acquire/filter info about Patron/user after the user returns from Patreon
