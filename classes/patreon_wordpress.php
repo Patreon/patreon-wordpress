@@ -56,7 +56,8 @@ class Patreon_Wordpress {
 			self::$patreon_admin_pointers = new Patreon_Admin_Pointers;	
 		}
 		
-		add_action( 'wp_head', array( $this, 'updatePatreonUser' ) );
+		add_action( 'wp_head', array( $this, 'check_refresh_patreon_user_token' ), 9 );
+		add_action( 'wp_head', array( $this, 'updatePatreonUser' ), 10 );
 		add_action( 'init', array( $this, 'checkPatreonCreatorID' ) );
 		add_action( 'init', array( $this, 'check_creator_tiers' ) );
 		add_action( 'init', array( &$this, 'order_independent_actions_to_run_on_init_start' ), 0 );
@@ -88,18 +89,27 @@ class Patreon_Wordpress {
 				
 		
 	}
-	public static function getPatreonUser( $user ) {
+	public static function getPatreonUser( $user = false ) {
 
 		if ( self::$current_patreon_user != -1 ) {
 			return self::$current_patreon_user;
 		}
 		
-		/* get user meta data and query patreon api */
-		$user_meta = get_user_meta( $user->ID );
+		if ( !$user ) {
+			$user = wp_get_current_user();
+		}
 		
-		if ( isset( $user_meta['patreon_access_token'][0] ) ) {
+		// If there's no user object or user is anon, return false
+		if ( $user == false OR $user->ID == 0 ) {
+			return false;
+		}
+		
+		/* get user meta data and query patreon api */
+		$patreon_access_token  = get_user_meta( $user->ID, 'patreon_access_token', true );
+		
+		if ( $patreon_access_token != '' ) {
 			
-			$api_client = new Patreon_API( $user_meta['patreon_access_token'][0] );
+			$api_client = new Patreon_API( $patreon_access_token );
 
 			// Below is a code that caches user object for 60 seconds. This can be commented out depending on the response from Infrastructure team about contacting api to check for user on every page load
 			/*
@@ -112,13 +122,92 @@ class Patreon_Wordpress {
 			*/
 
 			// For now we are always getting user from APi fresh:
-			$user = $api_client->fetch_user();
+			$user_response = $api_client->fetch_user();
+			
+			// Here we check the returned result if its valid 
+			
+			if ( isset( $user_response['included'][0] ) AND is_array( $user_response['included'][0] ) ) {
+				
+				// Valid return. Save it with timestamp
+				
+				update_user_meta( $user->ID, 'patreon_latest_patron_info', $user_response );
+				update_user_meta( $user->ID, 'patreon_latest_patron_info_timestamp', time() );
+				
+				return self::$current_patreon_user = $user_response;
+				
+			}
+			
+			// Couldnt get user from Patreon, fresh. Try to refresh tokens if it was a token error
+			
+			if ( isset( $user_response['errors'] ) && is_array( $user_response['errors'] ) ) {
 
-			return self::$current_patreon_user = $user;
+				foreach ( $user_response['errors'] as $error ) {
+			
+					if( $error['code'] == 1 ) {
+						
+						$token_refreshed = self::refresh_user_access_token( $user );
+						
+					}
+				}
+			}
+			
+			// Reload token
+			$patreon_access_token  = get_user_meta( $user->ID, 'patreon_access_token', true );
+			
+			if ( $token_refreshed AND $patreon_access_token != '' ) {
+			
+				$api_client = new Patreon_API( $patreon_access_token );
+				
+				$user_response = $api_client->fetch_user();
+				
+				if ( isset( $user_response['included'][0] ) AND is_array( $user_response['included'][0] ) ) {
+					
+					// Valid return. Save it with timestamp
+					
+					update_user_meta( $user->ID, 'patreon_latest_patron_info', $user_response );
+					update_user_meta( $user->ID, 'patreon_latest_patron_info_timestamp', time() );
+					
+					return self::$current_patreon_user = $user_response;
+					
+				}
+				
+			}
+			
+			// For whatsoever reason the returns are not valid and we cant refresh the user
+			// Check if a saved return exists for this user
+	
+			$user_response           = get_user_meta( $user->ID, 'patreon_latest_patron_info', true );
+			$user_response_timestamp = get_user_meta( $user->ID, 'patreon_latest_patron_info_timestamp', true );
+			
+			// Check if there is a valid saved user return and whether it has a timestamp within desired range
+			if ( isset( $user_response['included'][0] ) AND is_array( $user_response['included'][0] ) AND $user_response_timestamp >= ( time() - ( 3600 * 24 * 7 ) ) ) {
+				return self::$current_patreon_user = $user_response;
+			}
 			
 		}
+		
+		// All failed - return false
 
 		return self::$current_patreon_user = false;
+		
+	}
+	
+	static refresh_user_access_token( $user ) {
+		
+		$refresh_token = get_user_meta( $user->ID, 'patreon_refresh_token', true );
+
+		$oauth_client = new Patreon_Oauth;
+		$tokens = $oauth_client->refresh_token( $refresh_token, site_url().'/patreon-authorization/' );
+		
+		if ( isset( $tokens['access_token'] ) ) {
+			
+			update_user_meta( $user->ID, 'patreon_refresh_token', $tokens['refresh_token'] );
+			update_user_meta( $user->ID, 'patreon_access_token', $tokens['access_token'] );
+
+			return $tokens['access_token'];
+		}
+		
+		return false;
 		
 	}
 	
@@ -131,12 +220,11 @@ class Patreon_Wordpress {
 		}
 
 		$user = wp_get_current_user();
+		
 		if ( $user == false ) {
 			return false;
 		}
-		
-		// Temporarily introduced caching until calls are moved to webhooks #REVISIT
-		
+				
 		$last_update = get_user_meta( $user->ID, 'patreon_user_details_last_updated', true );
 		
 		// If last update time is not empty and it is closer to time() than one day, dont update
@@ -146,30 +234,6 @@ class Patreon_Wordpress {
 
 		/* query Patreon API to get users patreon details */
 		$user_response = self::getPatreonUser( $user );
-
-		if ( isset( $user_response['errors'] ) && is_array( $user_response['errors'] ) ) {
-
-			foreach ( $user_response['errors'] as $error ) {
-				
-				if( $error['code'] == 1 ) {
-					
-					/* refresh users token if error 1 */
-
-					$refresh_token = get_user_meta($user->ID, 'patreon_refresh_token', true);
-
-					$oauth_client = new Patreon_Oauth;
-					$tokens = $oauth_client->refresh_token($refresh_token, site_url().'/patreon-authorization/');
-
-					update_user_meta($user->ID, 'patreon_refresh_token', $tokens['refresh_token']);
-					update_user_meta($user->ID, 'patreon_access_token', $tokens['access_token']);
-
-					$user_response = self::getPatreonUser($user);
-					
-				}
-				
-			}
-
-		}
 
 		if ( $user_response == false ) {
 			return false;

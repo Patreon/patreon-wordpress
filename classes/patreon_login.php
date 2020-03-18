@@ -25,8 +25,6 @@ class Patreon_Login {
 		update_user_meta( $user_id, 'patreon_created', $patreon_created );
 		update_user_meta( $user_id, 'patreon_token_minted', microtime() );
 		update_user_meta( $user_id, 'patreon_token_expires_in', $tokens['expires_in'] );
-		update_user_meta( $user_id, 'patreon_latest_patron_info', $user_response );
-		update_user_meta( $user_id, 'patreon_latest_patron_info_timestamp', time() );
 
 		$user = get_user_by( 'ID', $user_id );
 
