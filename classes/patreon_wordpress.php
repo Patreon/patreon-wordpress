@@ -56,7 +56,7 @@ class Patreon_Wordpress {
 			self::$patreon_admin_pointers = new Patreon_Admin_Pointers;	
 		}
 		
-		add_action( 'wp_head', array( $this, 'check_refresh_patreon_user_token' ), 9 );
+		// add_action( 'wp_head', array( $this, 'check_refresh_patreon_user_token' ), 9 );
 		add_action( 'wp_head', array( $this, 'updatePatreonUser' ), 10 );
 		add_action( 'init', array( $this, 'checkPatreonCreatorID' ) );
 		add_action( 'init', array( $this, 'check_creator_tiers' ) );
@@ -137,7 +137,8 @@ class Patreon_Wordpress {
 				
 			}
 			
-			// Couldnt get user from Patreon, fresh. Try to refresh tokens if it was a token error
+			// Couldnt get user from Patreon. Try to refresh tokens if it was a token error
+			$token_refreshed = false;
 			
 			if ( isset( $user_response['errors'] ) && is_array( $user_response['errors'] ) ) {
 
@@ -192,7 +193,7 @@ class Patreon_Wordpress {
 		
 	}
 	
-	static refresh_user_access_token( $user ) {
+	static function refresh_user_access_token( $user ) {
 		
 		$refresh_token = get_user_meta( $user->ID, 'patreon_refresh_token', true );
 
