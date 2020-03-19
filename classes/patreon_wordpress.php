@@ -56,7 +56,6 @@ class Patreon_Wordpress {
 			self::$patreon_admin_pointers = new Patreon_Admin_Pointers;	
 		}
 		
-		// add_action( 'wp_head', array( $this, 'check_refresh_patreon_user_token' ), 9 );
 		add_action( 'wp_head', array( $this, 'updatePatreonUser' ), 10 );
 		add_action( 'init', array( $this, 'checkPatreonCreatorID' ) );
 		add_action( 'init', array( $this, 'check_creator_tiers' ) );
@@ -181,7 +180,7 @@ class Patreon_Wordpress {
 			$user_response_timestamp = get_user_meta( $user->ID, 'patreon_latest_patron_info_timestamp', true );
 			
 			// Check if there is a valid saved user return and whether it has a timestamp within desired range
-			if ( isset( $user_response['included'][0] ) AND is_array( $user_response['included'][0] ) AND $user_response_timestamp >= ( time() - ( 3600 * 24 * 7 ) ) ) {
+			if ( isset( $user_response['included'][0] ) AND is_array( $user_response['included'][0] ) AND $user_response_timestamp >= ( time() - ( 3600 * 24 * 3 ) ) ) {
 				return self::$current_patreon_user = $user_response;
 			}
 			
