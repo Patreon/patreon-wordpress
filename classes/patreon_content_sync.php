@@ -22,7 +22,7 @@ class Patreon_Content_Sync {
 		
 			add_action( 'patreon_five_minute_action', array( &$this, 'patreon_five_minute_cron_job' ) );
 		}
-		add_action( 'wp_head', array( &$this, 'import_posts_from_patreon' ) );
+
 		// For debug - remove later
 		update_option( 'patreon-sync-posts', true );
 	}
