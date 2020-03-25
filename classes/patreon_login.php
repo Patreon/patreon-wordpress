@@ -11,21 +11,21 @@ class Patreon_Login {
 	public static function updateExistingUser( $user_id, $user_response, $tokens ) {
 		
 		/* update user meta data with patreon data */
-		update_user_meta($user_id, 'patreon_refresh_token', $tokens['refresh_token']);
-		update_user_meta($user_id, 'patreon_access_token', $tokens['access_token']);
-		update_user_meta($user_id, 'patreon_user', $user_response['data']['attributes']['vanity']);
-		update_user_meta($user_id, 'patreon_user_id', $user_response['data']['id']);
-		update_user_meta($user_id, 'patreon_last_logged_in', time());
+		update_user_meta( $user_id, 'patreon_refresh_token', $tokens['refresh_token'] );
+		update_user_meta( $user_id, 'patreon_access_token', $tokens['access_token'] );
+		update_user_meta( $user_id, 'patreon_user', $user_response['data']['attributes']['vanity'] );
+		update_user_meta( $user_id, 'patreon_user_id', $user_response['data']['id'] );
+		update_user_meta( $user_id, 'patreon_last_logged_in', time() );
 		
 		$patreon_created = '';
 		if ( isset( $user_response['data']['attributes']['created'] ) ) {
 			$patreon_created = $user_response['data']['attributes']['created'];
 		}
 
-		update_user_meta($user_id, 'patreon_created', $patreon_created);
-		update_user_meta($user_id, 'patreon_token_minted', microtime());
-		update_user_meta($user_id, 'patreon_token_expires_in', $tokens['expires_in']);
-		
+		update_user_meta( $user_id, 'patreon_created', $patreon_created );
+		update_user_meta( $user_id, 'patreon_token_minted', microtime() );
+		update_user_meta( $user_id, 'patreon_token_expires_in', $tokens['expires_in'] );
+
 		$user = get_user_by( 'ID', $user_id );
 
 		// Below filter vars and the following filter allows plugin devs to acquire/filter info about Patron/user after the user returns from Patreon
