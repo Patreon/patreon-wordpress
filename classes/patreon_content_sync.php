@@ -22,7 +22,7 @@ class Patreon_Content_Sync {
 		
 			add_action( 'patreon_five_minute_action', array( &$this, 'patreon_five_minute_cron_job' ) );
 		}
-
+		
 		// For debug - remove later
 		update_option( 'patreon-sync-posts', true );
 	}
@@ -65,20 +65,100 @@ class Patreon_Content_Sync {
 			
 			$posts = $api_client->get_posts();
 			
+			if ( !isset( $posts['data'] ) ) {
+				// Couldnt get posts. Bail out
+				return;				
+			}
+			
 			foreach ( $posts['data'] as $key => $value ) {
 				
-				$post = $api_client->get_post( $posts['data'][$key]['id'] );
-				echo '<pre>';
-				print_r($post);
-				echo '</pre>';
+				$patreon_post = $api_client->get_post( $posts['data'][$key]['id'] );
 				
+				if ( !isset( $patreon_post['data']['id'] ) OR $patreon_post['data']['id'] == '' ) {
+					// Couldn't get this post. Skip
+					continue;
+				}
+				
+				// Check if a matching WP post exists
+				
+				$matching_post_id = false;
+				
+				global $wpdb;
+				
+				$matching_posts = $wpdb->get_results( "SELECT post_id, meta_value FROM " . $wpdb->postmeta . " WHERE meta_key = 'patreon-post-id' AND meta_value = '" . $posts['data'][$key]['id'] . "' ", ARRAY_A );
+								
+				if ( count( $matching_posts ) > 0 ) {
+					
+					// Matching post found - just get the first one
+					$matching_post_id = $matching_posts[0]['post_id'];				
+					
+				}
+				
+				// If no matching posts were found from query, try to find from title
+			
+				if ( count( $matching_posts ) == 0 ) {
+					
+					// no matching posts. Try checking from the title.
+					$matching_post = get_page_by_title( $patreon_post['data']['attributes']['title'], OBJECT, 'post' );
+					
+					if ( isset( $matching_post ) ) {
+						
+						// A post matching from title was found.						
+						$matching_post_id = $matching_post->ID;
+						
+					}
+					
+				}
+		
+				if ( !$matching_post_id ) {
+					$this->add_new_patreon_post( $patreon_post );
+				}
+				else {
+					$this->update_patreon_post( $matching_post_id, $patreon_post );
+				}
+			
 			}
 			
 		}
 		
 	}
 	
+	public function add_new_patreon_post( $patreon_post ) {
+		
+		$post                  = array();
+		$post['post_title']    = $patreon_post['data']['attributes']['title'];
+		$post['post_content']  = $patreon_post['data']['attributes']['content'];
+		$post['post_status']   = 'publish';
+		$post['post_author']   = 1;
+		$post['post_category'] = array(0);
 	
+		$inserted_post_id = wp_insert_post( $post );
+		
+		if ( is_wp_error( $inserted_post_id ) ) {
+			// Handle error_get_last
+			return;
+		}
+		
+		update_post_meta( $inserted_post_id, 'patreon-post-id', $patreon_post['data']['id'] );
+		
+	}
 	
+	public function update_patreon_post( $post_id, $patreon_post ) {
+		
+		$post                  = array();
+		$post['ID']            = $post_id;
+		$post['post_title']    = $patreon_post['data']['attributes']['title'];
+		$post['post_content']  = $patreon_post['data']['attributes']['content'];
+	
+		$updated_post_id = wp_update_post( $post );
+		
+		if ( is_wp_error( $updated_post_id ) OR $updated_post_id == 0 ) {
+			// Handle error_get_last
+			return;
+		}
+		
+		update_post_meta( $updated_post_id, 'patreon-post-id', $patreon_post['data']['id'] );
+		
+	}
 	
 }
