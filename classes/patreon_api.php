@@ -11,7 +11,7 @@ $load_api_version = get_option( 'patreon-installation-api-version', false );
 
 // Override api version even if the site is v1 in case delete / reconnect actions are requested. This is temporary until we have something on API side which will allow v1 sites to just reconnect to v2
 
-if ( isset( $_REQUEST['patreon_wordpress_action'] ) AND $_REQUEST['patreon_wordpress_action'] == 'disconnect_site_from_patreon' AND is_admin() ) {
+if ( isset( $_REQUEST['patreon_wordpress_action'] ) AND $_REQUEST['patreon_wordpress_action'] == 'disconnect_site_from_patreon' ) {
 	
 	// We repeat below code because we want it to be available !only! during reconnect/disconnect actions
 		
@@ -24,7 +24,7 @@ if ( isset( $_REQUEST['patreon_wordpress_action'] ) AND $_REQUEST['patreon_wordp
 	}
 }
 
-if ( isset( $_REQUEST['patreon_wordpress_action'] ) AND $_REQUEST['patreon_wordpress_action'] == 'disconnect_site_from_patreon_for_reconnection' AND is_admin() ) {
+if ( isset( $_REQUEST['patreon_wordpress_action'] ) AND $_REQUEST['patreon_wordpress_action'] == 'disconnect_site_from_patreon_for_reconnection' ) {
 
 	// We repeat below code because we want it to be available !only! during reconnect/disconnect actions
 		
@@ -42,20 +42,20 @@ if ( isset( $_REQUEST['patreon_wordpress_action'] ) AND $_REQUEST['patreon_wordp
 // Check if code exists in request
 
 if ( strpos( $_SERVER['REQUEST_URI'], '/patreon-authorization/' ) !== false ) {
-
-	if( array_key_exists( 'code', $wp->query_vars ) ) {
+	
+	if( isset( $_REQUEST['code'] ) ) {
 		
 		// Get state vars if they exist
 
-		if( isset( $wp->query_vars['state'] ) AND $wp->query_vars['state'] !='' ) {
-			$returned_state_var = json_decode( base64_decode( urldecode( $wp->query_vars['state'] ) ), true );
+		if( isset( $_REQUEST['state'] ) AND $_REQUEST['state'] !='' ) {
+			$returned_state_var = json_decode( base64_decode( urldecode( $_REQUEST['state'] ) ), true );
 		}
 
 	}
 	
 }
 
-if ( isset( $returned_state_var ) AND ( $returned_state_var['patreon_action'] == 'reconnect_site' OR $returned_state_var['patreon_action'] == 'connect_site' ) AND is_admin() ) {
+if ( isset( $returned_state_var ) AND ( $returned_state_var['patreon_action'] == 'reconnect_site' OR $returned_state_var['patreon_action'] == 'connect_site' ) ) {
 
 	// We repeat below code because we want it to be available !only! during reconnect/connect actions
 		
