@@ -4,7 +4,7 @@ Tags: patreon, membership, members
 Requires at least: 4.0
 Requires PHP: 5.4
 Tested up to: 5.3.2
-Stable tag: 1.5.2
+Stable tag: 1.5.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -73,6 +73,13 @@ To make a locked post public again, just choose "Everyone" from the select box a
 It is  difficult to protect videos due the intensive bandwidth requirements of hosting video  and having to rely on third parties such as Youtube or Vimeo. Youtube allows you to set videos to ‘private’ but Vimeo offers extra controls by only allowing videos to be played on specific domains. Visit this guide to [protecting your video content with Vimeo](https://help.vimeo.com/hc/en-us/articles/224817847-Privacy-settings-overview).
 
 == Upgrade Notice ==
+
+= 1.5.3 =
+
+* Added an override to set api version to 2 after return from connect/reconnect attempt at Patreon to address potential parse errors on v1 sites
+* Added override now loads v2 version of api class
+* Added overrides to set api version to 2 upon successful return from connect/reconnect attempt at Patreon
+* Removed is_admin condition in api class loader's version overrides
 
 = 1.5.2 =
 
@@ -221,6 +228,13 @@ Not at all - you can post different content totally independently at your site a
 Nothing will be changed at your site - the plugin will just connect your site to Patreon to allow communication in between your site and Patreon.
 
 == Changelog ==
+
+= 1.5.3 =
+
+* Added an override to set api version to 2 after return from connect/reconnect attempt at Patreon to address potential parse errors on v1 sites
+* Added override now loads v2 version of api class
+* Added overrides to set api version to 2 upon successful return from connect/reconnect attempt at Patreon
+* Removed is_admin condition in api class loader's version overrides
 
 = 1.5.2 =
 
