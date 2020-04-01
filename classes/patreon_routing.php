@@ -302,7 +302,7 @@ class Patreon_Routing {
 						exit;
 						
 					}
-					
+										
 					$oauth_client = new Patreon_Oauth;
 										
 					// Set the client id to plugin wide client id one for setup process
@@ -312,6 +312,11 @@ class Patreon_Routing {
 					$tokens = $oauth_client->get_tokens( $wp->query_vars['code'], site_url() . '/patreon-authorization/', array( 'scopes' => 'w:identity.clients' ) );
 										
 					if ( isset( $tokens['access_token'] ) ) {
+						
+						// Exception - If we are here with a legit access token, re-mark this installation as v2 - can be removed when all installations are using v2
+						
+						update_option( 'patreon-installation-api-version', '2' );
+						update_option( 'patreon-can-use-api-v2', true );
 						
 						// We got auth. Proceed with creating the client
 						
@@ -422,6 +427,11 @@ class Patreon_Routing {
 					if ( isset( $tokens['access_token'] ) ) {
 						
 						// We got auth. Proceed with creating the client
+						
+						// Exception - If we are here with a legit access token, re-mark this installation as v2 - can be removed when all installations are using v2
+						
+						update_option( 'patreon-installation-api-version', '2' );
+						update_option( 'patreon-can-use-api-v2', true );						
 						
 						// Create new api object
 						
