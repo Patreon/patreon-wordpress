@@ -168,8 +168,7 @@ class Patreon_API {
 		$params = false;
 		$api_endpoint = "https://www.patreon.com/api/oauth2/v2/" . $suffix;
 		$return_result_format = 'body';
-		echo $api_endpoint;
-		echo '<br>';
+
 		// Overrides
 		
 		if ( isset( $args['method'] ) AND $args['method'] != '' ) {
