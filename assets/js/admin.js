@@ -291,6 +291,28 @@
 			
 		});
 		
+		jQuery(document).on( 'click', '#patreon_wordpress_start_post_import', function(e) {
+			
+			e.preventDefault();
+			var pw_input_target = jQuery( this ).attr( 'pw_input_target' );
+			
+			jQuery.ajax({
+				url: ajaxurl,
+				type:"POST",
+				dataType : 'html',
+				data: {
+					action: 'patreon_wordpress_start_post_import',
+				},
+				success: function( response ) {
+					jQuery( '#patreon_wp_post_import_status' ).empty();
+					jQuery( '#patreon_wp_post_import_status' ).html( 'Started a post import' );
+					jQuery( '#patreon_wp_post_import_status' ).css( 'color', '#129500' );
+					
+				},
+			});		
+			
+		});
+		
 		jQuery(document).on( 'click', '.patreon_wordpress_interface_toggle', function(e) {
 			
 			e.preventDefault();

@@ -89,6 +89,8 @@ class Patreon_Wordpress {
 		add_action( "wp_ajax_nopriv_patreon_make_attachment_pledge_editor", array( self::$patreon_protect , "makeAttachmentPledgeEditor" ) );
 		add_action( "wp_ajax_patreon_save_attachment_patreon_level", array( self::$patreon_protect , "saveAttachmentLevel" ) );
 		add_action( "wp_ajax_nopriv_patreon_save_attachment_patreon_level", array( self::$patreon_protect , "saveAttachmentLevel" ) );
+		add_action( "wp_ajax_patreon_wordpress_start_post_import", array( $this, "start_post_import" ) );
+		add_action( "wp_ajax_nopriv_patreon_wordpress_start_post_import", array( $this , "start_post_import" ) );
 				
 		
 	}
@@ -943,6 +945,18 @@ class Patreon_Wordpress {
 			self::set_last_system_notice_shown_date();
 		}
 		
+	}
+	public function start_post_import() {
+		
+		if( !( is_admin() && current_user_can( 'manage_options' ) ) ) {
+			return;
+		}
+	
+		update_option( 'patreon-post-import-in-progress', 'yes' );
+		
+		echo 'Success';
+		exit;
+			
 	}
 	public function toggle_check_api_credentials_on_setting_save(  $old_value, $new_value ) {
 		

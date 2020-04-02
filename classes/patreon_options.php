@@ -55,6 +55,9 @@ class Patreon_Options {
         register_setting( 'patreon-options', 'patreon-custom-page-name' );
         register_setting( 'patreon-options', 'patreon-prevent-caching-gated-content' );
         register_setting( 'patreon-options', 'patreon-currency-sign' );
+        register_setting( 'patreon-options', 'patreon-sync-posts' );
+        register_setting( 'patreon-options', 'patreon-post-import-in-progress' );
+        register_setting( 'patreon-options', 'patreon-remove-deleted-posts' );
 		
     }
 	
@@ -302,20 +305,20 @@ class Patreon_Options {
 											<td>
 												<?php
 																									
-													$prevent_caching_checked = '';
-													$do_not_prevent_caching_checked = '';
+													$prevent_caching_selected = '';
+													$do_not_prevent_caching_selected = '';
 													
 													if ( get_option( 'patreon-prevent-caching-gated-content', 'yes' ) == 'yes' ) {
-														$prevent_caching_checked = " checked";
+														$prevent_caching_selected = " selected";
 													}
 													else {
-														$do_not_prevent_caching_checked = " checked";
+														$do_not_prevent_caching_selected = " selected";
 													}
 												
 												?>
 												<select name="patreon-prevent-caching-gated-content">
-													<option value="yes" <?php echo $prevent_caching_checked; ?>>Yes</option>
-													<option value="no" <?php echo $do_not_prevent_caching_checked; ?>>No</option>
+													<option value="yes" <?php echo $prevent_caching_selected; ?>>Yes</option>
+													<option value="no" <?php echo $do_not_prevent_caching_selected; ?>>No</option>
 												</select>
 											</td>
                                         </tr>
@@ -367,6 +370,77 @@ class Patreon_Options {
 											</td>
                                         </tr>
 
+                                        <tr valign="top">
+											<th scope="row">
+												<strong>Sync Patreon posts</strong>
+												<div class="patreon-options-info">If Yes, PW will sync your posts at Patreon and WP site on an ongoing basis. Recommended: Yes</div>
+											</th>
+											<td>
+												<?php
+																									
+													$sync_posts_selected = '';
+													$sync_posts_unselected = '';
+													
+													if ( get_option( 'patreon-sync-posts', 'no' ) == 'yes' ) {
+														$sync_posts_selected = " selected";
+													}
+													else {
+														$sync_posts_unselected = " selected";
+													}
+												
+												?>
+												<select name="patreon-sync-posts">
+													<option value="yes" <?php echo $sync_posts_selected; ?>>Yes</option>
+													<option value="no" <?php echo $sync_posts_unselected; ?>>No</option>
+												</select>
+											</td>
+                                        </tr>
+                                        <tr valign="top">
+											<th scope="row">
+												<strong>Delete local posts when Patreon post is deleted</strong>
+												<div class="patreon-options-info">If Yes, PW will delete local imported/matched posts when you delete a post at Patreon. Recommended: No</div>
+											</th>
+											<td>
+												<?php
+																									
+													$delete_posts_selected = '';
+													$delete_posts_unselected = '';
+													
+													if ( get_option( 'patreon-remove-deleted-posts', 'no' ) == 'yes' ) {
+														$delete_posts_selected = " selected";
+													}
+													else {
+														$delete_posts_unselected = " selected";
+													}
+												
+												?>
+												<select name="patreon-remove-deleted-posts">
+													<option value="yes" <?php echo $delete_posts_selected; ?>>Yes</option>
+													<option value="no" <?php echo $delete_posts_unselected; ?>>No</option>
+												</select>
+											</td>
+                                        </tr>
+                                        <tr valign="top">
+											<th scope="row">
+												<strong>Start a post import</strong>
+												<?php
+													
+													$post_import_status = 'No post import ongoing';
+													$post_import_status_color = "9d9d9d";
+													
+													if ( get_option( 'patreon-post-import-in-progress', false ) ) {
+														$post_import_status = "There is an ongoing post import";
+														$post_import_status_color = "129500";
+													}
+												
+												?>
+												<div class="patreon-options-info">Start an import of your posts from Patreon if you haven't done it before. After import of existing posts is complete, new posts will automatically be imported and existing posts automatically updated so you don't need to do this again.<div id="patreon_wp_post_import_status" style="color: #<?php echo $post_import_status_color ?>;"><?php echo $post_import_status; ?></div></div>
+											</th>
+											<td>
+												
+												<button id="patreon_wordpress_start_post_import" class="button button-primary button-large" [pw_input_target="#patreon_wp_post_import_status" target="">Start an import</button>
+											</td>
+                                        </tr>
                                     </table>
 
                                 </div>

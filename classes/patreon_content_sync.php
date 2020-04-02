@@ -23,10 +23,6 @@ class Patreon_Content_Sync {
 			add_action( 'patreon_five_minute_action', array( &$this, 'patreon_five_minute_cron_job' ) );
 		}
 		
-		// For debug - remove later
-		update_option( 'patreon-sync-posts', true );
-		
-			add_action( 'init', array( &$this, 'import_posts_from_patreon' ) );
 	}
 	
 	// Adds Patreon cron schedule if needed
@@ -64,9 +60,8 @@ class Patreon_Content_Sync {
 		
 		if ( !$post_import_in_progress ) {
 			// No ongoing import. Return
-			// return;
+			return;
 		}
-		
 			
 		$creator_access_token = get_option( 'patreon-creators-access-token', false );
 		$client_id 			  = get_option( 'patreon-client-id', false );
@@ -83,10 +78,16 @@ class Patreon_Content_Sync {
 			
 			$posts = $api_client->get_posts( false, 5, $cursor );
 			
+			if ( isset( $posts['data']['errors'][0]['code'] ) AND $posts['data']['errors'][0]['code'] == 3 AND $posts['data']['errors'][0]['source']['parameter'][''] == 'page[cursor]' ) {
+				// Cursor expired. Delete the cursor for next run and return
+				delete_option( 'patreon-post-import-next-cursor' );
+				return;				
+			}
+			
 			if ( !isset( $posts['data'] ) ) {
 				// Couldnt get posts. Bail out
 				return;				
-			}
+			}			
 			
 			if ( isset( $posts['meta']['pagination']['cursors']['next'] ) ) {
 				update_option( 'patreon-post-import-next-cursor', $posts['meta']['pagination']['cursors']['next'] );
@@ -100,7 +101,10 @@ class Patreon_Content_Sync {
 				delete_option( 'patreon-post-import-next-cursor' );
 				
 			}
-			
+			echo '<pre>';
+			print_r($posts);
+			echo '</pre>';
+			wp_die();	
 			foreach ( $posts['data'] as $key => $value ) {
 				
 				$patreon_post = $api_client->get_post( $posts['data'][$key]['id'] );
