@@ -103,16 +103,23 @@ class Patreon_API {
 		return $result;
 	}
 
-	public function get_posts( $campaign_id = false) {
+	public function get_posts( $campaign_id = false, $page_size = 1, $cursor = null ) {
 		
 		// Gets posts of relevant campaign
 		
-		if ( !$campaign_id ) {			
+		if ( !$campaign_id ) {
 			$campaign_id = get_option( 'patreon-campaign-id', false );
 		}
 		
+		$request = 'campaigns/'. $campaign_id .'/posts?page%5Bcount%5D=' . $page_size;
+		
+		if ( isset( $cursor ) ) {
+			$cursor = urlencode($cursor);
+			$request .= '&page%5Bcursor%5D='. $cursor;
+		}
+		
 		if ( $campaign_id ) {
-			return $this->__get_json( 'campaigns/'. $campaign_id .'/posts' );
+			return $this->__get_json( $request );
 		}
 		
 		return false;
@@ -161,7 +168,8 @@ class Patreon_API {
 		$params = false;
 		$api_endpoint = "https://www.patreon.com/api/oauth2/v2/" . $suffix;
 		$return_result_format = 'body';
-
+		echo $api_endpoint;
+		echo '<br>';
 		// Overrides
 		
 		if ( isset( $args['method'] ) AND $args['method'] != '' ) {

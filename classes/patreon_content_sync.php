@@ -25,6 +25,8 @@ class Patreon_Content_Sync {
 		
 		// For debug - remove later
 		update_option( 'patreon-sync-posts', true );
+		
+			add_action( 'init', array( &$this, 'import_posts_from_patreon' ) );
 	}
 	
 	// Adds Patreon cron schedule if needed
@@ -53,7 +55,19 @@ class Patreon_Content_Sync {
 	}
 	
 	public function import_posts_from_patreon() {
-	
+		
+		// This function performs a full import of posts from Patreon using cron
+		
+		// Check if an import is going on
+		
+		$post_import_in_progress = get_option( 'patreon-post-import-in-progress', false );
+		
+		if ( !$post_import_in_progress ) {
+			// No ongoing import. Return
+			// return;
+		}
+		
+			
 		$creator_access_token = get_option( 'patreon-creators-access-token', false );
 		$client_id 			  = get_option( 'patreon-client-id', false );
 
@@ -63,11 +77,28 @@ class Patreon_Content_Sync {
 
 			$api_client = new Patreon_API( $creator_access_token );
 			
-			$posts = $api_client->get_posts();
+			// Get if there is a saved cursor
+			
+			$cursor = get_option( 'patreon-post-import-next-cursor', null );
+			
+			$posts = $api_client->get_posts( false, 5, $cursor );
 			
 			if ( !isset( $posts['data'] ) ) {
 				// Couldnt get posts. Bail out
 				return;				
+			}
+			
+			if ( isset( $posts['meta']['pagination']['cursors']['next'] ) ) {
+				update_option( 'patreon-post-import-next-cursor', $posts['meta']['pagination']['cursors']['next'] );
+			}
+			
+			// If we have a saved cursor, the return is legitimate, but there is no more cursor then we are at the last page - iteration over. Mark it:
+			
+			if ( isset( $cursor ) AND !isset( $posts['meta']['pagination']['cursors']['next'] ) ) {
+				
+				delete_option( 'patreon-post-import-in-progress' );
+				delete_option( 'patreon-post-import-next-cursor' );
+				
 			}
 			
 			foreach ( $posts['data'] as $key => $value ) {
