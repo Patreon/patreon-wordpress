@@ -105,7 +105,7 @@ class Patron_Metabox {
 		
 			<?php
 			
-			$label    = 'Require an active pledge at the time of this post’s creation to view this post. (optional) <a href="https://www.patreondevelopers.com/t/patreon-wordpress-locking-options-guide/1135#heading--section-2?utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=post_locking_metabox_link_3&utm_term=" target="_blank">(?)</a>';
+			$label    = 'Require a pledge active at the time of this post’s creation to view this post. (optional) This will make it so that only patrons who were patrons at or before the post date of this post can access this post. <a href="https://www.patreondevelopers.com/t/patreon-wordpress-locking-options-guide/1135#heading--section-2?utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=post_locking_metabox_link_3&utm_term=" target="_blank">(?)</a>';
 			$readonly = '';
 			
 			if ( !get_option( 'patreon-creator-id', false ) ) {

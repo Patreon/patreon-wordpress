@@ -55,7 +55,7 @@ if ( strpos( $_SERVER['REQUEST_URI'], '/patreon-authorization/' ) !== false ) {
 	
 }
 
-if ( isset( $returned_state_var ) AND ( $returned_state_var['patreon_action'] == 'reconnect_site' OR $returned_state_var['patreon_action'] == 'connect_site' ) ) {
+if ( isset( $returned_state_var ) AND isset( $returned_state_var['patreon_action'] ) AND ( $returned_state_var['patreon_action'] == 'reconnect_site' OR $returned_state_var['patreon_action'] == 'connect_site' ) ) {
 
 	// We repeat below code because we want it to be available !only! during reconnect/connect actions
 		
