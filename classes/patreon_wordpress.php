@@ -952,7 +952,8 @@ class Patreon_Wordpress {
 			return;
 		}
 	
-		update_option( 'patreon-post-import-in-progress', 'yes' );
+		update_option( 'patreon-post-import-in-progress', true );
+		delete_option( 'patreon-post-import-next-cursor' );
 		
 		echo 'Success';
 		exit;

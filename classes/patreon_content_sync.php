@@ -77,7 +77,7 @@ class Patreon_Content_Sync {
 			$cursor = get_option( 'patreon-post-import-next-cursor', null );
 			
 			$posts = $api_client->get_posts( false, 5, $cursor );
-			
+
 			if ( isset( $posts['data']['errors'][0]['code'] ) AND $posts['data']['errors'][0]['code'] == 3 AND $posts['data']['errors'][0]['source']['parameter'][''] == 'page[cursor]' ) {
 				// Cursor expired. Delete the cursor for next run and return
 				delete_option( 'patreon-post-import-next-cursor' );
@@ -87,7 +87,7 @@ class Patreon_Content_Sync {
 			if ( !isset( $posts['data'] ) ) {
 				// Couldnt get posts. Bail out
 				return;				
-			}			
+			}		
 			
 			if ( isset( $posts['meta']['pagination']['cursors']['next'] ) ) {
 				update_option( 'patreon-post-import-next-cursor', $posts['meta']['pagination']['cursors']['next'] );
@@ -101,10 +101,7 @@ class Patreon_Content_Sync {
 				delete_option( 'patreon-post-import-next-cursor' );
 				
 			}
-			echo '<pre>';
-			print_r($posts);
-			echo '</pre>';
-			wp_die();	
+			
 			foreach ( $posts['data'] as $key => $value ) {
 				
 				$patreon_post = $api_client->get_post( $posts['data'][$key]['id'] );
@@ -149,7 +146,14 @@ class Patreon_Content_Sync {
 					$this->add_new_patreon_post( $patreon_post );
 				}
 				else {
-					$this->update_patreon_post( $matching_post_id, $patreon_post );
+					
+					// Update if existing posts are set to be updated 
+					
+					if ( get_option( 'patreon-update-posts', 'no' ) == 'yes' ) {
+						$this->update_patreon_post( $matching_post_id, $patreon_post );
+					}
+					
+					
 				}
 			
 			}

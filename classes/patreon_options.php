@@ -58,6 +58,7 @@ class Patreon_Options {
         register_setting( 'patreon-options', 'patreon-sync-posts' );
         register_setting( 'patreon-options', 'patreon-post-import-in-progress' );
         register_setting( 'patreon-options', 'patreon-remove-deleted-posts' );
+        register_setting( 'patreon-options', 'patreon-update-posts' );
 		
     }
 	
@@ -373,7 +374,7 @@ class Patreon_Options {
                                         <tr valign="top">
 											<th scope="row">
 												<strong>Sync Patreon posts</strong>
-												<div class="patreon-options-info">If Yes, PW will sync your posts at Patreon and WP site on an ongoing basis. Recommended: Yes</div>
+												<div class="patreon-options-info">If Yes, the plugin will sync your posts from Patreon to your WP site on an ongoing basis. Recommended: Yes</div>
 											</th>
 											<td>
 												<?php
@@ -397,8 +398,33 @@ class Patreon_Options {
                                         </tr>
                                         <tr valign="top">
 											<th scope="row">
+												<strong>Update local posts from the ones at Patreon</strong>
+												<div class="patreon-options-info">If Yes, the plugin will update local imported/matched posts with the post content at Patreon. If you have extra formatting in your <i>local</i> posts, they will be overwritten with the formatting of the Patreon posts. Recommended: Yes</div>
+											</th>
+											<td>
+												<?php
+																									
+													$update_posts_selected = '';
+													$update_posts_unselected = '';
+													
+													if ( get_option( 'patreon-update-posts', 'no' ) == 'yes' ) {
+														$update_posts_selected = " selected";
+													}
+													else {
+														$update_posts_unselected = " selected";
+													}
+												
+												?>
+												<select name="patreon-update-posts">
+													<option value="yes" <?php echo $update_posts_selected; ?>>Yes</option>
+													<option value="no" <?php echo $update_posts_unselected; ?>>No</option>
+												</select>
+											</td>
+                                        </tr>
+                                        <tr valign="top">
+											<th scope="row">
 												<strong>Delete local posts when Patreon post is deleted</strong>
-												<div class="patreon-options-info">If Yes, PW will delete local imported/matched posts when you delete a post at Patreon. Recommended: No</div>
+												<div class="patreon-options-info">If Yes, the plugin will delete local imported/matched posts when you delete a post at Patreon. Recommended: No</div>
 											</th>
 											<td>
 												<?php
