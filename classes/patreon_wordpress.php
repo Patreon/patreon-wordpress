@@ -1522,6 +1522,48 @@ class Patreon_Wordpress {
 
 		}
 		
+		if ( isset( $_REQUEST['setup_stage'] ) AND $_REQUEST['setup_stage'] == 'post_sync_0' ) {
+			
+			
+			
+			$setup_message = PATREON_POST_SYNC_0;
+			
+			if ( isset( $_REQUEST['patreon_message'] ) AND $_REQUEST['patreon_message'] != '' ) {
+				$setup_message = Patreon_Frontend::$messages_map[$_REQUEST['patreon_message']];
+
+			}
+
+			// Create state var needed for identifying connection attempt
+			
+			echo '<div id="patreon_setup_screen">';
+	
+			echo '<div id="patreon_setup_logo"><img src="' . PATREON_PLUGIN_ASSETS . '/img/Patreon_Logo_100.png" /></div>';
+			
+			echo '<div id="patreon_setup_content"><h1 style="margin-top: 0px;">Do you want to sync your posts?</h1><div id="patreon_setup_message">' . $setup_message . '</div><form style="display:inline-block;margin-right: 10px;" method="post" action="' . admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=post_sync_1' ) . '"><p class="submit" style="margin-top: 10px;"><input type="submit" class="button button-large button-primary" value="Yes, lets go!" /></p></form><form style="display:inline-block;" method="get" action="' . admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=final' ) . '"><p class="submit" style="margin-top: 10px;"><input type="submit" class="button button-large button-primary" value="Maybe later" /></p></form></div>';
+			
+			echo '</div>';
+
+		}
+		if ( isset( $_REQUEST['setup_stage'] ) AND $_REQUEST['setup_stage'] == 'post_sync_1' ) {
+			
+			$setup_message = '';
+			
+			if ( isset( $_REQUEST['patreon_message'] ) AND $_REQUEST['patreon_message'] != '' ) {
+				$setup_message = Patreon_Frontend::$messages_map[$_REQUEST['patreon_message']];
+
+			}
+
+			// Create state var needed for identifying connection attempt
+			
+			echo '<div id="patreon_setup_screen">';
+	
+			echo '<div id="patreon_setup_logo"><img src="' . PATREON_PLUGIN_ASSETS . '/img/Patreon_Logo_100.png" /></div>';
+			
+			echo '<div id="patreon_setup_content"><h1 style="margin-top: 0px;">How should posts be synced?</h1><div id="patreon_setup_message">' . $setup_message . '<div class="patreon_post_sync_choice"><div class="patreon_post_sync_choice_title">Update local posts from the ones at Patreon</div>'. PATREON_POST_SYNC_2 .'<div style="display:block;margin-top:10px;"><select name="patreon-remove-deleted-posts"  style="font-size:20px;"><option value="">Select</option><option value="yes">Yes</option><option value="no">No</option></select></div></div><div class="patreon_post_sync_choice"><div class="patreon_post_sync_choice_title">Delete local post when Patreon post is deleted</div>'. PATREON_POST_SYNC_3 .'<div style="display:block;margin-top:10px;"><select name="patreon-remove-deleted-posts"  style="font-size:20px;"><option value="">Select</option><option value="yes">Yes</option><option value="no">No</option></select></div></div></div>' . '<form style="display:inline-block;margin-right:10px;" method="get" action="'. admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=post_sync_1') .'register-client-creation"><p class="submit" style="margin-top: 10px;"><input type="submit" name="submit" id="submit" class="button button-large button-primary" value="Yes, lets go!"></p></form><form style="display:inline-block;" method="get" action="'. admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=final') .'register-client-creation"><p class="submit" style="margin-top: 10px;"><input type="submit" name="submit" id="submit" class="button button-large button-primary" value="Maybe later"></p></form></div>';
+		
+			echo '</div>';
+
+		}
 		
 		if ( isset( $_REQUEST['setup_stage'] ) AND $_REQUEST['setup_stage'] == 'reconnect_0' ) {
 			

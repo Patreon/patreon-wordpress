@@ -131,6 +131,10 @@ define( "PATREON_LOGIN_WIDGET_DESC", 'Have your users login with Patreon or conn
 define( "PATREON_LOGIN_WIDGET_LOGOUT", 'You are logged in. %%click_here%% to logout.' );
 define( "PATREON_CLICK_HERE", 'Click here' );
 define( "PATREON_ADMIN_MESSAGE_V1_CLIENT_ATTEMPTING_V2_SETUP", 'Your site is using the old v1 version of Patreon connection. Since v1 apps can\'t be reconnected automatically, please visit <a href="https://www.patreon.com/portal/registration/register-clients?utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=v1_client_attempting_v2_setup&utm_term=" target="_blank">your app/clients page</a> at Patreon and delete the app/client that shows up for this site. After this, you can continue with setup.' );
+define( "PATREON_POST_SYNC_0", 'If you want, you can sync your posts from Patreon to your WP site and simplify your workflow. You can import all your existing posts to your site and import new and updated posts on the go.' );
+define( "PATREON_POST_SYNC_1", 'Choose how you want to sync your posts from Patreon' );
+define( "PATREON_POST_SYNC_2", 'This will overwrite content and formatting in your local posts with the ones in your Patreon posts. Recommended: Yes' );
+define( "PATREON_POST_SYNC_3", 'Delete local post if when you delete matching post at Patreon. Recommended: No' );
 
 require( 'classes/patreon_wordpress.php' );
 

@@ -376,7 +376,18 @@ class Patreon_Routing {
 								
 								// First apply a filter so that 3rd party addons can redirect to a custom final screen
 								
+								// Check if post syncing is set up, if not, redirect to post sync page.
+								
 								$setup_final_redirect = apply_filters( 'ptrn/setup_wizard_final_redirect', admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=final') );
+								
+								if ( !get_option( 'patreon-post-sync-set-up', false ) ) {
+									
+									// Post sync not set up. Redirect it to relevant page
+									
+									$setup_final_redirect = apply_filters( 'ptrn/setup_wizard_post_sync_redirect', admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=post_sync_0') );
+									
+								}
+								
 
 								wp_redirect( $setup_final_redirect );
 								exit;				

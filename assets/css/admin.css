@@ -388,3 +388,14 @@
 	top: 50%;
 	transform: translateY(-50%);
 }
+
+.patreon_post_sync_choice {
+	display: block;
+	margin-top: 10px;
+}
+
+.patreon_post_sync_choice_title {
+	display: block;
+	margin-bottom: 10px;
+	font-weight: bold;
+}
