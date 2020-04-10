@@ -1634,7 +1634,7 @@ class Patreon_Wordpress {
 
 			}
 
-			// Create state var needed for identifying connection attempt
+			update_option( 'patreon-post-sync-set-up', true );
 			
 			echo '<div id="patreon_setup_screen">';
 	
