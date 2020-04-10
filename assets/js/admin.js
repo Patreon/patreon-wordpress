@@ -333,6 +333,94 @@
 			jQuery( "#patreon-level-exact" ).val( this.value );
 		});
 		
+		// Save patreon-update-posts option upon change during post sync wizard screens
+		jQuery( "#patreon-update-posts" ).on( 'change', function(e) {
+			
+			// Just in case
+			e.preventDefault();
+			var pw_input_target = jQuery( this ).attr( 'pw_input_target' );
+			var option_value = jQuery(this).val();
+			
+			if (  option_value == '' ) {
+				// Do nothing if value is empty
+				jQuery( pw_input_target ).html('');
+				return;
+			}
+			
+			jQuery.ajax({
+				url: ajaxurl,
+				async: true, // Just to make sure
+				type:"POST",
+				dataType : 'html',
+				data: {
+					action: 'patreon_wordpress_set_update_posts_option',
+					update_posts_option_value: option_value,
+				},
+				beforeSend: function( e ) {			
+				},
+				success: function( response ) {
+					jQuery( pw_input_target ).empty();
+					jQuery( pw_input_target ).html( 'Saved!' );
+					
+				},
+				error: function( response ) {
+					jQuery( pw_input_target ).empty();
+					jQuery( pw_input_target ).html( 'Sorry - could not save' );
+				},
+				statusCode: {
+					500: function(error) {
+						jQuery( pw_input_target ).empty();
+						jQuery( pw_input_target ).html( 'Sorry - error (500)' );
+					}
+				}
+			});	
+			
+		});
+		
+		// Save patreon-update-posts option upon change during post sync wizard screens
+		jQuery( "#patreon-remove-deleted-posts" ).on( 'change', function(e) {
+			
+			// Just in case
+			e.preventDefault();
+			var pw_input_target = jQuery( this ).attr( 'pw_input_target' );
+			var option_value = jQuery(this).val();
+
+			if (  option_value == '' ) {
+				// Do nothing if value is empty
+				jQuery( pw_input_target ).html('');
+				return;
+			}
+			
+			jQuery.ajax({
+				url: ajaxurl,
+				async: true, // Just to make sure
+				type:"POST",
+				dataType : 'html',
+				data: {
+					action: 'patreon_wordpress_set_delete_posts_option',
+					delete_posts_option_value: option_value,
+				},
+				beforeSend: function( e ) {			
+				},
+				success: function( response ) {
+					jQuery( pw_input_target ).empty();
+					jQuery( pw_input_target ).html( 'Saved!' );
+					
+				},
+				error: function( response ) {
+					jQuery( pw_input_target ).empty();
+					jQuery( pw_input_target ).html( 'Sorry - could not save' );
+				},
+				statusCode: {
+					500: function(error) {
+						jQuery( pw_input_target ).empty();
+						jQuery( pw_input_target ).html( 'Sorry - error (500)' );
+					}
+				}
+			});	
+			
+		});
+		
 		jQuery( ".patreon_toggle_admin_sections" ).on( 'click', function (e) {
 			
 			if ( jQuery( e.target ).hasClass( 'patreon_setting_section_help_icon' ) ) { 

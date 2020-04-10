@@ -91,6 +91,10 @@ class Patreon_Wordpress {
 		add_action( "wp_ajax_nopriv_patreon_save_attachment_patreon_level", array( self::$patreon_protect , "saveAttachmentLevel" ) );
 		add_action( "wp_ajax_patreon_wordpress_start_post_import", array( $this, "start_post_import" ) );
 		add_action( "wp_ajax_nopriv_patreon_wordpress_start_post_import", array( $this , "start_post_import" ) );
+		add_action( "wp_ajax_patreon_wordpress_set_update_posts_option", array( $this, "set_update_posts_option" ) );
+		add_action( "wp_ajax_nopriv_patreon_wordpress_set_update_posts_option", array( $this , "set_update_posts_option" ) );
+		add_action( "wp_ajax_patreon_wordpress_set_delete_posts_option", array( $this, "set_delete_posts_option" ) );
+		add_action( "wp_ajax_nopriv_patreon_wordpress_set_delete_posts_option", array( $this , "set_delete_posts_option" ) );
 				
 		
 	}
@@ -959,6 +963,44 @@ class Patreon_Wordpress {
 		exit;
 			
 	}
+	public function set_update_posts_option() {
+		
+		if( !( is_admin() && current_user_can( 'manage_options' ) ) ) {
+			return;
+		}
+		
+		if ( $_REQUEST['update_posts_option_value'] == 'yes' ) {
+			update_option( 'patreon-update-posts', 'yes' );
+		}
+	
+		
+		if ( $_REQUEST['update_posts_option_value'] == 'no' ) {
+			update_option( 'patreon-update-posts', 'no' );
+		}
+	
+		echo 'Success';
+		exit;
+			
+	}
+	public function set_delete_posts_option() {
+		
+		if( !( is_admin() && current_user_can( 'manage_options' ) ) ) {
+			return;
+		}
+		
+		if ( $_REQUEST['delete_posts_option_value'] == 'yes' ) {
+			update_option( 'patreon-remove-deleted-posts', 'yes' );
+		}
+	
+		
+		if ( $_REQUEST['delete_posts_option_value'] == 'no' ) {
+			update_option( 'patreon-remove-deleted-posts', 'no' );
+		}		
+			
+		echo 'Success';
+		exit;
+			
+	}
 	public function toggle_check_api_credentials_on_setting_save(  $old_value, $new_value ) {
 		
 		// This function fires after any of the client details are updated. 
@@ -1544,9 +1586,48 @@ class Patreon_Wordpress {
 			echo '</div>';
 
 		}
+		
 		if ( isset( $_REQUEST['setup_stage'] ) AND $_REQUEST['setup_stage'] == 'post_sync_1' ) {
 			
 			$setup_message = '';
+			
+			if ( isset( $_REQUEST['patreon_message'] ) AND $_REQUEST['patreon_message'] != '' ) {
+				$setup_message = Patreon_Frontend::$messages_map[$_REQUEST['patreon_message']];
+
+			}
+			
+			$update_posts_selected = '';
+			$update_posts_unselected = '';
+			
+			if ( get_option( 'patreon-update-posts', 'no' ) == 'yes' ) {
+				$update_posts_selected = " selected";
+			}
+			else {
+				$update_posts_unselected = " selected";
+			}
+			
+			$delete_posts_selected = '';
+			$delete_posts_unselected = '';
+			
+			if ( get_option( 'patreon-remove-deleted-posts', 'no' ) == 'yes' ) {
+				$delete_posts_selected = " selected";
+			}
+			else {
+				$delete_posts_unselected = " selected";
+			}			
+			
+			echo '<div id="patreon_setup_screen">';
+	
+			echo '<div id="patreon_setup_logo"><img src="' . PATREON_PLUGIN_ASSETS . '/img/Patreon_Logo_100.png" /></div>';
+			
+			echo '<div id="patreon_setup_content"><h1 style="margin-top: 0px;">How should posts be synced?</h1><div id="patreon_setup_message">' . $setup_message . '<div class="patreon_post_sync_choice"><div class="patreon_post_sync_choice_title">Update local posts from the ones at Patreon</div>'. PATREON_POST_SYNC_2 .'<div style="display:block;margin-top:10px;width: 200px;"><select id="patreon-update-posts" name="patreon-update-posts" pw_input_target="#patreon-update-posts-info" style="font-size:20px; display:inline-block;"><option value="">Select</option><option value="yes" '. $update_posts_selected .'>Yes</option><option value="no"'. $update_posts_unselected .'>No</option></select><div id="patreon-update-posts-info"></div></div></div><div class="patreon_post_sync_choice"><div class="patreon_post_sync_choice_title">Delete local post when Patreon post is deleted</div>'. PATREON_POST_SYNC_3 .'<div style="display:block;margin-top:10px;width: 200px;"><select name="patreon-remove-deleted-posts" id="patreon-remove-deleted-posts" pw_input_target="#patreon-remove-deleted-posts-info" style="font-size:20px;"><option value="">Select</option><option value="yes" '. $delete_posts_selected .'>Yes</option><option value="no" '. $delete_posts_unselected .'>No</option></select><div id="patreon-remove-deleted-posts-info"></div></div></div></div><form style="display:inline-block;margin-right:10px;" method="post" action="'. admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=post_sync_2') .'"><p class="submit" style="margin-top: 10px;"><input type="submit" name="submit" id="submit" class="button button-large button-primary" value="Done!"></p></form></div>';
+		
+			echo '</div>';
+
+		}
+		if ( isset( $_REQUEST['setup_stage'] ) AND $_REQUEST['setup_stage'] == 'post_sync_2' ) {
+			
+			$setup_message = PATREON_POST_SYNC_4;
 			
 			if ( isset( $_REQUEST['patreon_message'] ) AND $_REQUEST['patreon_message'] != '' ) {
 				$setup_message = Patreon_Frontend::$messages_map[$_REQUEST['patreon_message']];
@@ -1559,7 +1640,7 @@ class Patreon_Wordpress {
 	
 			echo '<div id="patreon_setup_logo"><img src="' . PATREON_PLUGIN_ASSETS . '/img/Patreon_Logo_100.png" /></div>';
 			
-			echo '<div id="patreon_setup_content"><h1 style="margin-top: 0px;">How should posts be synced?</h1><div id="patreon_setup_message">' . $setup_message . '<div class="patreon_post_sync_choice"><div class="patreon_post_sync_choice_title">Update local posts from the ones at Patreon</div>'. PATREON_POST_SYNC_2 .'<div style="display:block;margin-top:10px;"><select name="patreon-remove-deleted-posts"  style="font-size:20px;"><option value="">Select</option><option value="yes">Yes</option><option value="no">No</option></select></div></div><div class="patreon_post_sync_choice"><div class="patreon_post_sync_choice_title">Delete local post when Patreon post is deleted</div>'. PATREON_POST_SYNC_3 .'<div style="display:block;margin-top:10px;"><select name="patreon-remove-deleted-posts"  style="font-size:20px;"><option value="">Select</option><option value="yes">Yes</option><option value="no">No</option></select></div></div></div>' . '<form style="display:inline-block;margin-right:10px;" method="get" action="'. admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=post_sync_1') .'register-client-creation"><p class="submit" style="margin-top: 10px;"><input type="submit" name="submit" id="submit" class="button button-large button-primary" value="Yes, lets go!"></p></form><form style="display:inline-block;" method="get" action="'. admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=final') .'register-client-creation"><p class="submit" style="margin-top: 10px;"><input type="submit" name="submit" id="submit" class="button button-large button-primary" value="Maybe later"></p></form></div>';
+			echo '<div id="patreon_setup_content"><h1 style="margin-top: 0px;">Post sync set up!</h1><div id="patreon_setup_message">' . $setup_message . '</div><form style="display:inline-block;margin-right:10px;" method="post" action="'. admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=final') .'"><p class="submit" style="margin-top: 10px;"><input type="submit" name="submit" id="submit" class="button button-large button-primary" value="Got it!"></p></form></div>';
 		
 			echo '</div>';
 

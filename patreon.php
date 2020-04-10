@@ -135,6 +135,7 @@ define( "PATREON_POST_SYNC_0", 'If you want, you can sync your posts from Patreo
 define( "PATREON_POST_SYNC_1", 'Choose how you want to sync your posts from Patreon' );
 define( "PATREON_POST_SYNC_2", 'This will overwrite content and formatting in your local posts with the ones in your Patreon posts. Recommended: Yes' );
 define( "PATREON_POST_SYNC_3", 'Delete local post if when you delete matching post at Patreon. Recommended: No' );
+define( "PATREON_POST_SYNC_4", 'Your post sync choices were saved! Existing posts will be imported every 5 min until all are imported, and new/updated posts will also be synced. You can change these settings, start a new import or turn post sync on/of in "Patreon Settings" menu.' );
 
 require( 'classes/patreon_wordpress.php' );
 

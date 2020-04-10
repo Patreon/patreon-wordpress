@@ -399,3 +399,13 @@
 	margin-bottom: 10px;
 	font-weight: bold;
 }
+
+#patreon-update-posts-info, #patreon-remove-deleted-posts-info {
+	color: #129500;
+	font-weight: bold;
+	padding: 2px;
+	padding-left: 10px;
+	width: 80px;
+	display:inline-block;	
+}
+
