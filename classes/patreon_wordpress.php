@@ -2335,5 +2335,90 @@ class Patreon_Wordpress {
 		
 	}
 	
+	public function make_post_type_select( $selected_post_type = 'post' ) {
+		
+		$post_types = get_post_types();
+		$select = '';
+	
+		foreach( $post_types as $key => $value ) {
+			
+			$selected = '';
+			$obj = get_post_type_object( $key );
+			
+			if ( $key == $selected_post_type ) {
+				$selected = ' selected';
+			}
+			
+			$select .= '<option value="' . $key . '" ' . $selected . ' >' . $obj->labels->singular_name . '</option>';
+
+		}
+		
+		return $select;
+		
+	}
+	public function make_taxonomy_select( $selected_post_type = 'post', $selected_taxonomy = 'category' ) {
+		
+		$taxonomies = get_object_taxonomies( $selected_post_type );
+		$select = '';
+
+		foreach( $taxonomies as $key => $value ) {
+			
+			$selected = '';
+
+		
+			$taxonomy = get_taxonomy( $taxonomies[$key] );
+
+			if ( is_object( $taxonomy ) ) {
+				
+				if ( $taxonomy->name == $selected_taxonomy ) {
+					$selected = ' selected';
+				}
+				
+				$select .= '<option value="' . $taxonomy->name . '" ' . $selected . ' >'. $taxonomy->labels->singular_name . '</option>';	
+			}
+			
+
+		}
+		
+		return $select;
+		
+	}
+	public function make_term_select( $selected_post_type = 'post', $selected_taxonomy = 'category', $selected_term = 1 ) {
+		
+		$select = '';
+
+		
+			
+			$selected = '';
+			
+			$terms = get_terms( $selected_taxonomy, 
+				array(
+					'hide_empty' => false, 
+					'parent' => 0, 
+					'orderby' => 
+					'description', 
+					'order' => 'ASC',
+				) 
+			);
+		
+		foreach( $terms as $key => $value ) {
+			
+			
+			if ( count( $terms ) > 0 ) {
+				
+				if ( $terms[$key]->term_id == $selected_term ) {
+					$selected = ' selected';
+				}
+				
+				$select .= '<option value="' . $terms[$key]->term_id . '" ' . $selected . ' >'. $terms[$key]->name . '</option>';	
+			}
+			
+
+		}
+		
+		return $select;
+		
+	}
+	
 }
 

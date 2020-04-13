@@ -398,6 +398,38 @@ class Patreon_Options {
                                         </tr>
                                         <tr valign="top">
 											<th scope="row">
+												<strong>Post type and category for synced posts</strong>
+												<div class="patreon-options-info">Set which post type and category/taxonomy will be used for synced posts.
+												<div id="patreon_select_post_sync_category">
+													<?php
+														global $Patreon_Wordpress;
+																										
+														$post_type_select = $Patreon_Wordpress->make_post_type_select();
+														$taxonomy_select  = $Patreon_Wordpress->make_taxonomy_select();
+														$term_select      = $Patreon_Wordpress->make_term_select();
+														
+													
+													?>
+													<select name="patreon-sync-posts" style="display: inline-block; margin-right: 5px;">
+														<?php echo $post_type_select ?>
+													</select>
+													<select name="patreon-sync-posts" style="display: inline-block; margin-right: 5px;">
+														<?php echo $taxonomy_select ?>
+													</select>
+													<select name="patreon-sync-posts" style="display: inline-block; margin-right: 5px;">
+														<?php echo $term_select ?>
+													</select>
+													<button id="patreon_wordpress_start_post_import" class="button button-primary button-large" [pw_input_target="#patreon_wp_post_import_status" target="">Save</button>
+												</div>
+												
+												</div>
+											</th>
+											<td>
+												
+											</td>
+                                        </tr>
+                                        <tr valign="top">
+											<th scope="row">
 												<strong>Update local posts from the ones at Patreon</strong>
 												<div class="patreon-options-info">If Yes, the plugin will update local imported/matched posts with the post content at Patreon. If you have extra formatting in your <i>local</i> posts, they will be overwritten with the formatting of the Patreon posts. Recommended: Yes</div>
 											</th>
