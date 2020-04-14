@@ -407,19 +407,20 @@ class Patreon_Options {
 														$post_type_select = $Patreon_Wordpress->make_post_type_select();
 														$taxonomy_select  = $Patreon_Wordpress->make_taxonomy_select();
 														$term_select      = $Patreon_Wordpress->make_term_select();
+														$post_import_status_color = "9d9d9d";
 														
 													
 													?>
-													<select name="patreon-sync-posts" style="display: inline-block; margin-right: 5px;">
+													<select name="patreon_sync_post_type" id="patreon_sync_post_type" style="display: inline-block; margin-right: 5px;">
 														<?php echo $post_type_select ?>
 													</select>
-													<select name="patreon-sync-posts" style="display: inline-block; margin-right: 5px;">
+													<select  name="patreon_sync_post_category" id="patreon_sync_post_category" style="display: inline-block; margin-right: 5px;">
 														<?php echo $taxonomy_select ?>
 													</select>
-													<select name="patreon-sync-posts" style="display: inline-block; margin-right: 5px;">
+													<select  name="patreon_sync_post_term" id="patreon_sync_post_term" style="display: inline-block; margin-right: 5px;">
 														<?php echo $term_select ?>
 													</select>
-													<button id="patreon_wordpress_start_post_import" class="button button-primary button-large" [pw_input_target="#patreon_wp_post_import_status" target="">Save</button>
+													<button id="patreon_wordpress_save_post_sync_category" class="button button-primary button-large" pw_input_target="#patreon_wordpress_post_import_category_status" target="">Save</button><div id="patreon_wordpress_post_import_category_status" style="color: #<?php echo $post_sync_category_status_color ?>;"></div>
 												</div>
 												
 												</div>

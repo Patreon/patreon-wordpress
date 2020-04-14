@@ -58,6 +58,7 @@ class Patreon_Frontend {
 			'client_delete_error_content'                => PATREON_ADMIN_MESSAGE_CLIENT_DELETE_ERROR_CONTENT,
 			'client_reconnect_delete_error_title'        => PATREON_ADMIN_MESSAGE_CLIENT_RECONNECT_DELETE_ERROR_TITLE,
 			'client_reconnect_delete_error_content'      => PATREON_ADMIN_MESSAGE_CLIENT_RECONNECT_DELETE_ERROR_CONTENT,
+			'all_post_category_fields_must_be_selected'  => PATREON_ALL_POST_CATEGORY_FIELDS_MUST_BE_SELECTED,
 		);
 		
 	}

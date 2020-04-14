@@ -95,6 +95,12 @@ class Patreon_Wordpress {
 		add_action( "wp_ajax_nopriv_patreon_wordpress_set_update_posts_option", array( $this , "set_update_posts_option" ) );
 		add_action( "wp_ajax_patreon_wordpress_set_delete_posts_option", array( $this, "set_delete_posts_option" ) );
 		add_action( "wp_ajax_nopriv_patreon_wordpress_set_delete_posts_option", array( $this , "set_delete_posts_option" ) );
+		add_action( "wp_ajax_patreon_wordpress_get_taxonomies_for_post_type", array( $this, "make_taxonomy_select" ) );
+		add_action( "wp_ajax_patreon_wordpress_get_taxonomies_for_post_type", array( $this , "make_taxonomy_select" ) );
+		add_action( "wp_ajax_patreon_wordpress_get_terms_for_taxonomy", array( $this, "make_term_select" ) );
+		add_action( "wp_ajax_patreon_wordpress_get_terms_for_taxonomy", array( $this , "make_term_select" ) );
+		add_action( "wp_ajax_patreon_wordpress_save_post_sync_category", array( $this, "save_post_sync_category" ) );
+		add_action( "wp_ajax_patreon_wordpress_save_post_sync_category", array( $this , "save_post_sync_category" ) );
 				
 		
 	}
@@ -963,6 +969,39 @@ class Patreon_Wordpress {
 		exit;
 			
 	}
+	public function save_post_sync_category() {
+		
+		if( !( is_admin() && current_user_can( 'manage_options' ) ) ) {
+			return;
+		}
+		
+		if ( !( 
+				isset( $_REQUEST['patreon_sync_post_type'] ) AND
+				isset( $_REQUEST['patreon_sync_post_category'] ) AND
+				isset( $_REQUEST['patreon_sync_post_term'] )
+			)
+		) {
+			echo 'Please select all fields';
+			exit;
+		}
+		// Check for empty cases
+		if ( 
+				$_REQUEST['patreon_sync_post_type'] == '-' OR
+				$_REQUEST['patreon_sync_post_category'] == '-' OR
+				$_REQUEST['patreon_sync_post_term'] == '-'
+		) {
+			echo 'Please select all fields';
+			exit;
+		}
+	
+		update_option( 'patreon_sync_post_type', $_REQUEST['patreon_sync_post_type'] );
+		update_option( 'patreon_sync_post_category', $_REQUEST['patreon_sync_post_category'] );
+		update_option( 'patreon_sync_post_term', $_REQUEST['patreon_sync_post_term'] );
+		
+		echo 'Saved!';
+		exit;
+			
+	}
 	public function set_update_posts_option() {
 		
 		if( !( is_admin() && current_user_can( 'manage_options' ) ) ) {
@@ -1593,7 +1632,6 @@ class Patreon_Wordpress {
 			
 			if ( isset( $_REQUEST['patreon_message'] ) AND $_REQUEST['patreon_message'] != '' ) {
 				$setup_message = Patreon_Frontend::$messages_map[$_REQUEST['patreon_message']];
-
 			}
 			
 			$update_posts_selected = '';
@@ -1614,13 +1652,19 @@ class Patreon_Wordpress {
 			}
 			else {
 				$delete_posts_unselected = " selected";
-			}			
+			}
+			
+			global $Patreon_Wordpress;
+															
+			$post_type_select = $Patreon_Wordpress->make_post_type_select();
+			$taxonomy_select  = $Patreon_Wordpress->make_taxonomy_select();
+			$term_select      = $Patreon_Wordpress->make_term_select();			
 			
 			echo '<div id="patreon_setup_screen">';
 	
 			echo '<div id="patreon_setup_logo"><img src="' . PATREON_PLUGIN_ASSETS . '/img/Patreon_Logo_100.png" /></div>';
 			
-			echo '<div id="patreon_setup_content"><h1 style="margin-top: 0px;">How should posts be synced?</h1><div id="patreon_setup_message">' . $setup_message . '<div class="patreon_post_sync_choice"><div class="patreon_post_sync_choice_title">Update local posts from the ones at Patreon</div>'. PATREON_POST_SYNC_2 .'<div style="display:block;margin-top:10px;width: 200px;"><select id="patreon-update-posts" name="patreon-update-posts" pw_input_target="#patreon-update-posts-info" style="font-size:20px; display:inline-block;"><option value="">Select</option><option value="yes" '. $update_posts_selected .'>Yes</option><option value="no"'. $update_posts_unselected .'>No</option></select><div id="patreon-update-posts-info"></div></div></div><div class="patreon_post_sync_choice"><div class="patreon_post_sync_choice_title">Delete local post when Patreon post is deleted</div>'. PATREON_POST_SYNC_3 .'<div style="display:block;margin-top:10px;width: 200px;"><select name="patreon-remove-deleted-posts" id="patreon-remove-deleted-posts" pw_input_target="#patreon-remove-deleted-posts-info" style="font-size:20px;"><option value="">Select</option><option value="yes" '. $delete_posts_selected .'>Yes</option><option value="no" '. $delete_posts_unselected .'>No</option></select><div id="patreon-remove-deleted-posts-info"></div></div></div></div><form style="display:inline-block;margin-right:10px;" method="post" action="'. admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=post_sync_2') .'"><p class="submit" style="margin-top: 10px;"><input type="submit" name="submit" id="submit" class="button button-large button-primary" value="Done!"></p></form></div>';
+			echo '<div id="patreon_setup_content"><h1 style="margin-top: 0px;">How should posts be synced?</h1><div id="patreon_setup_message">' . $setup_message . '<div class="patreon_post_sync_choice"><div class="patreon_post_sync_choice_title">Sync posts to this category</div>'. PATREON_POST_SYNC_5 .'<div style="display:block;margin-top:10px;width: 200px;"><select name="patreon_sync_post_type" id="patreon_sync_post_type" style="display: inline-block; margin-right: 5px; margin-bottom: 10px; font-size: 20px; width: 250px;">' . $post_type_select . '</select><select  name="patreon_sync_post_category" id="patreon_sync_post_category" style="display: inline-block; margin-right: 5px; margin-bottom: 10px; font-size: 20px; width: 250px;">' .$taxonomy_select . '</select><select  name="patreon_sync_post_term" id="patreon_sync_post_term" style="display: inline-block; margin-right: 5px; margin-bottom: 10px; font-size: 20px; width: 250px;">' . $term_select .'</select><button id="patreon_wordpress_save_post_sync_category" class="button button-primary button-large" style="display: inline-block; margin-right: 5px; margin-bottom: 10px; font-size: 20px; width: 250px;" pw_input_target="#patreon_wordpress_post_import_category_status" target="">Save</button><div id="patreon_wordpress_post_import_category_status" style="color: #<?php echo $post_sync_category_status_color ?>;"></div></div><div class="patreon_post_sync_choice"><div class="patreon_post_sync_choice_title">Update local posts from the ones at Patreon</div>'. PATREON_POST_SYNC_2 .'<div style="display:block;margin-top:10px;width: 200px;"><select id="patreon-update-posts" name="patreon-update-posts" pw_input_target="#patreon-update-posts-info" style="font-size:20px; display:inline-block;"><option value="">Select</option><option value="yes" '. $update_posts_selected .'>Yes</option><option value="no"'. $update_posts_unselected .'>No</option></select><div id="patreon-update-posts-info"></div></div></div><div class="patreon_post_sync_choice"><div class="patreon_post_sync_choice_title">Delete local post when Patreon post is deleted</div>'. PATREON_POST_SYNC_3 .'<div style="display:block;margin-top:10px;width: 200px;"><select name="patreon-remove-deleted-posts" id="patreon-remove-deleted-posts" pw_input_target="#patreon-remove-deleted-posts-info" style="font-size:20px;"><option value="">Select</option><option value="yes" '. $delete_posts_selected .'>Yes</option><option value="no" '. $delete_posts_unselected .'>No</option></select><div id="patreon-remove-deleted-posts-info"></div></div></div></div><form style="display:inline-block;margin-right:10px;" method="post" action="'. admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=post_sync_2') .'"><p class="submit" style="margin-top: 10px;"><input type="submit" name="submit" id="submit" class="button button-large button-primary" value="Done!"></p></form></div>';
 		
 			echo '</div>';
 
@@ -1628,6 +1672,8 @@ class Patreon_Wordpress {
 		if ( isset( $_REQUEST['setup_stage'] ) AND $_REQUEST['setup_stage'] == 'post_sync_2' ) {
 			
 			$setup_message = PATREON_POST_SYNC_4;
+			
+			// Check if any post sync field 
 			
 			if ( isset( $_REQUEST['patreon_message'] ) AND $_REQUEST['patreon_message'] != '' ) {
 				$setup_message = Patreon_Frontend::$messages_map[$_REQUEST['patreon_message']];
@@ -2356,10 +2402,18 @@ class Patreon_Wordpress {
 		return $select;
 		
 	}
+		
 	public function make_taxonomy_select( $selected_post_type = 'post', $selected_taxonomy = 'category' ) {
 		
-		$taxonomies = get_object_taxonomies( $selected_post_type );
+		$return = true;
 		$select = '';
+		
+		if ( isset( $_REQUEST['patreon_wordpress_post_type'] ) ) {
+			$selected_post_type = $_REQUEST['patreon_wordpress_post_type'];
+			$return = false;
+		}
+		
+		$taxonomies = get_object_taxonomies( $selected_post_type );
 
 		foreach( $taxonomies as $key => $value ) {
 			
@@ -2370,43 +2424,52 @@ class Patreon_Wordpress {
 
 			if ( is_object( $taxonomy ) ) {
 				
-				if ( $taxonomy->name == $selected_taxonomy ) {
+				if ( $taxonomy->name == $selected_taxonomy AND $return ) {
 					$selected = ' selected';
 				}
 				
 				$select .= '<option value="' . $taxonomy->name . '" ' . $selected . ' >'. $taxonomy->labels->singular_name . '</option>';	
 			}
 			
+		}
 
+		if ( $return ) {
+			return $select;
 		}
 		
-		return $select;
+		echo $select;
+		exit;
 		
 	}
 	public function make_term_select( $selected_post_type = 'post', $selected_taxonomy = 'category', $selected_term = 1 ) {
 		
+		$return = true;
 		$select = '';
-
 		
-			
-			$selected = '';
-			
-			$terms = get_terms( $selected_taxonomy, 
-				array(
-					'hide_empty' => false, 
-					'parent' => 0, 
-					'orderby' => 
-					'description', 
-					'order' => 'ASC',
-				) 
-			);
+		if ( isset( $_REQUEST['patreon_wordpress_post_taxonomy'] ) ) {
+			$selected_taxonomy = $_REQUEST['patreon_wordpress_post_taxonomy'];
+			$return = false;
+		}
+		
+		
+		$selected = '';
+		
+		$terms = get_terms( $selected_taxonomy, 
+			array(
+				'hide_empty' => false, 
+				'parent' => 0, 
+				'orderby' => 
+				'description', 
+				'order' => 'ASC',
+			) 
+		);
 		
 		foreach( $terms as $key => $value ) {
 			
 			
 			if ( count( $terms ) > 0 ) {
 				
-				if ( $terms[$key]->term_id == $selected_term ) {
+				if ( $terms[$key]->term_id == $selected_term AND $return ) {
 					$selected = ' selected';
 				}
 				
@@ -2416,7 +2479,12 @@ class Patreon_Wordpress {
 
 		}
 		
-		return $select;
+		if ( $return ) {
+			return $select;
+		}
+		
+		echo $select;
+		exit;
 		
 	}
 	

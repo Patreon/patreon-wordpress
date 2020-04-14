@@ -313,6 +313,43 @@
 			
 		});
 		
+
+		jQuery(document).on( 'click', '#patreon_wordpress_save_post_sync_category', function(e) {
+			
+			e.preventDefault();
+			var pw_input_target = jQuery( this ).attr( 'pw_input_target' );
+			var patreon_sync_post_type = jQuery('#patreon_sync_post_type').val();
+			var patreon_sync_post_category = jQuery('#patreon_sync_post_category').val();
+			var patreon_sync_post_term = jQuery('#patreon_sync_post_term').val();
+			
+			jQuery.ajax({
+				url: ajaxurl,
+				type:"POST",
+				dataType : 'html',
+				data: {
+					action: 'patreon_wordpress_save_post_sync_category',
+					patreon_sync_post_type: patreon_sync_post_type,
+					patreon_sync_post_category: patreon_sync_post_category,
+					patreon_sync_post_term: patreon_sync_post_term,
+				},
+				beforeSend: function( xhr ) {
+					jQuery( '#patreon_wordpress_post_import_category_status' ).empty();					
+				},
+				success: function( response ) {
+					jQuery( '#patreon_wordpress_post_import_category_status' ).empty();
+					jQuery( '#patreon_wordpress_post_import_category_status' ).html( response );
+					jQuery( '#patreon_wordpress_post_import_category_status' ).css( 'color', '#129500' );
+					
+				},
+				error: function( response ) {
+					jQuery( '#patreon_wordpress_post_import_category_status' ).empty();
+					jQuery( '#patreon_wordpress_post_import_category_status' ).html( 'Sorry, encountered an issue' );
+					
+				},
+			});		
+			
+		});		
+		
 		jQuery(document).on( 'click', '.patreon_wordpress_interface_toggle', function(e) {
 			
 			e.preventDefault();
@@ -377,7 +414,7 @@
 			
 		});
 		
-		// Save patreon-update-posts option upon change during post sync wizard screens
+		// Save patreon-remove-deleted-posts option upon change during post sync wizard screens
 		jQuery( "#patreon-remove-deleted-posts" ).on( 'change', function(e) {
 			
 			// Just in case
@@ -419,6 +456,97 @@
 				}
 			});	
 			
+		});
+		
+		// Post sync post type selection dropdown action
+		jQuery( "#patreon_sync_post_type" ).on( 'change', function(e) {
+			
+			var patreon_wordpress_post_type = jQuery(this).val();
+			var patreon_wordpress_input_target = jQuery('#patreon_sync_post_category');
+			var patreon_wordpress_general_error = 'Sorry - could not get the category list for this post type';
+			
+			e.preventDefault();
+					
+			jQuery('#patreon_sync_post_category').hide('slow');
+			jQuery('#patreon_sync_post_term').hide('slow');
+
+			jQuery.ajax({
+				url: ajaxurl,
+				type:"POST",
+				dataType : 'html',
+				cache: false,
+				data: {
+					action: 'patreon_wordpress_get_taxonomies_for_post_type',
+					patreon_wordpress_post_type: patreon_wordpress_post_type,
+				},
+				success: function( response ) {
+					if( response == '' ) {
+						response = patreon_wordpress_general_error;
+					}
+					jQuery(patreon_wordpress_input_target).html('<option selected value="-">Select</option>' + response);
+				},
+				complete: function( response ) {
+					jQuery('#patreon_sync_post_category').show('slow');
+				},
+				error: function( response ) {
+					if( response == '' ) {
+						//White page - possibly an issue with the server/site caused an error during updates
+						response = patreon_wordpress_general_error;
+					}
+					jQuery(patreon_wordpress_input_target).html(response);
+				},
+				statusCode: {
+					500: function(error) {
+						response = 'Sorry, a program error was encountered on WordPress side. (500 error)';
+						jQuery(patreon_wordpress_input_target).html(response);
+					}
+				}
+			});		
+		});
+		
+		// Post sync post - category selection dropdown action
+		jQuery( "#patreon_sync_post_category" ).on( 'change', function(e) {
+			
+			var patreon_wordpress_post_taxonomy = jQuery(this).val();
+			var patreon_wordpress_input_target = jQuery('#patreon_sync_post_term');
+			var patreon_wordpress_general_error = 'Sorry - could not get the category list for this post type';
+			
+			e.preventDefault();
+					
+			jQuery('#patreon_sync_post_term').hide('slow');
+
+			jQuery.ajax({
+				url: ajaxurl,
+				type:"POST",
+				dataType : 'html',
+				cache: false,
+				data: {
+					action: 'patreon_wordpress_get_terms_for_taxonomy',
+					patreon_wordpress_post_taxonomy: patreon_wordpress_post_taxonomy,
+				},
+				success: function( response ) {
+					if( response == '' ) {
+						response = patreon_wordpress_general_error;
+					}
+					jQuery(patreon_wordpress_input_target).html('<option selected value="-">Select</option>' + response);
+				},
+				complete: function( response ) {
+					jQuery('#patreon_sync_post_term').show('slow');
+				},
+				error: function( response ) {
+					if( response == '' ) {
+						//White page - possibly an issue with the server/site caused an error during updates
+						response = patreon_wordpress_general_error;
+					}
+					jQuery(patreon_wordpress_input_target).html(response);
+				},
+				statusCode: {
+					500: function(error) {
+						response = 'Sorry, a program error was encountered on WordPress side. (500 error)';
+						jQuery(patreon_wordpress_input_target).html(response);
+					}
+				}
+			});		
 		});
 		
 		jQuery( ".patreon_toggle_admin_sections" ).on( 'click', function (e) {
