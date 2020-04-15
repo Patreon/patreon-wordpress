@@ -59,6 +59,7 @@ class Patreon_Options {
         register_setting( 'patreon-options', 'patreon-post-import-in-progress' );
         register_setting( 'patreon-options', 'patreon-remove-deleted-posts' );
         register_setting( 'patreon-options', 'patreon-update-posts' );
+        register_setting( 'patreon-options', 'patreon-post-author-for-synced-posts' );
 		
     }
 	
@@ -403,10 +404,14 @@ class Patreon_Options {
 												<div id="patreon_select_post_sync_category">
 													<?php
 														global $Patreon_Wordpress;
-																										
-														$post_type_select = $Patreon_Wordpress->make_post_type_select();
-														$taxonomy_select  = $Patreon_Wordpress->make_taxonomy_select();
-														$term_select      = $Patreon_Wordpress->make_term_select();
+														
+														$sync_post_type     = get_option( 'patreon-sync-post-type', 'post' );
+														$sync_post_category = get_option( 'patreon-sync-post-category', 'category' );
+														$sync_post_term     = get_option( 'patreon-sync-post-term', '1' );
+															
+														$post_type_select = $Patreon_Wordpress->make_post_type_select( $sync_post_type );
+														$taxonomy_select  = $Patreon_Wordpress->make_taxonomy_select( $sync_post_type, $sync_post_category );
+														$term_select      = $Patreon_Wordpress->make_term_select( $sync_post_type, $sync_post_category, $sync_post_term );
 														$post_import_status_color = "9d9d9d";
 														
 													
@@ -427,6 +432,23 @@ class Patreon_Options {
 											</th>
 											<td>
 												
+											</td>
+                                        </tr>
+                                        <tr valign="top">
+											<th scope="row">
+												<strong>Author for synced posts</strong>
+												<div class="patreon-options-info">Choose the author to be used in synced posts. This will only affect newly imported posts</div>
+											</th>
+											<td>
+												<?php
+													
+													$post_author_for_synced_posts = get_option( 'patreon-post-author-for-synced-posts', 1 );
+													$user_select = $Patreon_Wordpress->make_user_select( $post_author_for_synced_posts );
+													
+												?>
+												<select name="patreon-post-author-for-synced-posts">
+													<?php echo $user_select ?>
+												</select>
 											</td>
                                         </tr>
                                         <tr valign="top">

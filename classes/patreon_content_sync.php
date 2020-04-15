@@ -164,12 +164,15 @@ class Patreon_Content_Sync {
 	
 	public function add_new_patreon_post( $patreon_post ) {
 		
+		$post_category = get_option( 'patreon-sync-post-term', '1' );
+		$post_author = get_option( 'patreon-post-author-for-synced-posts', 1 );
+		
 		$post                  = array();
 		$post['post_title']    = $patreon_post['data']['attributes']['title'];
 		$post['post_content']  = $patreon_post['data']['attributes']['content'];
 		$post['post_status']   = 'publish';
-		$post['post_author']   = 1;
-		$post['post_category'] = array(0);
+		$post['post_author']   = $post_author;
+		$post['post_category'] = array( $post_category );
 	
 		$inserted_post_id = wp_insert_post( $post );
 		

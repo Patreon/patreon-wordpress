@@ -414,6 +414,50 @@
 			
 		});
 		
+		// Save patreon post author option upon change in post sync wizard screens
+		jQuery( "#patreon-post-author-for-synced-posts" ).on( 'change', function(e) {
+			
+			// Just in case
+			e.preventDefault();
+			var pw_input_target = jQuery( this ).attr( 'pw_input_target' );
+			var option_value = jQuery(this).val();
+			
+			if (  option_value == '' ) {
+				// Do nothing if value is empty
+				jQuery( pw_input_target ).html('');
+				return;
+			}
+			
+			jQuery.ajax({
+				url: ajaxurl,
+				async: true, // Just to make sure
+				type:"POST",
+				dataType : 'html',
+				data: {
+					action: 'patreon_wordpress_set_post_author_for_post_sync',
+					patreon_post_author_for_post_sync: option_value,
+				},
+				beforeSend: function( e ) {			
+				},
+				success: function( response ) {
+					jQuery( pw_input_target ).empty();
+					jQuery( pw_input_target ).html( 'Saved!' );
+					
+				},
+				error: function( response ) {
+					jQuery( pw_input_target ).empty();
+					jQuery( pw_input_target ).html( 'Sorry - could not save' );
+				},
+				statusCode: {
+					500: function(error) {
+						jQuery( pw_input_target ).empty();
+						jQuery( pw_input_target ).html( 'Sorry - error (500)' );
+					}
+				}
+			});	
+			
+		});
+		
 		// Save patreon-remove-deleted-posts option upon change during post sync wizard screens
 		jQuery( "#patreon-remove-deleted-posts" ).on( 'change', function(e) {
 			

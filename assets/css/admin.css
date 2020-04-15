@@ -400,7 +400,7 @@
 	font-weight: bold;
 }
 
-#patreon-update-posts-info, #patreon-remove-deleted-posts-info {
+#patreon-update-posts-info, #patreon-remove-deleted-posts-info, #patreon-post-author-for-synced-posts-info {
 	color: #129500;
 	font-weight: bold;
 	padding: 2px;

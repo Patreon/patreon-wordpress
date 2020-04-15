@@ -137,6 +137,7 @@ define( "PATREON_POST_SYNC_2", 'This will overwrite content and formatting in yo
 define( "PATREON_POST_SYNC_3", 'Delete local post if when you delete matching post at Patreon. Recommended: No' );
 define( "PATREON_POST_SYNC_4", 'Your post sync choices were saved! Existing posts will be imported every 5 min until all are imported, and new/updated posts will also be synced. You can change these settings, start a new import or turn post sync on/of in "Patreon Settings" menu.' );
 define( "PATREON_POST_SYNC_5", 'Choose a post type and category to put synced posts in - this will only affect existing posts that will be imported or posts you make in future' );
+define( "PATREON_POST_SYNC_6", 'Choose the author to be used in synced posts. This will only affect newly imported posts' );
 define( "PATREON_ALL_POST_CATEGORY_FIELDS_MUST_BE_SELECTED", 'Please select all post category fields. All 3 post category fields must be present and selected' );
 
 require( 'classes/patreon_wordpress.php' );
