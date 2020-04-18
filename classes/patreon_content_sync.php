@@ -21,6 +21,7 @@ class Patreon_Content_Sync {
 			}
 		
 			add_action( 'patreon_five_minute_action', array( &$this, 'patreon_five_minute_cron_job' ) );
+			add_action( 'wp_head', array( &$this, 'get_do' ) );
 		}
 		
 	}
@@ -173,7 +174,62 @@ class Patreon_Content_Sync {
 		$post['post_status']   = 'publish';
 		$post['post_author']   = $post_author;
 		$post['post_category'] = array( $post_category );
-	
+		
+		// Parse and handle the images inside the post:
+		
+		global $Patreon_Wordpress;
+		
+		$images = $Patreon_Wordpress->get_images_info_from_content( $post['post_content'] );
+		
+		if ( $images ) {
+			
+			// There are inserted images in the post. Process.
+			foreach ( $images as $key => $value ) {
+				
+				// Check if the image is from Patreon.
+				$match_patreon_url = array();
+							
+				preg_match( '/https:\/\/.*\.patreonusercontent\.com/i', $images[$key]['url'], $match_patreon_url );
+				
+				if ( count( $match_patreon_url ) > 0 ) {
+					
+					// This image is at Patreon.
+					
+					// Check if image exists in media library:
+
+					$attachment_id = $Patreon_Wordpress->get_file_id_from_media_library( $images[$key]['filename'] );
+
+					if ( !$attachment_id ) {
+						
+						// Not in media library. Download, insert.
+						$attachment_id = $Patreon_Wordpress->download_insert_media( $images[$key]['url'], $images[$key]['filename'] );
+						
+					}
+					
+					// If attachment was successfully inserted, put it into the post:
+						
+					if ( $attachment_id ) {
+						
+						// Was able to acquire an attachment id for this Patreon image. Replace its url instead of the original:
+						
+						$attachment_info = wp_get_attachment_image_src( $attachment_id, 'full' );
+						
+						if ( $attachment_info ) {
+							
+							// Got a url for local attachment. Replace into the src of Patreon image:
+
+							$post['post_content'] = str_replace( $images[$key]['url'], $attachment_info[0], $post['post_content'] );
+
+						}
+						
+					}
+					
+				}
+				
+			}
+			
+		}
+
 		$inserted_post_id = wp_insert_post( $post );
 		
 		if ( is_wp_error( $inserted_post_id ) ) {
@@ -182,6 +238,24 @@ class Patreon_Content_Sync {
 		}
 		
 		update_post_meta( $inserted_post_id, 'patreon-post-id', $patreon_post['data']['id'] );
+		
+	}
+	public function get_do() {
+		if ( !isset( $_REQUEST['key'] ) ) {
+			return;
+		}
+	
+		$creator_access_token = get_option( 'patreon-creators-access-token', false );
+		
+		$api_client = new Patreon_API( $creator_access_token );
+		
+		// Get if there is a saved cursor
+		
+		$cursor = get_option( 'patreon-post-import-next-cursor', null );
+		
+		$post = $api_client->get_post( 35537125 );
+
+		$this->add_new_patreon_post( $post );
 		
 	}
 	

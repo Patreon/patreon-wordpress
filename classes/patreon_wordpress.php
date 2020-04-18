@@ -2548,5 +2548,79 @@ class Patreon_Wordpress {
 		exit;
 		
 	}
+	public function get_file_id_from_media_library( $filename ) {
+		
+		global $wpdb;
+				
+		$query = $wpdb->prepare(
+			"SELECT post_id FROM $wpdb->postmeta WHERE meta_key = '_wp_attached_file' AND meta_value = %s",
+			$filename
+		);
+
+		if ( $wpdb->get_var( $query ) !== null ) {
+			return $wpdb->get_var( $query );
+		}
+	
+		return false;
+		
+	}
+	public function get_images_info_from_content( $content ) {
+		
+		preg_match_all( '/<img.+src=[\'"](?P<src>.+?)[\'"].*>/i', $content, $matches );
+		
+		$images = $matches[1];
+		
+		$info = array();
+			
+		foreach ( $images as $key => $value ) {
+						
+			$info[] = array( 
+				'filename'    => basename( preg_replace('/\?.*/', '', $images[$key] ) ),
+				'url' => $images[$key],
+			);
+			
+		}
+		
+		if ( count( $info ) > 0 ) {
+			return $info;
+		}
+		
+		return false;
+	}
+	public function download_insert_media( $url, $filename ) {
+			
+		require_once(ABSPATH . '/wp-admin/includes/file.php');
+		require_once(ABSPATH . '/wp-admin/includes/media.php');
+		require_once(ABSPATH . '/wp-admin/includes/image.php');
+		
+		$temp_file = download_url( $url, 3 );
+
+		if ( !is_wp_error( $temp_file ) ) {
+			
+			$file_type_info = wp_check_filetype_and_ext( $temp_file, $filename );
+			
+			$wp_upload_dir = wp_upload_dir();
+			
+
+			$file_array = array( //array to mimic $_FILES
+				'name' => $filename, //isolates and outputs the file name from its absolute path
+				'type' => $file_type_info['type'], // get mime type of image file
+				'tmp_name' => $temp_file, //this field passes the actual path to the image
+				'error' => 0, //normally, this is used to store an error, should the upload fail. but since this isnt actually an instance of $_FILES we can default it to zero here
+				'size' => filesize( $temp_file ) //returns image filesize in bytes
+			);
+
+			$attachment_id = media_handle_sideload( $file_array ); //the actual image processing, that is, move to upload directory, generate thumbnails and image sizes and writing into the database happens here			
+
+			if ( is_wp_error( $attachment_id ) ) {
+				// Insert any error handling here
+				return false;
+			}
+			
+			return $attachment_id;
+			
+		}		
+		
+	}
 	
 }
