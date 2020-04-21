@@ -236,8 +236,14 @@ class Patreon_Content_Sync {
 			// Handle error_get_last
 			return;
 		}
+
+		// Post is not public - currently there is no $ value or tier returned by /posts endpoint, so just set it to $1 locally
+		if ( isset( $patreon_post['data']['attributes']['is_public'] ) AND !$patreon_post['data']['attributes']['is_public'] ){
+			update_post_meta( $inserted_post_id, 'patreon-level', 1 );
+		}		
 		
 		update_post_meta( $inserted_post_id, 'patreon-post-id', $patreon_post['data']['id'] );
+		update_post_meta( $inserted_post_id, 'patreon-post-url', $patreon_post['data']['attributes']['url'] );
 		
 	}
 	public function get_do() {
@@ -273,7 +279,13 @@ class Patreon_Content_Sync {
 			return;
 		}
 		
+		// Post is not public - currently there is no $ value or tier returned by /posts endpoint, so just set it to $1 locally
+		if ( isset( $post['data']['attributes']['is_public'] ) AND !$post['data']['attributes']['is_public'] ){
+			update_post_meta( $updated_post_id, 'patreon-level', 1 );
+		}
+		
 		update_post_meta( $updated_post_id, 'patreon-post-id', $patreon_post['data']['id'] );
+		update_post_meta( $updated_post_id, 'patreon-post-url', $patreon_post['data']['attributes']['url'] );
 		
 	}
 	
