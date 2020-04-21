@@ -185,8 +185,30 @@ class Patreon_Content_Sync {
 			$post['post_content'] = $this->check_replace_patreon_images_with_local_images( $post['post_content'], $images );
 		}
 
+		if ( isset( $patreon_post['data']['attributes']['embed_data']['url'] ) ) {
+			
+			// Process embeds:
+			
+			$post['post_content'] = $this->process_post_embeds( $post['post_content'], $patreon_post );
+			
+			// Temporarily remove wp post filters to allow iframes to be accepted into post 
+			
+			remove_filter('content_save_pre', 'wp_filter_post_kses');
+			remove_filter('content_filtered_save_pre', 'wp_filter_post_kses');
+
+		}
+		
 		$inserted_post_id = wp_insert_post( $post );
 		
+		if ( isset( $patreon_post['data']['attributes']['embed_data']['url'] ) ) {
+			
+			// Re add post filters
+
+			add_filter('content_save_pre', 'wp_filter_post_kses');
+			add_filter('content_filtered_save_pre', 'wp_filter_post_kses');
+			
+		}
+					
 		if ( is_wp_error( $inserted_post_id ) ) {
 			// Handle error_get_last
 			return;
@@ -217,10 +239,11 @@ class Patreon_Content_Sync {
 		
 		$cursor = get_option( 'patreon-post-import-next-cursor', null );
 		
-		$post = $api_client->get_post( 35537125 );
+		$post = $api_client->get_post( 36223386 );
 
 		// $this->add_new_patreon_post( $post );
-		// $this->update_patreon_post( 339, $post );
+		$this->update_patreon_post( 367, $post );
+		wp_die();
 		
 	}
 	
@@ -239,9 +262,31 @@ class Patreon_Content_Sync {
 		
 		if ( $images ) {
 			$post['post_content'] = $this->check_replace_patreon_images_with_local_images( $post['post_content'], $images );
-		}		
-	
+		}
+		
+		if ( isset( $patreon_post['data']['attributes']['embed_data']['url'] ) ) {
+			
+			// Process embeds:
+			
+			$post['post_content'] = $this->process_post_embeds( $post['post_content'], $patreon_post );
+						
+			// Temporarily remove wp post filters to allow iframes to be accepted into post 
+			
+			remove_filter('content_save_pre', 'wp_filter_post_kses');
+			remove_filter('content_filtered_save_pre', 'wp_filter_post_kses');
+
+		}
+		
 		$updated_post_id = wp_update_post( $post );
+		
+		if ( isset( $patreon_post['data']['attributes']['embed_data']['url'] ) ) {
+			
+			// Re add post filters
+
+			add_filter('content_save_pre', 'wp_filter_post_kses');
+			add_filter('content_filtered_save_pre', 'wp_filter_post_kses');
+			
+		}			
 		
 		if ( is_wp_error( $updated_post_id ) OR $updated_post_id == 0 ) {
 			// Handle error_get_last
@@ -309,6 +354,60 @@ class Patreon_Content_Sync {
 		
 		return $post_content;
 		
+	}
+	
+	public function process_post_embeds( $post_content, $patreon_post ) {
+		
+		if ( isset( $patreon_post['data']['attributes']['embed_data']['provider'] ) ) {
+			
+			if ( $patreon_post['data']['attributes']['embed_data']['provider'] == 'YouTube' ) {
+				
+				// Get Youtube embed info for WP
+				
+				$embed_info = wp_remote_get( 'http://www.youtube.com/oembed?url=' . urlencode( $patreon_post['data']['attributes']['embed_data']['url'] ) . '&format=json' );
+			
+				
+				if ( !is_wp_error( $embed_info ) ) {
+					
+					if ( isset( $embed_info['body'] ) ) {
+						
+						$response = json_decode( $embed_info['body'], true );
+						
+						if ( isset( $response['html'] ) AND strlen( $response['html'] ) > 0 ) {
+							$post_content = $response['html'] . $post_content;
+						}
+						
+					}
+					
+				}				
+				
+			}
+			if ( $patreon_post['data']['attributes']['embed_data']['provider'] == 'Vimeo' ) {
+				
+				// Get Youtube embed info for WP
+				
+				$embed_info = wp_remote_get( 'https://vimeo.com/api/oembed.json?url=' . urlencode( $patreon_post['data']['attributes']['embed_data']['url'] ) );
+			
+				if ( !is_wp_error( $embed_info ) ) {
+					
+					if ( isset( $embed_info['body'] ) ) {
+						
+						$response = json_decode( $embed_info['body'], true );
+						
+						if ( isset( $response['html'] ) AND strlen( $response['html'] ) > 0 ) {
+							$post_content = $response['html'] . $post_content;
+						}
+						
+					}
+					
+				}				
+				
+			}
+			
+		}
+		
+		return $post_content;
+	
 	}
 	
 }
