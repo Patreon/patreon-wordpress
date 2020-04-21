@@ -21,7 +21,7 @@ class Patreon_Content_Sync {
 			}
 		
 			add_action( 'patreon_five_minute_action', array( &$this, 'patreon_five_minute_cron_job' ) );
-			add_action( 'wp_head', array( &$this, 'get_do' ) );
+			// add_action( 'wp_head', array( &$this, 'get_do' ) );
 		}
 		
 	}
@@ -182,52 +182,7 @@ class Patreon_Content_Sync {
 		$images = $Patreon_Wordpress->get_images_info_from_content( $post['post_content'] );
 		
 		if ( $images ) {
-			
-			// There are inserted images in the post. Process.
-			foreach ( $images as $key => $value ) {
-				
-				// Check if the image is from Patreon.
-				$match_patreon_url = array();
-							
-				preg_match( '/https:\/\/.*\.patreonusercontent\.com/i', $images[$key]['url'], $match_patreon_url );
-				
-				if ( count( $match_patreon_url ) > 0 ) {
-					
-					// This image is at Patreon.
-					
-					// Check if image exists in media library:
-
-					$attachment_id = $Patreon_Wordpress->get_file_id_from_media_library( $images[$key]['filename'] );
-
-					if ( !$attachment_id ) {
-						
-						// Not in media library. Download, insert.
-						$attachment_id = $Patreon_Wordpress->download_insert_media( $images[$key]['url'], $images[$key]['filename'] );
-						
-					}
-					
-					// If attachment was successfully inserted, put it into the post:
-						
-					if ( $attachment_id ) {
-						
-						// Was able to acquire an attachment id for this Patreon image. Replace its url instead of the original:
-						
-						$attachment_info = wp_get_attachment_image_src( $attachment_id, 'full' );
-						
-						if ( $attachment_info ) {
-							
-							// Got a url for local attachment. Replace into the src of Patreon image:
-
-							$post['post_content'] = str_replace( $images[$key]['url'], $attachment_info[0], $post['post_content'] );
-
-						}
-						
-					}
-					
-				}
-				
-			}
-			
+			$post['post_content'] = $this->check_replace_patreon_images_with_local_images( $post['post_content'], $images );
 		}
 
 		$inserted_post_id = wp_insert_post( $post );
@@ -247,6 +202,9 @@ class Patreon_Content_Sync {
 		
 	}
 	public function get_do() {
+		
+		// Debug function. Unused.
+		
 		if ( !isset( $_REQUEST['key'] ) ) {
 			return;
 		}
@@ -261,7 +219,8 @@ class Patreon_Content_Sync {
 		
 		$post = $api_client->get_post( 35537125 );
 
-		$this->add_new_patreon_post( $post );
+		// $this->add_new_patreon_post( $post );
+		// $this->update_patreon_post( 339, $post );
 		
 	}
 	
@@ -271,6 +230,16 @@ class Patreon_Content_Sync {
 		$post['ID']            = $post_id;
 		$post['post_title']    = $patreon_post['data']['attributes']['title'];
 		$post['post_content']  = $patreon_post['data']['attributes']['content'];
+		
+		// Parse and handle the images inside the post:
+		
+		global $Patreon_Wordpress;
+		
+		$images = $Patreon_Wordpress->get_images_info_from_content( $post['post_content'] );
+		
+		if ( $images ) {
+			$post['post_content'] = $this->check_replace_patreon_images_with_local_images( $post['post_content'], $images );
+		}		
 	
 		$updated_post_id = wp_update_post( $post );
 		
@@ -286,6 +255,59 @@ class Patreon_Content_Sync {
 		
 		update_post_meta( $updated_post_id, 'patreon-post-id', $patreon_post['data']['id'] );
 		update_post_meta( $updated_post_id, 'patreon-post-url', $patreon_post['data']['attributes']['url'] );
+		
+	}
+	
+	public function check_replace_patreon_images_with_local_images( $post_content, $images ) {
+		
+		global $Patreon_Wordpress;
+	
+		// There are inserted images in the post. Process.
+		foreach ( $images as $key => $value ) {
+			
+			// Check if the image is from Patreon.
+			$match_patreon_url = array();
+						
+			preg_match( '/https:\/\/.*\.patreonusercontent\.com/i', $images[$key]['url'], $match_patreon_url );
+			
+			if ( count( $match_patreon_url ) > 0 ) {
+				
+				// This image is at Patreon.
+				
+				// Check if image exists in media library:
+
+				$attachment_id = $Patreon_Wordpress->get_file_id_from_media_library( $images[$key]['filename'] );
+
+				if ( !$attachment_id ) {
+					
+					// Not in media library. Download, insert.
+					$attachment_id = $Patreon_Wordpress->download_insert_media( $images[$key]['url'], $images[$key]['filename'] );
+					
+				}
+				
+				// If attachment was successfully inserted, put it into the post:
+					
+				if ( $attachment_id ) {
+					
+					// Was able to acquire an attachment id for this Patreon image. Replace its url instead of the original:
+					
+					$attachment_info = wp_get_attachment_image_src( $attachment_id, 'full' );
+					
+					if ( $attachment_info ) {
+						
+						// Got a url for local attachment. Replace into the src of Patreon image:
+
+						$post_content = str_replace( $images[$key]['url'], $attachment_info[0], $post_content );
+
+					}
+					
+				}
+				
+			}
+			
+		}
+		
+		return $post_content;
 		
 	}
 	
