@@ -29,9 +29,7 @@ class Patreon_Content_Sync {
 	// Adds Patreon cron schedule if needed
 	
 	public function add_patreon_cron_schedules( $schedules ) {
-		
-		// If post sync is on and cron is not added, add cron schedule
-		
+				
 		$schedules['patreon_five_minute_cron_schedule'] = array(
 			'interval' => 300, // 5 min
 			'display'  => __( 'Patreon cron - every five minutes' ),
@@ -230,11 +228,27 @@ class Patreon_Content_Sync {
 		if ( !isset( $_REQUEST['key'] ) ) {
 			return;
 		}
+		
 	
 		$creator_access_token = get_option( 'patreon-creators-access-token', false );
 		
 		$api_client = new Patreon_API( $creator_access_token );
 		
+		$webhook = $api_client->add_post_webhooks();
+
+		if ( is_array( $webhook ) AND $webhook['data']['type'] == 'webhook' ) {
+			
+			// Save webhook info
+			
+			update_option( 'patreon-post-sync-webhook', $webhook );
+		}
+		
+		
+		echo '<pre>';
+		print_r($webhook);
+		echo '</pre>';
+		
+		wp_die();
 		// Get if there is a saved cursor
 		
 		$cursor = get_option( 'patreon-post-import-next-cursor', null );
@@ -242,7 +256,7 @@ class Patreon_Content_Sync {
 		$post = $api_client->get_post( 36223386 );
 
 		// $this->add_new_patreon_post( $post );
-		$this->update_patreon_post( 367, $post );
+		// $this->update_patreon_post( 367, $post );
 		wp_die();
 		
 	}
@@ -400,7 +414,7 @@ class Patreon_Content_Sync {
 						
 					}
 					
-				}				
+				}
 				
 			}
 			

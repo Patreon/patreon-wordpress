@@ -129,8 +129,59 @@ class Patreon_API {
 	public function get_post( $post_id ) {
 		return $this->__get_json( 'posts/' . $post_id . '?fields[post]=title,content,is_paid,is_public,published_at,url,embed_data,embed_url,app_id,app_status' );
 	}
-		
 	
+	public function add_post_webhooks( $params = array() ) {
+		
+		// Contacts api to create or refresh client
+		// Only uses v2
+		
+		if ( !isset( $params['campaign_id'] ) ) {
+			$params['campaign_id'] = get_option( 'patreon-campaign-id', false );
+		}
+		
+		// Site url with forced https
+		
+		$webhook_response_uri = site_url( '', 'https' ) . '/patreon-authorization/';
+		
+		// Check if this url is legitimate with https:
+		
+		$check_url = wp_remote_get( $webhook_response_uri );
+		
+		if ( is_wp_error( $check_url ) ) {
+			return;
+		}
+		
+		$postfields = array(
+			'data' => array (
+				'type' => 'webhook',
+				'attributes' => array (
+					'triggers' => array (
+						'posts:publish',
+						'posts:update',
+						'posts:delete',
+					),
+					'uri' => site_url( '', 'https' ) . '/patreon-authorization/',
+				),
+				'relationships' => array (
+					'campaign' => array (
+						'data' => array (
+							'type' => 'campaign',
+							'id' => $params['campaign_id'],
+						),
+					),
+				),
+			),
+		);
+
+		$postfields= json_encode( $postfields );
+		
+		$args = array(
+			'method' => 'POST',
+			'params' => $postfields,
+		);
+		
+		return $this->__get_json( "webhooks", $args );
+	}
 	public function create_refresh_client( $params ) {
 		
 		// Contacts api to create or refresh client

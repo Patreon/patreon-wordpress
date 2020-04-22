@@ -63,6 +63,7 @@ class Patreon_Wordpress {
 		add_action( 'wp_head', array( $this, 'updatePatreonUser' ), 10 );
 		add_action( 'init', array( $this, 'checkPatreonCreatorID' ) );
 		add_action( 'init', array( $this, 'check_creator_tiers' ) );
+		add_action( 'init', array( $this, 'check_post_sync_webhook' ) );
 		add_action( 'init', array( &$this, 'order_independent_actions_to_run_on_init_start' ), 0 );
 		add_action( 'init', array( $this, 'check_plugin_activation_date_for_existing_installs' ) );
 		add_action( 'admin_init', array( $this, 'post_credential_update_api_connectivity_check' ) );
@@ -2622,5 +2623,33 @@ class Patreon_Wordpress {
 		}		
 		
 	}
-	
+	public function check_post_sync_webhook() {
+		
+		// Checks if post sync is enabled and posts webhook in case it is not posted
+		
+		if ( get_option( 'patreon-sync-posts', 'no' ) == 'no' ) {
+			return;			
+		}
+		
+		// If webhook already added, skip
+		if ( get_option( 'patreon-post-sync-webhook-saved', false ) ) {
+			return;			
+		}
+		
+		$creator_access_token = get_option( 'patreon-creators-access-token', false );
+		
+		$api_client = new Patreon_API( $creator_access_token );
+		
+		$webhook = $api_client->add_post_webhooks();
+
+		if ( is_array( $webhook ) AND $webhook['data']['type'] == 'webhook' ) {
+			
+			// Save webhook info
+			
+			update_option( 'patreon-post-sync-webhook', $webhook );
+			update_option( 'patreon-post-sync-webhook-saved', true );
+			
+		}
+		
+	}
 }
