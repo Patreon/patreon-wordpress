@@ -130,7 +130,7 @@ class Patreon_API {
 		return $this->__get_json( 'posts/' . $post_id . '?fields[post]=title,content,is_paid,is_public,published_at,url,embed_data,embed_url,app_id,app_status' );
 	}
 	
-	public function add_post_webhooks( $params = array() ) {
+	public function add_post_webhook( $params = array() ) {
 		
 		// Contacts api to create or refresh client
 		// Only uses v2
@@ -138,15 +138,15 @@ class Patreon_API {
 		if ( !isset( $params['campaign_id'] ) ) {
 			$params['campaign_id'] = get_option( 'patreon-campaign-id', false );
 		}
-		
+	
 		// Site url with forced https
 		
-		$webhook_response_uri = site_url( '', 'https' ) . '/patreon-authorization/';
-		
+		$webhook_response_uri = site_url( '', 'https' ) . '/patreon-webhook/';
+
 		// Check if this url is legitimate with https:
 		
 		$check_url = wp_remote_get( $webhook_response_uri );
-		
+
 		if ( is_wp_error( $check_url ) ) {
 			return;
 		}
@@ -160,7 +160,7 @@ class Patreon_API {
 						'posts:update',
 						'posts:delete',
 					),
-					'uri' => site_url( '', 'https' ) . '/patreon-authorization/',
+					'uri' => $webhook_response_uri,
 				),
 				'relationships' => array (
 					'campaign' => array (
@@ -182,6 +182,18 @@ class Patreon_API {
 		
 		return $this->__get_json( "webhooks", $args );
 	}
+	public function delete_post_webhook( $webhook_id ) {
+		
+		// Deletes a webhook
+				
+		$args = array(
+			'method' => 'DELETE',
+			'return_result_format' => 'full',
+		);
+		
+		return $this->__get_json( "webhooks/" . $webhook_id, $args );
+	}
+	
 	public function create_refresh_client( $params ) {
 		
 		// Contacts api to create or refresh client
@@ -259,7 +271,14 @@ class Patreon_API {
 		}
 		
 		if ( $method == 'DELETE' ) {
-			$response = wp_remote_post( $api_endpoint, $api_request );
+			
+			if ( isset( $args['force_get'] ) AND $args['force_get'] ) {
+				$response = wp_remote_request( $api_endpoint, $api_request );
+			}
+			else {
+				$response = wp_remote_post( $api_endpoint, $api_request );
+			}
+			
 		}
 		
 		$result   = $response;

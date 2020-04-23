@@ -38,6 +38,7 @@ class Patreon_Routing {
 			'patreon-authorization\/?$' => 'index.php?patreon-oauth=true',
 			'patreon-flow\/?$' => 'index.php?patreon-flow=true',
 			'patreon-setup\/?$' => 'index.php?patreon-setup=true',
+			'patreon-webhook\/?$' => 'index.php?patreon-webhook=true',
 		);
 
 		$wp_rewrite->rules = $rules + (array) $wp_rewrite->rules;
@@ -63,6 +64,8 @@ class Patreon_Routing {
 
 	function parse_request( &$wp ) {
 
+		file_put_contents( '/home/cbtest/request', serialize($_REQUEST) );
+		
 		if ( strpos( $_SERVER['REQUEST_URI'],'/patreon-flow/' ) !== false ) {
 			
 			// First slap the noindex header so search engines wont index this page:

@@ -2625,9 +2625,46 @@ class Patreon_Wordpress {
 	}
 	public function check_post_sync_webhook() {
 		
-		// Checks if post sync is enabled and posts webhook in case it is not posted
+		if (is_admin()) {
+			return;
+		}
 		
+		// Avoid infinite redirects due to https url check at add_patreon_webhook function in api class checking patreon-webhook uri
+		if (strpos( $_SERVER['REQUEST_URI'], 'patreon-webhook' ) !== false ) {
+			return;
+		}
+
 		if ( get_option( 'patreon-sync-posts', 'no' ) == 'no' ) {
+	
+			// Checks if post sync is enabled and posts webhook in case it is not posted
+			$existing_hook = get_option( 'patreon-post-sync-webhook', array() );	
+	
+			// If there is an existing webhook, delete it.
+			
+			if ( get_option( 'patreon-post-sync-webhook-saved', false ) ) {
+			
+				$existing_hook = get_option( 'patreon-post-sync-webhook', false );
+				
+				if ( !$existing_hook ) {
+					return;
+				}
+				
+				$creator_access_token = get_option( 'patreon-creators-access-token', false );
+				
+				$api_client = new Patreon_API( $creator_access_token );
+				
+				$webhook_delete = $api_client->delete_post_webhook( $existing_hook['data']['id'] );
+				
+				// If delete is successful remove the local info about webhook
+				if ( is_array( $webhook_delete ) AND isset( $webhook_delete['response']['code'] ) AND $webhook_delete['response']['code'] == '204' ) {
+
+					update_option( 'patreon-post-sync-webhook-saved', false );
+					delete_option( 'patreon-post-sync-webhook');
+
+				}
+
+			}
+			
 			return;			
 		}
 		
@@ -2640,13 +2677,13 @@ class Patreon_Wordpress {
 		
 		$api_client = new Patreon_API( $creator_access_token );
 		
-		$webhook = $api_client->add_post_webhooks();
+		$webhook_added = $api_client->add_post_webhook();
 
-		if ( is_array( $webhook ) AND $webhook['data']['type'] == 'webhook' ) {
+		if ( is_array( $webhook_added ) AND $webhook_added['data']['type'] == 'webhook' ) {
 			
 			// Save webhook info
 			
-			update_option( 'patreon-post-sync-webhook', $webhook );
+			update_option( 'patreon-post-sync-webhook', $webhook_added );
 			update_option( 'patreon-post-sync-webhook-saved', true );
 			
 		}

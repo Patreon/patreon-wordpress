@@ -234,7 +234,7 @@ class Patreon_Content_Sync {
 		
 		$api_client = new Patreon_API( $creator_access_token );
 		
-		$webhook = $api_client->add_post_webhooks();
+		$webhook = $api_client->add_post_webhook();
 
 		if ( is_array( $webhook ) AND $webhook['data']['type'] == 'webhook' ) {
 			
