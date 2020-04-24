@@ -141,7 +141,7 @@ class Patreon_API {
 	
 		// Site url with forced https
 		
-		$webhook_response_uri = site_url( '', 'https' ) . '/patreon-webhook/';
+		$webhook_response_uri = site_url( '', 'https' ) . '/patreon-webhooks/';
 
 		// Check if this url is legitimate with https:
 		

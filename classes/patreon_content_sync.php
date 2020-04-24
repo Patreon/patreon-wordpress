@@ -22,6 +22,7 @@ class Patreon_Content_Sync {
 		
 			add_action( 'patreon_five_minute_action', array( &$this, 'patreon_five_minute_cron_job' ) );
 			// add_action( 'wp_head', array( &$this, 'get_do' ) );
+			
 		}
 		
 	}
@@ -110,54 +111,67 @@ class Patreon_Content_Sync {
 					continue;
 				}
 				
-				// Check if a matching WP post exists
-				
-				$matching_post_id = false;
-				
-				global $wpdb;
-				
-				$matching_posts = $wpdb->get_results( "SELECT post_id, meta_value FROM " . $wpdb->postmeta . " WHERE meta_key = 'patreon-post-id' AND meta_value = '" . $posts['data'][$key]['id'] . "' ", ARRAY_A );
-								
-				if ( count( $matching_posts ) > 0 ) {
-					
-					// Matching post found - just get the first one
-					$matching_post_id = $matching_posts[0]['post_id'];				
-					
-				}
-				
-				// If no matching posts were found from query, try to find from title
-			
-				if ( count( $matching_posts ) == 0 ) {
-					
-					// no matching posts. Try checking from the title.
-					$matching_post = get_page_by_title( $patreon_post['data']['attributes']['title'], OBJECT, 'post' );
-					
-					if ( isset( $matching_post ) ) {
-						
-						// A post matching from title was found.						
-						$matching_post_id = $matching_post->ID;
-						
-					}
-					
-				}
-		
-				if ( !$matching_post_id ) {
-					$this->add_new_patreon_post( $patreon_post );
-				}
-				else {
-					
-					// Update if existing posts are set to be updated 
-					
-					if ( get_option( 'patreon-update-posts', 'no' ) == 'yes' ) {
-						$this->update_patreon_post( $matching_post_id, $patreon_post );
-					}
-					
-					
-				}
+				$this->add_update_patreon_post( $patreon_post );
 			
 			}
 			
 		}
+		
+	}
+	
+	public function add_update_patreon_post( $patreon_post ) { 
+		
+		// Check if a matching WP post exists
+		
+		$matching_post_id = false;
+		
+		global $wpdb;
+		
+		$matching_posts = $wpdb->get_results( "SELECT post_id, meta_value FROM " . $wpdb->postmeta . " WHERE meta_key = 'patreon-post-id' AND meta_value = '" . $patreon_post['data']['id'] . "' ", ARRAY_A );
+						
+		if ( count( $matching_posts ) > 0 ) {
+			
+			// Matching post found - just get the first one
+			$matching_post_id = $matching_posts[0]['post_id'];				
+			
+		}
+		
+		// If no matching posts were found from query, try to find from title
+	
+		if ( count( $matching_posts ) == 0 ) {
+			
+			// no matching posts. Try checking from the title.
+			$matching_post = get_page_by_title( $patreon_post['data']['attributes']['title'], OBJECT, 'post' );
+			
+			if ( isset( $matching_post ) ) {
+				
+				// A post matching from title was found.						
+				$matching_post_id = $matching_post->ID;
+				
+			}
+			
+		}
+
+		if ( !$matching_post_id ) {
+			$result = $this->add_new_patreon_post( $patreon_post );
+		}
+		else {
+			
+			// Update if existing posts are set to be updated 
+			
+			if ( get_option( 'patreon-update-posts', 'no' ) == 'yes' ) {
+				$result = $this->update_patreon_post( $matching_post_id, $patreon_post );
+			}
+			
+		}
+		
+		if ( is_wp_error( $result ) OR $result == 0 ) {
+			// Flopped - return false
+			return false;
+		}
+		
+		// Success
+		return true;
 		
 	}
 	
@@ -317,6 +331,14 @@ class Patreon_Content_Sync {
 		
 	}
 	
+	public function delete_patreon_post( $post_id ) {
+		
+		// Deletes a Patreon linked post
+		
+		wp_delete_post( $post_id, true );
+		
+	}		
+	
 	public function check_replace_patreon_images_with_local_images( $post_content, $images ) {
 		
 		global $Patreon_Wordpress;
@@ -422,6 +444,21 @@ class Patreon_Content_Sync {
 		
 		return $post_content;
 	
+	
+	}
+	public function get_matching_post_by_patreon_post_id( $patreon_post_id ) {
+		
+		// Gets a WP post by a matching Patreon post id from its Patreon post id meta
+		global $wpdb;
+		
+		$post = $wpdb->get_results("SELECT * FROM $wpdb->postmeta WHERE meta_key = 'patreon-post-id' AND  meta_value = '" . $patreon_post_id . "' LIMIT 1", ARRAY_A);
+		
+		if ( isset( $post[0]['post_id'] ) ) {
+			return $post[0]['post_id'];
+		}
+		
+		return false;
+		
 	}
 	
 }
