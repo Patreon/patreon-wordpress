@@ -1679,6 +1679,10 @@ class Patreon_Wordpress {
 			}
 			
 			global $Patreon_Wordpress;
+			
+			// If we are at this page, user wants posts synced - set it to on.
+			
+			update_option( 'patreon-sync-posts', 'yes' );
 
 			$sync_post_type               = get_option( 'patreon-sync-post-type', 'post' );
 			$sync_post_category           = get_option( 'patreon-sync-post-category', 'category' );

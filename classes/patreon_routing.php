@@ -735,12 +735,14 @@ class Patreon_Routing {
 						// Couldn't get this post. Skip
 						return;
 					}
-
-					$result = $Patreon_Wordpress::$patreon_content_sync->add_update_patreon_post( $patreon_post );
 					
-					if ( !$result ) {
-						// Failure. Error handling if necessary
+					if ( get_option( 'patreon-update-posts', 'no' ) == 'yes' ) {
 						
+						$result = $Patreon_Wordpress::$patreon_content_sync->add_update_patreon_post( $patreon_post );
+					
+						if ( !$result ) {
+							// Failure. Error handling if necessary - not needed for now
+						}
 					}
 					
 				}				
@@ -753,12 +755,15 @@ class Patreon_Routing {
 					
 					$patreon_post_id = $event_info['data']['id'];
 					
-					$wp_post_id = $Patreon_Wordpress::$patreon_content_sync->get_matching_post_by_patreon_post_id( $patreon_post_id );
+					if ( get_option( 'patreon-remove-deleted-posts', 'no' ) == 'yes' ) {
 					
-					$result = $Patreon_Wordpress::$patreon_content_sync->delete_patreon_post( $wp_post_id );
-					
-					if ( !$result OR is_null( $result ) ) {
-						// Delete failed - this may be a local issue. Can be used to give error to Patreon via header in future
+						$wp_post_id = $Patreon_Wordpress::$patreon_content_sync->get_matching_post_by_patreon_post_id( $patreon_post_id );
+						
+						$result = $Patreon_Wordpress::$patreon_content_sync->delete_patreon_post( $wp_post_id );
+											
+						if ( !$result OR is_null( $result ) ) {
+							// Delete failed - this may be a local issue. Can be used to give error to Patreon via header in future
+						}
 					}
 				
 				}
