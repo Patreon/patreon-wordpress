@@ -1644,7 +1644,7 @@ class Patreon_Wordpress {
 	
 			echo '<div id="patreon_setup_logo"><img src="' . PATREON_PLUGIN_ASSETS . '/img/Patreon_Logo_100.png" /></div>';
 			
-			echo '<div id="patreon_setup_content"><h1 style="margin-top: 0px;">Do you want to sync your posts?</h1><div id="patreon_setup_message">' . $setup_message . '</div><form style="display:inline-block;margin-right: 10px;" method="post" action="' . admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=post_sync_1' ) . '"><p class="submit" style="margin-top: 10px;"><input type="submit" class="button button-large button-primary" value="Yes, lets go!" /></p></form><form style="display:inline-block;" method="get" action="' . admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=final' ) . '"><p class="submit" style="margin-top: 10px;"><input type="submit" class="button button-large button-primary" value="Maybe later" /></p></form></div>';
+			echo '<div id="patreon_setup_content"><h1 style="margin-top: 0px;">Do you want to sync your posts?</h1><div id="patreon_setup_message">' . $setup_message . '</div><form style="display:inline-block;margin-right: 10px;" method="post" action="' . admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=post_sync_1' ) . '"><p class="submit" style="margin-top: 10px;"><input type="submit" class="button button-large button-primary" value="Yes, lets go!" /></p></form><form style="display:inline-block;" method="post" action="' . admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=final' ) . '"><p class="submit" style="margin-top: 10px;"><input type="submit" class="button button-large button-primary" value="Maybe later" /></p></form></div>';
 			
 			echo '</div>';
 
