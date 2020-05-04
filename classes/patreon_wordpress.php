@@ -19,7 +19,7 @@ class Patreon_Wordpress {
 	public static $current_user_pledge_amount = -1;
 	public static $current_user_patronage_declined = -1;
 	public static $current_user_is_patron = -1;
-	public static $current_patreon_user = -1;
+	public static $patreon_user_info_cache = array();
 	public static $current_member_details = -1;
 	public static $current_user_patronage_duration = -1;
 	public static $current_user_lifetime_patronage = -1;
@@ -71,6 +71,7 @@ class Patreon_Wordpress {
 		add_action( 'init', array( $this, 'checkPatreonCreatorURL' ) );
 		add_action( 'init', array( $this, 'checkPatreonCreatorName' ) );
 		add_action( 'init', 'Patreon_Login::checkTokenExpiration' );
+		add_action( 'the_content', array( $this, 'iterator' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueueAdminScripts' ) );
 		add_action( 'upgrader_process_complete', 'Patreon_Wordpress::AfterUpdateActions', 10, 2 );
 		add_action( 'admin_notices', array( $this, 'AdminMessages' ) );
@@ -89,20 +90,20 @@ class Patreon_Wordpress {
 		
 	}
 	public static function getPatreonUser( $user = false ) {
-
-		if ( self::$current_patreon_user != -1 ) {
-			return self::$current_patreon_user;
-		}
 		
 		if ( !$user ) {
 			$user = wp_get_current_user();
 		}
 		
-		// If there's no user object or user is anon, return false
-		if ( $user == false OR $user->ID == 0 ) {
+		// Bail out if there's no user object or user id or user is anon
+		if ( !$user OR !is_object( $user ) OR !isset( $user->ID ) OR $user->ID == 0 ) {
 			return false;
 		}
 		
+		if ( isset( self::$patreon_user_info_cache[$user->ID] ) ) {
+			return self::$patreon_user_info_cache[$user->ID];
+		}		
+			
 		/* get user meta data and query patreon api */
 		$patreon_access_token  = get_user_meta( $user->ID, 'patreon_access_token', true );
 		
@@ -132,7 +133,7 @@ class Patreon_Wordpress {
 				update_user_meta( $user->ID, 'patreon_latest_patron_info', $user_response );
 				update_user_meta( $user->ID, 'patreon_latest_patron_info_timestamp', time() );
 				
-				return self::$current_patreon_user = $user_response;
+				return $this->add_to_patreon_user_info_cache( $user->ID, $user_response );
 				
 			}
 			
@@ -167,7 +168,7 @@ class Patreon_Wordpress {
 					update_user_meta( $user->ID, 'patreon_latest_patron_info', $user_response );
 					update_user_meta( $user->ID, 'patreon_latest_patron_info_timestamp', time() );
 					
-					return self::$current_patreon_user = $user_response;
+					return $this->add_to_patreon_user_info_cache( $user->ID, $user_response );
 					
 				}
 				
@@ -181,14 +182,14 @@ class Patreon_Wordpress {
 			
 			// Check if there is a valid saved user return and whether it has a timestamp within desired range
 			if ( isset( $user_response['included'][0] ) AND is_array( $user_response['included'][0] ) AND $user_response_timestamp >= ( time() - ( 3600 * 24 * 3 ) ) ) {
-				return self::$current_patreon_user = $user_response;
+				return $this->add_to_patreon_user_info_cache( $user->ID, $user_response );
 			}
 			
 		}
 		
 		// All failed - return false
 
-		return self::$current_patreon_user = false;
+		return $this->add_to_patreon_user_info_cache( $user->ID, false );
 		
 	}
 	
@@ -2190,6 +2191,42 @@ class Patreon_Wordpress {
 		
 		// If we are at this point, it means the post is gated with PW. Return true.
 		return true;
+		
+	}
+	
+	public function add_to_patreon_user_info_cache( $user, $user_info ) {
+		
+		// This function manages the array that is used as the cache for info of Patreon users in a given page run. What it does is to accept the id of the WP user and a given Patreon user info, then add it to the a cache array 
+		
+		// If the cache array is larger than 50, snip the first item. This may be increased in future
+		
+		if ( !empty($this->patreon_user_info_cache) && (count( $this->patreon_user_info_cache ) > 50)  ) {
+			array_shift( $this->patreon_user_info_cache );
+		}
+		
+		// Add the new request and return it
+		
+		return $this->patreon_user_info_cache[$user->ID] = $user_info;
+		
+	}	
+	
+	
+	public function iterator() {
+		
+		$users = get_users();
+		
+		foreach ( $users as $user => $value ) {
+			echo Patreon_Wordpress::getPatreonUser( $user );
+			
+			echo '<pre>';
+			print_r(Patreon_Wordpress::getPatreonUser( $user ));
+			echo '</pre>';
+			
+		}
+		
+		echo '<pre>';
+		print_r( self::$patreon_user_info_cache);
+		echo '</pre>';
 		
 	}
 	
