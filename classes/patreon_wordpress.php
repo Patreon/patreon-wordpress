@@ -71,7 +71,6 @@ class Patreon_Wordpress {
 		add_action( 'init', array( $this, 'checkPatreonCreatorURL' ) );
 		add_action( 'init', array( $this, 'checkPatreonCreatorName' ) );
 		add_action( 'init', 'Patreon_Login::checkTokenExpiration' );
-		add_action( 'the_content', array( $this, 'iterator' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueueAdminScripts' ) );
 		add_action( 'upgrader_process_complete', 'Patreon_Wordpress::AfterUpdateActions', 10, 2 );
 		add_action( 'admin_notices', array( $this, 'AdminMessages' ) );
@@ -133,7 +132,7 @@ class Patreon_Wordpress {
 				update_user_meta( $user->ID, 'patreon_latest_patron_info', $user_response );
 				update_user_meta( $user->ID, 'patreon_latest_patron_info_timestamp', time() );
 				
-				return $this->add_to_patreon_user_info_cache( $user->ID, $user_response );
+				return Patreon_Wordpress::add_to_patreon_user_info_cache( $user->ID, $user_response );
 				
 			}
 			
@@ -168,7 +167,7 @@ class Patreon_Wordpress {
 					update_user_meta( $user->ID, 'patreon_latest_patron_info', $user_response );
 					update_user_meta( $user->ID, 'patreon_latest_patron_info_timestamp', time() );
 					
-					return $this->add_to_patreon_user_info_cache( $user->ID, $user_response );
+					return Patreon_Wordpress::add_to_patreon_user_info_cache( $user->ID, $user_response );
 					
 				}
 				
@@ -182,14 +181,14 @@ class Patreon_Wordpress {
 			
 			// Check if there is a valid saved user return and whether it has a timestamp within desired range
 			if ( isset( $user_response['included'][0] ) AND is_array( $user_response['included'][0] ) AND $user_response_timestamp >= ( time() - ( 3600 * 24 * 3 ) ) ) {
-				return $this->add_to_patreon_user_info_cache( $user->ID, $user_response );
+				return Patreon_Wordpress::add_to_patreon_user_info_cache( $user->ID, $user_response );
 			}
 			
 		}
 		
 		// All failed - return false
 
-		return $this->add_to_patreon_user_info_cache( $user->ID, false );
+		return Patreon_Wordpress::add_to_patreon_user_info_cache( $user->ID, false );
 		
 	}
 	
@@ -2194,41 +2193,21 @@ class Patreon_Wordpress {
 		
 	}
 	
-	public function add_to_patreon_user_info_cache( $user, $user_info ) {
+	public static function add_to_patreon_user_info_cache( $user_id, $user_info ) {
 		
 		// This function manages the array that is used as the cache for info of Patreon users in a given page run. What it does is to accept the id of the WP user and a given Patreon user info, then add it to the a cache array 
 		
 		// If the cache array is larger than 50, snip the first item. This may be increased in future
 		
-		if ( !empty($this->patreon_user_info_cache) && (count( $this->patreon_user_info_cache ) > 50)  ) {
-			array_shift( $this->patreon_user_info_cache );
+		if ( !empty( self::$patreon_user_info_cache ) && (count( self::$patreon_user_info_cache ) > 50)  ) {
+			array_shift( self::$patreon_user_info_cache );
 		}
 		
 		// Add the new request and return it
 		
-		return $this->patreon_user_info_cache[$user->ID] = $user_info;
+		return self::$patreon_user_info_cache[$user_id] = $user_info;
 		
 	}	
-	
-	
-	public function iterator() {
 		
-		$users = get_users();
-		
-		foreach ( $users as $user => $value ) {
-			echo Patreon_Wordpress::getPatreonUser( $user );
-			
-			echo '<pre>';
-			print_r(Patreon_Wordpress::getPatreonUser( $user ));
-			echo '</pre>';
-			
-		}
-		
-		echo '<pre>';
-		print_r( self::$patreon_user_info_cache);
-		echo '</pre>';
-		
-	}
-	
 }
 
