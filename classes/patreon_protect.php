@@ -119,7 +119,7 @@ class Patreon_Protect {
 		return false;
 		
 	}
-	public static function readAndServeImage( $image ) {
+	public static function readAndServeImage( $image, $locked = false ) {
 		
 		// Remove site url from requested image url - force http case
 		
@@ -148,6 +148,19 @@ class Patreon_Protect {
 		
 		if ( strpos( $_SERVER['SERVER_SOFTWARE'], 'Microsoft-IIS' ) === false ) {
 			header( 'Content-Length: ' . filesize( $file ) );
+		}
+		
+		// If the image is a gated image, send no-cache headers:
+		
+		
+		if ( $locked ) {
+		
+			header( "Expires: " . gmdate("D, d M Y H:i:s") . " GMT" );
+			header( "Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT" );
+			header( "Cache-Control: no-store, no-cache, must-revalidate" ); 
+			header( "Cache-Control: post-check=0, pre-check=0", false ); 
+			header("Pragma: no-cache");
+			
 		}
 
 		echo file_get_contents( $file );
@@ -238,7 +251,7 @@ class Patreon_Protect {
 		}
 		
 		// At this point pledge checks are valid, and patron can see the image. Serve it:
-		Patreon_Protect::readAndServeImage( $image );
+		Patreon_Protect::readAndServeImage( $image, true );
 	}
 	public static function deleteCachedAttachmentPlaceholders( $attachment_id ) {
 		
@@ -566,6 +579,13 @@ class Patreon_Protect {
 		}
 		
 		header( 'Content-Type: '.$force_mime_type );
+		
+		// Always send no cache headers since this is a gated image placeholder
+	
+		header( "Expires: " . gmdate("D, d M Y H:i:s") . " GMT" );
+		header( "Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT" );
+		header( "Cache-Control: no-store, no-cache, must-revalidate" ); 
+		header( "Cache-Control: post-check=0, pre-check=0", false ); 
 
 		if ( $force_mime_type=='image/png' ) {
 			imagepng( $image,PATREON_PLUGIN_LOCKED_IMAGE_CACHE_DIR . '/' . $cached_filename );
@@ -579,7 +599,7 @@ class Patreon_Protect {
 		if ( $force_mime_type=='image/bmp' ) {
 			imagebmp( $image, PATREON_PLUGIN_LOCKED_IMAGE_CACHE_DIR . '/' . $cached_filename );
 		}
-		
+	
 		// Readfile below for lower memory usage. Can be changed to echo file_get_contents for small images in future
 		echo file_get_contents( PATREON_PLUGIN_LOCKED_IMAGE_CACHE_DIR . '/' . $cached_filename );
 			
