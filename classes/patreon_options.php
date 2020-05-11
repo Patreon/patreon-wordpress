@@ -55,6 +55,7 @@ class Patreon_Options {
         register_setting( 'patreon-options', 'patreon-custom-page-name' );
         register_setting( 'patreon-options', 'patreon-prevent-caching-gated-content' );
         register_setting( 'patreon-options', 'patreon-currency-sign' );
+        register_setting( 'patreon-options', 'patreon-hide-login-button' );
 		
     }
 	
@@ -283,6 +284,18 @@ class Patreon_Options {
 											</td>
                                         </tr>
                                         <?php } ?>
+										
+                                       
+                                        <tr valign="top">
+											<th scope="row">
+												<strong>Hide 'Login with Patreon' Button</strong>
+												<div class="patreon-options-info">If on, 'Login with Patreon' button will be hidden from WP login page and WP login forms. Users can still log in or unlock via Patreon using unlock buttons. Recommended: off</div>
+											</th>
+											<td>
+												<input type="checkbox" name="patreon-hide-login-button" value="1"<?php checked( get_option( 'patreon-hide-login-button', false ) ); ?> />
+											</td>
+                                        </tr>
+                                    
 										
                                         <tr valign="top">
 											<th scope="row">
