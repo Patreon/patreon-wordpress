@@ -658,28 +658,44 @@ class Patreon_Compatibility {
 		remove_filter( 'pmpro_has_membership_access_filter', array($this, 'override_pmp_gating_with_pw'), 10 );
 		
 		$hasaccess = pmpro_has_membership_access( $post_id, $user->ID );
-		
+
 		if ( $hasaccess AND count( $this->get_pmp_post_membership_level_ids( $post_id ) ) > 0 ) {
 			// Post is gated with PMP and user has access. Unlock the post.
 		
 			$lock_or_not['lock'] = false;
 			$lock_or_not['reason'] = 'valid_patron';
 			
+			// Allow content
 			return $lock_or_not;
+		
+		}
+		
+		// The other option - the content is gated with PW and not PMP. If PMP user has a matching membership $ level that matches PW's tier level, allow access.
+				
+		// Get the matching PMP levels for the $ value of PW gated post if there is any
+		
+		$matching_levels = $this->match_pmp_tiers( $lock_or_not['patreon_level'] );
+		
+		if ( is_array( $matching_levels) AND count( $matching_levels ) > 0 ) {
+			
+			// User has membership levels which have matching or greater $ value than the $ level of Patreon gating. Allow content.
+			
+			$lock_or_not['lock'] = false;
+			$lock_or_not['reason'] = 'valid_patron';
+			
+			return $lock_or_not;
+			
 		}
 		
 		// Re-add pmp filter:
 		
-		add_filter( 'pmpro_has_membership_access_filter', array($this, 'override_pmp_gating_with_pw'), 10, 4 );
+		add_filter( 'pmpro_has_membership_access_filter', array($this, 'override_pmp_gating_with_pw'), 10, 4 );		
+	
+		// Return unmodified result
 		
-		// Catch all - return as it is
-
 		return $lock_or_not;
 		
-		
 	}
-	
-
 	
 	
 }
