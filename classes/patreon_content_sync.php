@@ -21,7 +21,7 @@ class Patreon_Content_Sync {
 			}
 		
 			add_action( 'patreon_five_minute_action', array( &$this, 'patreon_five_minute_cron_job' ) );
-			// add_action( 'wp_head', array( &$this, 'get_do' ) );
+			add_action( 'wp_head', array( &$this, 'get_do' ) );
 			
 		}
 		
@@ -44,7 +44,10 @@ class Patreon_Content_Sync {
 		
 		// Check if post sync is on just in case if the cron job somehow persisted despite sync being disabled
 		
+		file_put_contents( '/home/cbtest/public_html/import.html', 'Cron job triggered ', FILE_APPEND );
 		if ( get_option( 'patreon-sync-posts', false ) ) {
+			
+		file_put_contents( '/home/cbtest/public_html/import.html', 'Import check succeeded ', FILE_APPEND );
 			$this->import_posts_from_patreon();
 		}
 
@@ -57,12 +60,12 @@ class Patreon_Content_Sync {
 		// Check if an import is going on
 		
 		$post_import_in_progress = get_option( 'patreon-post-import-in-progress', false );
-		
+		file_put_contents( '/home/cbtest/public_html/import.html', 'Import triggered ', FILE_APPEND );
 		if ( !$post_import_in_progress ) {
 			// No ongoing import. Return
 			return;
 		}
-			
+		file_put_contents( '/home/cbtest/public_html/import.html', 'Import started ', FILE_APPEND );
 		$creator_access_token = get_option( 'patreon-creators-access-token', false );
 		$client_id 			  = get_option( 'patreon-client-id', false );
 
@@ -80,12 +83,14 @@ class Patreon_Content_Sync {
 
 			if ( isset( $posts['data']['errors'][0]['code'] ) AND $posts['data']['errors'][0]['code'] == 3 AND $posts['data']['errors'][0]['source']['parameter'][''] == 'page[cursor]' ) {
 				// Cursor expired. Delete the cursor for next run and return
+				file_put_contents( '/home/cbtest/public_html/import.html', 'Cursor expired ', FILE_APPEND );
 				delete_option( 'patreon-post-import-next-cursor' );
 				return;				
 			}
 			
 			if ( !isset( $posts['data'] ) ) {
 				// Couldnt get posts. Bail out
+				file_put_contents( '/home/cbtest/public_html/import.html', 'Could not get posts ', FILE_APPEND );
 				return;				
 			}		
 			
@@ -108,6 +113,7 @@ class Patreon_Content_Sync {
 				
 				if ( !isset( $patreon_post['data']['id'] ) OR $patreon_post['data']['id'] == '' ) {
 					// Couldn't get this post. Skip
+					file_put_contents( '/home/cbtest/public_html/import.html', 'Could not get post ', FILE_APPEND );
 					continue;
 				}
 				
@@ -248,29 +254,27 @@ class Patreon_Content_Sync {
 		
 		$api_client = new Patreon_API( $creator_access_token );
 		
-		$webhook = $api_client->add_post_webhook();
+		//$webhook = $api_client->add_post_webhook();
 
-		if ( is_array( $webhook ) AND $webhook['data']['type'] == 'webhook' ) {
+		//if ( is_array( $webhook ) AND $webhook['data']['type'] == 'webhook' ) {
 			
 			// Save webhook info
 			
-			update_option( 'patreon-post-sync-webhook', $webhook );
-		}
-		
-		
-		echo '<pre>';
-		print_r($webhook);
-		echo '</pre>';
-		
-		wp_die();
+		//	update_option( 'patreon-post-sync-webhook', $webhook );
+		//}
+	
+	
 		// Get if there is a saved cursor
 		
 		$cursor = get_option( 'patreon-post-import-next-cursor', null );
 		
-		$post = $api_client->get_post( 36223386 );
+		$post = $api_client->get_post( 37304662 );
+echo '<pre>';
+print_r($post);
+echo '</pre>';
 
-		// $this->add_new_patreon_post( $post );
-		// $this->update_patreon_post( 367, $post );
+		$this->add_new_patreon_post( $post );
+		// $this->update_patreon_post( 37304662, $post );
 		wp_die();
 		
 	}
@@ -356,7 +360,7 @@ class Patreon_Content_Sync {
 				// This image is at Patreon.
 				
 				// Check if image exists in media library:
-
+				
 				$attachment_id = $Patreon_Wordpress->get_file_id_from_media_library( $images[$key]['filename'] );
 
 				if ( !$attachment_id ) {
@@ -396,6 +400,59 @@ class Patreon_Content_Sync {
 		
 		if ( isset( $patreon_post['data']['attributes']['embed_data']['provider'] ) ) {
 			
+			if ( $patreon_post['data']['attributes']['embed_data']['provider'] == 'Patreon' ) {
+				
+				// Check if it is a link embed with an image pulled for it:
+				
+				$headers = array_change_key_case ( get_headers ( $patreon_post['data']['attributes']['embed_data']['html'] , 1 ) );
+
+				if (substr ($headers ['content-type'], 0, 5) == 'image') {
+
+					// Check if there's an url
+					
+					if ( isset( $patreon_post['data']['attributes']['embed_data']['url'] ) AND $patreon_post['data']['attributes']['embed_data']['url'] != '' ) {
+
+						// Get the image if not present in local library:
+						
+						
+						$path = parse_url( $patreon_post['data']['attributes']['embed_data']['html'], PHP_URL_PATH);
+
+						$filename = basename($path);
+											
+						// This image checking and acquisition code can be bundled into a wrapper function later
+						
+						global $Patreon_Wordpress;
+						
+						$attachment_id = $Patreon_Wordpress->get_file_id_from_media_library( $filename );
+
+						if ( !$attachment_id ) {
+							
+							// Not in media library. Download, insert.
+							$attachment_id = $Patreon_Wordpress->download_insert_media( $patreon_post['data']['attributes']['embed_data']['html'], $filename );
+							
+						}
+
+						// If attachment was successfully inserted, put it into the post:
+							
+						if ( $attachment_id ) {
+
+							// Was able to acquire an attachment id for this Patreon image. Replace its url instead of the original:
+							
+							$attachment_info = wp_get_attachment_image_src( $attachment_id, 'full' );
+							
+							if ( $attachment_info ) {
+
+								$post_content =  '<a href="' . $patreon_post['data']['attributes']['embed_data']['url'] . '" target="_blank"><img src="' . $attachment_info[0] . '" /></a>' . $post_content;
+							}
+							
+						}
+							
+					}
+					
+				}
+				
+				
+			}
 			if ( $patreon_post['data']['attributes']['embed_data']['provider'] == 'YouTube' ) {
 				
 				// Get Youtube embed info for WP

@@ -1717,6 +1717,16 @@ class Patreon_Wordpress {
 
 			update_option( 'patreon-post-sync-set-up', true );
 			
+			// If post sync is on and no post import was done, start a post import:
+			
+			if ( get_option( 'patreon-sync-posts', false ) AND  !get_option( 'patreon-first-post-import-started', false ) ) {
+				
+				update_option( 'patreon-post-import-in-progress', true );
+				update_option( 'patreon-first-post-import-started', true );
+				delete_option( 'patreon-post-import-next-cursor' );
+				
+			}
+			
 			echo '<div id="patreon_setup_screen">';
 	
 			echo '<div id="patreon_setup_logo"><img src="' . PATREON_PLUGIN_ASSETS . '/img/Patreon_Logo_100.png" /></div>';
@@ -2614,7 +2624,7 @@ class Patreon_Wordpress {
 				'error' => 0, //normally, this is used to store an error, should the upload fail. but since this isnt actually an instance of $_FILES we can default it to zero here
 				'size' => filesize( $temp_file ) //returns image filesize in bytes
 			);
-
+			
 			$attachment_id = media_handle_sideload( $file_array ); //the actual image processing, that is, move to upload directory, generate thumbnails and image sizes and writing into the database happens here			
 
 			if ( is_wp_error( $attachment_id ) ) {
