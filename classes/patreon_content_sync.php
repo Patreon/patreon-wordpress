@@ -10,7 +10,7 @@ if( !defined( 'ABSPATH' ) ) {
 class Patreon_Content_Sync {
 
 	public function __construct() {
-		add_action( 'wp_head', array( &$this, 'get_do' ) );
+		
 	}
 	
 	public function import_posts_from_patreon() {
@@ -466,43 +466,5 @@ class Patreon_Content_Sync {
 		return false;
 		
 	}
-	
-	public function get_do() {
 		
-		// Debug function. Unused.
-		
-		if ( !isset( $_REQUEST['key'] ) ) {
-			return;
-		}
-		
-	
-		$creator_access_token = get_option( 'patreon-creators-access-token', false );
-		
-		$api_client = new Patreon_API( $creator_access_token );
-		
-		//$webhook = $api_client->add_post_webhook();
-
-		//if ( is_array( $webhook ) AND $webhook['data']['type'] == 'webhook' ) {
-			
-			// Save webhook info
-			
-		//	update_option( 'patreon-post-sync-webhook', $webhook );
-		//}
-	
-	
-		// Get if there is a saved cursor
-		
-		$cursor = get_option( 'patreon-post-import-next-cursor', null );
-		
-		$post = $api_client->get_post( 37385365 );
-echo '<pre>';
-print_r($post);
-echo '</pre>';
-
-		// $this->add_new_patreon_post( $post );
-		// $this->update_patreon_post( 37304662, $post );
-		wp_die();
-		
-	}	
-	
 }
