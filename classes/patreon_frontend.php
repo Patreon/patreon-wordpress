@@ -1321,7 +1321,11 @@ class Patreon_Frontend {
 	public static function displayPatreonLoginButtonInLoginForm() {
 		
 		// For displaying login button in the form - wrapper
-		echo '<div style="display:inline-block;width : 100%; text-align: center;">' . self::showPatreonLoginButton() . '</div>';
+		
+		// Check if the login button hide option is on
+		if ( !get_option( 'patreon-hide-login-button', false ) ) {
+			echo '<div style="display:inline-block;width : 100%; text-align: center;">' . self::showPatreonLoginButton() . '</div>';
+		}		
 		
 	}
 	public static function showPatreonLoginButton( $args = array() ) {

@@ -3,14 +3,14 @@ Contributors: wordpressorg@patreon.com, codebard
 Tags: patreon, membership, members
 Requires at least: 4.0
 Requires PHP: 5.4
-Tested up to: 5.3.2
-Stable tag: 1.5.3
+Tested up to: 5.4.1
+Stable tag: 1.5.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
 Connect your WordPress site and your Patreon to increase your patrons and pledges!
 
-With Patreon WordPress, you can bring Patreon features to your WordPress website and integrate them to make them work together. You can even easily start posting patron-only content at your WordPress site and encourage your visitors to become your patrons to unlock your content.
+With Patreon WordPress, you can bring Patreon features to your WordPress website and integrate them to make them work together. You can even easily import your existing Patreon posts and keep your Patreon posts synced to your WP site automatically! Your patron-only content at your WordPress site will encourage your visitors to become your patrons to unlock your content.
 
 You can lock any single post or all of your posts! You can also lock any custom post type. Your visitors can log into your site via Patreon, making it easier for them to use your site in addition to accessing your locked content.
 
@@ -22,10 +22,15 @@ This plugin is developed and maintained by Patreon.
 
 - Choose one of your tiers or a minimum pledge amount necessary to access a post or custom post
 - All patrons with pledge at or above that minimum tier will be able to access your post
+- Alternatively, you can set a minimum pledge amount to see all posts
 - Visitors who are not your patrons can click the "Unlock with Patreon" button on the locked post to pledge to you and access content
 - Visitors will be automatically redirected to Patreon, pledge to you and come back to your site to original unlocked post
 - Plugin will automatically log in Patreon users
-- Alternatively, you can set a minimum pledge amount to see all posts
+- Import your existing Patreon posts, with Video and images
+- Sync your Patreon posts as you go
+- Choose the post type, category which posts will be synced to
+- Choose the author to be used for synced posts
+- Your posts will be automatically updated as you add/update/delete your Patreon posts
 - Set custom HTML that non-patrons see instead of the post, prompting them to become a patron
 - Patreon WordPress is compatible with Paid Memberships Pro - you can gate your content with either plugin
 - Patreon pledges are matched with Paid Memberships Pro monthly memberships - works out of the box with no changes
@@ -73,6 +78,43 @@ To make a locked post public again, just choose "Everyone" from the select box a
 It is  difficult to protect videos due the intensive bandwidth requirements of hosting video  and having to rely on third parties such as Youtube or Vimeo. Youtube allows you to set videos to ‘private’ but Vimeo offers extra controls by only allowing videos to be played on specific domains. Visit this guide to [protecting your video content with Vimeo](https://help.vimeo.com/hc/en-us/articles/224817847-Privacy-settings-overview).
 
 == Upgrade Notice ==
+
+= 1.5.6 =
+
+* Plugin now syncs posts from Patreon to WP site
+* Added support for syncing text, video (Youtube, Vimeo), link post types at Patreon. These posts are replicated exactly as they are
+* All other post types at Patreon are currently synced with their title and content only
+* Gets proper embed info for video posts from Youtube and Vimeo and embeds into proper place in post content
+* All images in any given post type is replicated to local media library and inserted into proper places in post content from WP media library
+* Syncs patron only status of posts. Tiers currently not supported.
+* Syncs paid per post type posts' patron only status
+* Added post import functions
+* Added Patreon cron job to import posts in the background
+* Hooked post import function to Patreon cron job
+* Cron job checks if an import is going on and processes the next batch of posts as needed. Currently 20 posts per every 5 minutes
+* Added webhooks to sync newly added posts, deleted posts and updated posts without needing to start a post import
+* Added intermediary screen to setup wizard to set post import preferences during initial plugin setup
+* Intermediary setup wizard screen allows setting of post sync preferences for update/delete, post type and category
+* Intermediary setup wizard screen starts an immediate post import if the user chooses to sync posts
+* Added options to manage post sync - turn post sync on/off, set updating posts on/off, set deleting posts on/off
+* Added options to set which post type and category (or taxonomy) the synced posts should be added
+* Added option to set the author to be used for imported posts
+* Added an option to start a manual import
+* Added status indicators for import progress to option screen
+* Made it possible to do manual import of posts without turning on syncing
+* Made it possible to unlock PW only gated content with a PMP membership from the same $ level
+
+= 1.5.5 =
+
+* Added no cache headers to gated/locked images so browsers and ISPs will be less prone to caching them. This would address issues with images appearing locked/unlocked despite being in the opposite state.
+* Added an option to allow hiding login with Patreon button in WP login page and login forms. Does not impact login - users can still unlock/login via Patreon even if the button is hidden.
+* Added caching to getPatreonUser function. Will cache last 50 Patreon users' info when queried. This will speed up user listings and will reduce load on the api.
+* getPatreonUser function now accepts $user object as parameter. You can now query different users' Patreon info as opposed to only the current user. This will help custom code and 3rd party plugins to do mass user processing to distribute benefits at WP sites.
+
+= 1.5.4 =
+
+* Made active patrons only choice desc text clearer
+* Added a isset check to prevent notices from breaking login after return from Patreon in sites which display notices
 
 = 1.5.3 =
 
@@ -228,6 +270,43 @@ Not at all - you can post different content totally independently at your site a
 Nothing will be changed at your site - the plugin will just connect your site to Patreon to allow communication in between your site and Patreon.
 
 == Changelog ==
+
+= 1.5.6 =
+
+* Plugin now syncs posts from Patreon to WP site
+* Added support for syncing text, video (Youtube, Vimeo), link post types at Patreon. These posts are replicated exactly as they are
+* All other post types at Patreon are currently synced with their title and content only
+* Gets proper embed info for video posts from Youtube and Vimeo and embeds into proper place in post content
+* All images in any given post type is replicated to local media library and inserted into proper places in post content from WP media library
+* Syncs patron only status of posts. Tiers currently not supported.
+* Syncs paid per post type posts' patron only status
+* Added post import functions
+* Added Patreon cron job to import posts in the background
+* Hooked post import function to Patreon cron job
+* Cron job checks if an import is going on and processes the next batch of posts as needed. Currently 20 posts per every 5 minutes
+* Added webhooks to sync newly added posts, deleted posts and updated posts without needing to start a post import
+* Added intermediary screen to setup wizard to set post import preferences during initial plugin setup
+* Intermediary setup wizard screen allows setting of post sync preferences for update/delete, post type and category
+* Intermediary setup wizard screen starts an immediate post import if the user chooses to sync posts
+* Added options to manage post sync - turn post sync on/off, set updating posts on/off, set deleting posts on/off
+* Added options to set which post type and category (or taxonomy) the synced posts should be added
+* Added option to set the author to be used for imported posts
+* Added an option to start a manual import
+* Added status indicators for import progress to option screen
+* Made it possible to do manual import of posts without turning on syncing
+* Made it possible to unlock PW only gated content with a PMP membership from the same $ level
+
+= 1.5.5 =
+
+* Added no cache headers to gated/locked images so browsers and ISPs will be less prone to caching them. This would address issues with images appearing locked/unlocked despite being in the opposite state.
+* Added an option to allow hiding login with Patreon button in WP login page and login forms. Does not impact login - users can still unlock/login via Patreon even if the button is hidden.
+* Added caching to getPatreonUser function. Will cache last 50 Patreon users' info when queried. This will speed up user listings and will reduce load on the api.
+* getPatreonUser function now accepts $user object as parameter. You can now query different users' Patreon info as opposed to only the current user. This will help custom code and 3rd party plugins to do mass user processing to distribute benefits at WP sites.
+
+= 1.5.4 =
+
+* Made active patrons only choice desc text clearer
+* Added a isset check to prevent notices from breaking login after return from Patreon in sites which display notices
 
 = 1.5.3 =
 

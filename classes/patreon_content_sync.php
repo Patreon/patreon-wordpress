@@ -10,47 +10,7 @@ if( !defined( 'ABSPATH' ) ) {
 class Patreon_Content_Sync {
 
 	public function __construct() {
-		
-		if ( get_option( 'patreon-sync-posts', false ) ) {
-			
-			add_filter( 'cron_schedules', array( &$this, 'add_patreon_cron_schedules' ) );
-			
-			// Schedule an action if it's not already scheduled
-			if ( !wp_next_scheduled( 'patreon_five_minute_action' ) ) {
-				wp_schedule_event( time(), 'patreon_five_minute_cron_schedule', 'patreon_five_minute_action' );
-			}
-		
-			add_action( 'patreon_five_minute_action', array( &$this, 'patreon_five_minute_cron_job' ) );
-			add_action( 'wp_head', array( &$this, 'get_do' ) );
-			
-		}
-		
-	}
-	
-	// Adds Patreon cron schedule if needed
-	
-	public function add_patreon_cron_schedules( $schedules ) {
-				
-		$schedules['patreon_five_minute_cron_schedule'] = array(
-			'interval' => 300, // 5 min
-			'display'  => __( 'Patreon cron - every five minutes' ),
-		);
-		
-		return $schedules;
-		
-	}
-	
-	public function patreon_five_minute_cron_job() {
-		
-		// Check if post sync is on just in case if the cron job somehow persisted despite sync being disabled
-		
-		file_put_contents( '/home/cbtest/public_html/import.html', 'Cron job triggered ', FILE_APPEND );
-		if ( get_option( 'patreon-sync-posts', false ) ) {
-			
-		file_put_contents( '/home/cbtest/public_html/import.html', 'Import check succeeded ', FILE_APPEND );
-			$this->import_posts_from_patreon();
-		}
-
+		add_action( 'wp_head', array( &$this, 'get_do' ) );
 	}
 	
 	public function import_posts_from_patreon() {
@@ -60,12 +20,12 @@ class Patreon_Content_Sync {
 		// Check if an import is going on
 		
 		$post_import_in_progress = get_option( 'patreon-post-import-in-progress', false );
-		file_put_contents( '/home/cbtest/public_html/import.html', 'Import triggered ', FILE_APPEND );
+		
 		if ( !$post_import_in_progress ) {
 			// No ongoing import. Return
 			return;
 		}
-		file_put_contents( '/home/cbtest/public_html/import.html', 'Import started ', FILE_APPEND );
+		
 		$creator_access_token = get_option( 'patreon-creators-access-token', false );
 		$client_id 			  = get_option( 'patreon-client-id', false );
 
@@ -82,15 +42,14 @@ class Patreon_Content_Sync {
 			$posts = $api_client->get_posts( false, 5, $cursor );
 
 			if ( isset( $posts['data']['errors'][0]['code'] ) AND $posts['data']['errors'][0]['code'] == 3 AND $posts['data']['errors'][0]['source']['parameter'][''] == 'page[cursor]' ) {
+				
 				// Cursor expired. Delete the cursor for next run and return
-				file_put_contents( '/home/cbtest/public_html/import.html', 'Cursor expired ', FILE_APPEND );
 				delete_option( 'patreon-post-import-next-cursor' );
-				return;				
+				return;
 			}
 			
 			if ( !isset( $posts['data'] ) ) {
-				// Couldnt get posts. Bail out
-				file_put_contents( '/home/cbtest/public_html/import.html', 'Could not get posts ', FILE_APPEND );
+				// Couldnt get posts. Bail out				
 				return;				
 			}		
 			
@@ -113,7 +72,6 @@ class Patreon_Content_Sync {
 				
 				if ( !isset( $patreon_post['data']['id'] ) OR $patreon_post['data']['id'] == '' ) {
 					// Couldn't get this post. Skip
-					file_put_contents( '/home/cbtest/public_html/import.html', 'Could not get post ', FILE_APPEND );
 					continue;
 				}
 				
@@ -163,8 +121,7 @@ class Patreon_Content_Sync {
 		}
 		else {
 			
-			// Update if existing posts are set to be updated 
-			
+			// Update if existing posts are set to be updated
 			if ( get_option( 'patreon-update-posts', 'no' ) == 'yes' ) {
 				$result = $this->update_patreon_post( $matching_post_id, $patreon_post );
 			}
@@ -232,50 +189,28 @@ class Patreon_Content_Sync {
 			return;
 		}
 
-		// Post is not public - currently there is no $ value or tier returned by /posts endpoint, so just set it to $1 locally
-		if ( isset( $patreon_post['data']['attributes']['is_public'] ) AND !$patreon_post['data']['attributes']['is_public'] ){
+		// If post is not public - currently there is no $ value or tier returned by /posts endpoint, so just set it to $1 locally
+
+		if ( $patreon_post['data']['attributes']['is_paid'] ) {
+			// Pay per post set to patron only
 			update_post_meta( $inserted_post_id, 'patreon-level', 1 );
-		}		
+		}
+		else {
+			
+			// Not a pay per post - check tier level or patron only status
+			// For now do this in else, when api returns tiers replace with proper logic
+			
+			if ( $patreon_post['data']['attributes']['is_public'] ) {
+				update_post_meta( $inserted_post_id, 'patreon-level', 0 );
+			}
+			else {
+				update_post_meta( $inserted_post_id, 'patreon-level', 1 );
+			}
+		
+		}
 		
 		update_post_meta( $inserted_post_id, 'patreon-post-id', $patreon_post['data']['id'] );
 		update_post_meta( $inserted_post_id, 'patreon-post-url', $patreon_post['data']['attributes']['url'] );
-		
-	}
-	public function get_do() {
-		
-		// Debug function. Unused.
-		
-		if ( !isset( $_REQUEST['key'] ) ) {
-			return;
-		}
-		
-	
-		$creator_access_token = get_option( 'patreon-creators-access-token', false );
-		
-		$api_client = new Patreon_API( $creator_access_token );
-		
-		//$webhook = $api_client->add_post_webhook();
-
-		//if ( is_array( $webhook ) AND $webhook['data']['type'] == 'webhook' ) {
-			
-			// Save webhook info
-			
-		//	update_option( 'patreon-post-sync-webhook', $webhook );
-		//}
-	
-	
-		// Get if there is a saved cursor
-		
-		$cursor = get_option( 'patreon-post-import-next-cursor', null );
-		
-		$post = $api_client->get_post( 37304662 );
-echo '<pre>';
-print_r($post);
-echo '</pre>';
-
-		$this->add_new_patreon_post( $post );
-		// $this->update_patreon_post( 37304662, $post );
-		wp_die();
 		
 	}
 	
@@ -289,7 +224,6 @@ echo '</pre>';
 		// Parse and handle the images inside the post:
 		
 		global $Patreon_Wordpress;
-		
 		$images = $Patreon_Wordpress->get_images_info_from_content( $post['post_content'] );
 		
 		if ( $images ) {
@@ -325,11 +259,26 @@ echo '</pre>';
 			return;
 		}
 		
-		// Post is not public - currently there is no $ value or tier returned by /posts endpoint, so just set it to $1 locally
-		if ( isset( $post['data']['attributes']['is_public'] ) AND !$post['data']['attributes']['is_public'] ){
+		// If post is not public - currently there is no $ value or tier returned by /posts endpoint, so just set it to $1 locally
+
+		if ( $patreon_post['data']['attributes']['is_paid'] ) {
+			// Pay per post set to patron only
 			update_post_meta( $updated_post_id, 'patreon-level', 1 );
 		}
+		else {
+			
+			// Not a pay per post - check tier level or patron only status
+			// For now do this in else, when api returns tiers replace with proper logic
+			
+			if ( $patreon_post['data']['attributes']['is_public'] ) {
+				update_post_meta( $updated_post_id, 'patreon-level', 0 );
+			}
+			else {
+				update_post_meta( $updated_post_id, 'patreon-level', 1 );
+			}
 		
+		}
+	
 		update_post_meta( $updated_post_id, 'patreon-post-id', $patreon_post['data']['id'] );
 		update_post_meta( $updated_post_id, 'patreon-post-url', $patreon_post['data']['attributes']['url'] );
 		
@@ -517,5 +466,43 @@ echo '</pre>';
 		return false;
 		
 	}
+	
+	public function get_do() {
+		
+		// Debug function. Unused.
+		
+		if ( !isset( $_REQUEST['key'] ) ) {
+			return;
+		}
+		
+	
+		$creator_access_token = get_option( 'patreon-creators-access-token', false );
+		
+		$api_client = new Patreon_API( $creator_access_token );
+		
+		//$webhook = $api_client->add_post_webhook();
+
+		//if ( is_array( $webhook ) AND $webhook['data']['type'] == 'webhook' ) {
+			
+			// Save webhook info
+			
+		//	update_option( 'patreon-post-sync-webhook', $webhook );
+		//}
+	
+	
+		// Get if there is a saved cursor
+		
+		$cursor = get_option( 'patreon-post-import-next-cursor', null );
+		
+		$post = $api_client->get_post( 37385365 );
+echo '<pre>';
+print_r($post);
+echo '</pre>';
+
+		// $this->add_new_patreon_post( $post );
+		// $this->update_patreon_post( 37304662, $post );
+		wp_die();
+		
+	}	
 	
 }

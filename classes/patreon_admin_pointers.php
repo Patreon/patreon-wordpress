@@ -138,9 +138,9 @@ class Patreon_Admin_Pointers {
 		// We want this pointer to appear only for existing installations 
 		
 		$plugin_activated =	get_option( 'patreon-plugin-first-activated' );
-		
+
 		// Set to appear to installations completed until a week after date of this commit
-		if ( $plugin_activated > 1588593924 ) {
+		if ( $plugin_activated > 10000000005555 ) {
 			return;
 		}
 		
@@ -149,7 +149,7 @@ class Patreon_Admin_Pointers {
 			'options' => array(
 				'content' => sprintf( '<h3> %s </h3> <p> %s </p>',
 					'You can now sync your Patreon posts!',
-					'Turn on post sync to have your Patreon posts automatically synced to your WP site! Works totally hands off! Read details here <a href="https://www.patreondevelopers.com/t/patreon-wordpress-post-sync-guide/3069" target="_blank">here</a>.'
+					'Turn on post sync to have your Patreon posts automatically synced to your WP site! Works totally hands off! <br /><br />Set up post sync <a href="' . admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=post_sync_1' ) . '">here</a>. <br /><br />Read details here <a href="https://www.patreondevelopers.com/t/patreon-wordpress-post-sync-guide/3069" target="_blank">here</a>.'
 				),
 				'position' => array( 'edge' => 'top', 'align' => 'middle' )
 			)

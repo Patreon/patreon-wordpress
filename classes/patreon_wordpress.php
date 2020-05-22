@@ -20,7 +20,7 @@ class Patreon_Wordpress {
 	public static $current_user_pledge_amount = -1;
 	public static $current_user_patronage_declined = -1;
 	public static $current_user_is_patron = -1;
-	public static $current_patreon_user = -1;
+	public static $patreon_user_info_cache = array();
 	public static $current_member_details = -1;
 	public static $current_user_patronage_duration = -1;
 	public static $current_user_lifetime_patronage = -1;
@@ -58,8 +58,8 @@ class Patreon_Wordpress {
 			self::$patreon_admin_pointers = new Patreon_Admin_Pointers;	
 		}
 		
-		self::$patreon_content_sync = new Patreon_Content_Sync;	
-		
+		self::$patreon_content_sync = new Patreon_Content_Sync;
+			
 		add_action( 'wp_head', array( $this, 'updatePatreonUser' ), 10 );
 		add_action( 'init', array( $this, 'checkPatreonCreatorID' ) );
 		add_action( 'init', array( $this, 'check_creator_tiers' ) );
@@ -104,24 +104,31 @@ class Patreon_Wordpress {
 		add_action( "wp_ajax_nopriv_patreon_wordpress_save_post_sync_category", array( $this , "save_post_sync_category" ) );
 		add_action( "wp_ajax_patreon_wordpress_set_post_author_for_post_sync", array( $this, "set_post_author_for_post_sync" ) );
 		add_action( "wp_ajax_nopriv_patreon_wordpress_set_post_author_for_post_sync", array( $this , "set_post_author_for_post_sync" ) );
-				
+		add_filter( 'cron_schedules', array( &$this, 'add_patreon_cron_schedules' ) );
+		
+		// Schedule an action if it's not already scheduled
+		if ( !wp_next_scheduled( 'patreon_five_minute_action' ) ) {
+			wp_schedule_event( time(), 'patreon_five_minute_cron_schedule', 'patreon_five_minute_action' );
+		}
+	
+		add_action( 'patreon_five_minute_action', array( &$this, 'patreon_five_minute_cron_job' ) );		
 		
 	}
 	public static function getPatreonUser( $user = false ) {
-
-		if ( self::$current_patreon_user != -1 ) {
-			return self::$current_patreon_user;
-		}
 		
 		if ( !$user ) {
 			$user = wp_get_current_user();
 		}
 		
-		// If there's no user object or user is anon, return false
-		if ( $user == false OR $user->ID == 0 ) {
+		// Bail out if there's no user object or user id or user is anon
+		if ( !$user OR !is_object( $user ) OR !isset( $user->ID ) OR $user->ID == 0 ) {
 			return false;
 		}
 		
+		if ( isset( self::$patreon_user_info_cache[$user->ID] ) ) {
+			return self::$patreon_user_info_cache[$user->ID];
+		}		
+			
 		/* get user meta data and query patreon api */
 		$patreon_access_token  = get_user_meta( $user->ID, 'patreon_access_token', true );
 		
@@ -151,7 +158,7 @@ class Patreon_Wordpress {
 				update_user_meta( $user->ID, 'patreon_latest_patron_info', $user_response );
 				update_user_meta( $user->ID, 'patreon_latest_patron_info_timestamp', time() );
 				
-				return self::$current_patreon_user = $user_response;
+				return Patreon_Wordpress::add_to_patreon_user_info_cache( $user->ID, $user_response );
 				
 			}
 			
@@ -186,7 +193,7 @@ class Patreon_Wordpress {
 					update_user_meta( $user->ID, 'patreon_latest_patron_info', $user_response );
 					update_user_meta( $user->ID, 'patreon_latest_patron_info_timestamp', time() );
 					
-					return self::$current_patreon_user = $user_response;
+					return Patreon_Wordpress::add_to_patreon_user_info_cache( $user->ID, $user_response );
 					
 				}
 				
@@ -200,14 +207,14 @@ class Patreon_Wordpress {
 			
 			// Check if there is a valid saved user return and whether it has a timestamp within desired range
 			if ( isset( $user_response['included'][0] ) AND is_array( $user_response['included'][0] ) AND $user_response_timestamp >= ( time() - ( 3600 * 24 * 3 ) ) ) {
-				return self::$current_patreon_user = $user_response;
+				return Patreon_Wordpress::add_to_patreon_user_info_cache( $user->ID, $user_response );
 			}
 			
 		}
 		
 		// All failed - return false
 
-		return self::$current_patreon_user = false;
+		return Patreon_Wordpress::add_to_patreon_user_info_cache( $user->ID, false );
 		
 	}
 	
@@ -2425,7 +2432,7 @@ class Patreon_Wordpress {
 		return true;
 		
 	}
-	
+
 	public function make_post_type_select( $selected_post_type = 'post' ) {
 		
 		$post_types = get_post_types();
@@ -2447,6 +2454,22 @@ class Patreon_Wordpress {
 		return $select;
 		
 	}
+
+	public static function add_to_patreon_user_info_cache( $user_id, $user_info ) {
+		
+		// This function manages the array that is used as the cache for info of Patreon users in a given page run. What it does is to accept the id of the WP user and a given Patreon user info, then add it to the a cache array 
+		
+		// If the cache array is larger than 50, snip the first item. This may be increased in future
+		
+		if ( !empty( self::$patreon_user_info_cache ) && (count( self::$patreon_user_info_cache ) > 50)  ) {
+			array_shift( self::$patreon_user_info_cache );
+		}
+		
+		// Add the new request and return it
+		
+		return self::$patreon_user_info_cache[$user_id] = $user_info;
+		
+	}	
 		
 	public function make_taxonomy_select( $selected_post_type = 'post', $selected_taxonomy = 'category' ) {
 		
@@ -2717,4 +2740,30 @@ class Patreon_Wordpress {
 		return $headers;
 
 	}
+
+	// Adds Patreon cron schedule if needed
+	
+	public function add_patreon_cron_schedules( $schedules ) {
+				
+		$schedules['patreon_five_minute_cron_schedule'] = array(
+			'interval' => 300, // 5 min
+			'display'  => __( 'Patreon cron - every five minutes' ),
+		);
+		
+		return $schedules;
+		
+	}
+	
+	public function patreon_five_minute_cron_job() {
+		
+		// Check if post sync is on just in case if the cron job somehow persisted despite sync being disabled
+		
+		if ( get_option( 'patreon-post-import-in-progress', false ) ) {
+						
+			self::$patreon_content_sync->import_posts_from_patreon();
+			
+		}
+
+	}
+	
 }
