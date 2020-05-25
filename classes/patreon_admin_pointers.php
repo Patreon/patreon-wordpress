@@ -140,7 +140,7 @@ class Patreon_Admin_Pointers {
 		$plugin_activated =	get_option( 'patreon-plugin-first-activated' );
 
 		// Set to appear to installations completed until a week after date of this commit
-		if ( $plugin_activated > 10000000005555 ) {
+		if ( $plugin_activated > 1590510554 ) {
 			return;
 		}
 		
