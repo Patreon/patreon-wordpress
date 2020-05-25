@@ -103,6 +103,8 @@ It is  difficult to protect videos due the intensive bandwidth requirements of h
 * Added status indicators for import progress to option screen
 * Made it possible to do manual import of posts without turning on syncing
 * Made it possible to unlock PW only gated content with a PMP membership from the same $ level
+* Combined category/taxonomy setting code to simpler wp_set_object_terms
+* Various bugs about creating/inserting into new category/terms fixed. JS adjusted accordingly.
 
 = 1.5.5 =
 
@@ -295,6 +297,8 @@ Nothing will be changed at your site - the plugin will just connect your site to
 * Added status indicators for import progress to option screen
 * Made it possible to do manual import of posts without turning on syncing
 * Made it possible to unlock PW only gated content with a PMP membership from the same $ level
+* Combined category/taxonomy setting code to simpler wp_set_object_terms
+* Various bugs about creating/inserting into new category/terms fixed. JS adjusted accordingly.
 
 = 1.5.5 =
 
