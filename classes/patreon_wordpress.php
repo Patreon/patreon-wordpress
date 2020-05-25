@@ -2513,8 +2513,8 @@ class Patreon_Wordpress {
 		$return = true;
 		$select = '';
 		
-		if ( isset( $_REQUEST['patreon_sync_post_term'] ) ) {
-			$selected_term = $_REQUEST['patreon_sync_post_term'];
+		if ( isset( $_REQUEST['patreon_sync_post_category'] ) ) {
+			$selected_taxonomy = $_REQUEST['patreon_sync_post_category'];
 			$return = false;
 		}
 		

@@ -551,7 +551,7 @@
 		// Post sync post - category selection dropdown action
 		jQuery( "#patreon_sync_post_category" ).on( 'change', function(e) {
 			
-			var patreon_wordpress_post_taxonomy = jQuery(this).val();
+			var patreon_sync_post_category = jQuery(this).val();
 			var patreon_wordpress_input_target = jQuery('#patreon_sync_post_term');
 			var patreon_wordpress_general_error = 'Sorry - could not get the category list for this post type';
 			
@@ -566,7 +566,7 @@
 				cache: false,
 				data: {
 					action: 'patreon_wordpress_get_terms_for_taxonomy',
-					patreon_wordpress_post_taxonomy: patreon_wordpress_post_taxonomy,
+					patreon_sync_post_category: patreon_sync_post_category,
 				},
 				success: function( response ) {
 					if( response == '' ) {

@@ -140,15 +140,17 @@ class Patreon_Content_Sync {
 	
 	public function add_new_patreon_post( $patreon_post ) {
 		
-		$post_category = get_option( 'patreon-sync-post-term', '1' );
-		$post_author = get_option( 'patreon-post-author-for-synced-posts', 1 );
+		$post_type         = get_option( 'patreon-sync-post-type', 'post' );
+		$post_category     = get_option( 'patreon-sync-post-category', 'category' );
+		$post_term_id         = get_option( 'patreon-sync-post-term', '1' );
+		$post_author       = get_option( 'patreon-post-author-for-synced-posts', 1 );
 		
 		$post                  = array();
 		$post['post_title']    = $patreon_post['data']['attributes']['title'];
 		$post['post_content']  = $patreon_post['data']['attributes']['content'];
 		$post['post_status']   = 'publish';
 		$post['post_author']   = $post_author;
-		$post['post_category'] = array( $post_category );
+		$post['post_type']     = $post_type;
 		
 		// Parse and handle the images inside the post:
 		
@@ -209,6 +211,13 @@ class Patreon_Content_Sync {
 		
 		}
 		
+		// Set category/taxonomy
+		
+		$post_term      = get_term( $post_term_id, $post_category );
+		$post_term_slug = $post_term->slug;
+
+		wp_set_object_terms( $inserted_post_id, $post_term_slug, $post_category );
+				
 		update_post_meta( $inserted_post_id, 'patreon-post-id', $patreon_post['data']['id'] );
 		update_post_meta( $inserted_post_id, 'patreon-post-url', $patreon_post['data']['attributes']['url'] );
 		
