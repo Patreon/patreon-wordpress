@@ -87,7 +87,7 @@ class Patreon_Protect {
 
 		if ( strpos( $protocol_snipped_attachment_url, $protocol_snipped_baseurl ) !== false ) {
 
-			$search_attachment_url = preg_replace( '/-\d+x\d+(?=\.(jpg|jpeg|png|gif)$)/i', '', $attachment_url );
+			$search_attachment_url = preg_replace( '/-\d+x\d+(?=\.(jpg|jpeg|png|gif|zip|pdf)$)/i', '', $attachment_url );
 			$search_attachment_url = str_replace( $upload_dir_paths['baseurl'] . '/', '', $search_attachment_url );
 	
 			$cache_key     = 'thumb_attachment_id_url_' . md5( $attachment_url );
@@ -104,7 +104,7 @@ class Patreon_Protect {
 	
 			if ( $attachment_id == false OR $attachment_id = '' ) {
 				
-				$search_attachment_url = preg_replace( '/-\d+x\d+(?=\.(jpg|jpeg|png|gif)$)/i', '', $protocol_snipped_attachment_url );
+				$search_attachment_url = preg_replace( '/-\d+x\d+(?=\.(jpg|jpeg|png|gif|zip|pdf)$)/i', '', $protocol_snipped_attachment_url );
 				$search_attachment_url = str_replace( $protocol_snipped_baseurl . '/', '', $search_attachment_url );		
 
 				$attachment_id = $wpdb->get_var( $wpdb->prepare( "SELECT wposts.ID FROM $wpdb->posts wposts, $wpdb->postmeta wpostmeta WHERE wposts.ID = wpostmeta.post_id AND wpostmeta.meta_key = '_wp_attached_file' AND wpostmeta.meta_value = '%s' AND wposts.post_type = 'attachment'", $search_attachment_url ) );
@@ -226,7 +226,7 @@ class Patreon_Protect {
 		if ( !$patreon_level ) {
 			$patreon_level = 0;
 		}
-		
+
 		// If no level was set for image or it was 0, just serve the image.
 		if ( $patreon_level == 0 ) {
 			Patreon_Protect::readAndServeImage( $image );
@@ -635,8 +635,8 @@ class Patreon_Protect {
 
 		$append = PHP_EOL . "# BEGIN Patreon WordPress Image Protection
 RewriteEngine On
-RewriteBase /		
-RewriteCond %{REQUEST_FILENAME} (\.png|\.jpg|\.gif|\.jpeg|\.bmp)
+RewriteBase /
+RewriteCond %{REQUEST_FILENAME} (\.png|\.jpg|\.gif|\.jpeg|\.bmp|\.zip|\.pdf)
 RewriteCond %{HTTP_REFERER} !^wp-admin [NC]
 RewriteRule ^" . $upload_dir . "/(.*)$ index.php?patreon_action=serve_patron_only_image&patron_only_image=$1 [QSA,L]
 # END Patreon WordPress".PHP_EOL;
