@@ -58,6 +58,57 @@ class Patreon_User_Profiles {
 
 		}
 		
+		// Add disconnect field 
+		global $user_id;
+		
+		if ( current_user_can( 'manage_options' ) OR ( isset( $user_id ) AND ( get_current_user_id() == $user_id  ) ) ) {
+			
+			// This is either an admin in profile page or a user who is viewing his/her own profile page. Go ahead.
+			
+			
+					?>
+
+			<br />
+
+			<h3><?php _e( "Patreon account", "blank" ); ?></h3>
+		
+			<?php
+			
+				// Check if this is a connected account.
+				
+				$linked_patreon_account = get_user_meta( $user_id, 'patreon_user_id', true );
+			
+				// get_user_meta returns empty string with the above if the meta does not exist or is blank
+				if ( $linked_patreon_account == '' ) {
+					// Not a linked account.
+					$connect_disconnect_patreon_text = 'Connect your site account to your Patreon account';
+					$connect_disconnect_button_text = 'Connect to Patreon';
+				}
+				if ( $linked_patreon_account != '' ) {
+					// A linked account
+					$connect_disconnect_patreon_text = 'Disconnect your site account from your  Patreon account';
+					$connect_disconnect_button_text = 'Disconnect from Patreon';
+				}
+			
+			
+			?>
+			
+
+			<table class="form-table">
+				<tr>
+					<th><label for="patreon_user"><?php echo $connect_disconnect_patreon_text; ?></label></th>
+					<td>
+						<button id="patreon_wordpress_start_post_import" class="button button-primary button-large" [pw_input_target="#patreon_wp_post_import_status" target=""><?php echo $connect_disconnect_button_text; ?></button><br />
+					</td>
+				</tr>
+			</table>
+		
+		<?php
+			
+			
+			
+		}
+		
 	}
 
 	function save_patreon_user_profile_fields( $user_id ) {
@@ -76,6 +127,7 @@ class Patreon_User_Profiles {
 		// update_user_meta( $user_id, 'patreon_created', $_POST['patreon_created'] );
 		// update_user_meta( $user_id, 'user_firstname', $_POST['province'] );
 		// update_user_meta( $user_id, 'user_lastname', $_POST['postalcode'] );
+		
 		
 	}
 

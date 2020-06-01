@@ -484,4 +484,11 @@ class Patreon_Login {
 		return false;
 		
 	}
+
+	public static function disconnect_account_from_patreon() {
+		
+		// Disconnects an account from Patreon.
+
+	}
+	
 }
