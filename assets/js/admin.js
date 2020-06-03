@@ -313,6 +313,52 @@
 			
 		});
 		
+		jQuery(document).on( 'click', '#patreon_wordpress_disconnect_patreon_account', function(e) {
+			
+			e.preventDefault();
+			var pw_input_target = jQuery( this ).attr( 'pw_input_target' );
+			
+			jQuery.ajax({
+				url: ajaxurl,
+				type:"POST",
+				dataType : 'html',
+				data: {
+					action: 'patreon_wordpress_disconnect_patreon_account',
+					patreon_disconnect_user_id: jQuery( this ).attr( 'patreon_disconnect_user_id' ),
+				},
+				beforeSend: function(e) {
+					jQuery( '#patreon_wordpress_user_profile_account_connection_wrapper' ).html( 'A moment...' );
+				},
+				success: function( response ) {
+					jQuery( '#patreon_wordpress_user_profile_account_connection_wrapper' ).html( response );
+				},
+			});		
+			
+		});
+		
+		jQuery(document).on( 'click', '#patreon_wordpress_connect_patreon_account', function(e) {
+			// Disconnects a connected Patreon account from local WP account. Does not contact the api
+			e.preventDefault();
+			
+						
+			jQuery.ajax({
+				url: ajaxurl,
+				type:"POST",
+				dataType : 'html',
+				data: {
+					action: 'patreon_wordpress_disconnect_account_from_patreon',
+					user_id: jQuery( this ).attr( "patreon_user_id" ),
+				},
+				success: function( response ) {
+					jQuery( '#patreon_wp_post_import_status' ).empty();
+					jQuery( '#patreon_wp_post_import_status' ).html( 'Started a post import' );
+					jQuery( '#patreon_wp_post_import_status' ).css( 'color', '#129500' );
+					
+				},
+			});		
+			
+		});
+		
 
 		jQuery(document).on( 'click', '#patreon_wordpress_save_post_sync_category', function(e) {
 			

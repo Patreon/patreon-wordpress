@@ -488,7 +488,32 @@ class Patreon_Login {
 	public static function disconnect_account_from_patreon() {
 		
 		// Disconnects an account from Patreon.
+		
+		$user_id_to_disconnect_from_patreon = $_REQUEST['patreon_disconnect_user_id'];
+		$user = wp_get_current_user();
 
+		if ( current_user_can( 'manage_options' ) OR $user->ID == $user_id_to_disconnect_from_patreon ) {
+			
+			// Delete all Patreon user meta for this WP user id here
+			
+			?>
+				Disconnected! Now you can connect your site account to another Patreon account.
+				<table class="form-table">
+					<tr>
+						<th><label for="patreon_user">Connect your site account to your Patreon account</label></th>
+						<td>
+							<button id="patreon_wordpress_connect_patreon_account" class="button button-primary button-large" target="">Connect to Patreon</button><br />
+						</td>
+					</tr>
+				</table>
+			
+			<?php
+
+		}
+		else {
+			echo 'Sorry, you must be an admin or owner of this account to disconnect it from Patreon';
+		}
+		exit;
 	}
 	
 }

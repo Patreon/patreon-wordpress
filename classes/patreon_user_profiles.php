@@ -77,34 +77,39 @@ class Patreon_User_Profiles {
 				// Check if this is a connected account.
 				
 				$linked_patreon_account = get_user_meta( $user_id, 'patreon_user_id', true );
-			
-				// get_user_meta returns empty string with the above if the meta does not exist or is blank
-				if ( $linked_patreon_account == '' ) {
-					// Not a linked account.
-					$connect_disconnect_patreon_text = 'Connect your site account to your Patreon account';
-					$connect_disconnect_button_text = 'Connect to Patreon';
+				
+				if ( $linked_patreon_account == '' AND ( isset( $user_id ) AND ( get_current_user_id() == $user_id  ) ) ) {
+					// Only show this if the current user is the owner of the profile - an admin cant link a user's Patreon account for that user
+					?>
+						<div id="patreon_wordpress_user_profile_account_connection_wrapper">
+							<table class="form-table">
+								<tr>
+									<th><label for="patreon_user">Connect your site account to your Patreon account</label></th>
+									<td>
+										<button id="patreon_wordpress_connect_patreon_account" class="button button-primary button-large" target="">Connect to Patreon</button><br />
+									</td>
+								</tr>
+							</table>
+						</div>
+					<?php
 				}
+				
 				if ( $linked_patreon_account != '' ) {
-					// A linked account
-					$connect_disconnect_patreon_text = 'Disconnect your site account from your  Patreon account';
-					$connect_disconnect_button_text = 'Disconnect from Patreon';
+					// Admins can disconnect someone's account as well as the user himself/herself
+					?>
+						<div id="patreon_wordpress_user_profile_account_connection_wrapper">
+							<table class="form-table">
+								<tr>
+									<th><label id="patreon_wordpress_disconnect_patreon_account_label" for="patreon_user">Disconnect your site account from your  Patreon account</label></th>
+									<td id="patreon_wordpress_disconnect_patreon_account_content">
+										<button id="patreon_wordpress_disconnect_patreon_account" patreon_disconnect_user_id="<?php echo $user_id; ?>" class="button button-primary button-large" target="">Disconnect from Patreon</button><br />
+									</td>
+								</tr>
+							</table>
+						</div>
+					<?php
 				}
-			
-			
-			?>
-			
-
-			<table class="form-table">
-				<tr>
-					<th><label for="patreon_user"><?php echo $connect_disconnect_patreon_text; ?></label></th>
-					<td>
-						<button id="patreon_wordpress_start_post_import" class="button button-primary button-large" [pw_input_target="#patreon_wp_post_import_status" target=""><?php echo $connect_disconnect_button_text; ?></button><br />
-					</td>
-				</tr>
-			</table>
-		
-		<?php
-			
+				
 			
 			
 		}

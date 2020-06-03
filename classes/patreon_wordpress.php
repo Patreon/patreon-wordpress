@@ -14,6 +14,7 @@ class Patreon_Wordpress {
 	public static $patreon_options;
 	public static $patron_metabox;
 	public static $patreon_compatibility;
+	public static $patreon_login;
 	public static $patreon_user_profiles;
 	public static $patreon_admin_pointers;
 	public static $patreon_content_sync;
@@ -53,6 +54,7 @@ class Patreon_Wordpress {
 		self::$patreon_user_profiles  = new Patreon_User_Profiles;
 		self::$patreon_protect        = new Patreon_Protect;
 		self::$patreon_compatibility  = new Patreon_Compatibility;
+		self::$patreon_login          = new Patreon_Login;
 		
 		if ( is_admin() ) {
 			self::$patreon_admin_pointers = new Patreon_Admin_Pointers;	
@@ -105,6 +107,8 @@ class Patreon_Wordpress {
 		add_action( "wp_ajax_patreon_wordpress_set_post_author_for_post_sync", array( $this, "set_post_author_for_post_sync" ) );
 		add_action( "wp_ajax_nopriv_patreon_wordpress_set_post_author_for_post_sync", array( $this , "set_post_author_for_post_sync" ) );
 		add_filter( 'cron_schedules', array( &$this, 'add_patreon_cron_schedules' ) );
+		add_action( "wp_ajax_patreon_wordpress_disconnect_patreon_account", array( self::$patreon_login , "disconnect_account_from_patreon" ) );
+		add_action( "wp_ajax_nopriv_patreon_wordpress_disconnect_patreon_account", array( self::$patreon_login , "disconnect_account_from_patreon" ) );
 		
 		// Schedule an action if it's not already scheduled
 		if ( !wp_next_scheduled( 'patreon_five_minute_action' ) ) {
