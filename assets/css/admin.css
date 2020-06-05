@@ -421,3 +421,14 @@
 	margin-top: 10px;
 	font-weight: bold;
 }
+
+#patreon_api_version_warning {
+	display: block;
+	padding: 10px;
+}
+
+.patreon_api_version_warning_important {
+	color: #00a0d2;
+	font-weight: bold;
+	display: inline;
+}

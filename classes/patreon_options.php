@@ -386,15 +386,25 @@ class Patreon_Options {
 												</select>
 											</td>
                                         </tr>
-
+										
+										<?php
+										
+											$api_version_warning = '';
+											
+											if ( get_option( 'patreon-installation-api-version', 2 ) == '1' ) {
+												$api_version_warning = '<div id="patreon_api_version_warning" class="patreon_api_version_warning_inside_options"><div class="patreon_api_version_warning_important">' . PATREON_WARNING_IMPORTANT . '</div>' . PATREON_API_VERSION_WARNING . '</div>';
+											}
+										?>
+										
                                         <tr valign="top">
 											<th scope="row">
 												<strong>Sync Patreon posts</strong>
-												<div class="patreon-options-info">If Yes, the plugin will sync your posts from Patreon to your WP site on an ongoing basis. Recommended: Yes</div>
+												<div class="patreon-options-info">If Yes, the plugin will sync your posts from Patreon to your WP site on an ongoing basis. Recommended: Yes
+												<?php echo $api_version_warning; ?></div>
 											</th>
 											<td>
 												<?php
-																									
+														
 													$sync_posts_selected = '';
 													$sync_posts_unselected = '';
 													
