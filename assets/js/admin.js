@@ -341,7 +341,6 @@
 			e.preventDefault();
 
 			var patreon_login_url = jQuery( this ).attr( 'patreon_login_url' );
-			console.log(patreon_login_url);
 			window.location.replace( patreon_login_url );
 			
 		});

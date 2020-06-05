@@ -131,7 +131,7 @@ class Patreon_User_Profiles {
 						</div>
 					<?php
 				}
-			
+		
 		}
 		
 	}
