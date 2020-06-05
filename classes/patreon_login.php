@@ -489,15 +489,14 @@ class Patreon_Login {
 		
 		// Disconnects an account from Patreon.
 		
-		$user_id_to_disconnect_from_patreon = $_REQUEST['patreon_disconnect_user_id'];
 		$user = wp_get_current_user();
 
-		if ( current_user_can( 'manage_options' ) OR $user->ID == $user_id_to_disconnect_from_patreon ) {
+		if ( current_user_can( 'manage_options' ) OR $user->ID == $_REQUEST['patreon_disconnect_user_id'] ) {
 			
 			// Delete all Patreon user meta for this WP user id here
 			// User id to delete:
 			
-			$user_to_disconnect = get_user_by( 'ID', $user_id_to_disconnect_from_patreon );
+			$user_to_disconnect = get_user_by( 'ID', $_REQUEST['patreon_disconnect_user_id'] );
 			
 			if ( isset( $user_to_disconnect->ID ) ) {
 			
@@ -553,14 +552,10 @@ class Patreon_Login {
 				?>
 					Disconnected! Only the owner of this user account can reconnect it to his/her Patreon account.
 		
-				
 				<?php
 				
 			}
 			
-			
-			
-
 		}
 		else {
 			echo 'Sorry, you must be an admin or owner of this account to disconnect it from Patreon';

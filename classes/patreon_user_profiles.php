@@ -65,8 +65,7 @@ class Patreon_User_Profiles {
 			
 			// This is either an admin in profile page or a user who is viewing his/her own profile page. Go ahead.
 			
-			
-					?>
+			?>
 
 			<br />
 
@@ -117,7 +116,7 @@ class Patreon_User_Profiles {
 						
 						$disconnect_label = 'Disconnect this site account from linked Patreon account';
 					
-					} 
+					}
 					
 					?>
 						<div id="patreon_wordpress_user_profile_account_connection_wrapper">
@@ -132,8 +131,6 @@ class Patreon_User_Profiles {
 						</div>
 					<?php
 				}
-				
-			
 			
 		}
 		
