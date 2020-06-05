@@ -2107,7 +2107,7 @@ class Patreon_Wordpress {
 		
 		// Does an update of creator tiers from the api
 		
-		if ( get_option( 'patreon-client-id', false ) 
+		if ( get_option( 'patreon-client-id', false )
 				&& get_option( 'patreon-client-secret', false ) 
 				&& get_option( 'patreon-creators-access-token' , false )
 		) {
@@ -2118,7 +2118,7 @@ class Patreon_Wordpress {
 				
 		}
 
-		if ( isset( $creator_info ) AND is_array( $creator_info['included'] ) AND isset( $creator_info['included'][1]['type'] ) AND $creator_info['included'][1]['type'] == 'reward' ) {
+		if ( isset( $creator_info ) AND isset( $creator_info['included'] ) AND is_array( $creator_info['included'] ) AND isset( $creator_info['included'][1]['type'] ) AND $creator_info['included'][1]['type'] == 'reward' ) {
 
 			// Creator info acquired. Update.
 			// We want to sort tiers according to their $ level.
@@ -2727,7 +2727,7 @@ class Patreon_Wordpress {
 		
 		$webhook_added = $api_client->add_post_webhook();
 
-		if ( is_array( $webhook_added ) AND $webhook_added['data']['type'] == 'webhook' ) {
+		if ( is_array( $webhook_added ) AND isset( $webhook_added['data']['type'] ) AND $webhook_added['data']['type'] == 'webhook' ) {
 			
 			// Save webhook info
 			
