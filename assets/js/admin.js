@@ -337,10 +337,21 @@
 		});
 		
 		jQuery(document).on( 'click', '#patreon_wordpress_connect_patreon_account', function(e) {
+			
+			e.preventDefault();
+
+			var patreon_login_url = jQuery( this ).attr( 'patreon_login_url' );
+			console.log(patreon_login_url);
+			window.location.replace( patreon_login_url );
+			
+		});
+		
+		jQuery(document).on( 'click', '#patreon_wordpress_connect_patreon_account', function(e) {
+			
 			// Disconnects a connected Patreon account from local WP account. Does not contact the api
+			
 			e.preventDefault();
 			
-						
 			jQuery.ajax({
 				url: ajaxurl,
 				type:"POST",
