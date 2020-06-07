@@ -117,7 +117,24 @@ class Patreon_Wordpress {
 	
 		add_action( 'patreon_five_minute_action', array( &$this, 'patreon_five_minute_cron_job' ) );		
 		
+		add_action( 'rest_api_init', array( $this, 'register_post_metadata' ) );
+		
 	}
+
+	public static function register_post_metadata() {
+
+		$args = array(
+			'type' => 'integer',
+			'description' => 'Patreon meta data',
+			'single' => true,
+			'show_in_rest' => true
+		);
+
+		register_meta('post', 'patreon-level', $args);
+		register_meta('post', 'patreon-total-patronage-level', $args);
+	}
+
+
 	public static function getPatreonUser( $user = false ) {
 		
 		if ( !$user ) {
