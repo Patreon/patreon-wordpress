@@ -2615,23 +2615,35 @@ class Patreon_Wordpress {
 	}
 	public function get_images_info_from_content( $content ) {
 		
-		preg_match_all( '/<img.+src=[\'"](?P<src>.+?)[\'"].*>/i', $content, $matches );
+		// Get images out of content using dom
+		$dom_document = new domDocument;
+		$save_errors  = libxml_use_internal_errors( true );
+		$dom_document->loadHTML( $content ); 
+		$dom_document->preserveWhiteSpace = false;
+		$images = $dom_document->getElementsByTagName( 'img' );
+		libxml_use_internal_errors($save_errors);
 		
-		$images = $matches[1];
+		$parsed_images_info = array();
+	 
+		foreach ($images as $image) {
+    
+			$url =  $image->getAttribute('src');
 		
-		$info = array();
+			$details = parse_url($url);
+
+			$exploded_path = array_reverse( explode('/', $details['path'] ) );
+
+			// First element is the Patreon given filename, second is unique identifier
 			
-		foreach ( $images as $key => $value ) {
-						
-			$info[] = array( 
-				'filename'    => basename( preg_replace('/\?.*/', '', $images[$key] ) ),
-				'url' => $images[$key],
+			$parsed_images_info[] = array( 
+					'filename'    => $exploded_path[1] . '_' . $exploded_path[0],
+					'url' => $url,
 			);
-			
+
 		}
-		
-		if ( count( $info ) > 0 ) {
-			return $info;
+
+		if ( count( $parsed_images_info ) > 0 ) {
+			return $parsed_images_info;
 		}
 		
 		return false;

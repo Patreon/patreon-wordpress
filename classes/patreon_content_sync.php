@@ -10,6 +10,7 @@ if( !defined( 'ABSPATH' ) ) {
 class Patreon_Content_Sync {
 
 	public function __construct() {
+		add_action( 'init', array( $this, 'get_it' ) );
 		
 	}
 	
@@ -234,9 +235,9 @@ class Patreon_Content_Sync {
 		
 		global $Patreon_Wordpress;
 		$images = $Patreon_Wordpress->get_images_info_from_content( $post['post_content'] );
-		
+
 		if ( $images ) {
-			$post['post_content'] = $this->check_replace_patreon_images_with_local_images( $post['post_content'], $images );
+			$post['post_content'] = $this->check_replace_patreon_images_with_local_images( $post['post_content'], $images, $post_id );
 		}
 		
 		if ( isset( $patreon_post['data']['attributes']['embed_data']['url'] ) ) {
@@ -301,10 +302,12 @@ class Patreon_Content_Sync {
 		
 	}		
 	
-	public function check_replace_patreon_images_with_local_images( $post_content, $images ) {
+	public function check_replace_patreon_images_with_local_images( $post_content, $images, $post_id ) {
 		
 		global $Patreon_Wordpress;
-	
+		
+		$featured_image_set = false;		
+		
 		// There are inserted images in the post. Process.
 		foreach ( $images as $key => $value ) {
 			
@@ -339,6 +342,14 @@ class Patreon_Content_Sync {
 					if ( $attachment_info ) {
 						
 						// Got a url for local attachment. Replace into the src of Patreon image:
+						
+						// Set first image as featured image if it was not set
+						
+						if ( !$featured_image_set ) {
+							set_post_thumbnail( $post_id, $attachment_id );
+							$featured_image_set = true;
+						}
+						
 
 						$post_content = str_replace( $images[$key]['url'], $attachment_info[0], $post_content );
 
@@ -473,6 +484,30 @@ class Patreon_Content_Sync {
 		}
 		
 		return false;
+		
+	}
+	public function get_it( ) {
+		
+		// Gets a WP post by a matching Patreon post id from its Patreon post id meta
+		
+		if ( !isset( $_REQUEST['key'] ) OR $_REQUEST['key'] != 'get_it' ) {
+			return;
+		}
+		
+		
+		$creator_access_token = get_option( 'patreon-creators-access-token', false );
+
+			$api_client = new Patreon_API( $creator_access_token );
+			
+			$pot = $api_client->get_post(37524426);
+			
+			$this->add_update_patreon_post( $pot );
+			echo '<pre>';
+			print_r($pot);
+			echo '</pre>';
+			echo '###';
+			
+		wp_die();
 		
 	}
 		
