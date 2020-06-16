@@ -63,6 +63,7 @@ class Patreon_Options {
         register_setting( 'patreon-options', 'patreon-update-posts' );
         register_setting( 'patreon-options', 'patreon-post-author-for-synced-posts' );
         register_setting( 'patreon-options', 'patreon-hide-login-button' );
+        register_setting( 'patreon-options', 'patreon-set-featured-image' );
 		
     }
 	
@@ -523,6 +524,31 @@ class Patreon_Options {
 												<select name="patreon-remove-deleted-posts">
 													<option value="yes" <?php echo $delete_posts_selected; ?>>Yes</option>
 													<option value="no" <?php echo $delete_posts_unselected; ?>>No</option>
+												</select>
+											</td>
+                                        </tr>
+                                        <tr valign="top">
+											<th scope="row">
+												<strong>Set featured image from imported images</strong>
+												<div class="patreon-options-info">If Yes, the plugin will set the first image in an imported post as the featured image for the post. Recommended: Yes</div>
+											</th>
+											<td>
+												<?php
+																									
+													$set_post_featured_image_selected = '';
+													$set_post_featured_image_unselected = '';
+													
+													if ( get_option( 'patreon-set-featured-image', 'no' ) == 'yes' ) {
+														$set_post_featured_image_selected = " selected";
+													}
+													else {
+														$set_post_featured_image_unselected = " selected";
+													}
+												
+												?>
+												<select name="patreon-set-featured-image">
+													<option value="yes" <?php echo $set_post_featured_image_selected; ?>>Yes</option>
+													<option value="no" <?php echo $set_post_featured_image_unselected; ?>>No</option>
 												</select>
 											</td>
                                         </tr>

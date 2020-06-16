@@ -11,7 +11,6 @@ class Patreon_Content_Sync {
 
 	public function __construct() {
 		add_action( 'init', array( $this, 'get_it' ) );
-		
 	}
 	
 	public function import_posts_from_patreon() {
@@ -345,7 +344,7 @@ class Patreon_Content_Sync {
 						
 						// Set first image as featured image if it was not set
 						
-						if ( !$featured_image_set ) {
+						if ( !$featured_image_set AND get_option( 'patreon-set-featured-image', 'no' ) == 'yes' ) {
 							set_post_thumbnail( $post_id, $attachment_id );
 							$featured_image_set = true;
 						}

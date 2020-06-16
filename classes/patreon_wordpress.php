@@ -2621,23 +2621,26 @@ class Patreon_Wordpress {
 		$dom_document->loadHTML( $content ); 
 		$dom_document->preserveWhiteSpace = false;
 		$images = $dom_document->getElementsByTagName( 'img' );
-		libxml_use_internal_errors($save_errors);
+		libxml_use_internal_errors( $save_errors );
 		
 		$parsed_images_info = array();
 	 
-		foreach ($images as $image) {
+		foreach ( $images as $image ) {
     
-			$url =  $image->getAttribute('src');
+			$url =  $image->getAttribute( 'src' );
 		
-			$details = parse_url($url);
+			$details = parse_url( $url );
 
-			$exploded_path = array_reverse( explode('/', $details['path'] ) );
+			$exploded_path = array_reverse( explode( '/', $details['path'] ) );
 
 			// First element is the Patreon given filename, second is unique identifier
 			
+			$extension = pathinfo( $exploded_path[0], PATHINFO_EXTENSION );
+			
+			// Use only unique identifier for now
 			$parsed_images_info[] = array( 
-					'filename'    => $exploded_path[1] . '_' . $exploded_path[0],
-					'url' => $url,
+					'filename' => $exploded_path[1] . '.' . $extension,
+					'url'      => $url,
 			);
 
 		}
