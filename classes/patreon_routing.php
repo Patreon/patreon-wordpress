@@ -614,7 +614,14 @@ class Patreon_Routing {
 			header( 'X-Robots-Tag: noindex, nofollow' );
 			 
 			// Make sure browsers dont cache this
-			header( 'cache-control: no-cache, must-revalidate, max-age=0' );			
+			header( 'cache-control: no-cache, must-revalidate, max-age=0' );
+
+			// Abort if apiv ersion used is not v2
+			$api_version    = get_option( 'patreon-installation-api-version', '1' );
+					
+			if ( $api_version != '2' ) {
+				return;
+			}			
 
 			if( array_key_exists( 'patreon-webhooks', $wp->query_vars ) ) {
 				

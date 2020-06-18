@@ -437,7 +437,7 @@ class Patreon_Options {
 														$post_type_select = $Patreon_Wordpress->make_post_type_select( $sync_post_type );
 														$taxonomy_select  = $Patreon_Wordpress->make_taxonomy_select( $sync_post_type, $sync_post_category );
 														$term_select      = $Patreon_Wordpress->make_term_select( $sync_post_type, $sync_post_category, $sync_post_term );
-														$post_import_status_color = "9d9d9d";
+														$post_sync_category_status_color = "9d9d9d";
 														
 													
 													?>
@@ -538,7 +538,15 @@ class Patreon_Options {
 														$post_import_status = "There is an ongoing post import";
 														$post_import_status_color = "129500";
 													}
-												
+													
+													$api_version    = get_option( 'patreon-installation-api-version', '1' );
+													$sync_posts     = get_option( 'patreon-sync-posts', 'no' );
+															
+													if ( $api_version != '2' AND $sync_posts == 'yes' ) {
+														$post_import_status = 'Cant import posts - Wrong api version! Please upgrade to v2 using the tutorial <a href="https://www.patreondevelopers.com/t/how-to-upgrade-your-patreon-wordpress-to-use-api-v2/3249" target="_blank">here</a>';
+														$post_import_status_color = "f31d00";
+													}	
+													
 												?>
 												<div class="patreon-options-info">Start an import of your posts from Patreon if you haven't done it before. After import of existing posts is complete, new posts will automatically be imported and existing posts automatically updated so you don't need to do this again.<div id="patreon_wp_post_import_status" style="color: #<?php echo $post_import_status_color ?>;"><?php echo $post_import_status; ?></div></div>
 											</th>

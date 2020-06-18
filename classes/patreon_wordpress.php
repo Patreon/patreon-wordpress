@@ -807,6 +807,18 @@ class Patreon_Wordpress {
 		$show_site_disconnect_success_notice = get_option( 'patreon-show-site-disconnect-success-notice', false );
 
 		// Queue this message immediately after activation if not already shown
+
+		$api_version    = get_option( 'patreon-installation-api-version', '1' );
+		$sync_posts   = get_option( 'patreon-sync-posts', 'no' );
+				
+		if ( $api_version != '2' AND $sync_posts == 'yes' ) {
+
+			?>
+				 <div class="notice notice-warning is-dismissible  patreon-wordpress" id="patreon_site_disconnect_success_notice">
+					<p><?php echo PATREON_WARNING_POST_SYNC_SET_WITHOUT_API_V2; ?></p>
+				</div>
+			<?php	
+		}
 		
 		if( $show_site_disconnect_success_notice ) {
 			
@@ -975,7 +987,17 @@ class Patreon_Wordpress {
 		if( !( is_admin() && current_user_can( 'manage_options' ) ) ) {
 			return;
 		}
-	
+		
+		// Abort if apiv ersion used is not v2 
+
+		$api_version    = get_option( 'patreon-installation-api-version', '1' );
+		$sync_posts     = get_option( 'patreon-sync-posts', 'no' );
+				
+		if ( $api_version != '2' ) {
+			echo 'apiv2fail';
+			exit;
+		}	
+		
 		update_option( 'patreon-post-import-in-progress', true );
 		delete_option( 'patreon-post-import-next-cursor' );
 		
@@ -2679,6 +2701,13 @@ class Patreon_Wordpress {
 		
 		// Avoid infinite redirects due to https url check at add_patreon_webhook function in api class checking patreon-webhook uri
 		if (strpos( $_SERVER['REQUEST_URI'], 'patreon-webhook' ) !== false ) {
+			return;
+		}
+		
+		// Abort if site is using api v1
+		$api_version    = get_option( 'patreon-installation-api-version', '1' );
+		
+		if ( $api_version != '2' ) {
 			return;
 		}
 
