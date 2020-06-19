@@ -3,8 +3,8 @@ Contributors: wordpressorg@patreon.com, codebard
 Tags: patreon, membership, members
 Requires at least: 4.0
 Requires PHP: 5.4
-Tested up to: 5.4.1
-Stable tag: 1.5.7
+Tested up to: 5.4.2
+Stable tag: 1.5.8
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -78,6 +78,15 @@ To make a locked post public again, just choose "Everyone" from the select box a
 It is  difficult to protect videos due the intensive bandwidth requirements of hosting video  and having to rely on third parties such as Youtube or Vimeo. Youtube allows you to set videos to ‘private’ but Vimeo offers extra controls by only allowing videos to be played on specific domains. Visit this guide to [protecting your video content with Vimeo](https://help.vimeo.com/hc/en-us/articles/224817847-Privacy-settings-overview).
 
 == Upgrade Notice ==
+
+= 1.5.8 =
+
+* Fixed an issue with image importing when syncing posts. Images should now import properly.
+* Now uses image's Patreon unique id when importing the image. This will allow accurate import of images. May re-import some images.
+* Added option to auto-set featured image for imported/synced post from within the images inside the post.
+* Added checks to disable post sync functions if site is using api v1
+* Added warning to post import section and post import function about upgrading to api v2 to use post sync
+* Added admin notification to warn about using post sync with apiv1
 
 = 1.5.7 =
 
@@ -285,6 +294,15 @@ Not at all - you can post different content totally independently at your site a
 Nothing will be changed at your site - the plugin will just connect your site to Patreon to allow communication in between your site and Patreon.
 
 == Changelog ==
+
+= 1.5.8 =
+
+* Fixed an issue with image importing when syncing posts. Images should now import properly.
+* Now uses image's Patreon unique id when importing the image. This will allow accurate import of images. May re-import some images.
+* Added option to auto-set featured image for imported/synced post from within the images inside the post.
+* Added checks to disable post sync functions if site is using api v1
+* Added warning to post import section and post import function about upgrading to api v2 to use post sync
+* Added admin notification to warn about using post sync with apiv1
 
 = 1.5.7 =
 
