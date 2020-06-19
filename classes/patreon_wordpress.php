@@ -807,18 +807,6 @@ class Patreon_Wordpress {
 		$show_site_disconnect_success_notice = get_option( 'patreon-show-site-disconnect-success-notice', false );
 
 		// Queue this message immediately after activation if not already shown
-
-		$api_version    = get_option( 'patreon-installation-api-version', '1' );
-		$sync_posts   = get_option( 'patreon-sync-posts', 'no' );
-				
-		if ( $api_version != '2' AND $sync_posts == 'yes' ) {
-
-			?>
-				 <div class="notice notice-warning is-dismissible  patreon-wordpress" id="patreon_site_disconnect_success_notice">
-					<p><?php echo PATREON_WARNING_POST_SYNC_SET_WITHOUT_API_V2; ?></p>
-				</div>
-			<?php	
-		}
 		
 		if( $show_site_disconnect_success_notice ) {
 			
@@ -987,17 +975,7 @@ class Patreon_Wordpress {
 		if( !( is_admin() && current_user_can( 'manage_options' ) ) ) {
 			return;
 		}
-		
-		// Abort if apiv ersion used is not v2 
-
-		$api_version    = get_option( 'patreon-installation-api-version', '1' );
-		$sync_posts     = get_option( 'patreon-sync-posts', 'no' );
-				
-		if ( $api_version != '2' ) {
-			echo 'apiv2fail';
-			exit;
-		}	
-		
+	
 		update_option( 'patreon-post-import-in-progress', true );
 		delete_option( 'patreon-post-import-next-cursor' );
 		
@@ -2637,38 +2615,23 @@ class Patreon_Wordpress {
 	}
 	public function get_images_info_from_content( $content ) {
 		
-		// Get images out of content using dom
-		$dom_document = new domDocument;
-		$save_errors  = libxml_use_internal_errors( true );
-		$dom_document->loadHTML( $content ); 
-		$dom_document->preserveWhiteSpace = false;
-		$images = $dom_document->getElementsByTagName( 'img' );
-		libxml_use_internal_errors( $save_errors );
+		preg_match_all( '/<img.+src=[\'"](?P<src>.+?)[\'"].*>/i', $content, $matches );
 		
-		$parsed_images_info = array();
-	 
-		foreach ( $images as $image ) {
-    
-			$url =  $image->getAttribute( 'src' );
+		$images = $matches[1];
 		
-			$details = parse_url( $url );
-
-			$exploded_path = array_reverse( explode( '/', $details['path'] ) );
-
-			// First element is the Patreon given filename, second is unique identifier
+		$info = array();
 			
-			$extension = pathinfo( $exploded_path[0], PATHINFO_EXTENSION );
-			
-			// Use only unique identifier for now
-			$parsed_images_info[] = array( 
-					'filename' => $exploded_path[1] . '.' . $extension,
-					'url'      => $url,
+		foreach ( $images as $key => $value ) {
+						
+			$info[] = array( 
+				'filename'    => basename( preg_replace('/\?.*/', '', $images[$key] ) ),
+				'url' => $images[$key],
 			);
-
+			
 		}
-
-		if ( count( $parsed_images_info ) > 0 ) {
-			return $parsed_images_info;
+		
+		if ( count( $info ) > 0 ) {
+			return $info;
 		}
 		
 		return false;
@@ -2714,15 +2677,14 @@ class Patreon_Wordpress {
 			return;
 		}
 		
-		// Avoid infinite redirects due to https url check at add_patreon_webhook function in api class checking patreon-webhook uri
-		if (strpos( $_SERVER['REQUEST_URI'], 'patreon-webhook' ) !== false ) {
+		$api_version = get_option( 'patreon-installation-api-version', '1' );
+
+		if ( $api_version != '2' ) {
 			return;
 		}
 		
-		// Abort if site is using api v1
-		$api_version    = get_option( 'patreon-installation-api-version', '1' );
-		
-		if ( $api_version != '2' ) {
+		// Avoid infinite redirects due to https url check at add_patreon_webhook function in api class checking patreon-webhook uri
+		if (strpos( $_SERVER['REQUEST_URI'], 'patreon-webhook' ) !== false ) {
 			return;
 		}
 
