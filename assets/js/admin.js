@@ -304,7 +304,15 @@
 					action: 'patreon_wordpress_start_post_import',
 				},
 				success: function( response ) {
+					
 					jQuery( '#patreon_wp_post_import_status' ).empty();
+					
+					if ( response == 'apiv2fail') {
+						jQuery( '#patreon_wp_post_import_status' ).html( 'Wrong api version! Please upgrade to v2 using the tutorial <a href="https://www.patreondevelopers.com/t/how-to-upgrade-your-patreon-wordpress-to-use-api-v2/3249" target="_blank">here</a>' );
+						jQuery( '#patreon_wp_post_import_status' ).css( 'color', '#f31d00' );
+						return;
+					}
+					
 					jQuery( '#patreon_wp_post_import_status' ).html( 'Started a post import' );
 					jQuery( '#patreon_wp_post_import_status' ).css( 'color', '#129500' );
 					

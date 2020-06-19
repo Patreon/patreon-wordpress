@@ -17,6 +17,16 @@ class Patreon_Content_Sync {
 		
 		// This function performs a full import of posts from Patreon using cron
 		
+		// Check if the site uses api v2. If not, abort.
+		
+		$api_version    = get_option( 'patreon-installation-api-version', '1' );
+
+		if ( $api_version != '2' ) {
+			// Cancel any ongoing imports.
+			delete_option( 'patreon-post-import-in-progress' );
+			return;
+		}
+		
 		// Check if an import is going on
 		
 		$post_import_in_progress = get_option( 'patreon-post-import-in-progress', false );
@@ -142,7 +152,7 @@ class Patreon_Content_Sync {
 		
 		$post_type         = get_option( 'patreon-sync-post-type', 'post' );
 		$post_category     = get_option( 'patreon-sync-post-category', 'category' );
-		$post_term_id         = get_option( 'patreon-sync-post-term', '1' );
+		$post_term_id      = get_option( 'patreon-sync-post-term', '1' );
 		$post_author       = get_option( 'patreon-post-author-for-synced-posts', 1 );
 		
 		$post                  = array();
