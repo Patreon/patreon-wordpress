@@ -10,7 +10,6 @@ if( !defined( 'ABSPATH' ) ) {
 class Patreon_Content_Sync {
 
 	public function __construct() {
-		add_action( 'init', array( $this, 'get_it' ) );
 	}
 	
 	public function import_posts_from_patreon() {
@@ -495,29 +494,6 @@ class Patreon_Content_Sync {
 		return false;
 		
 	}
-	public function get_it( ) {
-		
-		// Gets a WP post by a matching Patreon post id from its Patreon post id meta
-		
-		if ( !isset( $_REQUEST['key'] ) OR $_REQUEST['key'] != 'get_it' ) {
-			return;
-		}
-		
-		
-		$creator_access_token = get_option( 'patreon-creators-access-token', false );
 
-			$api_client = new Patreon_API( $creator_access_token );
-			
-			$pot = $api_client->get_post(37524426);
-			
-			$this->add_update_patreon_post( $pot );
-			echo '<pre>';
-			print_r($pot);
-			echo '</pre>';
-			echo '###';
-			
-		wp_die();
-		
-	}
 		
 }
