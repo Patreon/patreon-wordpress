@@ -40,9 +40,11 @@ class Patron_Metabox {
 		
 	}
 
-	function patreon_plugin_meta_box( $object, $box ) { 
+	function patreon_plugin_meta_box( $object, $box ) {
 	
 		$current_user = wp_get_current_user();
+		
+		global $post;
 			
 		$label    = 'Require the below membership tier or higher to view this post. (Makes entire post patron only)  <a href="https://www.patreondevelopers.com/t/patreon-wordpress-locking-options-guide/1135#heading--section-1?utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=post_locking_metabox_link_1&utm_term=" target="_blank">(?)</a>';
 		$readonly = '';
@@ -62,7 +64,7 @@ class Patron_Metabox {
 		<p>
 			<label for="patreon-level"><?php _e( $label, '1' ); ?></label>
 			<br><br>
-			<select id="patreon_level_select" name="patreon-level"<?php echo $disabled ?> pw_post_id="<?php echo $object->ID; ?>"><option value="<?php echo get_post_meta( $object->ID, 'patreon-level', true ); ?>">Loading...</option></select>			
+			<div id="patreon_level_select_wrapper"><select id="patreon_level_select" name="patreon-level"<?php echo $disabled ?> pw_post_id="<?php echo $object->ID; ?>"><option value="<?php echo get_post_meta( $object->ID, 'patreon-level', true ); ?>"><?php echo Patreon_Wordpress::make_tiers_select( $post ); ?></option></select> <img id="patreon_level_refresh" src="<?php echo PATREON_PLUGIN_ASSETS; ?>/img/refresh_tiers_18.png" style="width: 18px; height: 18px;" /></div>
 		</p>
 		
 		<p> If you set a precise amount in advanced settings below, or had one set before, that will be used instead.
@@ -103,7 +105,7 @@ class Patron_Metabox {
 		
 			<?php
 			
-			$label    = 'Require an active pledge at the time of this post’s creation to view this post. (optional) <a href="https://www.patreondevelopers.com/t/patreon-wordpress-locking-options-guide/1135#heading--section-2?utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=post_locking_metabox_link_3&utm_term=" target="_blank">(?)</a>';
+			$label    = 'Require a pledge active at the time of this post’s creation to view this post. (optional) This will make it so that only patrons who were patrons at or before the post date of this post can access this post. <a href="https://www.patreondevelopers.com/t/patreon-wordpress-locking-options-guide/1135#heading--section-2?utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=post_locking_metabox_link_3&utm_term=" target="_blank">(?)</a>';
 			$readonly = '';
 			
 			if ( !get_option( 'patreon-creator-id', false ) ) {

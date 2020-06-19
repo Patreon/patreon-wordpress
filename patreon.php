@@ -4,7 +4,7 @@
 Plugin Name: Patreon Wordpress
 Plugin URI: https://www.patreon.com/apps/wordpress
 Description: Patron-only content, directly on your website.
-Version: 1.4.4
+Version: 1.5.8
 Author: Patreon <platform@patreon.com>
 Author URI: https://patreon.com
 */
@@ -68,7 +68,7 @@ define( "PATREON_ADMIN_BYPASSES_FILTER_MESSAGE", 'This content is for Patrons on
 define( "PATREON_CREATOR_BYPASSES_FILTER_MESSAGE", 'This content is for Patrons only, it\'s not locked for you because you are logged in as the Patreon creator' );
 define( "PATREON_NO_LOCKING_LEVEL_SET_FOR_THIS_POST", 'Post is already public. If you would like to lock this post, please set a pledge level for it' );
 define( "PATREON_NO_POST_ID_TO_UNLOCK_POST", 'Sorry - could not get the post id for this locked post' );
-define( "PATREON_WORDPRESS_VERSION", '1.4.4' );
+define( "PATREON_WORDPRESS_VERSION", '1.5.8' );
 define( "PATREON_WORDPRESS_BETA_STRING", '' );
 define( "PATREON_WORDPRESS_PLUGIN_SLUG", plugin_basename( __FILE__ ) );
 define( "PATREON_PRIVACY_POLICY_ADDENDUM", '<h2>Patreon features in this website</h2>In order to enable you to use this website with Patreon services, we save certain functionally important Patreon information about you in this website if you log in with Patreon.
@@ -113,10 +113,10 @@ define( "PATREON_RECONNECT_INITIAL_MESSAGE", 'We will now reconnect your site to
 define( "PATREON_ADMIN_MESSAGE_DEFAULT_TITLE", 'All\'s cool' );
 define( "PATREON_ADMIN_MESSAGE_DEFAULT_CONTENT", 'Pretty much nothing to report.' );
 define( "PATREON_ADMIN_MESSAGE_CLIENT_DELETE_ERROR_TITLE", 'Sorry, couldn\'t disconnect your site' );
-define( "PATREON_ADMIN_MESSAGE_CLIENT_DELETE_ERROR_CONTENT", 'Please wait a few minutes and <a href="http://test.codebard.com/wp-admin/admin.php?page=patreon-plugin&patreon_wordpress_action=disconnect_site_from_patreon">try again</a>. If this issue persists, you can visit your <a href="https://www.patreon.com/portal/registration/register-clients?utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=client_delete_error_info_link&utm_term=" target="_blank">your app/clients page</a> and delete the app/client for this site. Then you can save empty values for details in "Connection details" tab in "Patreon settings" menu at your site. This would manually disconnect your site from Patreon. Then, you can reconnect your site to another Patreon account or to the same account.' );
+define( "PATREON_ADMIN_MESSAGE_CLIENT_DELETE_ERROR_CONTENT", 'Please wait a few minutes and <a href="' . admin_url( 'admin.php?page=patreon-plugin&patreon_wordpress_action=disconnect_site_from_patreon' ) . '">try again</a>. If this issue persists, you can visit your <a href="https://www.patreon.com/portal/registration/register-clients?utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=client_delete_error_info_link&utm_term=" target="_blank">your app/clients page</a> and delete the app/client for this site. Then you can save empty values for details in "Connection details" tab in "Patreon settings" menu at your site. This would manually disconnect your site from Patreon. Then, you can reconnect your site to another Patreon account or to the same account.' );
 define( "PATREON_ADMIN_MESSAGE_CLIENT_RECONNECT_DELETE_ERROR_TITLE", 'Sorry, couldn\'t disconnect your site before reconnecting it' );
 define( "PATREON_TEXT_YOU_HAVE_NO_REWARDS_IN_THIS_CAMPAIGN", 'You have no tiers in this campaign' );
-define( "PATREON_ADMIN_MESSAGE_CLIENT_RECONNECT_DELETE_ERROR_CONTENT", 'Please wait a few minutes and <a href="http://test.codebard.com/wp-admin/admin.php?page=patreon-plugin&patreon_wordpress_action=disconnect_site_from_patreon_for_reconnection">try again</a>. If this issue persists, you can visit your <a href="https://www.patreon.com/portal/registration/register-clients?utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=client_reconnect_delete_error_info_link&utm_term=" target="_blank">your app/clients page</a> and delete the app/client for this site. Then you can save empty values for details in "Connection details" tab in "Patreon settings" menu at your site. This would manually disconnect your site from Patreon. Then, you can reconnect your site to another Patreon account or to the same account.' );
+define( "PATREON_ADMIN_MESSAGE_CLIENT_RECONNECT_DELETE_ERROR_CONTENT", 'Please wait a few minutes and <a href="' . admin_url( 'admin.php?page=patreon-plugin&patreon_wordpress_action=disconnect_site_from_patreon_for_reconnection' ) . '">try again</a>. If this issue persists, you can visit your <a href="https://www.patreon.com/portal/registration/register-clients?utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=client_reconnect_delete_error_info_link&utm_term=" target="_blank">your app/clients page</a> and delete the app/client for this site. Then you can save empty values for details in "Connection details" tab in "Patreon settings" menu at your site. This would manually disconnect your site from Patreon. Then, you can reconnect your site to another Patreon account or to the same account.' );
 define( "PATREON_WP_SUPER_CACHE_LOGGED_IN_USERS_ENABLED_HEADING", 'WP Super Cache caches pages for logged in users' );
 define( "PATREON_WP_SUPER_CACHE_LOGGED_IN_USERS_ENABLED", 'This could cause logged in patrons to see a content they unlocked still as locked because they may be served a cached version of the page.<h3>Solution</h3>Please visit <a target="_blank" href="' . admin_url( 'options-general.php?page=wpsupercache&tab=settings' ) . '">this WP Super Cache settings page</a> and turn the option <b>"Disable caching for visitors who have a cookie set in their browser."</b> or <b>"Disable caching for logged in visitors. (Recommended)"</b> on and click "Update Status" button to save WP Super Cache settings' );
 define( "PATREON_WP_SUPER_CACHE_MAKE_KNOWN_ANON_ENABLED_HEADING", 'WP Super Cache caches treats logged in users as anonymous' );
@@ -126,9 +126,28 @@ define( "PATREON_PRETTY_PERMALINKS_ARE_OFF", 'Pretty permalinks are off in your 
 define( "PATREON_LAST_50_CONNECTION_ERRORS", 'These are the last 50 connection issues encountered by your site when contacting Patreon API. These are here for general info on health of the connection of your WP site to Patreon API. They only constitute an error if there are a lot of recent ones. Healthiest integrations should have a number of them (up to 50) in the long run.' );
 define( "PATREON_LAST_50_CONNECTION_ERRORS_HEADING", 'Last 50 connection errors' );
 define( "PATREON_FEED_ACTION_TEXT", ' - Click "Read more" to unlock this content at the source' );
+define( "PATREON_LOGIN_WIDGET_NAME", 'Login with Patreon' );
+define( "PATREON_LOGIN_WIDGET_DESC", 'Have your users login with Patreon or connect their Patreon account.' );
+define( "PATREON_LOGIN_WIDGET_LOGOUT", 'You are logged in. %%click_here%% to logout.' );
+define( "PATREON_CLICK_HERE", 'Click here' );
+define( "PATREON_ADMIN_MESSAGE_V1_CLIENT_ATTEMPTING_V2_SETUP", 'Your site is using the old v1 version of Patreon connection. Since v1 apps can\'t be reconnected automatically, please visit <a href="https://www.patreon.com/portal/registration/register-clients?utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=v1_client_attempting_v2_setup&utm_term=" target="_blank">your app/clients page</a> at Patreon and delete the app/client that shows up for this site. After this, you can continue with setup.' );
+define( "PATREON_POST_SYNC_0", 'If you want, you can sync your posts from Patreon to your WP site and simplify your workflow. You can import all your existing posts to your site and import new and updated posts on the go.' );
+define( "PATREON_POST_SYNC_1", 'Choose how you want to sync your posts from Patreon' );
+define( "PATREON_POST_SYNC_2", 'This will overwrite content and formatting in your local posts with the ones in your Patreon posts. Recommended: Yes' );
+define( "PATREON_POST_SYNC_3", 'Delete local post if when you delete matching post at Patreon. Recommended: No' );
+define( "PATREON_POST_SYNC_4", 'Your post sync choices were saved! Existing posts will be imported every 5 minutes until all are imported, and new/updated posts will also be synced. You can change these settings, start a new import or turn post sync on/off in "Patreon Settings" menu.' );
+define( "PATREON_POST_SYNC_5", 'Choose a post type and category to put synced posts in - this will only affect existing posts that will be imported or posts you make in future' );
+define( "PATREON_POST_SYNC_6", 'Choose the author to be used in synced posts. This will only affect newly imported posts' );
+define( "PATREON_ALL_POST_CATEGORY_FIELDS_MUST_BE_SELECTED", 'Please select all post category fields. All 3 post category fields must be present and selected' );
+define( "PATREON_API_VERSION_WARNING", 'Your plugin is still using API v1! This will cause errors when you use post sync feature! Please read <a href="https://www.patreondevelopers.com/t/how-to-upgrade-your-patreon-wordpress-to-use-api-v2/3249" target="_blank">this guide</a> to upgrade your plugin to API v2 before activating post sync.' );
+define( "PATREON_WARNING_IMPORTANT", 'Important: ' );
+define( "PATREON_WARNING_POST_SYNC_SET_WITHOUT_API_V2", 'Important: Post syncing from Patreon is set to on, but your site is using API v1. Post sync wont work without API v2. Follow <a href="https://www.patreondevelopers.com/t/how-to-upgrade-your-patreon-wordpress-to-use-api-v2/3249" target="_blank">this guide</a> to upgrade your site to API v2 or disable post sync <a href="' . admin_url( 'admin.php?page=patreon-plugin' ) .'">here in settings</a>'  );
 
-include 'classes/patreon_wordpress.php';
+require( 'classes/patreon_wordpress.php' );
 
 register_activation_hook( __FILE__, array( 'Patreon_Wordpress', 'activate' ) );
 
 $Patreon_Wordpress = new Patreon_Wordpress;
+
+require( 'includes/patreon_widgets.php' );
+

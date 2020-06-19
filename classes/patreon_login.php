@@ -11,21 +11,21 @@ class Patreon_Login {
 	public static function updateExistingUser( $user_id, $user_response, $tokens ) {
 		
 		/* update user meta data with patreon data */
-		update_user_meta($user_id, 'patreon_refresh_token', $tokens['refresh_token']);
-		update_user_meta($user_id, 'patreon_access_token', $tokens['access_token']);
-		update_user_meta($user_id, 'patreon_user', $user_response['data']['attributes']['vanity']);
-		update_user_meta($user_id, 'patreon_user_id', $user_response['data']['id']);
-		update_user_meta($user_id, 'patreon_last_logged_in', time());
+		update_user_meta( $user_id, 'patreon_refresh_token', $tokens['refresh_token'] );
+		update_user_meta( $user_id, 'patreon_access_token', $tokens['access_token'] );
+		update_user_meta( $user_id, 'patreon_user', $user_response['data']['attributes']['vanity'] );
+		update_user_meta( $user_id, 'patreon_user_id', $user_response['data']['id'] );
+		update_user_meta( $user_id, 'patreon_last_logged_in', time() );
 		
 		$patreon_created = '';
 		if ( isset( $user_response['data']['attributes']['created'] ) ) {
 			$patreon_created = $user_response['data']['attributes']['created'];
 		}
 
-		update_user_meta($user_id, 'patreon_created', $patreon_created);
-		update_user_meta($user_id, 'patreon_token_minted', microtime());
-		update_user_meta($user_id, 'patreon_token_expires_in', $tokens['expires_in']);
-		
+		update_user_meta( $user_id, 'patreon_created', $patreon_created );
+		update_user_meta( $user_id, 'patreon_token_minted', microtime() );
+		update_user_meta( $user_id, 'patreon_token_expires_in', $tokens['expires_in'] );
+
 		$user = get_user_by( 'ID', $user_id );
 
 		// Below filter vars and the following filter allows plugin devs to acquire/filter info about Patron/user after the user returns from Patreon
@@ -484,4 +484,84 @@ class Patreon_Login {
 		return false;
 		
 	}
+
+	public static function disconnect_account_from_patreon() {
+		
+		// Disconnects an account from Patreon.
+		
+		$user = wp_get_current_user();
+
+		if ( current_user_can( 'manage_options' ) OR $user->ID == $_REQUEST['patreon_disconnect_user_id'] ) {
+			
+			// Delete all Patreon user meta for this WP user id here
+			// User id to delete:
+			
+			$user_to_disconnect = get_user_by( 'ID', $_REQUEST['patreon_disconnect_user_id'] );
+			
+			if ( isset( $user_to_disconnect->ID ) ) {
+			
+				delete_user_meta( $user_to_disconnect->ID, 'patreon_refresh_token' );
+				delete_user_meta( $user_to_disconnect->ID, 'patreon_access_token' );
+				delete_user_meta( $user_to_disconnect->ID, 'patreon_user' );
+				delete_user_meta( $user_to_disconnect->ID, 'patreon_user_id' );
+				delete_user_meta( $user_to_disconnect->ID, 'patreon_last_logged_in' );
+				delete_user_meta( $user_to_disconnect->ID, 'patreon_created' );
+				delete_user_meta( $user_to_disconnect->ID, 'patreon_token_minted' );
+				delete_user_meta( $user_to_disconnect->ID, 'patreon_token_expires_in' );
+				delete_user_meta( $user_to_disconnect->ID, 'patreon-avatar-url' );
+				delete_user_meta( $user_to_disconnect->ID, 'patreon-avatar-file' );
+				delete_user_meta( $user_to_disconnect->ID, 'patreon_user' );
+				delete_user_meta( $user_to_disconnect->ID, 'patreon_latest_patron_info' );
+				delete_user_meta( $user_to_disconnect->ID, 'patreon_email' );
+				delete_user_meta( $user_to_disconnect->ID, 'patreon_latest_patron_info_timestamp' );
+				delete_user_meta( $user_to_disconnect->ID, 'patreon_user_details_last_updated' );
+				
+			}
+			else {
+				// Problem! No valid user id to disconnect or no valid user
+				
+				?>
+				
+					Ooops! Disconnect failed - could not find matching user account!
+				
+				<?php
+				exit;
+			}
+			
+			$login_flow_url = Patreon_Frontend::patreonMakeLoginLink( false, array( 'final_redirect_uri' => get_edit_profile_url( $user->ID ) ) );
+			
+			if ( !current_user_can( 'manage_options' ) ) {
+			
+				?>
+					Disconnected! Now you can connect your site account to another Patreon account.
+					<table class="form-table">
+						<tr>
+							<th><label for="patreon_user">Connect your site account to your Patreon account</label></th>
+							<td>
+								<button id="patreon_wordpress_connect_patreon_account" class="button button-primary button-large" patreon_login_url="<?php echo $login_flow_url; ?>" target="">Connect to Patreon</button><br />
+							</td>
+						</tr>
+					</table>
+				
+				<?php
+				
+			}
+			
+			if ( current_user_can( 'manage_options' ) ) {
+			
+				?>
+					Disconnected! Only the owner of this user account can reconnect it to his/her Patreon account.
+		
+				<?php
+				
+			}
+			
+		}
+		else {
+			echo 'Sorry, you must be an admin or owner of this account to disconnect it from Patreon';
+		}
+		
+		exit;
+	}
+	
 }

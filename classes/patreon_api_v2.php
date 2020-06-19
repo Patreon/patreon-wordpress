@@ -102,6 +102,97 @@ class Patreon_API {
 		
 		return $result;
 	}
+
+	public function get_posts( $campaign_id = false, $page_size = 1, $cursor = null ) {
+		
+		// Gets posts of relevant campaign
+		
+		if ( !$campaign_id ) {
+			$campaign_id = get_option( 'patreon-campaign-id', false );
+		}
+		
+		$request = 'campaigns/'. $campaign_id .'/posts?page%5Bcount%5D=' . $page_size;
+		
+		if ( isset( $cursor ) ) {
+			$cursor = urlencode($cursor);
+			$request .= '&page%5Bcursor%5D='. $cursor;
+		}
+		
+		if ( $campaign_id ) {
+			return $this->__get_json( $request );
+		}
+		
+		return false;
+		
+	}
+		
+	public function get_post( $post_id ) {
+		return $this->__get_json( 'posts/' . $post_id . '?fields[post]=title,content,is_paid,is_public,published_at,url,embed_data,embed_url,app_id,app_status' );
+	}
+	
+	public function add_post_webhook( $params = array() ) {
+		
+		// Contacts api to create or refresh client
+		// Only uses v2
+		
+		if ( !isset( $params['campaign_id'] ) ) {
+			$params['campaign_id'] = get_option( 'patreon-campaign-id', false );
+		}
+	
+		// Site url with forced https
+		
+		$webhook_response_uri = site_url( '', 'https' ) . '/patreon-webhooks/';
+
+		// Check if this url is legitimate with https:
+		
+		$check_url = wp_remote_get( $webhook_response_uri );
+
+		if ( is_wp_error( $check_url ) ) {
+			return;
+		}
+		
+		$postfields = array(
+			'data' => array (
+				'type' => 'webhook',
+				'attributes' => array (
+					'triggers' => array (
+						'posts:publish',
+						'posts:update',
+						'posts:delete',
+					),
+					'uri' => $webhook_response_uri,
+				),
+				'relationships' => array (
+					'campaign' => array (
+						'data' => array (
+							'type' => 'campaign',
+							'id' => $params['campaign_id'],
+						),
+					),
+				),
+			),
+		);
+
+		$postfields= json_encode( $postfields );
+		
+		$args = array(
+			'method' => 'POST',
+			'params' => $postfields,
+		);
+		
+		return $this->__get_json( "webhooks", $args );
+	}
+	public function delete_post_webhook( $webhook_id ) {
+		
+		// Deletes a webhook
+				
+		$args = array(
+			'method' => 'DELETE',
+			'return_result_format' => 'full',
+		);
+		
+		return $this->__get_json( "webhooks/" . $webhook_id, $args );
+	}
 	
 	public function create_refresh_client( $params ) {
 		
@@ -180,7 +271,14 @@ class Patreon_API {
 		}
 		
 		if ( $method == 'DELETE' ) {
-			$response = wp_remote_post( $api_endpoint, $api_request );
+			
+			if ( isset( $args['force_get'] ) AND $args['force_get'] ) {
+				$response = wp_remote_request( $api_endpoint, $api_request );
+			}
+			else {
+				$response = wp_remote_post( $api_endpoint, $api_request );
+			}
+			
 		}
 		
 		$result   = $response;
@@ -200,7 +298,7 @@ class Patreon_API {
 		
 		if ( isset( $response['response']['code'] ) AND $response['response']['code'] != '200' AND $response['response']['code'] != '201' )  {
 			Patreon_Wordpress::log_connection_error( 'Response code: ' . $response['response']['code'] . ' Response :' . $response['body'] );
-		}	
+		}
 		
 		// Return full result if full result was requested
 		if ( $return_result_format == 'full' ) {

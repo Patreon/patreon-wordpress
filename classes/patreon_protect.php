@@ -11,16 +11,12 @@ class Patreon_Protect {
 		// If image feature was not turned on before, or turned off, we skip activating image protection functions:
 
 		if ( get_option( 'patreon-enable-file-locking', false ) ) {
-			
+		
 			add_filter( 'attachment_fields_to_edit', array( $this, 'GalleryItemSavePatreonEdit' ), 10, 2 );
 			add_filter( 'attachment_fields_to_save', array( $this, 'GalleryItemSavePatreonLevel' ), 10, 2 );
 			add_filter( 'the_content', array( $this, 'ParseContentForProtectedImages' ), PHP_INT_MAX-4);
-			add_action( "wp_ajax_patreon_save_attachment_patreon_level", array( $this, "saveAttachmentLevel" ) );
-			add_action( "wp_ajax_patreon_make_attachment_pledge_editor", array( $this, "makeAttachmentPledgeEditor" ) );
 			add_action( 'wp_ajax_nopriv_patreon_catch_image_click', 'Patreon_Protect::CatchImageClick' );
 			add_action( 'wp_ajax_patreon_catch_image_click', 'Patreon_Protect::CatchImageClick' );
-			add_action( 'admin_footer', 'Patreon_Protect::addImageToolbar' );
-			add_action( 'admin_head', 'Patreon_Protect::addCustomCSSinAdmin' );
 			
 		}
 		// Only image-reader is left always on for backward compatibility in case a user already has images linked directly - it can be put into the conditional block above in later versios 
@@ -123,7 +119,7 @@ class Patreon_Protect {
 		return false;
 		
 	}
-	public static function readAndServeImage( $image ) {
+	public static function readAndServeImage( $image, $locked = false ) {
 		
 		// Remove site url from requested image url - force http case
 		
@@ -152,6 +148,19 @@ class Patreon_Protect {
 		
 		if ( strpos( $_SERVER['SERVER_SOFTWARE'], 'Microsoft-IIS' ) === false ) {
 			header( 'Content-Length: ' . filesize( $file ) );
+		}
+		
+		// If the image is a gated image, send no-cache headers:
+		
+		
+		if ( $locked ) {
+		
+			header( "Expires: " . gmdate("D, d M Y H:i:s") . " GMT" );
+			header( "Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT" );
+			header( "Cache-Control: no-store, no-cache, must-revalidate" ); 
+			header( "Cache-Control: post-check=0, pre-check=0", false ); 
+			header("Pragma: no-cache");
+			
 		}
 
 		echo file_get_contents( $file );
@@ -242,7 +251,7 @@ class Patreon_Protect {
 		}
 		
 		// At this point pledge checks are valid, and patron can see the image. Serve it:
-		Patreon_Protect::readAndServeImage( $image );
+		Patreon_Protect::readAndServeImage( $image, true );
 	}
 	public static function deleteCachedAttachmentPlaceholders( $attachment_id ) {
 		
@@ -570,6 +579,13 @@ class Patreon_Protect {
 		}
 		
 		header( 'Content-Type: '.$force_mime_type );
+		
+		// Always send no cache headers since this is a gated image placeholder
+	
+		header( "Expires: " . gmdate("D, d M Y H:i:s") . " GMT" );
+		header( "Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT" );
+		header( "Cache-Control: no-store, no-cache, must-revalidate" ); 
+		header( "Cache-Control: post-check=0, pre-check=0", false ); 
 
 		if ( $force_mime_type=='image/png' ) {
 			imagepng( $image,PATREON_PLUGIN_LOCKED_IMAGE_CACHE_DIR . '/' . $cached_filename );
@@ -583,7 +599,7 @@ class Patreon_Protect {
 		if ( $force_mime_type=='image/bmp' ) {
 			imagebmp( $image, PATREON_PLUGIN_LOCKED_IMAGE_CACHE_DIR . '/' . $cached_filename );
 		}
-		
+	
 		// Readfile below for lower memory usage. Can be changed to echo file_get_contents for small images in future
 		echo file_get_contents( PATREON_PLUGIN_LOCKED_IMAGE_CACHE_DIR . '/' . $cached_filename );
 			
@@ -664,36 +680,21 @@ RewriteRule ^" . $upload_dir . "/(.*)$ index.php?patreon_action=serve_patron_onl
 			$update_status = 'updated';
 		}
 		
-		echo '<form id="patreon_attachment_patreon_level_form" action="/wp-admin/admin-ajax.php" method="post">';
-		echo '<h1 class="patreon_image_locking_interface_heading">Lock Image</h1>';
-		echo '<a href="javascript:tb_remove();" id="TB_closeWindowButton" title="Close"><img src="' . PATREON_PLUGIN_ASSETS . '/img/patreon-close-button.jpg" /></a>';
-		echo '<div class="patreon_image_locking_interface_content">';
-		echo '<div class="patreon_image_locking_interface_content_row">';
-		echo '<div class="patreon_image_locking_interface_content_left">';
-		echo 'Minimum Patreon pledge amount required to see this image';
-		echo '</div>';
-		echo '<div class="patreon_image_locking_interface_content_right">';
-		echo '<span class="patreon_image_locking_interface_input_prefix">$<input id="patreon_attachment_patreon_level" type="text" name="patreon_attachment_patreon_level" value="' . get_post_meta( $_REQUEST['patreon_attachment_id'], 'patreon_level', true ) . '" / ></span>';
-		echo '</div>';
-		echo '</div>';
-		echo '<div class="patreon_image_locking_interface_content_row">';
-		echo '<div class="patreon_image_locking_interface_content_message">';
-		
 		if ( $update_status == 'updated' ) {
-			echo 'Pledge level for the image was updated!';
+			$message = 'Pledge level for the image was updated!';
 		}
 		else {
-			echo 'Pledge level for the image was updated! The value you posted may be same with the value already set!';
+			$message = 'Pledge level for the image was updated! The value you posted may be same with the value already set!';
 		}
 		
-		echo '</div>';
-		echo '</div>';
-		echo '</div>';
 		
-		echo '<div class="patreon-image-locking-update-button"><input type="submit" class="button button-primary button-large" value=" Update " /></div>';
-		echo '<input type="hidden" name="action" value="patreon_save_attachment_patreon_level" />';
-		echo '<input type="hidden" name=patreon_attachment_id" value="' . $_REQUEST['patreon_attachment_id'] . '" />';
-		echo '</form>';
+		$args = array (
+			'attachment_id' => $attachment_id,
+			'patreon_level' => $_REQUEST['patreon_attachment_patreon_level'],
+			'message' => $message,
+		);
+		
+		echo self::make_image_lock_interface( $args	);
 		
 		// Delete all cached images for this attachment
 		self::deleteCachedAttachmentPlaceholders( $_REQUEST['patreon_attachment_id'] );
@@ -704,36 +705,83 @@ RewriteRule ^" . $upload_dir . "/(.*)$ index.php?patreon_action=serve_patron_onl
 	public function makeAttachmentPledgeEditor( $attachment_id = false ) {
 
 		if ( !( is_admin() AND current_user_can( 'manage_options' ) ) ) {
-			return;
+			echo 'Not in admin or without admin capabilities!';
+			wp_die();
 		}
 	
-		if ( isset( $_REQUEST['patreon_attachment_id'] ) AND $_REQUEST['patreon_attachment_id'] != '' ) {
-			$attachment_id = $_REQUEST['patreon_attachment_id'];
+		if ( isset( $_REQUEST['pw_image_source'] ) AND $_REQUEST['pw_image_source'] != '' ) {
+			$attachment_url = $_REQUEST['pw_image_source'];
 		}
 		
-		if ( !$attachment_id OR $attachment_id == '' ) {
-			// This is not a rewritten image request. Exit.
-			return;
-		}		
+		$message = '';
 		
+		if ( !$attachment_url OR $attachment_url == '' ) {
+			// This is not a rewritten image request.
+			$message = 'No attachment url provided. Cannot lock.';
+			
+		}
+		// Get attachment from attachment url.
+		
+		$attachment_id = attachment_url_to_postid( $attachment_url );
+		
+		// attachment_url_to_postid returns 0 if it cant find the attachment post id
+		
+		if ( $attachment_id == 0 ) {
+			
+			// Couldnt determine attachment post id. Try to get id from thumbnail
+			$attachment_id = Patreon_Protect::getAttachmentIDfromThumbnailURL( $attachment_url );
+			
+			if( $attachment_id == 0 ) {
+				$message = 'Can not find attachment id.  Cannot lock.';
+			}
+			
+		}
+		
+		// Check if image locking is enabled
+		
+		if ( !get_option( 'patreon-enable-file-locking', false ) ) {
+			// Give a message if the image locking feature is not enabled
+			$message = 'Image locking is not enabled in <a href="'. admin_url( 'admin.php?page=patreon-plugin' ) . '" target="_blank">settings</a>. Locking will not work';
+		}
+
 		$patreon_level = get_post_meta( $attachment_id, 'patreon_level', true );
 		
-		echo ' <form id="patreon_attachment_patreon_level_form" action="/wp-admin/admin-ajax.php" method="post">';
-		echo '<h1 class="patreon_image_locking_interface_heading">Lock Image</h1>';
-		echo '<a href="javascript:tb_remove();" id="TB_closeWindowButton" title="Close"><img src="' . PATREON_PLUGIN_ASSETS . '/img/patreon-close-button.jpg" /></a>';
-		echo '<div class="patreon_image_locking_interface_content">';
-		echo '<div class="patreon_image_locking_interface_content_left">';
-		echo 'Minimum Patreon pledge amount required to see this image';
-		echo '</div>';
-		echo '<div class="patreon_image_locking_interface_content_right">';
-		echo '<span class="patreon_image_locking_interface_input_prefix">$<input id="patreon_attachment_patreon_level" type="text" name="patreon_attachment_patreon_level" value="' . $patreon_level . '" / ></span>';
-		echo '</div>';
-		echo '<input type="hidden" name="patreon_attachment_id" value="' . $attachment_id . '" />';
-		echo '</div>';
-		echo '<div class="patreon-image-locking-update-button"><input type="submit" class="button button-primary button-large" value=" Update " /></div>';
-		echo '<input type="hidden" name="action" value="patreon_save_attachment_patreon_level" />';
-		echo '</form>';
+		$args = array (
+			'attachment_id' => $attachment_id,
+			'patreon_level' => $patreon_level,
+			'message' => $message,
+		);
+		
+		echo self::make_image_lock_interface( $args	);
+		
 		wp_die();
+		
+	}
+	public function make_image_lock_interface( $args = array() ) {
+		
+		$interface = '';
+		
+		$interface .=  '<div class="patreon_image_lock_modal_content">';
+		$interface .=  '<span class="patreon_image_lock_modal_close">&times;</span>';
+
+		$interface .=  ' <form id="patreon_attachment_patreon_level_form" action="/wp-admin/admin-ajax.php" method="post">';
+		$interface .=  '<h1 class="patreon_image_locking_interface_heading">Lock Image</h1>';
+		$interface .=  '<div class="patreon_image_locking_interface_level">';
+		$interface .=  '<span class="patreon_image_locking_interface_input_prefix">$<input id="patreon_attachment_patreon_level" type="text" name="patreon_attachment_patreon_level" value="' . $args['patreon_level'] . '" / ></span>';
+		$interface .=  '</div>';
+		$interface .=  '<div class="patreon_image_locking_interface_info">';
+		$interface .=  'Minimum Patreon pledge amount required to see this image';
+		$interface .=  '</div>';
+		$interface .=  '<input type="hidden" name="patreon_attachment_id" value="' . $args['attachment_id'] . '" />';
+		$interface .=  '<div class="patreon-image-locking-update-button"><input type="submit" class="button button-primary button-large" value=" Update " /></div>';
+		$interface .=  '<div id="patreon_image_locking_interface_message">';
+		$interface .=  $args['message'];
+		$interface .=  '</div>';
+		$interface .=  '<input type="hidden" name="action" value="patreon_save_attachment_patreon_level" />';
+		$interface .=  '</form>';
+		$interface .=  '</div>';
+		
+		return $interface;
 		
 	}
 	public function ParseContentForProtectedImages( $content ) {
@@ -834,6 +882,11 @@ RewriteRule ^" . $upload_dir . "/(.*)$ index.php?patreon_action=serve_patron_onl
 	public static function addImageToolbar() {
 		
 		// Adds the hidden floating image toolbar
+
+		$screen = get_current_screen();
+		if ( $screen->parent_base != 'edit' ) {
+			return;
+		}
 		
 		?>
 		
@@ -842,7 +895,7 @@ RewriteRule ^" . $upload_dir . "/(.*)$ index.php?patreon_action=serve_patron_onl
 		</div>
 
 		<?php
-		
+	
 	}
 	public static function checkPatronPledgeForImage( $attachment_id, $user = false ) {
 	

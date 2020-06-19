@@ -23,6 +23,9 @@ class Patreon_Frontend {
 		add_action( 'register_form', array( $this, 'showPatreonMessages' ) );
 		add_action( 'register_form', array( $this, 'displayPatreonLoginButtonInLoginForm' ) );
 		add_filter( 'the_content', array( $this, 'protectContentFromUsers'), PHP_INT_MAX - 5 );
+		// This filter will inject currency sign into label over button until proper internationalization is done
+		add_filter( 'ptrn/label_text_over_universal_button', array( $this, 'replace_in_currency_sign'), 10 );
+		add_filter( 'ptrn/valid_patron_final_footer', array( $this, 'replace_in_currency_sign'), 10 );
 		add_shortcode( 'patreon_login_button', array( $this,'LoginButtonShortcode' ) );
 		add_filter('get_avatar', array( $this, 'show_patreon_avatar' ), 10, 5);
 
@@ -55,6 +58,7 @@ class Patreon_Frontend {
 			'client_delete_error_content'                => PATREON_ADMIN_MESSAGE_CLIENT_DELETE_ERROR_CONTENT,
 			'client_reconnect_delete_error_title'        => PATREON_ADMIN_MESSAGE_CLIENT_RECONNECT_DELETE_ERROR_TITLE,
 			'client_reconnect_delete_error_content'      => PATREON_ADMIN_MESSAGE_CLIENT_RECONNECT_DELETE_ERROR_CONTENT,
+			'all_post_category_fields_must_be_selected'  => PATREON_ALL_POST_CATEGORY_FIELDS_MUST_BE_SELECTED,
 		);
 		
 	}
@@ -398,7 +402,10 @@ class Patreon_Frontend {
 				// selected = selected for XHTML compatibility
 				
 				// Use title if it exists, description if it does not.
-				$tier_title = $reward['attributes']['title'];
+				
+				if ( isset( $reward['attributes']['title'] ) ) {
+					$tier_title = $reward['attributes']['title'];
+				}
 				
 				if ( $tier_title == '' ) {
 					
@@ -1032,7 +1039,7 @@ class Patreon_Frontend {
 		
 	}
 	public static function protectContentFromUsers( $content, $post_id = false ) {
-		
+				
 		// This function receives content and optionally post id.
 		
 		// If content is received but no post id, the function acts to lock the existing post. In this case it can be hooked to the_content filter
@@ -1229,8 +1236,11 @@ class Patreon_Frontend {
 				// selected = selected for XHTML compatibility
 				
 				// Use title if it exists, description if it does not.
-				$tier_title = $reward['attributes']['title'];
 				
+				if ( isset( $reward['attributes']['title'] ) ) {
+					$tier_title = $reward['attributes']['title'];
+				}
+								
 				if ( $tier_title == '' ) {
 					
 					/// Detect if this is an old non bas64 desc
@@ -1311,12 +1321,35 @@ class Patreon_Frontend {
 	public static function displayPatreonLoginButtonInLoginForm() {
 		
 		// For displaying login button in the form - wrapper
-		echo '<div style="display:inline-block;width : 100%; text-align: center;">' . self::showPatreonLoginButton() . '</div>';
+		
+		// Check if the login button hide option is on
+		if ( !get_option( 'patreon-hide-login-button', false ) ) {
+			echo '<div style="display:inline-block;width : 100%; text-align: center;">' . self::showPatreonLoginButton() . '</div>';
+		}		
 		
 	}
-	public static function showPatreonLoginButton() {
+	public static function showPatreonLoginButton( $args = array() ) {
 
+		// Set default login image
 		$log_in_img = PATREON_PLUGIN_ASSETS . '/img/patreon login@1x.png';
+		
+		$user = wp_get_current_user();
+		$user_patreon_id = '';
+		
+		if ( $user AND isset( $user->ID ) ) {
+			$user_patreon_id = get_user_meta( $user->ID, 'patreon_user_id', true );
+		}		
+		
+		if ( is_user_logged_in() AND $user_patreon_id == '' ) {
+			// Logged in user without a connected Patreon account. Show connect button
+			$log_in_img = PATREON_PLUGIN_ASSETS . '/img/patreon connect@1x.png';			
+		}
+		
+		// Override image if argument given
+		if ( isset( $args['img'] ) ) {
+			$log_in_img = $args['img'];
+		}
+				
 		$client_id  = get_option( 'patreon-client-id', false );
 
 		if ( $client_id == false ) {
@@ -1341,7 +1374,16 @@ class Patreon_Frontend {
 	}
 	public static function LoginButtonShortcode( $args ) {
 		
-		if ( !is_user_logged_in() ) {
+		// Check if this user connected his/her account to Patreon
+		
+		$user = wp_get_current_user();
+		$user_patreon_id = '';
+		
+		if ( $user AND isset( $user->ID ) ) {
+			$user_patreon_id = get_user_meta( $user->ID, 'patreon_user_id', true );
+		}
+
+		if ( !is_user_logged_in() OR ( is_user_logged_in() AND $user_patreon_id == '' ) ) {
 			return Patreon_Frontend::showPatreonLoginButton();
 		}
 		
@@ -1450,7 +1492,80 @@ class Patreon_Frontend {
 		// Here. Then patron is valid. Return false.
 		return false;
 		
+	}
 		
+	public static function hide_ad_for_patrons( $patreon_level, $ad = '', $args = array() ) {
+		
+		// This function allows show/hiding any part of a WP website using $ level. It is a wrapper function that is to be used as an easy version of custom locking code
+
+		// Custom lock
+		
+		$user = wp_get_current_user();
+		
+		if ( isset( $args['user'] ) AND $args['user'] AND is_object( $args['user'] ) ) {
+			$user = $args['user'];
+		}
+		
+		// Check how much patronage the user has
+		$user_patronage = Patreon_Wordpress::getUserPatronage( $user );
+		
+		// Check if user is a patron whose payment is declined
+		$declined = Patreon_Wordpress::checkDeclinedPatronage( $user );
+		
+		// Set where we want to have the user land at - this can be anything. The below code sets it to this exact page. This page may be a category page, search page, a custom page url with custom parameters - anything
+		
+		global $wp;
+		
+		$redir = home_url( add_query_arg( $_GET, $wp->request ) );
+		
+		// If the user has less patronage than $patreon_level, or declined, and is not an admin-level user, lock the post.
+
+		if ( ( $user_patronage < ( $patreon_level * 100) OR $declined ) AND !current_user_can( 'manage_options' ) ) {
+			return $ad;
+		}
+		
+		// Here. Then patron is valid. Return false.
+		return '';
+		
+	}
+	
+	public static function login_widget() {
+		
+		// Displays a conditional Patreon login widget
+		
+		$user = wp_get_current_user();
+		$user_patreon_id = '';
+		
+		if ( $user AND isset( $user->ID ) ) {
+			$user_patreon_id = get_user_meta( $user->ID, 'patreon_user_id', true );
+		}
+
+		if ( !is_user_logged_in() ) {
+			return Patreon_Frontend::showPatreonLoginButton();
+		}
+		
+		if ( is_user_logged_in() AND $user_patreon_id == '' ) {
+			// WP logged in user with potentially unconnected Patreon account. Show connect button and any other specific info (if needed in future) - login button function will take care of showing the connect version of the image
+			return Patreon_Frontend::showPatreonLoginButton();
+		}
+		
+		// User logged in and has Patreon connected. Display logout link.
+		return str_replace( '%%click_here%%', '<a href="'. wp_logout_url( get_permalink() ) .'">'. PATREON_CLICK_HERE . '</a>', PATREON_LOGIN_WIDGET_LOGOUT );		
+		
+	}
+	
+	public function replace_in_currency_sign( $label ) {
+		
+		$currency_sign = '$';
+		
+		$saved_currency_sign = get_option( 'patreon-currency-sign', false );
+		
+		if ( $saved_currency_sign ) {
+			$currency_sign = $saved_currency_sign;
+		}
+		
+		return str_replace( '$', $currency_sign, $label );
+	
 	}
 	
 }

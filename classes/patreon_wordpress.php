@@ -7,19 +7,21 @@ if ( !defined( 'WPINC' ) ) {
 
 class Patreon_Wordpress {
 
-	private static $Patreon_Routing;
-	private static $Patreon_Frontend;
-	private static $Patreon_Posts;
-	private static $Patreon_Protect;
-	private static $Patreon_Options;
-	private static $Patron_Metabox;
-	private static $Patron_Compatibility;
-	private static $Patreon_User_Profiles;
-	private static $Patreon_Admin_Pointers;
+	public static $patreon_routing;
+	public static $patreon_frontend;
+	public static $patreon_posts;
+	public static $patreon_protect;
+	public static $patreon_options;
+	public static $patron_metabox;
+	public static $patreon_compatibility;
+	public static $patreon_login;
+	public static $patreon_user_profiles;
+	public static $patreon_admin_pointers;
+	public static $patreon_content_sync;
 	public static $current_user_pledge_amount = -1;
 	public static $current_user_patronage_declined = -1;
 	public static $current_user_is_patron = -1;
-	public static $current_patreon_user = -1;
+	public static $patreon_user_info_cache = array();
 	public static $current_member_details = -1;
 	public static $current_user_patronage_duration = -1;
 	public static $current_user_lifetime_patronage = -1;
@@ -28,37 +30,42 @@ class Patreon_Wordpress {
 
 	function __construct() {
 
-		include 'patreon_login.php';
-		include 'patreon_routing.php';
-		include 'patreon_frontend.php';
-		include 'patreon_api.php';
-		include 'patreon_oauth.php';
-		include 'patreon_options.php';
-		include 'patreon_metabox.php';
-		include 'patreon_user_profiles.php';
-		include 'patreon_protect.php';
-		include 'patreon_compatibility.php';
-		include 'patreon_admin_pointers.php';
+		include_once( 'patreon_login.php' );
+		include_once( 'patreon_routing.php' );
+		include_once( 'patreon_frontend.php' );
+		include_once( 'patreon_api.php' );
+		include_once( 'patreon_oauth.php' );
+		include_once( 'patreon_options.php' );
+		include_once( 'patreon_metabox.php' );
+		include_once( 'patreon_user_profiles.php' );
+		include_once( 'patreon_protect.php' );
+		include_once( 'patreon_compatibility.php' );
+		include_once( 'patreon_admin_pointers.php' );
+		include_once( 'patreon_content_sync.php' );
 
-		self::$Patreon_Routing        = new Patreon_Routing;
-		self::$Patreon_Frontend       = new Patreon_Frontend;
+		self::$patreon_routing        = new Patreon_Routing;
+		self::$patreon_frontend       = new Patreon_Frontend;
 		
 		if ( is_admin() ) {
-			self::$Patreon_Options        = new Patreon_Options;
-			self::$Patron_Metabox         = new Patron_Metabox;
+			self::$patreon_options    = new Patreon_Options;
+			self::$patron_metabox     = new Patron_Metabox;
 		}
 		
-		self::$Patreon_User_Profiles  = new Patreon_User_Profiles;
-		self::$Patreon_Protect        = new Patreon_Protect;
-		self::$Patron_Compatibility   = new Patreon_Compatibility;
+		self::$patreon_user_profiles  = new Patreon_User_Profiles;
+		self::$patreon_protect        = new Patreon_Protect;
+		self::$patreon_compatibility  = new Patreon_Compatibility;
+		self::$patreon_login          = new Patreon_Login;
 		
 		if ( is_admin() ) {
-			self::$Patreon_Admin_Pointers = new Patreon_Admin_Pointers;	
+			self::$patreon_admin_pointers = new Patreon_Admin_Pointers;	
 		}
 		
-		add_action( 'wp_head', array( $this, 'updatePatreonUser' ) );
+		self::$patreon_content_sync = new Patreon_Content_Sync;
+			
+		add_action( 'wp_head', array( $this, 'updatePatreonUser' ), 10 );
 		add_action( 'init', array( $this, 'checkPatreonCreatorID' ) );
 		add_action( 'init', array( $this, 'check_creator_tiers' ) );
+		add_action( 'init', array( $this, 'check_post_sync_webhook' ) );
 		add_action( 'init', array( &$this, 'order_independent_actions_to_run_on_init_start' ), 0 );
 		add_action( 'init', array( $this, 'check_plugin_activation_date_for_existing_installs' ) );
 		add_action( 'admin_init', array( $this, 'post_credential_update_api_connectivity_check' ) );
@@ -81,20 +88,57 @@ class Patreon_Wordpress {
 		add_action( 'wp_ajax_patreon_wordpress_toggle_option', array( $this, 'toggle_option' ), 10, 1 );
 		add_action( 'wp_ajax_patreon_wordpress_populate_patreon_level_select', array( $this, 'populate_patreon_level_select_from_ajax' ), 10, 1 );
 		add_action( 'plugin_action_links_' . PATREON_WORDPRESS_PLUGIN_SLUG, array( $this, 'add_plugin_action_links' ), 10, 1 );
+		add_action( "wp_ajax_patreon_make_attachment_pledge_editor", array( self::$patreon_protect , "makeAttachmentPledgeEditor" ) );
+		add_action( "wp_ajax_nopriv_patreon_make_attachment_pledge_editor", array( self::$patreon_protect , "makeAttachmentPledgeEditor" ) );
+		add_action( "wp_ajax_patreon_save_attachment_patreon_level", array( self::$patreon_protect , "saveAttachmentLevel" ) );
+		add_action( "wp_ajax_nopriv_patreon_save_attachment_patreon_level", array( self::$patreon_protect , "saveAttachmentLevel" ) );
+		add_action( "wp_ajax_patreon_wordpress_start_post_import", array( $this, "start_post_import" ) );
+		add_action( "wp_ajax_nopriv_patreon_wordpress_start_post_import", array( $this , "start_post_import" ) );
+		add_action( "wp_ajax_patreon_wordpress_set_update_posts_option", array( $this, "set_update_posts_option" ) );
+		add_action( "wp_ajax_nopriv_patreon_wordpress_set_update_posts_option", array( $this , "set_update_posts_option" ) );
+		add_action( "wp_ajax_patreon_wordpress_set_delete_posts_option", array( $this, "set_delete_posts_option" ) );
+		add_action( "wp_ajax_nopriv_patreon_wordpress_set_delete_posts_option", array( $this , "set_delete_posts_option" ) );
+		add_action( "wp_ajax_patreon_wordpress_get_taxonomies_for_post_type", array( $this, "make_taxonomy_select" ) );
+		add_action( "wp_ajax_nopriv_patreon_wordpress_get_taxonomies_for_post_type", array( $this , "make_taxonomy_select" ) );
+		add_action( "wp_ajax_patreon_wordpress_get_terms_for_taxonomy", array( $this, "make_term_select" ) );
+		add_action( "wp_ajax_nopriv_patreon_wordpress_get_terms_for_taxonomy", array( $this , "make_term_select" ) );
+		add_action( "wp_ajax_patreon_wordpress_save_post_sync_category", array( $this, "save_post_sync_category" ) );
+		add_action( "wp_ajax_nopriv_patreon_wordpress_save_post_sync_category", array( $this , "save_post_sync_category" ) );
+		add_action( "wp_ajax_patreon_wordpress_set_post_author_for_post_sync", array( $this, "set_post_author_for_post_sync" ) );
+		add_action( "wp_ajax_nopriv_patreon_wordpress_set_post_author_for_post_sync", array( $this , "set_post_author_for_post_sync" ) );
+		add_filter( 'cron_schedules', array( &$this, 'add_patreon_cron_schedules' ) );
+		add_action( "wp_ajax_patreon_wordpress_disconnect_patreon_account", array( self::$patreon_login , "disconnect_account_from_patreon" ) );
+		add_action( "wp_ajax_nopriv_patreon_wordpress_disconnect_patreon_account", array( self::$patreon_login , "disconnect_account_from_patreon" ) );
+		
+		// Schedule an action if it's not already scheduled
+		if ( !wp_next_scheduled( 'patreon_five_minute_action' ) ) {
+			wp_schedule_event( time(), 'patreon_five_minute_cron_schedule', 'patreon_five_minute_action' );
+		}
+	
+		add_action( 'patreon_five_minute_action', array( &$this, 'patreon_five_minute_cron_job' ) );		
 		
 	}
-	public static function getPatreonUser( $user ) {
-
-		if ( self::$current_patreon_user != -1 ) {
-			return self::$current_patreon_user;
+	public static function getPatreonUser( $user = false ) {
+		
+		if ( !$user ) {
+			$user = wp_get_current_user();
 		}
 		
-		/* get user meta data and query patreon api */
-		$user_meta = get_user_meta( $user->ID );
+		// Bail out if there's no user object or user id or user is anon
+		if ( !$user OR !is_object( $user ) OR !isset( $user->ID ) OR $user->ID == 0 ) {
+			return false;
+		}
 		
-		if ( isset( $user_meta['patreon_access_token'][0] ) ) {
+		if ( isset( self::$patreon_user_info_cache[$user->ID] ) ) {
+			return self::$patreon_user_info_cache[$user->ID];
+		}		
 			
-			$api_client = new Patreon_API( $user_meta['patreon_access_token'][0] );
+		/* get user meta data and query patreon api */
+		$patreon_access_token  = get_user_meta( $user->ID, 'patreon_access_token', true );
+		
+		if ( $patreon_access_token != '' ) {
+			
+			$api_client = new Patreon_API( $patreon_access_token );
 
 			// Below is a code that caches user object for 60 seconds. This can be commented out depending on the response from Infrastructure team about contacting api to check for user on every page load
 			/*
@@ -107,13 +151,93 @@ class Patreon_Wordpress {
 			*/
 
 			// For now we are always getting user from APi fresh:
-			$user = $api_client->fetch_user();
+			$user_response = $api_client->fetch_user();
+			
+			// Here we check the returned result if its valid 
+			
+			if ( isset( $user_response['included'][0] ) AND is_array( $user_response['included'][0] ) ) {
+				
+				// Valid return. Save it with timestamp
+				
+				update_user_meta( $user->ID, 'patreon_latest_patron_info', $user_response );
+				update_user_meta( $user->ID, 'patreon_latest_patron_info_timestamp', time() );
+				
+				return Patreon_Wordpress::add_to_patreon_user_info_cache( $user->ID, $user_response );
+				
+			}
+			
+			// Couldnt get user from Patreon. Try to refresh tokens if it was a token error
+			$token_refreshed = false;
+			
+			if ( isset( $user_response['errors'] ) && is_array( $user_response['errors'] ) ) {
 
-			return self::$current_patreon_user = $user;
+				foreach ( $user_response['errors'] as $error ) {
+			
+					if( $error['code'] == 1 ) {
+						
+						$token_refreshed = self::refresh_user_access_token( $user );
+						
+					}
+				}
+			}
+			
+			// Reload token
+			$patreon_access_token  = get_user_meta( $user->ID, 'patreon_access_token', true );
+			
+			if ( $token_refreshed AND $patreon_access_token != '' ) {
+			
+				$api_client = new Patreon_API( $patreon_access_token );
+				
+				$user_response = $api_client->fetch_user();
+				
+				if ( isset( $user_response['included'][0] ) AND is_array( $user_response['included'][0] ) ) {
+					
+					// Valid return. Save it with timestamp
+					
+					update_user_meta( $user->ID, 'patreon_latest_patron_info', $user_response );
+					update_user_meta( $user->ID, 'patreon_latest_patron_info_timestamp', time() );
+					
+					return Patreon_Wordpress::add_to_patreon_user_info_cache( $user->ID, $user_response );
+					
+				}
+				
+			}
+			
+			// For whatsoever reason the returns are not valid and we cant refresh the user
+			// Check if a saved return exists for this user
+	
+			$user_response           = get_user_meta( $user->ID, 'patreon_latest_patron_info', true );
+			$user_response_timestamp = get_user_meta( $user->ID, 'patreon_latest_patron_info_timestamp', true );
+			
+			// Check if there is a valid saved user return and whether it has a timestamp within desired range
+			if ( isset( $user_response['included'][0] ) AND is_array( $user_response['included'][0] ) AND $user_response_timestamp >= ( time() - ( 3600 * 24 * 3 ) ) ) {
+				return Patreon_Wordpress::add_to_patreon_user_info_cache( $user->ID, $user_response );
+			}
 			
 		}
+		
+		// All failed - return false
 
-		return self::$current_patreon_user = false;
+		return Patreon_Wordpress::add_to_patreon_user_info_cache( $user->ID, false );
+		
+	}
+	
+	static function refresh_user_access_token( $user ) {
+		
+		$refresh_token = get_user_meta( $user->ID, 'patreon_refresh_token', true );
+
+		$oauth_client = new Patreon_Oauth;
+		$tokens = $oauth_client->refresh_token( $refresh_token, site_url().'/patreon-authorization/' );
+		
+		if ( isset( $tokens['access_token'] ) ) {
+			
+			update_user_meta( $user->ID, 'patreon_refresh_token', $tokens['refresh_token'] );
+			update_user_meta( $user->ID, 'patreon_access_token', $tokens['access_token'] );
+
+			return $tokens['access_token'];
+		}
+		
+		return false;
 		
 	}
 	
@@ -126,12 +250,11 @@ class Patreon_Wordpress {
 		}
 
 		$user = wp_get_current_user();
+		
 		if ( $user == false ) {
 			return false;
 		}
-		
-		// Temporarily introduced caching until calls are moved to webhooks #REVISIT
-		
+				
 		$last_update = get_user_meta( $user->ID, 'patreon_user_details_last_updated', true );
 		
 		// If last update time is not empty and it is closer to time() than one day, dont update
@@ -141,30 +264,6 @@ class Patreon_Wordpress {
 
 		/* query Patreon API to get users patreon details */
 		$user_response = self::getPatreonUser( $user );
-
-		if ( isset( $user_response['errors'] ) && is_array( $user_response['errors'] ) ) {
-
-			foreach ( $user_response['errors'] as $error ) {
-				
-				if( $error['code'] == 1 ) {
-					
-					/* refresh users token if error 1 */
-
-					$refresh_token = get_user_meta($user->ID, 'patreon_refresh_token', true);
-
-					$oauth_client = new Patreon_Oauth;
-					$tokens = $oauth_client->refresh_token($refresh_token, site_url().'/patreon-authorization/');
-
-					update_user_meta($user->ID, 'patreon_refresh_token', $tokens['refresh_token']);
-					update_user_meta($user->ID, 'patreon_access_token', $tokens['access_token']);
-
-					$user_response = self::getPatreonUser($user);
-					
-				}
-				
-			}
-
-		}
 
 		if ( $user_response == false ) {
 			return false;
@@ -637,7 +736,7 @@ class Patreon_Wordpress {
 	public static function enqueueAdminScripts() {
 		
 		wp_enqueue_script( 'patreon-admin-js', PATREON_PLUGIN_ASSETS . '/js/admin.js', array( 'jquery' ), PATREON_WORDPRESS_VERSION, true );
-		wp_enqueue_script( 'patreon-admin-js', PATREON_PLUGIN_ASSETS . '/js/admin.js', array( 'jquery' ), PATREON_WORDPRESS_VERSION, true );
+		wp_localize_script( 'patreon-admin-js', 'pw_admin_js', array( 'patreon_wordpress_assets_url' => PATREON_PLUGIN_ASSETS, ) );
 
 	}
 	public static function AfterUpdateActions( $upgrader_object, $options = false ) {
@@ -708,6 +807,18 @@ class Patreon_Wordpress {
 		$show_site_disconnect_success_notice = get_option( 'patreon-show-site-disconnect-success-notice', false );
 
 		// Queue this message immediately after activation if not already shown
+
+		$api_version    = get_option( 'patreon-installation-api-version', '1' );
+		$sync_posts   = get_option( 'patreon-sync-posts', 'no' );
+				
+		if ( $api_version != '2' AND $sync_posts == 'yes' ) {
+
+			?>
+				 <div class="notice notice-warning is-dismissible  patreon-wordpress" id="patreon_site_disconnect_success_notice">
+					<p><?php echo PATREON_WARNING_POST_SYNC_SET_WITHOUT_API_V2; ?></p>
+				</div>
+			<?php	
+		}
 		
 		if( $show_site_disconnect_success_notice ) {
 			
@@ -870,6 +981,121 @@ class Patreon_Wordpress {
 			self::set_last_system_notice_shown_date();
 		}
 		
+	}
+	public function start_post_import() {
+		
+		if( !( is_admin() && current_user_can( 'manage_options' ) ) ) {
+			return;
+		}
+		
+		// Abort if apiv ersion used is not v2 
+
+		$api_version    = get_option( 'patreon-installation-api-version', '1' );
+		$sync_posts     = get_option( 'patreon-sync-posts', 'no' );
+				
+		if ( $api_version != '2' ) {
+			echo 'apiv2fail';
+			exit;
+		}	
+		
+		update_option( 'patreon-post-import-in-progress', true );
+		delete_option( 'patreon-post-import-next-cursor' );
+		
+		echo 'Success';
+		exit;
+			
+	}
+	public function save_post_sync_category() {
+		
+		if( !( is_admin() && current_user_can( 'manage_options' ) ) ) {
+			return;
+		}
+		
+		if ( !( 
+				isset( $_REQUEST['patreon_sync_post_type'] ) AND
+				isset( $_REQUEST['patreon_sync_post_category'] ) AND
+				isset( $_REQUEST['patreon_sync_post_term'] )
+			)
+		) {
+			echo 'Please select all fields';
+			exit;
+		}
+		// Check for empty cases
+		if ( 
+				$_REQUEST['patreon_sync_post_type'] == '-' OR
+				$_REQUEST['patreon_sync_post_category'] == '-' OR
+				$_REQUEST['patreon_sync_post_term'] == '-'
+		) {
+			echo 'Please select all fields';
+			exit;
+		}
+	
+		update_option( 'patreon-sync-post-type', $_REQUEST['patreon_sync_post_type'] );
+		update_option( 'patreon-sync-post-category', $_REQUEST['patreon_sync_post_category'] );
+		update_option( 'patreon-sync-post-term', $_REQUEST['patreon_sync_post_term'] );
+		
+		echo 'Saved!';
+		exit;
+			
+	}
+	public function set_post_author_for_post_sync() {
+		
+		if( !( is_admin() && current_user_can( 'manage_options' ) ) ) {
+			return;
+		}
+		
+		if ( !( 
+				isset( $_REQUEST['patreon_post_author_for_post_sync'] ) AND
+				$_REQUEST['patreon_post_author_for_post_sync'] != ''
+			)
+		) {
+			echo 'A valid user must be selected';
+			exit;
+		}
+	
+		update_option( 'patreon-post-author-for-synced-posts', $_REQUEST['patreon_post_author_for_post_sync'] );
+		
+		echo 'Saved!';
+		exit;
+			
+	}
+	public function set_update_posts_option() {
+		
+		if( !( is_admin() && current_user_can( 'manage_options' ) ) ) {
+			return;
+		}
+		
+		if ( $_REQUEST['update_posts_option_value'] == 'yes' ) {
+			update_option( 'patreon-update-posts', 'yes' );
+		}
+	
+		
+		if ( $_REQUEST['update_posts_option_value'] == 'no' ) {
+			update_option( 'patreon-update-posts', 'no' );
+		}
+	
+		echo 'Success';
+		exit;
+			
+	}
+	public function set_delete_posts_option() {
+		
+		if( !( is_admin() && current_user_can( 'manage_options' ) ) ) {
+			return;
+		}
+		
+		if ( $_REQUEST['delete_posts_option_value'] == 'yes' ) {
+			update_option( 'patreon-remove-deleted-posts', 'yes' );
+		}
+	
+		
+		if ( $_REQUEST['delete_posts_option_value'] == 'no' ) {
+			update_option( 'patreon-remove-deleted-posts', 'no' );
+		}		
+			
+		echo 'Success';
+		exit;
+			
 	}
 	public function toggle_check_api_credentials_on_setting_save(  $old_value, $new_value ) {
 		
@@ -1257,7 +1483,9 @@ class Patreon_Wordpress {
 			'user_total_historical_pledge' => $user_lifetime_patronage,
 		);
 		
-		return apply_filters( 'ptrn/lock_or_not', self::add_to_lock_or_not_results( $post_id, $result) , $post_id, $declined, $user );
+		$result = apply_filters( 'ptrn/lock_or_not', $result , $post_id, $declined, $user );
+		
+		return self::add_to_lock_or_not_results( $post_id, $result);
 		
 	}
 
@@ -1320,6 +1548,8 @@ class Patreon_Wordpress {
 		
 		// Handles setup wizard and reconnect wizard screens
 		
+		$setup_message = PATREON_SETUP_INITIAL_MESSAGE;
+		
 		if ( !isset( $_REQUEST['setup_stage'] ) OR $_REQUEST['setup_stage'] == '0' ) {
 			
 			$requirements_check = Patreon_Compatibility::check_requirements();
@@ -1331,7 +1561,46 @@ class Patreon_Wordpress {
 					$requirement_notices .= '&bull; ' . Patreon_Frontend::$messages_map[$requirements_check[$key]].'<br />';
 				}
 			}
+			
+			// Delete v1 related details in case a v1 site owner initiated setup wizard for whatsoever reason
+			if ( get_option( 'patreon-installation-api-version', false ) == '1' ) {
+					
+				$options_to_delete = array(
+					'patreon-custom-page-name',
+					'patreon-fetch-creator-id',
+					'patreon-creator-tiers',
+					'patreon-creator-last-name',
+					'patreon-creator-first-name',
+					'patreon-creator-full-name',
+					'patreon-creator-url',
+					'patreon-campaign-id',
+					'patreon-creators-refresh-token-expiration',
+					'patreon-creator-id',
+					'patreon-setup-wizard-last-call-result',
+					'patreon-creators-refresh-token',
+					'patreon-creators-access-token',
+					'patreon-client-secret',
+					'patreon-client-id',
+					'patreon-setup_is_being_done',
+					'patreon-setup-done',
+					'patreon-currency-sign',
+				);				
 
+				// Delete override - proceed with deleting local options
+				
+				foreach ( $options_to_delete as $key => $value ) {
+					delete_option( $options_to_delete[$key] );
+				}
+				
+				update_option( 'patreon-installation-api-version', '2' );
+				update_option( 'patreon-can-use-api-v2', true );
+				
+				// Set custom setup message telling old v1 install users to delete their client at clients page before starting setup
+				
+				$setup_message = PATREON_ADMIN_MESSAGE_V1_CLIENT_ATTEMPTING_V2_SETUP;
+				
+			}			
+			
 			$config_info = self::collect_app_info();
 			$config_input = '';
 			
@@ -1339,9 +1608,7 @@ class Patreon_Wordpress {
 				$config_input .= '<input type="hidden" name="' . $key . '" value="' . $config_info[$key] . '" />';
 
 			}
-			
-			$setup_message = PATREON_SETUP_INITIAL_MESSAGE;
-			
+						
 			if ( isset( $_REQUEST['patreon_message'] ) AND $_REQUEST['patreon_message'] != '' ) {
 				$setup_message = Patreon_Frontend::$messages_map[$_REQUEST['patreon_message']];
 
@@ -1393,6 +1660,122 @@ class Patreon_Wordpress {
 
 		}
 		
+		if ( isset( $_REQUEST['setup_stage'] ) AND $_REQUEST['setup_stage'] == 'post_sync_0' ) {
+			
+			
+			
+			$setup_message = PATREON_POST_SYNC_0;
+			
+			if ( isset( $_REQUEST['patreon_message'] ) AND $_REQUEST['patreon_message'] != '' ) {
+				$setup_message = Patreon_Frontend::$messages_map[$_REQUEST['patreon_message']];
+
+			}
+
+			// Create state var needed for identifying connection attempt
+			
+			echo '<div id="patreon_setup_screen">';
+	
+			echo '<div id="patreon_setup_logo"><img src="' . PATREON_PLUGIN_ASSETS . '/img/Patreon_Logo_100.png" /></div>';
+			
+			echo '<div id="patreon_setup_content"><h1 style="margin-top: 0px;">Do you want to sync your posts?</h1><div id="patreon_setup_message">' . $setup_message . '</div><form style="display:inline-block;margin-right: 10px;" method="post" action="' . admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=post_sync_1' ) . '"><p class="submit" style="margin-top: 10px;"><input type="submit" class="button button-large button-primary" value="Yes, lets go!" /></p></form><form style="display:inline-block;" method="post" action="' . admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=final' ) . '"><p class="submit" style="margin-top: 10px;"><input type="submit" class="button button-large button-primary" value="Maybe later" /></p></form></div>';
+			
+			echo '</div>';
+
+		}
+		
+		if ( isset( $_REQUEST['setup_stage'] ) AND $_REQUEST['setup_stage'] == 'post_sync_1' ) {
+			
+			$setup_message = '';
+			
+			if ( isset( $_REQUEST['patreon_message'] ) AND $_REQUEST['patreon_message'] != '' ) {
+				$setup_message = Patreon_Frontend::$messages_map[$_REQUEST['patreon_message']];
+			}
+			
+			$update_posts_selected = '';
+			$update_posts_unselected = '';
+			
+			if ( get_option( 'patreon-update-posts', 'no' ) == 'yes' ) {
+				$update_posts_selected = " selected";
+			}
+			else {
+				$update_posts_unselected = " selected";
+			}
+			
+			$delete_posts_selected = '';
+			$delete_posts_unselected = '';
+			
+			if ( get_option( 'patreon-remove-deleted-posts', 'no' ) == 'yes' ) {
+				$delete_posts_selected = " selected";
+			}
+			else {
+				$delete_posts_unselected = " selected";
+			}
+			
+			global $Patreon_Wordpress;
+			
+			// If we are at this page, user wants posts synced - set it to on.
+			
+			update_option( 'patreon-sync-posts', 'yes' );
+
+			$sync_post_type               = get_option( 'patreon-sync-post-type', 'post' );
+			$sync_post_category           = get_option( 'patreon-sync-post-category', 'category' );
+			$sync_post_term               = get_option( 'patreon-sync-post-term', '1' );
+			$post_author_for_synced_posts = get_option( 'patreon-post-author-for-synced-posts', 1 );
+			$api_version                  = get_option( 'patreon-installation-api-version', 2 );
+
+				
+			$post_type_select = $Patreon_Wordpress->make_post_type_select( $sync_post_type );
+			$taxonomy_select  = $Patreon_Wordpress->make_taxonomy_select( $sync_post_type, $sync_post_category );
+			$term_select      = $Patreon_Wordpress->make_term_select( $sync_post_type, $sync_post_category, $sync_post_term );	
+			$user_select      = $Patreon_Wordpress->make_user_select( $post_author_for_synced_posts );
+			
+			$api_version_warning = '';
+			
+			if ( $api_version == '1' ) {
+				$api_version_warning = '<div id="patreon_api_version_warning" class="notice notice-info"><div class="patreon_api_version_warning_important">' . PATREON_WARNING_IMPORTANT . '</div>' . PATREON_API_VERSION_WARNING . '</div>';
+			}
+
+			echo '<div id="patreon_setup_screen">';
+	
+			echo '<div id="patreon_setup_logo"><img src="' . PATREON_PLUGIN_ASSETS . '/img/Patreon_Logo_100.png" /></div>';
+			
+			echo '<div id="patreon_setup_content"><h1 style="margin-top: 0px;">How should posts be synced?</h1><div id="patreon_setup_message">' . $api_version_warning . $setup_message . '<div class="patreon_post_sync_choice"><div class="patreon_post_sync_choice_title">Sync posts to this category</div>'. PATREON_POST_SYNC_5 .'<div style="display:block;margin-top:10px;width: 200px;"><select name="patreon_sync_post_type" id="patreon_sync_post_type" style="display: inline-block; margin-right: 5px; margin-bottom: 10px; font-size: 20px; width: 250px;">' . $post_type_select . '</select><select  name="patreon_sync_post_category" id="patreon_sync_post_category" style="display: inline-block; margin-right: 5px; margin-bottom: 10px; font-size: 20px; width: 250px;">' .$taxonomy_select . '</select><select  name="patreon_sync_post_term" id="patreon_sync_post_term" style="display: inline-block; margin-right: 5px; margin-bottom: 10px; font-size: 20px; width: 250px;">' . $term_select .'</select><button id="patreon_wordpress_save_post_sync_category" class="button button-primary button-large" style="display: inline-block; margin-right: 5px; margin-bottom: 10px; font-size: 20px; width: 250px;" pw_input_target="#patreon_wordpress_post_import_category_status" target="">Save</button><div id="patreon_wordpress_post_import_category_status" style="color: #<?php echo $post_sync_category_status_color ?>;"></div></div><div class="patreon_post_sync_choice"><div class="patreon_post_sync_choice_title">Author for imported posts</div>'. PATREON_POST_SYNC_6 .'<div style="display:block;margin-top:10px;"><select id="patreon-post-author-for-synced-posts" name="patreon-post-author-for-synced-posts" pw_input_target="#patreon-post-author-for-synced-posts-info" style="font-size:20px; display:inline-block;">' . $user_select .'</select><div id="patreon-post-author-for-synced-posts-info"></div></div></div><div class="patreon_post_sync_choice"><div class="patreon_post_sync_choice_title">Update local posts from the ones at Patreon</div>'. PATREON_POST_SYNC_2 .'<div style="display:block;margin-top:10px;width: 200px;"><select id="patreon-update-posts" name="patreon-update-posts" pw_input_target="#patreon-update-posts-info" style="font-size:20px; display:inline-block;"><option value="">Select</option><option value="yes" '. $update_posts_selected .'>Yes</option><option value="no"'. $update_posts_unselected .'>No</option></select><div id="patreon-update-posts-info"></div></div></div><div class="patreon_post_sync_choice"><div class="patreon_post_sync_choice_title">Delete local post when Patreon post is deleted</div>'. PATREON_POST_SYNC_3 .'<div style="display:block;margin-top:10px;width: 200px;"><select name="patreon-remove-deleted-posts" id="patreon-remove-deleted-posts" pw_input_target="#patreon-remove-deleted-posts-info" style="font-size:20px;"><option value="">Select</option><option value="yes" '. $delete_posts_selected .'>Yes</option><option value="no" '. $delete_posts_unselected .'>No</option></select><div id="patreon-remove-deleted-posts-info"></div></div></div></div><form style="display:inline-block;margin-right:10px;" method="post" action="'. admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=post_sync_2') .'"><p class="submit" style="margin-top: 10px;"><input type="submit" name="submit" id="submit" class="button button-large button-primary" value="Done!"></p></form></div>';
+		
+			echo '</div>';
+
+		}
+		if ( isset( $_REQUEST['setup_stage'] ) AND $_REQUEST['setup_stage'] == 'post_sync_2' ) {
+			
+			$setup_message = PATREON_POST_SYNC_4;
+			
+			// Check if any post sync field 
+			
+			if ( isset( $_REQUEST['patreon_message'] ) AND $_REQUEST['patreon_message'] != '' ) {
+				$setup_message = Patreon_Frontend::$messages_map[$_REQUEST['patreon_message']];
+
+			}
+
+			update_option( 'patreon-post-sync-set-up', true );
+			
+			// If post sync is on and no post import was done, start a post import:
+			
+			if ( get_option( 'patreon-sync-posts', false ) AND  !get_option( 'patreon-first-post-import-started', false ) ) {
+				
+				update_option( 'patreon-post-import-in-progress', true );
+				update_option( 'patreon-first-post-import-started', true );
+				delete_option( 'patreon-post-import-next-cursor' );
+				
+			}
+			
+			echo '<div id="patreon_setup_screen">';
+	
+			echo '<div id="patreon_setup_logo"><img src="' . PATREON_PLUGIN_ASSETS . '/img/Patreon_Logo_100.png" /></div>';
+			
+			echo '<div id="patreon_setup_content"><h1 style="margin-top: 0px;">Post sync set up!</h1><div id="patreon_setup_message">' . $setup_message . '</div><form style="display:inline-block;margin-right:10px;" method="post" action="'. admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=final') .'"><p class="submit" style="margin-top: 10px;"><input type="submit" name="submit" id="submit" class="button button-large button-primary" value="Got it!"></p></form></div>';
+		
+			echo '</div>';
+
+		}
 		
 		if ( isset( $_REQUEST['setup_stage'] ) AND $_REQUEST['setup_stage'] == 'reconnect_0' ) {
 			
@@ -1630,13 +2013,17 @@ class Patreon_Wordpress {
 			exit;
 		}
 		
+		// Update creator tiers from api
+		
+		Patreon_Wordpress::update_creator_tiers_from_api();
+		
 		$post = get_post( $_REQUEST['pw_post_id'] );
 				
 		echo Patreon_Wordpress::make_tiers_select( $post );
 		exit;
 		
 	}
-	public static function make_tiers_select( $post = false ) {
+	public static function make_tiers_select( $post = false, $args = array() ) {
 		
 		if( !( is_admin() && current_user_can( 'manage_options' ) ) ) {
 			return;
@@ -1647,11 +2034,7 @@ class Patreon_Wordpress {
 		}
 		
 		// This function makes a select box with rewards and reward ids from creator's campaign to be used in post locking and site locking
-		
-		// First force an update of creator tiers from the api in case they were changed.
-		
-		self::update_creator_tiers_from_api();
-		
+				
 		// Get updated tiers from db
 		$creator_tiers = get_option( 'patreon-creator-tiers', false );
 
@@ -1746,7 +2129,7 @@ class Patreon_Wordpress {
 		
 		// Does an update of creator tiers from the api
 		
-		if ( get_option( 'patreon-client-id', false ) 
+		if ( get_option( 'patreon-client-id', false )
 				&& get_option( 'patreon-client-secret', false ) 
 				&& get_option( 'patreon-creators-access-token' , false )
 		) {
@@ -1757,7 +2140,7 @@ class Patreon_Wordpress {
 				
 		}
 
-		if ( isset( $creator_info ) AND is_array( $creator_info['included'] ) AND isset( $creator_info['included'][1]['type'] ) AND $creator_info['included'][1]['type'] == 'reward' ) {
+		if ( isset( $creator_info ) AND isset( $creator_info['included'] ) AND is_array( $creator_info['included'] ) AND isset( $creator_info['included'][1]['type'] ) AND $creator_info['included'][1]['type'] == 'reward' ) {
 
 			// Creator info acquired. Update.
 			// We want to sort tiers according to their $ level.
@@ -1834,6 +2217,7 @@ class Patreon_Wordpress {
 				'patreon-client-id',
 				'patreon-setup_is_being_done',
 				'patreon-setup-done',
+				'patreon-currency-sign',
 			);
 			
 			// Ask the API to delete this client:
@@ -1928,6 +2312,7 @@ class Patreon_Wordpress {
 				'patreon-client-id',
 				'patreon-setup_is_being_done',
 				'patreon-setup-done',
+				'patreon-currency-sign',
 			);
 			
 			// Ask the API to delete this client:
@@ -2028,4 +2413,412 @@ class Patreon_Wordpress {
 		update_option( 'patreon-last-50-conn-errors', $last_50_conn_errors );
 
 	}
+	
+	public static function is_content_gated_with_pw( $post_id ) {
+		
+		// Checks if a post is gated with PW
+				
+		$post = get_post( $post_id );
+
+		// Take into account excluded posts.
+		
+		$exclude = array(
+		);
+		
+		// Enables 3rd party plugins to modify the post types excluded from locking
+		$exclude = apply_filters( 'ptrn/filter_excluded_posts', $exclude );
+
+		if ( isset( $post->ID ) AND in_array( get_post_type( $post->ID ), $exclude ) ) {
+			// Excluded from gating. Therefore return false
+			return false;
+		}
+		
+		// First check if entire site is locked, get the level for locking.
+		
+		$patreon_level = get_option( 'patreon-lock-entire-site', false );
+		
+		// Check if specific level is given for this post:
+		
+		$post_level = '';
+		
+		if ( isset( $post->ID ) ) {
+			$post_level = get_post_meta( $post->ID, 'patreon-level', true );
+		}
+				
+		// get post meta returns empty if no value is found. If so, set the value to 0.
+		
+		if ( $post_level == '' ) {
+			$post_level = 0;				
+		}
+
+		// Check if both post level and site lock level are set to 0 or nonexistent. If so return normal content.
+		
+		if ( $post_level == 0 
+			&& ( !$patreon_level
+				|| $patreon_level == 0 )
+		) {
+			// Post is public
+			return false;			
+		}		
+		
+		// If we are at this point, it means the post is gated with PW. Return true.
+		return true;
+		
+	}
+
+	public function make_post_type_select( $selected_post_type = 'post' ) {
+		
+		$post_types = get_post_types();
+		$select = '';
+	
+		foreach( $post_types as $key => $value ) {
+			
+			$selected = '';
+			$obj = get_post_type_object( $key );
+			
+			if ( $key == $selected_post_type ) {
+				$selected = ' selected';
+			}
+			
+			$select .= '<option value="' . $key . '" ' . $selected . ' >' . $obj->labels->singular_name . '</option>';
+
+		}
+		
+		return $select;
+		
+	}
+
+	public static function add_to_patreon_user_info_cache( $user_id, $user_info ) {
+		
+		// This function manages the array that is used as the cache for info of Patreon users in a given page run. What it does is to accept the id of the WP user and a given Patreon user info, then add it to the a cache array 
+		
+		// If the cache array is larger than 50, snip the first item. This may be increased in future
+		
+		if ( !empty( self::$patreon_user_info_cache ) && (count( self::$patreon_user_info_cache ) > 50)  ) {
+			array_shift( self::$patreon_user_info_cache );
+		}
+		
+		// Add the new request and return it
+		
+		return self::$patreon_user_info_cache[$user_id] = $user_info;
+		
+	}	
+		
+	public function make_taxonomy_select( $selected_post_type = 'post', $selected_taxonomy = 'category' ) {
+		
+		$return = true;
+		$select = '';
+		
+		if ( isset( $_REQUEST['patreon_wordpress_post_type'] ) ) {
+			$selected_post_type = $_REQUEST['patreon_wordpress_post_type'];
+			$return = false;
+		}
+		
+		$taxonomies = get_object_taxonomies( $selected_post_type );
+
+		foreach( $taxonomies as $key => $value ) {
+			
+			$selected = '';
+
+			$taxonomy = get_taxonomy( $taxonomies[$key] );
+
+			if ( is_object( $taxonomy ) ) {
+				
+				if ( $taxonomy->name == $selected_taxonomy AND $return ) {
+					$selected = ' selected';
+				}
+				
+				$select .= '<option value="' . $taxonomy->name . '" ' . $selected . ' >'. $taxonomy->labels->singular_name . '</option>';	
+			}
+			
+		}
+
+		if ( $return ) {
+			return $select;
+		}
+		
+		echo $select;
+		exit;
+		
+	}
+	public function make_term_select( $selected_post_type = 'post', $selected_taxonomy = 'category', $selected_term = 1 ) {
+		
+		$return = true;
+		$select = '';
+		
+		if ( isset( $_REQUEST['patreon_sync_post_category'] ) ) {
+			$selected_taxonomy = $_REQUEST['patreon_sync_post_category'];
+			$return = false;
+		}
+		
+		$terms = get_terms( $selected_taxonomy, 
+			array(
+				'hide_empty' => false, 
+				'parent' => 0, 
+				'orderby' => 
+				'description', 
+				'order' => 'ASC',
+			) 
+		);
+		
+		foreach( $terms as $key => $value ) {
+			
+			$selected = '';
+			
+			if ( count( $terms ) > 0 ) {
+				
+				if ( $terms[$key]->term_id == $selected_term AND $return ) {
+					$selected = ' selected';
+				}
+				
+				$select .= '<option value="' . $terms[$key]->term_id . '" ' . $selected . ' >'. $terms[$key]->name . '</option>';	
+			}
+			
+		}
+		
+		if ( $return ) {
+			return $select;
+		}
+		
+		echo $select;
+		exit;
+		
+	}
+	public function make_user_select( $selected_user = 1 ) {
+		
+		$return = true;
+		$select = '';
+		
+		if ( isset( $_REQUEST['patreon-post-author-for-synced-posts'] ) ) {
+			$selected_user = $_REQUEST['patreon-post-author-for-synced-posts'];
+			$return = false;
+		}
+		
+		$users = get_users();
+		
+		foreach( $users as $key => $value ) {
+			
+			$selected = '';
+			
+			if ( count( $users ) > 0 ) {
+				
+				if ( $users[$key]->data->ID == $selected_user AND $return ) {
+					$selected = ' selected';
+				}
+				
+				$select .= '<option value="' . $users[$key]->data->ID . '" ' . $selected . ' >'. $users[$key]->data->display_name . '</option>';	
+			}
+			
+		}
+		
+		if ( $return ) {
+			return $select;
+		}
+		
+		echo $select;
+		exit;
+		
+	}
+	public function get_file_id_from_media_library( $filename ) {
+		
+		global $wpdb;
+				
+		$query = $wpdb->prepare(
+			"SELECT post_id FROM $wpdb->postmeta WHERE meta_key = '_wp_attached_file' AND meta_value = %s",
+			$filename
+		);
+
+		if ( $wpdb->get_var( $query ) !== null ) {
+			return $wpdb->get_var( $query );
+		}
+	
+		return false;
+		
+	}
+	public function get_images_info_from_content( $content ) {
+		
+		// Get images out of content using dom
+		$dom_document = new domDocument;
+		$save_errors  = libxml_use_internal_errors( true );
+		$dom_document->loadHTML( $content ); 
+		$dom_document->preserveWhiteSpace = false;
+		$images = $dom_document->getElementsByTagName( 'img' );
+		libxml_use_internal_errors( $save_errors );
+		
+		$parsed_images_info = array();
+	 
+		foreach ( $images as $image ) {
+    
+			$url =  $image->getAttribute( 'src' );
+		
+			$details = parse_url( $url );
+
+			$exploded_path = array_reverse( explode( '/', $details['path'] ) );
+
+			// First element is the Patreon given filename, second is unique identifier
+			
+			$extension = pathinfo( $exploded_path[0], PATHINFO_EXTENSION );
+			
+			// Use only unique identifier for now
+			$parsed_images_info[] = array( 
+					'filename' => $exploded_path[1] . '.' . $extension,
+					'url'      => $url,
+			);
+
+		}
+
+		if ( count( $parsed_images_info ) > 0 ) {
+			return $parsed_images_info;
+		}
+		
+		return false;
+	}
+	public function download_insert_media( $url, $filename ) {
+			
+		require_once(ABSPATH . '/wp-admin/includes/file.php');
+		require_once(ABSPATH . '/wp-admin/includes/media.php');
+		require_once(ABSPATH . '/wp-admin/includes/image.php');
+		
+		$temp_file = download_url( $url, 3 );
+
+		if ( !is_wp_error( $temp_file ) ) {
+			
+			$file_type_info = wp_check_filetype_and_ext( $temp_file, $filename );
+			
+			$wp_upload_dir = wp_upload_dir();
+			
+
+			$file_array = array( //array to mimic $_FILES
+				'name' => $filename, //isolates and outputs the file name from its absolute path
+				'type' => $file_type_info['type'], // get mime type of image file
+				'tmp_name' => $temp_file, //this field passes the actual path to the image
+				'error' => 0, //normally, this is used to store an error, should the upload fail. but since this isnt actually an instance of $_FILES we can default it to zero here
+				'size' => filesize( $temp_file ) //returns image filesize in bytes
+			);
+			
+			$attachment_id = media_handle_sideload( $file_array ); //the actual image processing, that is, move to upload directory, generate thumbnails and image sizes and writing into the database happens here			
+
+			if ( is_wp_error( $attachment_id ) ) {
+				// Insert any error handling here
+				return false;
+			}
+			
+			return $attachment_id;
+			
+		}		
+		
+	}
+	public function check_post_sync_webhook() {
+		
+		if (is_admin()) {
+			return;
+		}
+		
+		// Avoid infinite redirects due to https url check at add_patreon_webhook function in api class checking patreon-webhook uri
+		if (strpos( $_SERVER['REQUEST_URI'], 'patreon-webhook' ) !== false ) {
+			return;
+		}
+		
+		// Abort if site is using api v1
+		$api_version    = get_option( 'patreon-installation-api-version', '1' );
+		
+		if ( $api_version != '2' ) {
+			return;
+		}
+
+		if ( get_option( 'patreon-sync-posts', 'no' ) == 'no' ) {
+	
+			// Checks if post sync is enabled and posts webhook in case it is not posted
+			$existing_hook = get_option( 'patreon-post-sync-webhook', array() );	
+	
+			// If there is an existing webhook, delete it.
+			
+			if ( get_option( 'patreon-post-sync-webhook-saved', false ) ) {
+			
+				$existing_hook = get_option( 'patreon-post-sync-webhook', false );
+				
+				if ( !$existing_hook ) {
+					return;
+				}
+				
+				$creator_access_token = get_option( 'patreon-creators-access-token', false );
+				
+				$api_client = new Patreon_API( $creator_access_token );
+				
+				$webhook_delete = $api_client->delete_post_webhook( $existing_hook['data']['id'] );
+				
+				// If delete is successful remove the local info about webhook
+				if ( is_array( $webhook_delete ) AND isset( $webhook_delete['response']['code'] ) AND $webhook_delete['response']['code'] == '204' ) {
+
+					update_option( 'patreon-post-sync-webhook-saved', false );
+					delete_option( 'patreon-post-sync-webhook');
+
+				}
+
+			}
+			
+			return;			
+		}
+		
+		// If webhook already added, skip
+		if ( get_option( 'patreon-post-sync-webhook-saved', false ) ) {
+			return;			
+		}
+		
+		$creator_access_token = get_option( 'patreon-creators-access-token', false );
+		
+		$api_client = new Patreon_API( $creator_access_token );
+		
+		$webhook_added = $api_client->add_post_webhook();
+
+		if ( is_array( $webhook_added ) AND isset( $webhook_added['data']['type'] ) AND $webhook_added['data']['type'] == 'webhook' ) {
+			
+			// Save webhook info
+			
+			update_option( 'patreon-post-sync-webhook', $webhook_added );
+			update_option( 'patreon-post-sync-webhook-saved', true );
+			
+		}
+		
+	}
+	
+	public function get_all_headers() {
+		
+		// Gets headers on an incoming request
+
+		$headers = [];
+		foreach ($_SERVER as $name => $value) {
+			if (substr($name, 0, 5) == 'HTTP_') {
+				$headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
+			}
+		}
+		return $headers;
+
+	}
+
+	// Adds Patreon cron schedule if needed
+	
+	public function add_patreon_cron_schedules( $schedules ) {
+				
+		$schedules['patreon_five_minute_cron_schedule'] = array(
+			'interval' => 300, // 5 min
+			'display'  => __( 'Patreon cron - every five minutes' ),
+		);
+		
+		return $schedules;
+		
+	}
+	
+	public function patreon_five_minute_cron_job() {
+		
+		// Check if post sync is on just in case if the cron job somehow persisted despite sync being disabled
+		
+		if ( get_option( 'patreon-post-import-in-progress', false ) ) {
+						
+			self::$patreon_content_sync->import_posts_from_patreon();
+			
+		}
+
+	}
+	
 }

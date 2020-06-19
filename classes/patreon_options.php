@@ -26,6 +26,8 @@ class Patreon_Options {
 		
 		add_submenu_page( null, 'Patreon WordPress Admin Message', 'Admin message', 'manage_options', 'patreon-plugin-admin-message', array( $this, 'patreon_plugin_admin_message_page' ) );
 
+		add_submenu_page( 'patreon-plugin', 'Patreon WordPress Post Sync', 'Post Sync', 'manage_options', 'patreon_wordpress_setup_wizard&setup_stage=post_sync_1', array( $this, 'patreon_plugin_post_sync_page' ) );
+		
 		add_submenu_page( 'patreon-plugin', 'Patreon WordPress Health Check', 'Health check', 'manage_options', 'patreon-plugin-health', array( $this, 'patreon_plugin_health_check_page' ) );
 
     }
@@ -54,6 +56,14 @@ class Patreon_Options {
         register_setting( 'patreon-options', 'patreon-custom-universal-banner' );
         register_setting( 'patreon-options', 'patreon-custom-page-name' );
         register_setting( 'patreon-options', 'patreon-prevent-caching-gated-content' );
+        register_setting( 'patreon-options', 'patreon-currency-sign' );
+        register_setting( 'patreon-options', 'patreon-sync-posts' );
+        register_setting( 'patreon-options', 'patreon-post-import-in-progress' );
+        register_setting( 'patreon-options', 'patreon-remove-deleted-posts' );
+        register_setting( 'patreon-options', 'patreon-update-posts' );
+        register_setting( 'patreon-options', 'patreon-post-author-for-synced-posts' );
+        register_setting( 'patreon-options', 'patreon-hide-login-button' );
+        register_setting( 'patreon-options', 'patreon-set-featured-image' );
 		
     }
 	
@@ -283,6 +293,18 @@ class Patreon_Options {
                                         </tr>
                                         <?php } ?>
 										
+                                       
+                                        <tr valign="top">
+											<th scope="row">
+												<strong>Hide 'Login with Patreon' Button</strong>
+												<div class="patreon-options-info">If on, 'Login with Patreon' button will be hidden from WP login page and WP login forms. Users can still log in or unlock via Patreon using unlock buttons. Recommended: off</div>
+											</th>
+											<td>
+												<input type="checkbox" name="patreon-hide-login-button" value="1"<?php checked( get_option( 'patreon-hide-login-button', false ) ); ?> />
+											</td>
+                                        </tr>
+                                    
+										
                                         <tr valign="top">
 											<th scope="row">
 												<strong>Custom Patreon Page name</strong>
@@ -301,24 +323,264 @@ class Patreon_Options {
 											<td>
 												<?php
 																									
-													$prevent_caching_checked = '';
-													$do_not_prevent_caching_checked = '';
+													$prevent_caching_selected = '';
+													$do_not_prevent_caching_selected = '';
 													
 													if ( get_option( 'patreon-prevent-caching-gated-content', 'yes' ) == 'yes' ) {
-														$prevent_caching_checked = " checked";
+														$prevent_caching_selected = " selected";
 													}
 													else {
-														$do_not_prevent_caching_checked = " checked";
+														$do_not_prevent_caching_selected = " selected";
 													}
 												
 												?>
 												<select name="patreon-prevent-caching-gated-content">
-													<option value="yes" <?php echo $prevent_caching_checked; ?>>Yes</option>
-													<option value="no" <?php echo $do_not_prevent_caching_checked; ?>>No</option>
+													<option value="yes" <?php echo $prevent_caching_selected; ?>>Yes</option>
+													<option value="no" <?php echo $do_not_prevent_caching_selected; ?>>No</option>
 												</select>
 											</td>
                                         </tr>
-
+                                        <tr valign="top">
+											<th scope="row">
+												<strong>Currency sign</strong>
+												<div class="patreon-options-info">You can set the currency sign to match your campaign currency here. This will be used in gated posts to show the pledge amount needed to unlock the post</div>
+											</th>
+											<td>
+												<?php
+													
+													// Iterating through all cases here to not provide 3 choices by showing current/default as a 4th selection choice in select box
+													
+													$currency_sign = '$';
+													
+													$currency_dollar_selected = '';
+													$currency_euro_selected = '';
+													$currency_pound_selected = '';
+													
+													$saved_currency_sign = get_option( 'patreon-currency-sign', false );
+											
+													if ( $saved_currency_sign ) {
+														// Currency set. Set the sign to value from db
+														$currency_sign = $saved_currency_sign;
+													}
+													
+													// Set whichever currency is set as selected
+													if ( $currency_sign == '$' ) {
+														$currency_dollar_selected = " selected";
+													}
+													
+													// Set whichever currency is set as selected
+													if ( $currency_sign == '€' ) {
+														$currency_euro_selected = " selected";
+													}
+													
+													// Set whichever currency is set as selected
+													if ( $currency_sign == '£' ) {
+														$currency_pound_selected = " selected";
+													}
+													
+												
+												?>
+												<select name="patreon-currency-sign">
+													<option value="$" <?php echo $currency_dollar_selected; ?>>$</option>
+													<option value="€" <?php echo $currency_euro_selected; ?>>€</option>
+													<option value="£" <?php echo $currency_pound_selected; ?>>£</option>
+												</select>
+											</td>
+                                        </tr>
+										
+										<?php
+										
+											$api_version_warning = '';
+											
+											if ( get_option( 'patreon-installation-api-version', 2 ) == '1' ) {
+												$api_version_warning = '<div id="patreon_api_version_warning" class="patreon_api_version_warning_inside_options"><div class="patreon_api_version_warning_important">' . PATREON_WARNING_IMPORTANT . '</div>' . PATREON_API_VERSION_WARNING . '</div>';
+											}
+										?>
+										
+                                        <tr valign="top">
+											<th scope="row">
+												<strong>Sync Patreon posts</strong>
+												<div class="patreon-options-info">If Yes, the plugin will sync your posts from Patreon to your WP site on an ongoing basis. Recommended: Yes
+												<?php echo $api_version_warning; ?></div>
+											</th>
+											<td>
+												<?php
+														
+													$sync_posts_selected = '';
+													$sync_posts_unselected = '';
+													
+													if ( get_option( 'patreon-sync-posts', 'no' ) == 'yes' ) {
+														$sync_posts_selected = " selected";
+													}
+													else {
+														$sync_posts_unselected = " selected";
+													}
+												
+												?>
+												<select name="patreon-sync-posts">
+													<option value="yes" <?php echo $sync_posts_selected; ?>>Yes</option>
+													<option value="no" <?php echo $sync_posts_unselected; ?>>No</option>
+												</select>
+											</td>
+                                        </tr>
+                                        <tr valign="top">
+											<th scope="row">
+												<strong>Post type and category for synced posts</strong>
+												<div class="patreon-options-info">Set which post type and category/taxonomy will be used for synced posts.
+												<div id="patreon_select_post_sync_category">
+													<?php
+														global $Patreon_Wordpress;
+														
+														$sync_post_type     = get_option( 'patreon-sync-post-type', 'post' );
+														$sync_post_category = get_option( 'patreon-sync-post-category', 'category' );
+														$sync_post_term     = get_option( 'patreon-sync-post-term', '1' );
+															
+														$post_type_select = $Patreon_Wordpress->make_post_type_select( $sync_post_type );
+														$taxonomy_select  = $Patreon_Wordpress->make_taxonomy_select( $sync_post_type, $sync_post_category );
+														$term_select      = $Patreon_Wordpress->make_term_select( $sync_post_type, $sync_post_category, $sync_post_term );
+														$post_sync_category_status_color = "9d9d9d";
+														
+													
+													?>
+													<select name="patreon_sync_post_type" id="patreon_sync_post_type" style="display: inline-block; margin-right: 5px;">
+														<?php echo $post_type_select ?>
+													</select>
+													<select  name="patreon_sync_post_category" id="patreon_sync_post_category" style="display: inline-block; margin-right: 5px;">
+														<?php echo $taxonomy_select ?>
+													</select>
+													<select  name="patreon_sync_post_term" id="patreon_sync_post_term" style="display: inline-block; margin-right: 5px;">
+														<?php echo $term_select ?>
+													</select>
+													<button id="patreon_wordpress_save_post_sync_category" class="button button-primary button-large" pw_input_target="#patreon_wordpress_post_import_category_status" target="">Save</button><div id="patreon_wordpress_post_import_category_status" style="color: #<?php echo $post_sync_category_status_color ?>;"></div>
+												</div>
+												
+												</div>
+											</th>
+											<td>
+												
+											</td>
+                                        </tr>
+                                        <tr valign="top">
+											<th scope="row">
+												<strong>Author for synced posts</strong>
+												<div class="patreon-options-info">Choose the author to be used in synced posts. This will only affect newly imported posts</div>
+											</th>
+											<td>
+												<?php
+													
+													$post_author_for_synced_posts = get_option( 'patreon-post-author-for-synced-posts', 1 );
+													$user_select = $Patreon_Wordpress->make_user_select( $post_author_for_synced_posts );
+													
+												?>
+												<select name="patreon-post-author-for-synced-posts">
+													<?php echo $user_select ?>
+												</select>
+											</td>
+                                        </tr>
+                                        <tr valign="top">
+											<th scope="row">
+												<strong>Update local posts from the ones at Patreon</strong>
+												<div class="patreon-options-info">If Yes, the plugin will update local imported/matched posts with the post content at Patreon. If you have extra formatting in your <i>local</i> posts, they will be overwritten with the formatting of the Patreon posts. Recommended: Yes</div>
+											</th>
+											<td>
+												<?php
+																									
+													$update_posts_selected = '';
+													$update_posts_unselected = '';
+													
+													if ( get_option( 'patreon-update-posts', 'no' ) == 'yes' ) {
+														$update_posts_selected = " selected";
+													}
+													else {
+														$update_posts_unselected = " selected";
+													}
+												
+												?>
+												<select name="patreon-update-posts">
+													<option value="yes" <?php echo $update_posts_selected; ?>>Yes</option>
+													<option value="no" <?php echo $update_posts_unselected; ?>>No</option>
+												</select>
+											</td>
+                                        </tr>
+                                        <tr valign="top">
+											<th scope="row">
+												<strong>Delete local posts when Patreon post is deleted</strong>
+												<div class="patreon-options-info">If Yes, the plugin will delete local imported/matched posts when you delete a post at Patreon. Recommended: No</div>
+											</th>
+											<td>
+												<?php
+																									
+													$delete_posts_selected = '';
+													$delete_posts_unselected = '';
+													
+													if ( get_option( 'patreon-remove-deleted-posts', 'no' ) == 'yes' ) {
+														$delete_posts_selected = " selected";
+													}
+													else {
+														$delete_posts_unselected = " selected";
+													}
+												
+												?>
+												<select name="patreon-remove-deleted-posts">
+													<option value="yes" <?php echo $delete_posts_selected; ?>>Yes</option>
+													<option value="no" <?php echo $delete_posts_unselected; ?>>No</option>
+												</select>
+											</td>
+                                        </tr>
+                                        <tr valign="top">
+											<th scope="row">
+												<strong>Set featured image from imported images</strong>
+												<div class="patreon-options-info">If Yes, the plugin will set the first image in an imported post as the featured image for the post. Recommended: Yes</div>
+											</th>
+											<td>
+												<?php
+																									
+													$set_post_featured_image_selected = '';
+													$set_post_featured_image_unselected = '';
+													
+													if ( get_option( 'patreon-set-featured-image', 'no' ) == 'yes' ) {
+														$set_post_featured_image_selected = " selected";
+													}
+													else {
+														$set_post_featured_image_unselected = " selected";
+													}
+												
+												?>
+												<select name="patreon-set-featured-image">
+													<option value="yes" <?php echo $set_post_featured_image_selected; ?>>Yes</option>
+													<option value="no" <?php echo $set_post_featured_image_unselected; ?>>No</option>
+												</select>
+											</td>
+                                        </tr>
+                                        <tr valign="top">
+											<th scope="row">
+												<strong>Start a post import</strong>
+												<?php
+													
+													$post_import_status = 'No post import ongoing';
+													$post_import_status_color = "9d9d9d";
+													
+													if ( get_option( 'patreon-post-import-in-progress', false ) ) {
+														$post_import_status = "There is an ongoing post import";
+														$post_import_status_color = "129500";
+													}
+													
+													$api_version    = get_option( 'patreon-installation-api-version', '1' );
+													$sync_posts     = get_option( 'patreon-sync-posts', 'no' );
+															
+													if ( $api_version != '2' AND $sync_posts == 'yes' ) {
+														$post_import_status = 'Cant import posts - Wrong api version! Please upgrade to v2 using the tutorial <a href="https://www.patreondevelopers.com/t/how-to-upgrade-your-patreon-wordpress-to-use-api-v2/3249" target="_blank">here</a>';
+														$post_import_status_color = "f31d00";
+													}	
+													
+												?>
+												<div class="patreon-options-info">Start an import of your posts from Patreon if you haven't done it before. After import of existing posts is complete, new posts will automatically be imported and existing posts automatically updated so you don't need to do this again.<div id="patreon_wp_post_import_status" style="color: #<?php echo $post_import_status_color ?>;"><?php echo $post_import_status; ?></div></div>
+											</th>
+											<td>
+												
+												<button id="patreon_wordpress_start_post_import" class="button button-primary button-large" [pw_input_target="#patreon_wp_post_import_status" target="">Start an import</button>
+											</td>
+                                        </tr>
                                     </table>
 
                                 </div>
@@ -442,6 +704,10 @@ class Patreon_Options {
 			
 	}
 	
+    function patreon_plugin_post_sync_page(){
+		// For now, dud to prevent any PHP notices when going to post sync wizard from admi menu. Can be expanded later.
+		return;		
+	}
     function patreon_plugin_health_check_page(){
 
 		?>

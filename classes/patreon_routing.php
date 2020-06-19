@@ -38,6 +38,7 @@ class Patreon_Routing {
 			'patreon-authorization\/?$' => 'index.php?patreon-oauth=true',
 			'patreon-flow\/?$' => 'index.php?patreon-flow=true',
 			'patreon-setup\/?$' => 'index.php?patreon-setup=true',
+			'patreon-webhooks\/?$' => 'index.php?patreon-webhooks=true',
 		);
 
 		$wp_rewrite->rules = $rules + (array) $wp_rewrite->rules;
@@ -57,12 +58,13 @@ class Patreon_Routing {
 		array_push( $public_query_vars, 'code' );
 		array_push( $public_query_vars, 'state' );
 		array_push( $public_query_vars, 'patreon-redirect' );
+		array_push( $public_query_vars, 'patreon-webhooks' );
 		return $public_query_vars;
 		
 	}
 
 	function parse_request( &$wp ) {
-
+		
 		if ( strpos( $_SERVER['REQUEST_URI'],'/patreon-flow/' ) !== false ) {
 			
 			// First slap the noindex header so search engines wont index this page:
@@ -302,7 +304,7 @@ class Patreon_Routing {
 						exit;
 						
 					}
-					
+										
 					$oauth_client = new Patreon_Oauth;
 										
 					// Set the client id to plugin wide client id one for setup process
@@ -312,6 +314,11 @@ class Patreon_Routing {
 					$tokens = $oauth_client->get_tokens( $wp->query_vars['code'], site_url() . '/patreon-authorization/', array( 'scopes' => 'w:identity.clients' ) );
 										
 					if ( isset( $tokens['access_token'] ) ) {
+						
+						// Exception - If we are here with a legit access token, re-mark this installation as v2 - can be removed when all installations are using v2
+						
+						update_option( 'patreon-installation-api-version', '2' );
+						update_option( 'patreon-can-use-api-v2', true );
 						
 						// We got auth. Proceed with creating the client
 						
@@ -371,7 +378,18 @@ class Patreon_Routing {
 								
 								// First apply a filter so that 3rd party addons can redirect to a custom final screen
 								
+								// Check if post syncing is set up, if not, redirect to post sync page.
+								
 								$setup_final_redirect = apply_filters( 'ptrn/setup_wizard_final_redirect', admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=final') );
+								
+								if ( !get_option( 'patreon-post-sync-set-up', false ) ) {
+									
+									// Post sync not set up. Redirect it to relevant page
+									
+									$setup_final_redirect = apply_filters( 'ptrn/setup_wizard_post_sync_redirect', admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=post_sync_0') );
+									
+								}
+								
 
 								wp_redirect( $setup_final_redirect );
 								exit;				
@@ -422,6 +440,11 @@ class Patreon_Routing {
 					if ( isset( $tokens['access_token'] ) ) {
 						
 						// We got auth. Proceed with creating the client
+						
+						// Exception - If we are here with a legit access token, re-mark this installation as v2 - can be removed when all installations are using v2
+						
+						update_option( 'patreon-installation-api-version', '2' );
+						update_option( 'patreon-can-use-api-v2', true );						
 						
 						// Create new api object
 						
@@ -583,6 +606,181 @@ class Patreon_Routing {
 				
 			}
 			
+		}
+		
+		if ( strpos( $_SERVER['REQUEST_URI'], '/patreon-webhooks/' ) !== false ) {
+			
+			// First slap the noindex header so search engines wont index this page:
+			header( 'X-Robots-Tag: noindex, nofollow' );
+			 
+			// Make sure browsers dont cache this
+			header( 'cache-control: no-cache, must-revalidate, max-age=0' );
+
+			// Abort if apiv ersion used is not v2
+			$api_version    = get_option( 'patreon-installation-api-version', '1' );
+					
+			if ( $api_version != '2' ) {
+				return;
+			}			
+
+			if( array_key_exists( 'patreon-webhooks', $wp->query_vars ) ) {
+				
+				$webhook_info = get_option( 'patreon-post-sync-webhook', false );
+				
+				if ( !$webhook_info ) {
+					return;
+				}
+				
+				global $Patreon_Wordpress;
+							
+				// Parts taken from FB's webhook example
+				$secret = $webhook_info['data']['attributes']['secret'];
+				$raw_post_data = file_get_contents('php://input');
+				//$header_signature = $_SERVER['X-Patreon-Signature'];
+				
+				$header_signature = '';
+				$event            = '';		
+				$headers          = $Patreon_Wordpress->get_all_headers();
+				
+				// If this is not an event from Patreon bail out
+				
+				if ( !isset( $headers['X-Patreon-Signature'] ) OR !isset( $headers['X-Patreon-Event'] ) ) {
+					return;
+				}
+				
+				$header_signature = $headers['X-Patreon-Signature'];
+				$event            = $headers['X-Patreon-Event'];
+					
+				// Signature matching
+				$expected_signature = hash_hmac( 'md5', $raw_post_data, $secret );
+				
+				$verified = false;
+				
+				if ( is_string( $header_signature ) AND hash_equals( $header_signature, $expected_signature ) ) {
+					$verified = true;
+				}
+				
+				if ( !$verified ) {
+					return;
+				}
+				
+				// This is a verified post from Patreon - process
+				
+				// Check if raw post data exists - if not bail out
+				if ( strlen( $raw_post_data ) == 0 ) {
+					return;
+				}
+				
+				$event_info = json_decode( $raw_post_data, true );
+				
+				// Check if event is a legitimate array - if not bail out
+				if ( !( is_array( $event_info ) AND count( $event_info ) > 0 ) ) {
+					return;
+				}
+				
+				// This is a legitimate Patreon event - process
+				
+				if( $event == 'posts:publish' ) {
+					
+					// Add post.
+
+					$patreon_post_id = $event_info['data']['id'];
+					
+					// Get Patreon post
+					
+					$creator_access_token = get_option( 'patreon-creators-access-token', false );
+					$client_id 			  = get_option( 'patreon-client-id', false );
+
+					$patreon_post = false;
+					
+					if ( $creator_access_token AND $client_id ) {
+						
+						// Create new api object
+						$api_client = new Patreon_API( $creator_access_token );
+						
+						$patreon_post = $api_client->get_post( $patreon_post_id );
+						
+					}
+					
+					if ( !$patreon_post OR !isset( $patreon_post['data']['id'] ) OR $patreon_post['data']['id'] == '' ) {
+						// Couldn't get this post. Skip
+						return;
+					}
+
+					$result = $Patreon_Wordpress::$patreon_content_sync->add_update_patreon_post( $patreon_post );
+					
+					if ( !$result ) {
+						// Failure. Error handling if necessary
+						
+					}
+					
+				}
+				
+				if( $event == 'posts:update' ) {
+					
+					// Update relevant post.
+					
+					$patreon_post_id = $event_info['data']['id'];
+					
+					// Get Patreon post
+					
+					$creator_access_token = get_option( 'patreon-creators-access-token', false );
+					$client_id 			  = get_option( 'patreon-client-id', false );
+
+					$patreon_post = false;
+					
+					if ( $creator_access_token AND $client_id ) {
+						
+						// Create new api object
+						$api_client = new Patreon_API( $creator_access_token );
+						
+						$patreon_post = $api_client->get_post( $patreon_post_id );
+						
+					}
+					
+					if ( !$patreon_post OR !isset( $patreon_post['data']['id'] ) OR $patreon_post['data']['id'] == '' ) {
+						// Couldn't get this post. Skip
+						return;
+					}
+					
+					if ( get_option( 'patreon-update-posts', 'no' ) == 'yes' ) {
+						
+						$result = $Patreon_Wordpress::$patreon_content_sync->add_update_patreon_post( $patreon_post );
+					
+						if ( !$result ) {
+							// Failure. Error handling if necessary - not needed for now
+						}
+					}
+					
+				}				
+				
+				if( $event == 'posts:delete' ) {
+					
+					// Delete relevant post.
+					
+					// Get matching WP post from post meta:
+					
+					$patreon_post_id = $event_info['data']['id'];
+					
+					if ( get_option( 'patreon-remove-deleted-posts', 'no' ) == 'yes' ) {
+					
+						$wp_post_id = $Patreon_Wordpress::$patreon_content_sync->get_matching_post_by_patreon_post_id( $patreon_post_id );
+						
+						$result = $Patreon_Wordpress::$patreon_content_sync->delete_patreon_post( $wp_post_id );
+											
+						if ( !$result OR is_null( $result ) ) {
+							// Delete failed - this may be a local issue. Can be used to give error to Patreon via header in future
+						}
+					}
+				
+				}
+				
+				status_header( 200 );
+				nocache_headers();
+				exit;
+			
+			}
+		
 		}
 		
 	}
