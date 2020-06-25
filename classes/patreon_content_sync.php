@@ -205,9 +205,6 @@ class Patreon_Content_Sync {
 			return;
 		}
 		
-		// Set featured image
-
-
 		// Now get the attachment ids we added to the post from earlier filenames
 		
 		if ( $images ) {
@@ -226,9 +223,32 @@ class Patreon_Content_Sync {
 					)
 				);
 				
+				// Set image to patron only since its in a patron only post - for those who use image locking featured
+						
+				// If post is not public - set the contained images to be patron only
+				
+				if ( $patreon_post['data']['attributes']['is_paid'] ) {
+					// Pay per post set to patron only
+					update_post_meta( $inserted_attachment_id, 'patreon-level', 1 );
+				}
+				else {
+					
+					// Not a pay per post - check tier level or patron only status
+					// For now do this in else, when api returns tiers replace with proper logic
+					
+					if ( $patreon_post['data']['attributes']['is_public'] ) {
+						update_post_meta( $inserted_attachment_id, 'patreon-level', 0 );
+					}
+					else {
+						update_post_meta( $inserted_attachment_id, 'patreon-level', 1 );
+					}
+				
+				}
+				
 			}
-		}		
+		}	
 		
+		// Set featured image
 		$this->set_featured_image_for_patreon_post( $inserted_post_id );
 
 		// If post is not public - currently there is no $ value or tier returned by /posts endpoint, so just set it to $1 locally
@@ -328,14 +348,38 @@ class Patreon_Content_Sync {
 					)
 				);
 				
+				// Set image to patron only since its in a patron only post - for those who use image locking featured
+						
+				// If post is not public - set the contained images to be patron only
+				
+				if ( $patreon_post['data']['attributes']['is_paid'] ) {
+					// Pay per post set to patron only
+					update_post_meta( $inserted_attachment_id, 'patreon-level', 1 );
+				}
+				else {
+					
+					// Not a pay per post - check tier level or patron only status
+					// For now do this in else, when api returns tiers replace with proper logic
+					
+					if ( $patreon_post['data']['attributes']['is_public'] ) {
+						update_post_meta( $inserted_attachment_id, 'patreon-level', 0 );
+					}
+					else {
+						update_post_meta( $inserted_attachment_id, 'patreon-level', 1 );
+					}
+				
+				}
+				
 			}
 		}
 
 		// Set featured image for post
 		$this->set_featured_image_for_patreon_post( $updated_post_id );
 
+		// Repeating this as a bloc here since the logic for individual post vs logic for included images may change at any point
+		
 		// If post is not public - currently there is no $ value or tier returned by /posts endpoint, so just set it to $1 locally
-
+		
 		if ( $patreon_post['data']['attributes']['is_paid'] ) {
 			// Pay per post set to patron only
 			update_post_meta( $updated_post_id, 'patreon-level', 1 );
