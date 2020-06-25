@@ -83,6 +83,7 @@ It is  difficult to protect videos due the intensive bandwidth requirements of h
 
 * Fixed an issue with image importing stopping post sync
 * Fixed an issue with images not being imported properly
+* Fixed an issue with saving settings stopping ongoing post import
 * Now sets featured image for imported posts properly
 * Now uses unique indicator at Patreon cdn to identify and import images
 * Now marks images in imported patron only posts as patron only. Requires image lock feature to be active to take effect
@@ -308,6 +309,7 @@ Nothing will be changed at your site - the plugin will just connect your site to
 
 * Fixed an issue with image importing stopping post sync
 * Fixed an issue with images not being imported properly
+* Fixed an issue with saving settings stopping ongoing post import
 * Now sets featured image for imported posts properly
 * Now uses unique indicator at Patreon cdn to identify and import images
 * Now marks images in imported patron only posts as patron only. Requires image lock feature to be active to take effect
