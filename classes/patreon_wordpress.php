@@ -2615,23 +2615,43 @@ class Patreon_Wordpress {
 	}
 	public function get_images_info_from_content( $content ) {
 		
-		preg_match_all( '/<img.+src=[\'"](?P<src>.+?)[\'"].*>/i', $content, $matches );
-		
-		$images = $matches[1];
-		
-		$info = array();
-			
-		foreach ( $images as $key => $value ) {
-						
-			$info[] = array( 
-				'filename'    => basename( preg_replace('/\?.*/', '', $images[$key] ) ),
-				'url' => $images[$key],
-			);
-			
+		if ( $content == '' ) {
+			return false;
 		}
 		
-		if ( count( $info ) > 0 ) {
-			return $info;
+		// Get images out of content using dom
+		$dom_document = new domDocument;
+		$save_errors  = libxml_use_internal_errors( true );
+		$dom_document->loadHTML( $content ); 
+		$dom_document->preserveWhiteSpace = false;
+		$images = $dom_document->getElementsByTagName( 'img' );
+		libxml_use_internal_errors( $save_errors );
+		
+		$parsed_images_info = array();
+	 
+		foreach ( $images as $image ) {
+    
+			$url =  $image->getAttribute( 'src' );
+		
+			$details = parse_url( $url );
+
+			$exploded_path = array_reverse( explode( '/', $details['path'] ) );
+
+			// First element is the Patreon given filename, second is unique identifier
+			
+			$extension = pathinfo( $exploded_path[0], PATHINFO_EXTENSION );
+			
+			// Use only unique identifier for now
+			$parsed_images_info[] = array( 
+					'filename' => $exploded_path[1] . '.' . $extension,
+					'name'     => $exploded_path[1],
+					'url'      => $url,
+			);
+
+		}
+
+		if ( count( $parsed_images_info ) > 0 ) {
+			return $parsed_images_info;
 		}
 		
 		return false;

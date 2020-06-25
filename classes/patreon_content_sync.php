@@ -134,6 +134,10 @@ class Patreon_Content_Sync {
 			if ( get_option( 'patreon-update-posts', 'no' ) == 'yes' ) {
 				$result = $this->update_patreon_post( $matching_post_id, $patreon_post );
 			}
+			else {
+				// Updating posts disabled. Just return
+				return false;
+			}
 			
 		}
 		
@@ -164,6 +168,7 @@ class Patreon_Content_Sync {
 		// Parse and handle the images inside the post:
 		
 		global $Patreon_Wordpress;
+		global $wpdb;
 		
 		$images = $Patreon_Wordpress->get_images_info_from_content( $post['post_content'] );
 		
@@ -199,6 +204,52 @@ class Patreon_Content_Sync {
 			// Handle error_get_last
 			return;
 		}
+		
+		// Now get the attachment ids we added to the post from earlier filenames
+		
+		if ( $images ) {
+			
+			foreach ( $images as $key => $value ) {
+		
+				$inserted_attachment = $wpdb->get_results( "SELECT ID FROM " . $wpdb->posts . " WHERE post_name = '" . $images[$key]['name'] ."'" ); 
+
+				$inserted_attachment_id = $inserted_attachment[0]->ID;
+				
+				// Set Patreon post as parent of this attachment
+				
+				wp_update_post( array(
+					'ID'          => $inserted_attachment_id,
+					'post_parent' => $inserted_post_id
+					)
+				);
+				
+				// Set image to patron only since its in a patron only post - for those who use image locking featured
+						
+				// If post is not public - set the contained images to be patron only
+				
+				if ( $patreon_post['data']['attributes']['is_paid'] ) {
+					// Pay per post set to patron only
+					update_post_meta( $inserted_attachment_id, 'patreon-level', 1 );
+				}
+				else {
+					
+					// Not a pay per post - check tier level or patron only status
+					// For now do this in else, when api returns tiers replace with proper logic
+					
+					if ( $patreon_post['data']['attributes']['is_public'] ) {
+						update_post_meta( $inserted_attachment_id, 'patreon-level', 0 );
+					}
+					else {
+						update_post_meta( $inserted_attachment_id, 'patreon-level', 1 );
+					}
+				
+				}
+				
+			}
+		}	
+		
+		// Set featured image
+		$this->set_featured_image_for_patreon_post( $inserted_post_id );
 
 		// If post is not public - currently there is no $ value or tier returned by /posts endpoint, so just set it to $1 locally
 
@@ -242,10 +293,12 @@ class Patreon_Content_Sync {
 		// Parse and handle the images inside the post:
 		
 		global $Patreon_Wordpress;
+		global $wpdb;
+		
 		$images = $Patreon_Wordpress->get_images_info_from_content( $post['post_content'] );
 
 		if ( $images ) {
-			$post['post_content'] = $this->check_replace_patreon_images_with_local_images( $post['post_content'], $images, $post_id );
+			$post['post_content'] = $this->check_replace_patreon_images_with_local_images( $post['post_content'], $images );
 		}
 		
 		if ( isset( $patreon_post['data']['attributes']['embed_data']['url'] ) ) {
@@ -270,15 +323,63 @@ class Patreon_Content_Sync {
 			add_filter('content_save_pre', 'wp_filter_post_kses');
 			add_filter('content_filtered_save_pre', 'wp_filter_post_kses');
 			
-		}			
+		}
 		
 		if ( is_wp_error( $updated_post_id ) OR $updated_post_id == 0 ) {
 			// Handle error_get_last
 			return;
 		}
 		
-		// If post is not public - currently there is no $ value or tier returned by /posts endpoint, so just set it to $1 locally
+		// Now get the attachment ids we added to the post from earlier filenames
+		
+		if ( $images ) {
 
+			foreach ( $images as $key => $value ) {
+		
+				$inserted_attachment = $wpdb->get_results( "SELECT ID FROM " . $wpdb->posts . " WHERE post_name = '" . $images[$key]['name'] ."'" ); 
+
+				$inserted_attachment_id = $inserted_attachment[0]->ID;
+				
+				// Set Patreon post as parent of this attachment
+				
+				wp_update_post( array(
+					'ID'          => $inserted_attachment_id,
+					'post_parent' => $updated_post_id
+					)
+				);
+				
+				// Set image to patron only since its in a patron only post - for those who use image locking featured
+						
+				// If post is not public - set the contained images to be patron only
+				
+				if ( $patreon_post['data']['attributes']['is_paid'] ) {
+					// Pay per post set to patron only
+					update_post_meta( $inserted_attachment_id, 'patreon-level', 1 );
+				}
+				else {
+					
+					// Not a pay per post - check tier level or patron only status
+					// For now do this in else, when api returns tiers replace with proper logic
+					
+					if ( $patreon_post['data']['attributes']['is_public'] ) {
+						update_post_meta( $inserted_attachment_id, 'patreon-level', 0 );
+					}
+					else {
+						update_post_meta( $inserted_attachment_id, 'patreon-level', 1 );
+					}
+				
+				}
+				
+			}
+		}
+
+		// Set featured image for post
+		$this->set_featured_image_for_patreon_post( $updated_post_id );
+
+		// Repeating this as a bloc here since the logic for individual post vs logic for included images may change at any point
+		
+		// If post is not public - currently there is no $ value or tier returned by /posts endpoint, so just set it to $1 locally
+		
 		if ( $patreon_post['data']['attributes']['is_paid'] ) {
 			// Pay per post set to patron only
 			update_post_meta( $updated_post_id, 'patreon-level', 1 );
@@ -310,7 +411,7 @@ class Patreon_Content_Sync {
 		
 	}		
 	
-	public function check_replace_patreon_images_with_local_images( $post_content, $images, $post_id ) {
+	public function check_replace_patreon_images_with_local_images( $post_content, $images ) {
 		
 		global $Patreon_Wordpress;
 		
@@ -351,14 +452,6 @@ class Patreon_Content_Sync {
 						
 						// Got a url for local attachment. Replace into the src of Patreon image:
 						
-						// Set first image as featured image if it was not set
-						
-						if ( !$featured_image_set AND get_option( 'patreon-set-featured-image', 'no' ) == 'yes' ) {
-							set_post_thumbnail( $post_id, $attachment_id );
-							$featured_image_set = true;
-						}
-						
-
 						$post_content = str_replace( $images[$key]['url'], $attachment_info[0], $post_content );
 
 					}
@@ -372,7 +465,7 @@ class Patreon_Content_Sync {
 		return $post_content;
 		
 	}
-	
+		
 	public function process_post_embeds( $post_content, $patreon_post ) {
 		
 		if ( isset( $patreon_post['data']['attributes']['embed_data']['provider'] ) ) {
@@ -395,7 +488,7 @@ class Patreon_Content_Sync {
 						$path = parse_url( $patreon_post['data']['attributes']['embed_data']['html'], PHP_URL_PATH);
 
 						$filename = basename($path);
-											
+						
 						// This image checking and acquisition code can be bundled into a wrapper function later
 						
 						global $Patreon_Wordpress;
@@ -494,6 +587,30 @@ class Patreon_Content_Sync {
 		return false;
 		
 	}
-
+	public function set_featured_image_for_patreon_post( $post_id ) {
 		
+		// Gets gets an imported post, browses inserted images and sets the first as the featured image.
+		
+		if ( get_option( 'patreon-set-featured-image', 'no' ) == 'no' ) {
+			return;			
+		}
+
+		$attachments = get_attached_media( 'image', $post_id );
+		
+		if ( !is_array( $attachments ) OR count( $attachments ) == 0 ) {
+			return;
+		}
+		
+		// Get the first attachment:
+		
+		$reversed_attachments = array_reverse( $attachments );
+		
+		$first_attachment = array_pop( $reversed_attachments );
+		
+		// Set the first attachment as featured image
+		set_post_thumbnail( $post_id, $first_attachment->ID );
+		
+		return;		
+	}
+	
 }

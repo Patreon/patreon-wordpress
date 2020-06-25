@@ -58,7 +58,6 @@ class Patreon_Options {
         register_setting( 'patreon-options', 'patreon-prevent-caching-gated-content' );
         register_setting( 'patreon-options', 'patreon-currency-sign' );
         register_setting( 'patreon-options', 'patreon-sync-posts' );
-        register_setting( 'patreon-options', 'patreon-post-import-in-progress' );
         register_setting( 'patreon-options', 'patreon-remove-deleted-posts' );
         register_setting( 'patreon-options', 'patreon-update-posts' );
         register_setting( 'patreon-options', 'patreon-post-author-for-synced-posts' );
