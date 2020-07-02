@@ -553,15 +553,20 @@ class Patreon_Options {
                                         </tr>
                                         <tr valign="top">
 											<th scope="row">
-												<strong>Start a post import</strong>
 												<?php
 													
 													$post_import_status = 'No post import ongoing';
 													$post_import_status_color = "9d9d9d";
+													$post_import_button = '<button id="patreon_wordpress_start_post_import" class="button button-primary button-large" pw_input_target="#patreon_wp_post_import_status" target="">Start an import</button>';
+													$import_post_info_text = "Start an import of your posts from Patreon if you haven't done it before. After import of existing posts is complete, new posts will automatically be imported and existing posts automatically updated so you don't need to do this again.";
+													$import_post_info_header = "Start a post import";
 													
 													if ( get_option( 'patreon-post-import-in-progress', false ) ) {
 														$post_import_status = "There is an ongoing post import";
 														$post_import_status_color = "129500";
+														$post_import_button = '<button id="patreon_wordpress_import_next_batch_of_posts" class="button button-primary button-large" pw_input_target="#patreon_wp_post_import_status" target="">Import next batch</button>';
+														$import_post_info_text = "Click to import next batch of posts. This will import the next batch of posts in the queue. You can do this every 5 seconds.";
+														$import_post_info_header = "Ongoing post import";
 													}
 													
 													$api_version    = get_option( 'patreon-installation-api-version', '1' );
@@ -573,11 +578,12 @@ class Patreon_Options {
 													}	
 													
 												?>
-												<div class="patreon-options-info">Start an import of your posts from Patreon if you haven't done it before. After import of existing posts is complete, new posts will automatically be imported and existing posts automatically updated so you don't need to do this again.<div id="patreon_wp_post_import_status" style="color: #<?php echo $post_import_status_color ?>;"><?php echo $post_import_status; ?></div></div>
+												<strong id="post_import_status_heading"><?php echo $import_post_info_header; ?></strong>
+												<div class="patreon-options-info"><div id="post_import_info_text"><?php echo $import_post_info_text; ?></div><div id="patreon_wp_post_import_status" style="color: #<?php echo $post_import_status_color ?>;"><?php echo $post_import_status; ?></div></div>
 											</th>
 											<td>
 												
-												<button id="patreon_wordpress_start_post_import" class="button button-primary button-large" [pw_input_target="#patreon_wp_post_import_status" target="">Start an import</button>
+												<div id="patreon_post_import_button_container"><?php echo $post_import_button; ?></div>
 											</td>
                                         </tr>
                                     </table>

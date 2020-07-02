@@ -316,6 +316,42 @@
 					jQuery( '#patreon_wp_post_import_status' ).html( 'Started a post import' );
 					jQuery( '#patreon_wp_post_import_status' ).css( 'color', '#129500' );
 					
+					// Replace the button with post batch import button
+					
+					jQuery( '#patreon_post_import_button_container' ).html( '<button id="patreon_wordpress_import_next_batch_of_posts" class="button button-primary button-large" pw_input_target="#patreon_wp_post_import_status" target="">Import next batch</button>' );
+					jQuery( '#post_import_status_heading' ).html( 'Ongoing post import' );
+					jQuery( '#post_import_info_text' ).html( 'Click to import next batch of posts. This will import the next batch of posts in the queue. You can do this every 5 seconds.' );
+					
+				},
+			});		
+			
+		});
+		
+		jQuery(document).on( 'click', '#patreon_wordpress_import_next_batch_of_posts', function(e) {
+			
+			e.preventDefault();
+			var pw_input_target = jQuery( this ).attr( 'pw_input_target' );
+			
+			jQuery.ajax({
+				url: ajaxurl,
+				type:"POST",
+				dataType : 'html',
+				data: {
+					action: 'patreon_wordpress_start_post_import',
+				},
+				success: function( response ) {
+					
+					jQuery( '#patreon_wp_post_import_status' ).empty();
+					
+					if ( response == 'apiv2fail') {
+						jQuery( '#patreon_wp_post_import_status' ).html( 'Wrong api version! Please upgrade to v2 using the tutorial <a href="https://www.patreondevelopers.com/t/how-to-upgrade-your-patreon-wordpress-to-use-api-v2/3249" target="_blank">here</a>' );
+						jQuery( '#patreon_wp_post_import_status' ).css( 'color', '#f31d00' );
+						return;
+					}
+					
+					jQuery( '#patreon_wp_post_import_status' ).html( 'Started a post import' );
+					jQuery( '#patreon_wp_post_import_status' ).css( 'color', '#129500' );
+					
 				},
 			});		
 			
