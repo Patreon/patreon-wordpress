@@ -151,7 +151,7 @@ class Patreon_Options {
 									<div id="patreon_options_app_details_reconnect">
 								
 										We will now reconnect your site to Patreon. This will refresh your site's connection to Patreon. Your settings and content gating values will remain unchanged. Patron only content will become accessible to everyone until you finish reconnecting your site to Patreon.<br /><br />
-										<button id="patreon_wordpress_reconnect_to_patreon" class="button button-primary button-large" target="<?php echo admin_url( 'admin.php?page=patreon-plugin&patreon_wordpress_action=disconnect_site_from_patreon_for_reconnection' ); ?>">Confirm reconnection</button> <button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon_options_app_details_reconnect patreon_options_app_details_main">Cancel</button>
+										<button id="patreon_wordpress_disconnect_reconnect_to_patreon" class="button button-primary button-large" target="<?php echo admin_url( 'admin.php?page=patreon-plugin&patreon_wordpress_action=disconnect_site_from_patreon_for_reconnection' ); ?>">Confirm reconnection</button> <button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon_options_app_details_reconnect patreon_options_app_details_main">Cancel</button>
 										
 									</div>
 									
@@ -192,7 +192,7 @@ class Patreon_Options {
 											<td><input type="text" name="patreon-creators-refresh-token" value="<?php echo esc_attr( get_option( 'patreon-creators-refresh-token', '' ) ); ?>" class="large-text" /></td>
                                         </tr>
                                         <tr valign="top">
-											<th scope="row"><?php submit_button( 'Update Settings', 'primary', 'submit', false ); ?></th>
+											<th scope="row"><?php submit_button( 'Update Settings', 'primary', 'submit_second', false ); ?></th>
 											<td></td>
                                         </tr>
 
@@ -565,7 +565,7 @@ class Patreon_Options {
 														$post_import_status = "There is an ongoing post import";
 														$post_import_status_color = "129500";
 														$post_import_button = '<button id="patreon_wordpress_import_next_batch_of_posts" class="button button-primary button-large" pw_input_target="#patreon_wp_post_import_status" target="">Import next batch</button>';
-														$import_post_info_text = "Click to import next batch of posts. This will import the next batch of posts in the queue. You can do this every 5 seconds.";
+														$import_post_info_text = "Click to import next batch of posts. This will import the next batch of posts in the queue. You can do this every 10 seconds.";
 														$import_post_info_header = "Ongoing post import";
 													}
 													

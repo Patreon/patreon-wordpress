@@ -94,6 +94,8 @@ class Patreon_Wordpress {
 		add_action( "wp_ajax_nopriv_patreon_save_attachment_patreon_level", array( self::$patreon_protect , "saveAttachmentLevel" ) );
 		add_action( "wp_ajax_patreon_wordpress_start_post_import", array( $this, "start_post_import" ) );
 		add_action( "wp_ajax_nopriv_patreon_wordpress_start_post_import", array( $this , "start_post_import" ) );
+		add_action( "wp_ajax_patreon_wordpress_import_next_batch_of_posts", array( $this, "import_next_batch_of_posts" ) );
+		add_action( "wp_ajax_nopriv_patreon_wordpress_import_next_batch_of_posts", array( $this , "import_next_batch_of_posts" ) );
 		add_action( "wp_ajax_patreon_wordpress_set_update_posts_option", array( $this, "set_update_posts_option" ) );
 		add_action( "wp_ajax_nopriv_patreon_wordpress_set_update_posts_option", array( $this , "set_update_posts_option" ) );
 		add_action( "wp_ajax_patreon_wordpress_set_delete_posts_option", array( $this, "set_delete_posts_option" ) );
@@ -982,6 +984,73 @@ class Patreon_Wordpress {
 		echo 'Success';
 		exit;
 			
+	}
+	public function import_next_batch_of_posts() {
+		
+		if( !( is_admin() && current_user_can( 'manage_options' ) ) ) {
+			return;
+		}
+			
+		// Check the last time this function was triggered:
+		
+		$last_triggered = get_option( 'patreon-manual-import-batch-last-triggered', 0 );
+		
+		// Abort if last triggered time is within 10 seconds. Works for cases in which it was never triggered. 
+		if ( ( $last_triggered + 10 ) > time() ) {
+			echo 'time_limit_error';
+			exit;
+		}
+		
+		$last_triggered = get_option( 'patreon-manual-import-batch-last-triggered', 0 );
+		
+		// Abort if last triggered time is within 10 seconds. Works for cases in which it was never triggered. 
+		if ( ( $last_triggered + 10 ) > time() ) {
+			echo 'time_limit_error';
+			exit;
+		}
+		
+		// Trigger next batch of import
+		
+		$import_return = self::$patreon_content_sync->import_posts_from_patreon();
+		
+		// Set last triggered time
+		
+		update_option( 'patreon-manual-import-batch-last-triggered', time() );
+		
+		// If success, exit to success
+		
+		if ( $import_return == 'imported_posts' ) { 
+			echo 'imported_posts';
+			exit;		
+		}
+		
+		// If did not import any posts
+		
+		if ( $import_return == 'did_not_import_any_post' ) { 
+			echo 'did_not_import_any_post';
+			exit;		
+		}
+		// There was an issue getting posts
+		
+		if ( $import_return == 'couldnt_get_posts' ) { 
+			echo 'couldnt_get_posts';
+			exit;		
+		}
+		
+		// Import ended
+		
+		if ( $import_return == 'post_import_ended' ) { 
+			echo 'post_import_ended';
+			exit;		
+		}
+		
+		if ( $import_return == 'no_ongoing_post_import' ) {
+			// This means no post import ongoing
+			echo 'no_ongoing_post_import';
+			exit;			
+		}
+		
+		
 	}
 	public function save_post_sync_category() {
 		
