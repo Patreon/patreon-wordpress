@@ -1011,7 +1011,7 @@ class Patreon_Wordpress {
 		
 		// Trigger next batch of import
 		
-		$import_return = self::$patreon_content_sync->import_posts_from_patreon();
+		$import_return = self::$patreon_content_sync->import_posts_from_patreon( array( 'manual_import' => true ) );
 		
 		// Set last triggered time
 		

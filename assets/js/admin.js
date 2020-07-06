@@ -320,7 +320,7 @@
 					
 					jQuery( '#patreon_post_import_button_container' ).html( '<button id="patreon_wordpress_import_next_batch_of_posts" class="button button-primary button-large" pw_input_target="#patreon_wp_post_import_status" target="">Import next batch</button>' );
 					jQuery( '#post_import_status_heading' ).html( 'Ongoing post import' );
-					jQuery( '#post_import_info_text' ).html( 'Click to import next batch of posts. This will import the next batch of posts in the queue. You can do this every 10 seconds.' );
+					jQuery( '#post_import_info_text' ).html( "Posts will be imported automatically every 5 minutes. If they are not, or you want to do it faster, click to import next batch of posts. This will import the next batch of posts in the queue. You can do this every 10 seconds." );
 					
 				},
 			});		

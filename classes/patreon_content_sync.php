@@ -12,7 +12,7 @@ class Patreon_Content_Sync {
 	public function __construct() {
 	}
 	
-	public function import_posts_from_patreon() {
+	public function import_posts_from_patreon( $args = array() ) {
 		
 		// This function performs a full import of posts from Patreon using cron
 		
@@ -23,7 +23,15 @@ class Patreon_Content_Sync {
 		if ( $api_version != '2' ) {
 			// Cancel any ongoing imports.
 			delete_option( 'patreon-post-import-in-progress' );
-			return;
+			return 'api_version_error';
+		}
+		
+		// Bail out if this is not a manual request and a manual import was triggered in last minute
+		
+		$last_manual_import_triggered = get_option( 'patreon-manual-import-batch-last-triggered', 0 );
+		
+		if ( ( $last_manual_import_triggered + 60 ) > time() AND !isset( $args['manual_import'] ) ) {
+			return 'manual_import_exists_within_last_60_seconds';
 		}
 		
 		// Set a flag to use in checking whether any post import happened at all.
@@ -38,7 +46,7 @@ class Patreon_Content_Sync {
 		
 		if ( !$post_import_in_progress ) {
 			// No ongoing import. Return
-			return 'no_ongoing_post_import';		
+			return 'no_ongoing_post_import';
 		}
 		
 		$creator_access_token = get_option( 'patreon-creators-access-token', false );

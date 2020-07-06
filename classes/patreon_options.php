@@ -565,7 +565,7 @@ class Patreon_Options {
 														$post_import_status = "There is an ongoing post import";
 														$post_import_status_color = "129500";
 														$post_import_button = '<button id="patreon_wordpress_import_next_batch_of_posts" class="button button-primary button-large" pw_input_target="#patreon_wp_post_import_status" target="">Import next batch</button>';
-														$import_post_info_text = "Click to import next batch of posts. This will import the next batch of posts in the queue. You can do this every 10 seconds.";
+														$import_post_info_text = "Posts will be imported automatically every 5 minutes. If they are not, or you want to do it faster, click to import next batch of posts. This will import the next batch of posts in the queue. You can do this every 10 seconds.";
 														$import_post_info_header = "Ongoing post import";
 													}
 													
