@@ -4,7 +4,7 @@ Tags: patreon, membership, members
 Requires at least: 4.0
 Requires PHP: 5.4
 Tested up to: 5.4.2
-Stable tag: 1.6.0
+Stable tag: 1.6.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -43,7 +43,7 @@ Got ideas? Post them on our [Patreon WordPress Ideas Thread](https://www.patreon
 = FEATURES FOR PATRONS =
 
 - This plugin adds a "Unlock with Patreon" button to every post you lock.
-- "Unlock with Patreon" takes care of everything: whether they’re not yet a patron, need to upgrade their pledge, or already pledging enough, we’ll guide them through the process and back to your content
+- "Unlock with Patreon" takes care of everything: whether they’re not a patron yet, or they need to upgrade their pledge, or if they are already pledging enough, the plugin will guide them through the process and back to your content
 
 = FEATURES FOR DEVELOPERS =
 
@@ -78,6 +78,17 @@ To make a locked post public again, just choose "Everyone" from the select box a
 It is  difficult to protect videos due the intensive bandwidth requirements of hosting video  and having to rely on third parties such as Youtube or Vimeo. Youtube allows you to set videos to ‘private’ but Vimeo offers extra controls by only allowing videos to be played on specific domains. Visit this guide to [protecting your video content with Vimeo](https://help.vimeo.com/hc/en-us/articles/224817847-Privacy-settings-overview).
 
 == Upgrade Notice ==
+
+= 1.6.1 =
+
+* Added manual post import feature
+* Start a post import section in settings now transforms to 'Ongoing post import' section when an import is started
+* Start Import button transforms into 'Import next batch' button when an import is started
+* Can click 'Import next batch' button to manually import next batch of posts - every 10 seconds
+* Made possible to manually import all the posts by clicking 'Import next batch' button
+* Info on ongoing post import and next batch import is given to in the status section under the setting
+* Transforms the setting section to original 'Start a post import' version from 'Ongoing post import' version
+* Works alongside automatic import
 
 = 1.6.0 =
 
@@ -304,6 +315,17 @@ Not at all - you can post different content totally independently at your site a
 Nothing will be changed at your site - the plugin will just connect your site to Patreon to allow communication in between your site and Patreon.
 
 == Changelog ==
+
+= 1.6.1 =
+
+* Added manual post import feature
+* Start a post import section in settings now transforms to 'Ongoing post import' section when an import is started
+* Start Import button transforms into 'Import next batch' button when an import is started
+* Can click 'Import next batch' button to manually import next batch of posts - every 10 seconds
+* Made possible to manually import all the posts by clicking 'Import next batch' button
+* Info on ongoing post import and next batch import is given to in the status section under the setting
+* Transforms the setting section to original 'Start a post import' version from 'Ongoing post import' version
+* Works alongside automatic import
 
 = 1.6.0 =
 
