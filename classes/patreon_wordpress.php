@@ -78,6 +78,7 @@ class Patreon_Wordpress {
 		add_action( 'init', array( $this, 'checkPatreonCreatorURL' ) );
 		add_action( 'init', array( $this, 'checkPatreonCreatorName' ) );
 		add_action( 'init', 'Patreon_Login::checkTokenExpiration' );
+		add_action( 'init', array( $this, 'plugin_version_history_updater' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueueAdminScripts' ) );
 		add_action( 'upgrader_process_complete', 'Patreon_Wordpress::AfterUpdateActions', 10, 2 );
 		add_action( 'admin_notices', array( $this, 'AdminMessages' ) );
@@ -2871,5 +2872,19 @@ class Patreon_Wordpress {
 		}
 
 	}
+	
+	public function plugin_version_history_updater() {
+		
+		// This function updates the version history with the current version's. We are doing it here on every init so this covers not only existing installs but also future installs. And installations which temporarily load any given version.
+		
+		$version_history   = get_option( 'patreon-plugin-version-history', array() );
+		
+		// Add to version history - assoc array assignment logic prevents duplicates
+		
+		$version_history[PATREON_WORDPRESS_VERSION] = PATREON_WORDPRESS_VERSION;
+		
+		update_option( 'patreon-plugin-version-history', $version_history );
+
+	}	
 	
 }

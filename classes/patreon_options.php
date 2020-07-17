@@ -736,6 +736,40 @@ class Patreon_Options {
 			
 		}
 		
+		// Show version history:
+		
+		
+		$version_history   = get_option( 'patreon-plugin-version-history', array() );
+		
+		?>
+		
+		<div class="patreon_admin_health_content_box">
+		<h2>Version history</h2>
+		<?php
+			
+			if ( count( $version_history ) > 0 ) {
+			
+				$version_history = array_reverse( $version_history );
+				
+				$last_history_entry = end( $version_history );
+				
+				foreach ( $version_history as $key => $value ) {
+					
+					echo $version_history[$key];
+					
+					if ( $last_history_entry != $version_history[$key] ) {
+						echo ' - ';
+					}
+					
+				}
+			
+			}
+			
+		?>
+		</div>
+		
+		<?php
+		
 		if ( count( Patreon_Compatibility::$site_health_info ) > 0 ) {
 			
 			$health_info = Patreon_Compatibility::$site_health_info;
