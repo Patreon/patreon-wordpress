@@ -12,7 +12,7 @@ class Patreon_Content_Sync {
 	public function __construct() {
 	}
 	
-	public function import_posts_from_patreon() {
+	public function import_posts_from_patreon( $args = array() ) {
 		
 		// This function performs a full import of posts from Patreon using cron
 		
@@ -23,8 +23,22 @@ class Patreon_Content_Sync {
 		if ( $api_version != '2' ) {
 			// Cancel any ongoing imports.
 			delete_option( 'patreon-post-import-in-progress' );
-			return;
+			return 'api_version_error';
 		}
+		
+		// Bail out if this is not a manual request and a manual import was triggered in last minute
+		
+		$last_manual_import_triggered = get_option( 'patreon-manual-import-batch-last-triggered', 0 );
+		
+		if ( ( $last_manual_import_triggered + 60 ) > time() AND !isset( $args['manual_import'] ) ) {
+			return 'manual_import_exists_within_last_60_seconds';
+		}
+		
+		// Set a flag to use in checking whether any post import happened at all.
+		$at_least_one_post_imported = false;
+		
+		// Set the flag for detecting end of post import
+		$end_of_post_import = false;
 		
 		// Check if an import is going on
 		
@@ -32,7 +46,7 @@ class Patreon_Content_Sync {
 		
 		if ( !$post_import_in_progress ) {
 			// No ongoing import. Return
-			return;
+			return 'no_ongoing_post_import';
 		}
 		
 		$creator_access_token = get_option( 'patreon-creators-access-token', false );
@@ -58,8 +72,8 @@ class Patreon_Content_Sync {
 			}
 			
 			if ( !isset( $posts['data'] ) ) {
-				// Couldnt get posts. Bail out				
-				return;				
+				// Couldnt get posts. Bail out
+				return 'couldnt_get_posts';
 			}		
 			
 			if ( isset( $posts['meta']['pagination']['cursors']['next'] ) ) {
@@ -72,7 +86,7 @@ class Patreon_Content_Sync {
 				
 				delete_option( 'patreon-post-import-in-progress' );
 				delete_option( 'patreon-post-import-next-cursor' );
-				
+				$end_of_post_import = true;
 			}
 			
 			foreach ( $posts['data'] as $key => $value ) {
@@ -85,10 +99,23 @@ class Patreon_Content_Sync {
 				}
 				
 				$this->add_update_patreon_post( $patreon_post );
-			
+				$at_least_one_post_imported = true;
 			}
 			
 		}
+		
+		if ( $at_least_one_post_imported OR $end_of_post_import) {
+			
+			// Post import ended
+			if ( $end_of_post_import ) {
+				return 'post_import_ended';
+			}
+			
+			// Imported at least one post
+			return 'imported_posts';
+		}
+		
+		return 'did_not_import_any_post';
 		
 	}
 	

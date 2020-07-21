@@ -20,6 +20,9 @@ class Patreon_Compatibility {
 		// Hook to template_redirect filter so the $post object will be ready before sending headers - add_headers hook wont work
 		add_filter( 'template_redirect', array( $this, 'modify_headers' ), 99 );
 		
+		if ( $this->check_if_plugin_active( 'jetpack/jetpack.php' ) ) {
+			add_filter( 'jetpack_photon_skip_image', array( $this, 'jetpack_photon_skip_image' ), 99, 3 );
+		}
 		
 		if ( $this->check_if_plugin_active( 'paid-memberships-pro/paid-memberships-pro.php' ) AND !is_admin() ) {
 			
@@ -694,6 +697,29 @@ class Patreon_Compatibility {
 		// Return unmodified result
 		
 		return $lock_or_not;
+		
+	}
+	
+	public function jetpack_photon_skip_image( $val, $src, $tag ) {
+		
+		// This function skips Jetpack's image functions for an image in case the image is a Patreon gated one
+		
+		// Skip if no source is given
+		if ( !$src OR $src == '') {
+			return $val;
+		}
+		
+		$attachment_id = attachment_url_to_postid( $src );
+
+		// Get Patreon level if there is:
+		
+		$patreon_level = get_post_meta( $attachment_id, 'patreon_level', true );
+
+		if ( $patreon_level > 0 ) {
+			return true;			
+		}
+		
+		return $val;
 		
 	}
 	
