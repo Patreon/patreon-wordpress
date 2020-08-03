@@ -12,29 +12,11 @@ $load_api_version = get_option( 'patreon-installation-api-version', false );
 // Override api version even if the site is v1 in case delete / reconnect actions are requested. This is temporary until we have something on API side which will allow v1 sites to just reconnect to v2
 
 if ( isset( $_REQUEST['patreon_wordpress_action'] ) AND $_REQUEST['patreon_wordpress_action'] == 'disconnect_site_from_patreon' ) {
-	
-	// We repeat below code because we want it to be available !only! during reconnect/disconnect actions
-		
-	if(!function_exists('wp_get_current_user')) {
-		include(ABSPATH . "wp-includes/pluggable.php"); 
-	}
-	
-	if ( current_user_can( 'manage_options' ) ) {
-		$load_api_version = '2';
-	}
+	$load_api_version = '2';
 }
 
 if ( isset( $_REQUEST['patreon_wordpress_action'] ) AND $_REQUEST['patreon_wordpress_action'] == 'disconnect_site_from_patreon_for_reconnection' ) {
-
-	// We repeat below code because we want it to be available !only! during reconnect/disconnect actions
-		
-	if(!function_exists('wp_get_current_user')) {
-		include(ABSPATH . "wp-includes/pluggable.php"); 
-	}
-	
-	if ( current_user_can( 'manage_options' ) ) {
-		$load_api_version = '2';
-	}
+	$load_api_version = '2';
 }
 
 // Added to catch setup wizard/connection cases when user lands back at patreon-authorization
@@ -56,17 +38,7 @@ if ( strpos( $_SERVER['REQUEST_URI'], '/patreon-authorization/' ) !== false ) {
 }
 
 if ( isset( $returned_state_var ) AND isset( $returned_state_var['patreon_action'] ) AND ( $returned_state_var['patreon_action'] == 'reconnect_site' OR $returned_state_var['patreon_action'] == 'connect_site' ) ) {
-
-	// We repeat below code because we want it to be available !only! during reconnect/connect actions
-		
-	if(!function_exists('wp_get_current_user')) {
-		include(ABSPATH . "wp-includes/pluggable.php"); 
-	}
-	
-	if ( current_user_can( 'manage_options' ) ) {
-		$load_api_version = '2';
-	}
-	
+	$load_api_version = '2';
 }
 
 if ( $load_api_version AND $load_api_version == '2' ) {
