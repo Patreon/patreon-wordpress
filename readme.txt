@@ -84,6 +84,7 @@ It is  difficult to protect videos due the intensive bandwidth requirements of h
 * Fixed an issue with connecting/reconnecting the site to Patreon using the setup wizard in Multisite installations
 * Multisite network admins can now connect subsites to Patreon using the setup wizard or connect/reconnect options
 * Subsite admins can now connect subsites to Patreon using the setup wizard or connect/reconnect options
+* Disconnect function in multisite now works while using them as Network admins and subsite admins
 * Added an exception to locked post interface text for 'Any patron' tier gated content. This fixes the 'You have to be patron of creator from $0.01 or more' issue in interface text
 
 = 1.6.2 =
