@@ -156,7 +156,7 @@ class Patreon_Wordpress {
 			$user_response = $api_client->fetch_user();
 			
 			// Here we check the returned result if its valid 
-			
+
 			if ( isset( $user_response['included'][0] ) AND is_array( $user_response['included'][0] ) ) {
 				
 				// Valid return. Save it with timestamp
@@ -204,7 +204,7 @@ class Patreon_Wordpress {
 				}
 				
 			}
-			
+	
 			// For whatsoever reason the returns are not valid and we cant refresh the user
 			// Check if a saved return exists for this user
 	
@@ -707,11 +707,54 @@ class Patreon_Wordpress {
 			return self::$current_user_pledge_amount;
 		}
 		
-		if( isset( $pledge['attributes']['amount_cents'] ) ) {
-			return self::$current_user_pledge_amount = $pledge['attributes']['amount_cents'];
-		}
+		// Get currently entitled tiers:
 	
-		return 0;
+		$currently_entitled_tiers = $pledge['relationships']['currently_entitled_tiers']['data'];
+		
+		if ( !is_array( $currently_entitled_tiers ) ) {
+			return 0;
+		}
+
+		// Get creator's saved tiers
+	
+		$creator_tiers = get_option( 'patreon-creator-tiers', false );
+
+		if ( !$creator_tiers OR $creator_tiers == '' OR !is_array( $creator_tiers['included'][1] ) ) {
+			
+			// No local tiers. Return 0
+			return 0;
+			
+		}
+		
+		$creator_tiers = $creator_tiers['included'];
+		
+		// Using max entitled tier's value for backwards compatibility. This may be changed in future for exact tier match checks.
+		$max_entitled_tier_value = 0;
+
+		// Manually iterate arrays to make it easier to modify the logic in future
+		// Iterate the currently_entitled_tiers array to cover for any possibility in case there may be more than one tier entitled
+		
+		foreach ( $currently_entitled_tiers as $key => $value ) {
+			
+			foreach ( $creator_tiers as $c_key => $c_value ) {
+				
+				// If the checked tier value is higher than the known max value, set the max value to current
+				
+				if ( $currently_entitled_tiers[$key]['id'] == $creator_tiers[$c_key]['id'] ) {
+					
+					// Local tier matches this tier. Check if the amount value is greater, if so, set to that value
+					
+					if ( $creator_tiers[$c_key]['attributes']['amount_cents'] > $max_entitled_tier_value ) {
+						$max_entitled_tier_value = $creator_tiers[$c_key]['attributes']['amount_cents'];
+					}
+					
+				}
+			
+			}
+			
+		}
+		
+		return self::$current_user_pledge_amount = $max_entitled_tier_value;
 		
 	}
 	public static function isPatron( $user = false ) {

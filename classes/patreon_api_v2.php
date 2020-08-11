@@ -19,8 +19,8 @@ class Patreon_API {
 
 		// We construct the old return from the new returns by combining /me and pledge details
 
-		$api_return = $this->__get_json( "identity?include=memberships&fields[user]=email,first_name,full_name,image_url,last_name,thumb_url,url,vanity,is_email_verified&fields[member]=currently_entitled_amount_cents,lifetime_support_cents,last_charge_status,patron_status,last_charge_date,pledge_relationship_start" );
-		
+		$api_return = $this->__get_json( "identity?include=memberships.currently_entitled_tiers&fields[user]=email,first_name,full_name,image_url,last_name,thumb_url,url,vanity,is_email_verified&fields[member]=currently_entitled_amount_cents,lifetime_support_cents,last_charge_status,patron_status,last_charge_date,pledge_relationship_start" );
+
 		$creator_id = get_option( 'patreon-creator-id', false );
 		
 		if ( isset( $api_return['included'][0] ) AND is_array( $api_return['included'][0] ) ) {
@@ -35,7 +35,7 @@ class Patreon_API {
 			}
 			
 		}
-		
+
 		return $api_return;
 	}
 	
