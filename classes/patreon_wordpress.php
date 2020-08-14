@@ -2725,6 +2725,22 @@ class Patreon_Wordpress {
 		return false;
 		
 	}
+	public function get_remote_image_hash( $image_url ) {
+		
+		global $wpdb;
+		
+		$image_hash = false;
+		$image_response = wp_remote_get( $image_url, array( 'timeout' => 3 ) );
+		$image_content  = wp_remote_retrieve_body($image_response);
+		
+		if ( $image_content != '' ) {
+			$image_hash = md5( $image_content );
+		}
+
+		return $image_hash;
+		
+	}
+	
 	public function get_images_info_from_content( $content ) {
 		
 		if ( $content == '' ) {
@@ -2757,6 +2773,7 @@ class Patreon_Wordpress {
 			$parsed_images_info[] = array( 
 					'filename' => $exploded_path[1] . '.' . $extension,
 					'name'     => $exploded_path[1],
+					'extension'      => $extension,
 					'url'      => $url,
 			);
 

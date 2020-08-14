@@ -458,6 +458,13 @@ class Patreon_Content_Sync {
 				
 				// Check if image exists in media library:
 				
+				// Get the image hash
+				
+				$attachment_id = $Patreon_Wordpress->get_remote_image_hash( $images[$key]['url'] );
+				
+				// Set the filename to local translated one with hash
+				$images[$key]['filename'] = $attachment_id . '.' . $images[$key]['extension'];
+				
 				$attachment_id = $Patreon_Wordpress->get_file_id_from_media_library( $images[$key]['filename'] );
 
 				if ( !$attachment_id ) {
