@@ -167,7 +167,14 @@ else {
 				$result                    = array( 'error' => $response->get_error_message() );
 				$GLOBALS['patreon_notice'] = $response->get_error_message();
 				
-				Patreon_Wordpress::log_connection_error( $GLOBALS['patreon_notice'] );
+				$caller = 'none';
+				$backtrace = debug_backtrace( DEBUG_BACKTRACE_IGNORE_ARGS, 2 );
+				
+				if ( isset( $backtrace[1]['function'] ) ) {
+					$caller = $backtrace[1]['function'];
+				}
+				
+				Patreon_Wordpress::log_connection_error( $caller . ' - ' . $GLOBALS['patreon_notice'] );
 				
 				return $result;
 				
@@ -176,7 +183,15 @@ else {
 			// Log the connection as having error if the return is not 200
 			
 			if ( isset( $response['response']['code'] ) AND $response['response']['code'] != '200' AND $response['response']['code'] != '201' ) {
-				Patreon_Wordpress::log_connection_error( 'Response code: ' . $response['response']['code'] . ' Response :' . $response['body'] );
+				
+				$caller = 'none';
+				$backtrace = debug_backtrace( DEBUG_BACKTRACE_IGNORE_ARGS, 2 );
+				
+				if ( isset( $backtrace[1]['function'] ) ) {
+					$caller = $backtrace[1]['function'];
+				}
+				
+				Patreon_Wordpress::log_connection_error( $caller . ' - ' . 'Response code: ' . $response['response']['code'] . ' Response :' . $response['body'] );
 			}	
 			
 			return json_decode( $response['body'], true );
