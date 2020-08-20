@@ -295,7 +295,7 @@ class Patreon_API {
 				$caller = $backtrace[1]['function'];
 			}
 			
-			Patreon_Wordpress::log_connection_error( $caller . ' - ' . $GLOBALS['patreon_notice'] );
+			Patreon_Wordpress::log_connection_error( $caller . ' - WP error message ' . $GLOBALS['patreon_notice'] );
 			
 			return $result;
 			
@@ -311,8 +311,11 @@ class Patreon_API {
 			if ( isset( $backtrace[1]['function'] ) ) {
 				$caller = $backtrace[1]['function'];
 			}
+
+			$uuid = wp_remote_retrieve_header( $response, 'x-patreon-uuid' );
 			
-			Patreon_Wordpress::log_connection_error( $caller . ' - ' . 'Response code: ' . $response['response']['code'] . ' Response :' . $response['body'] );
+			Patreon_Wordpress::log_connection_error( $caller . ' - UUID ' .$uuid . ' - ' . 'Response code: ' . $response['response']['code'] . ' Response :' . $response['body'] );
+			
 		}
 		
 		// Return full result if full result was requested
