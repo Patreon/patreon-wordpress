@@ -432,3 +432,8 @@
 	font-weight: bold;
 	display: inline;
 }
+
+.patreon_wordpress_option_heading {
+	/* Slap important because WP disregards this rule - sort the sortable ui remnants later */
+	margin-top: 10px !important;
+}

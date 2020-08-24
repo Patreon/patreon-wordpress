@@ -101,14 +101,10 @@ class Patreon_Options {
                         <div class="meta-box-sortables ui-sortable">
 
                             <div class="postbox">
-
-                                <div class="handlediv" title="Click to toggle"><br /></div>
-                                <!-- Toggle -->
-
-									<h2 class="handle"><span>Patreon Connection</span></h2>
+                    
+								<h2 class="handle patreon_wordpress_option_heading"><span>Patreon Connection</span></h2>
                                 <div class="inside">
-								
-										
+									
 									<div id="patreon_options_app_details_main">
 									
 										<button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon-connection-details">Connection details</button><?php // Immediately inserted here to not cause any funny html rendering
@@ -209,15 +205,61 @@ class Patreon_Options {
 						
                         <!-- .meta-box-sortables .ui-sortable -->
 
+                        <div class="meta-box-sortables ui-sortable">
+
+                            <div class="postbox">
+
+                                <h2 class="handle patreon_wordpress_option_heading"><span>Getting support</span></h2>
+
+                                <div class="inside">
+
+									Get support at <a href="https://www.patreondevelopers.com/c/patreon-wordpress-plugin-support/11" target="_blank">the official forum</a> by copying your plugin info below and adding to your support thread by pasting to share with support team.<br /><div id="patreon_copied"></div>
+									<button class="button button-primary button-large" id="patreon_copy_health_check_output">Copy</button>
+									<div id="patreon_health_check_output_for_support">WP <?php echo get_bloginfo( 'version' ); ?> with PHP <?php echo phpversion(); echo "\r\n"; ?>Patreon WordPress <?php echo PATREON_WORDPRESS_VERSION ?> with API v<?php echo get_option( 'patreon-installation-api-version', false ); echo "\r\n";
+
+											// Conditionals for any addons / other relevant Patreon plugins
+											
+											global $cb_p6_a1;
+											
+											if ( isset( $cb_p6_a1 ) ) {
+												?>Patron Plugin Pro <?php echo $cb_p6_a1->internal['version']; echo "\r\n";
+											}
+											
+											global $cb_p6;
+											
+											if ( isset( $cb_p6 ) ) {
+												?>Patreon Button, Widgets and Plugin <?php echo $cb_p6->internal['version']; echo "\r\n";
+											}
+											
+											if ( isset( $health_info ) AND is_array( $health_info ) AND count( $health_info ) > 0 ) {
+												foreach ( $health_info as $key => $value ) {
+												 echo "\r\n";
+												 echo '# '.$health_info[$key]['heading'].' #';
+												 echo "\r\n";
+												 echo str_replace( '<h3>', "\r\n# ", str_replace( '</h3>', " #\r\n", $health_info[$key]['notice'] ) );			
+												}
+											}
+										?></div>
+									
+                                </div>
+                                <!-- .inside -->
+
+                            </div>
+                            <!-- .postbox -->
+
+                        </div>
+                        <!-- .meta-box-sortables .ui-sortable -->
+		
+										
+                        <!-- .meta-box-sortables .ui-sortable -->
 
                         <div class="meta-box-sortables ui-sortable">
 
                             <div class="postbox">
 
-                                <div class="handlediv" title="Click to toggle"><br /></div>
                                 <!-- Toggle -->
 
-                                <h2 class="handle"><span>Patreon Wordpress Options</span></h2>
+                                <h2 class="handle patreon_wordpress_option_heading"><span>Patreon Wordpress Options</span></h2>
 
                                 <div class="inside">
 
@@ -610,10 +652,9 @@ class Patreon_Options {
 
                             <div class="postbox">
 
-                                <div class="handlediv" title="Click to toggle"><br></div>
                                 <!-- Toggle -->
 
-                                <h2 class="hndle">About Patreon Wordpress</h2>
+                                <h2 class="handle patreon_wordpress_option_heading">About Patreon Wordpress</h2>
 
                                <div class="inside">
 									<p>Patreon Wordpress developed by Patreon</p>
@@ -629,10 +670,9 @@ class Patreon_Options {
                             <!-- .postbox -->
                             <div class="postbox">
 
-                                <div class="handlediv" title="Click to toggle"><br></div>
                                 <!-- Toggle -->
 
-                                <h2 class="hndle">Featured Third Party Addon</h2>
+                                <h2 class="handle patreon_wordpress_option_heading">Featured Third Party Addon</h2>
 
                                <div class="inside">
 									<p><strong>Patron Pro</strong></p>
@@ -646,10 +686,9 @@ class Patreon_Options {
                             <!-- .postbox -->
                             <div class="postbox">
 
-                                <div class="handlediv" title="Click to toggle"><br></div>
                                 <!-- Toggle -->
 
-                                <h2 class="hndle">GDPR compliance</h2>
+                                <h2 class="handle patreon_wordpress_option_heading">GDPR compliance</h2>
 
                                <div class="inside">
 									<p>Please visit <a href="<?php echo admin_url('tools.php?wp-privacy-policy-guide=1#wp-privacy-policy-guide-patreon-wordpress'); ?>">the new WordPress privacy policy recommendation page</a> and copy & paste the section related to Patreon WordPress to your privacy policy page.<br><br>You can read our easy tutorial for GDPR compliance with Patreon WordPress <a href="https://patreon.zendesk.com/hc/en-us/articles/360004198011?utm_source=<?php urlencode( site_url() ) ?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=settings_screen_gdpr_info_link&utm_term=" target="_blank">by visiting our GDPR help page</a></p>
@@ -824,7 +863,7 @@ class Patreon_Options {
 		// Output a hidden, non formatted version of the health info to be used by the users to c/p to support
 		?>
 		
-		<div id="patreon_health_check_output_for_support">WP <?php echo get_bloginfo( 'version' ); echo "\r\n"; ?> with PHP <?php echo phpversion(); ?>Patreon WordPress <?php echo PATREON_WORDPRESS_VERSION ?> with API v<?php echo get_option( 'patreon-installation-api-version', false ); echo "\r\n";
+		<div id="patreon_health_check_output_for_support">WP <?php echo get_bloginfo( 'version' ); ?> with PHP <?php echo phpversion(); echo "\r\n"; ?>Patreon WordPress <?php echo PATREON_WORDPRESS_VERSION ?> with API v<?php echo get_option( 'patreon-installation-api-version', false ); echo "\r\n";
 		
 			// Conditionals for any addons / other relevant Patreon plugins
 			
@@ -848,8 +887,7 @@ class Patreon_Options {
 				 echo str_replace( '<h3>', "\r\n# ", str_replace( '</h3>', " #\r\n", $health_info[$key]['notice'] ) );			
 				}
 			}
-		?>
-		</div><?php
+		?></div><?php
 		
     }
 	
