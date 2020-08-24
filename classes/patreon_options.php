@@ -720,6 +720,32 @@ class Patreon_Options {
 			<h1>Health check of your Patreon integration</h1>
 			Below are settings or issues which may affect your Patreon integration. Please check the recommendations and implement them to have your integration function better. You can get help for any of these items <a href="https://www.patreondevelopers.com/c/patreon-wordpress-plugin-support" target="_blank">by visiting our support forum</a> and posting a thread. 
 			<br><br>
+			Your site is using:<br /><br /> WP <?php echo get_bloginfo( 'version' ); ?> with PHP <?php echo phpversion(); ?><br />
+			Patreon WordPress <?php echo PATREON_WORDPRESS_VERSION ?> with API v<?php echo get_option( 'patreon-installation-api-version', false ) ?><br />
+			
+			<?
+			
+				// Conditionals for any addons / other relevant Patreon plugins
+				
+				global $cb_p6_a1;
+				
+				if ( isset( $cb_p6_a1 ) ) {
+					
+					?>Patron Plugin Pro <?php echo $cb_p6_a1->internal['version'] ?><br /><?php
+					
+				}
+				
+				global $cb_p6;
+				
+				if ( isset( $cb_p6 ) ) {
+					
+					?>Patreon Button, Widgets and Plugin <?php echo $cb_p6->internal['version'] ?><br /><?php
+					
+				}
+			
+			?>
+			
+			<br><br>
 			You can <a href="" id="patreon_copy_health_check_output">click here</a> to copy the output of this page to share with support team or post it in the forum. <div id="patreon_copied"></div>
 			
 		</div>
@@ -798,8 +824,22 @@ class Patreon_Options {
 		// Output a hidden, non formatted version of the health info to be used by the users to c/p to support
 		?>
 		
-		<div id="patreon_health_check_output_for_support">
-			<?php			
+		<div id="patreon_health_check_output_for_support">WP <?php echo get_bloginfo( 'version' ); echo "\r\n"; ?> with PHP <?php echo phpversion(); ?>Patreon WordPress <?php echo PATREON_WORDPRESS_VERSION ?> with API v<?php echo get_option( 'patreon-installation-api-version', false ); echo "\r\n";
+		
+			// Conditionals for any addons / other relevant Patreon plugins
+			
+			global $cb_p6_a1;
+			
+			if ( isset( $cb_p6_a1 ) ) {
+				?>Patron Plugin Pro <?php echo $cb_p6_a1->internal['version']; echo "\r\n";
+			}
+			
+			global $cb_p6;
+			
+			if ( isset( $cb_p6 ) ) {
+				?>Patreon Button, Widgets and Plugin <?php echo $cb_p6->internal['version']; echo "\r\n";
+			}
+			
 			if ( isset( $health_info ) AND is_array( $health_info ) AND count( $health_info ) > 0 ) {
 				foreach ( $health_info as $key => $value ) {
 				 echo "\r\n";
@@ -809,9 +849,7 @@ class Patreon_Options {
 				}
 			}
 		?>
-		</div>
-		
-		<?php
+		</div><?php
 		
     }
 	

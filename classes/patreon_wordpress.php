@@ -754,6 +754,15 @@ class Patreon_Wordpress {
 			
 		}
 		
+		// Check whether the pledge value that comes in is higher than the max entitled tier value - for custom pledge amounts
+		// This is not currency aware, but should cover cases in which there is large difference in between the custom pledge and 
+
+		if ( isset( $pledge['attributes']['amount_cents'] ) AND $pledge['attributes']['amount_cents'] > $max_entitled_tier_value ) {
+		
+			$max_entitled_tier_value = $pledge['attributes']['amount_cents'];
+			
+		}
+	
 		return self::$current_user_pledge_amount = $max_entitled_tier_value;
 		
 	}
