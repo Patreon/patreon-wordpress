@@ -762,11 +762,13 @@ class Patreon_Options {
 			Your site is using:<br /><br /> WP <?php echo get_bloginfo( 'version' ); ?> with PHP <?php echo phpversion(); ?><br />
 			Patreon WordPress <?php echo PATREON_WORDPRESS_VERSION ?> with API v<?php echo get_option( 'patreon-installation-api-version', false ) ?><br />
 			
-			<?
+			<?php
 			
 				// Conditionals for any addons / other relevant Patreon plugins
 				
-				global $cb_p6_a1;
+				if ( array_key_exists( 'cb_p6_a1', $GLOBALS ) ) {
+					global $cb_p6_a1;					
+				}
 				
 				if ( isset( $cb_p6_a1 ) ) {
 					
@@ -774,7 +776,9 @@ class Patreon_Options {
 					
 				}
 				
-				global $cb_p6;
+				if ( array_key_exists( 'cb_p6', $GLOBALS ) ) {
+					global $cb_p6;					
+				}
 				
 				if ( isset( $cb_p6 ) ) {
 					
