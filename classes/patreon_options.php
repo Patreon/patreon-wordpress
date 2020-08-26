@@ -218,14 +218,18 @@ class Patreon_Options {
 									<div id="patreon_health_check_output_for_support">WP <?php echo get_bloginfo( 'version' ); ?> with PHP <?php echo phpversion(); echo "\r\n"; ?>Patreon WordPress <?php echo PATREON_WORDPRESS_VERSION ?> with API v<?php echo get_option( 'patreon-installation-api-version', false ); echo "\r\n";
 
 											// Conditionals for any addons / other relevant Patreon plugins
-											
-											global $cb_p6_a1;
+
+											if ( array_key_exists( 'cb_p6_a1', $GLOBALS ) ) {
+												global $cb_p6_a1;					
+											}
 											
 											if ( isset( $cb_p6_a1 ) ) {
 												?>Patron Plugin Pro <?php echo $cb_p6_a1->internal['version']; echo "\r\n";
 											}
 											
-											global $cb_p6;
+											if ( array_key_exists( 'cb_p6', $GLOBALS ) ) {
+												global $cb_p6;					
+											}
 											
 											if ( isset( $cb_p6 ) ) {
 												?>Patreon Button, Widgets and Plugin <?php echo $cb_p6->internal['version']; echo "\r\n";
@@ -870,14 +874,18 @@ class Patreon_Options {
 		<div id="patreon_health_check_output_for_support">WP <?php echo get_bloginfo( 'version' ); ?> with PHP <?php echo phpversion(); echo "\r\n"; ?>Patreon WordPress <?php echo PATREON_WORDPRESS_VERSION ?> with API v<?php echo get_option( 'patreon-installation-api-version', false ); echo "\r\n";
 		
 			// Conditionals for any addons / other relevant Patreon plugins
-			
-			global $cb_p6_a1;
+		
+			if ( array_key_exists( 'cb_p6_a1', $GLOBALS ) ) {
+				global $cb_p6_a1;					
+			}
 			
 			if ( isset( $cb_p6_a1 ) ) {
 				?>Patron Plugin Pro <?php echo $cb_p6_a1->internal['version']; echo "\r\n";
 			}
-			
-			global $cb_p6;
+		
+			if ( array_key_exists( 'cb_p6', $GLOBALS ) ) {
+				global $cb_p6;					
+			}
 			
 			if ( isset( $cb_p6 ) ) {
 				?>Patreon Button, Widgets and Plugin <?php echo $cb_p6->internal['version']; echo "\r\n";
