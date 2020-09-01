@@ -4,7 +4,7 @@
 Plugin Name: Patreon Wordpress
 Plugin URI: https://www.patreon.com/apps/wordpress
 Description: Patron-only content, directly on your website.
-Version: 1.6.2
+Version: 1.6.5
 Author: Patreon <platform@patreon.com>
 Author URI: https://patreon.com
 */
@@ -68,7 +68,7 @@ define( "PATREON_ADMIN_BYPASSES_FILTER_MESSAGE", 'This content is for Patrons on
 define( "PATREON_CREATOR_BYPASSES_FILTER_MESSAGE", 'This content is for Patrons only, it\'s not locked for you because you are logged in as the Patreon creator' );
 define( "PATREON_NO_LOCKING_LEVEL_SET_FOR_THIS_POST", 'Post is already public. If you would like to lock this post, please set a pledge level for it' );
 define( "PATREON_NO_POST_ID_TO_UNLOCK_POST", 'Sorry - could not get the post id for this locked post' );
-define( "PATREON_WORDPRESS_VERSION", '1.6.2' );
+define( "PATREON_WORDPRESS_VERSION", '1.6.5' );
 define( "PATREON_WORDPRESS_BETA_STRING", '' );
 define( "PATREON_WORDPRESS_PLUGIN_SLUG", plugin_basename( __FILE__ ) );
 define( "PATREON_PRIVACY_POLICY_ADDENDUM", '<h2>Patreon features in this website</h2>In order to enable you to use this website with Patreon services, we save certain functionally important Patreon information about you in this website if you log in with Patreon.
@@ -93,6 +93,7 @@ define( "PATREON_TEXT_OVER_BUTTON_11", 'This content is available exclusively to
 define( "PATREON_TEXT_OVER_BUTTON_12", 'This content is available exclusively to members of <a href="%%creator_link%%" target="_blank">%%creator%% Patreon</a> at %%tier_level%% or higher tier, or having at least $%%total_pledge%% pledged in total.' );
 define( "PATREON_TEXT_OVER_BUTTON_13", 'This content is available exclusively to members of <a href="%%creator_link%%" target="_blank">%%creator%% Patreon</a> at %%tier_level%% or higher tier at the time this content was posted, or having at least $%%total_pledge%% pledged in total.' );
 define( "PATREON_TEXT_OVER_BUTTON_14", 'This content is available exclusively to members of <a href="%%creator_link%%" target="_blank">%%creator%% Patreon</a> at %%tier_level%% or higher tier at the time this content was posted, or having at least $%%total_pledge%% pledged in total. Your account currently does not qualify.' );
+define( "PATREON_TEXT_OVER_BUTTON_15", 'To view this content, you must be a member of <b><a href="%%creator_link%%" target="_blank">%%creator%% Patreon</a></b>' );
 define( "PATREON_COULDNT_ACQUIRE_USER_DETAILS", 'Sorry. Could not acquire your info from Patreon. Please try again later.' );
 define( "PATREON_PRETTY_PERMALINKS_NEED_TO_BE_ENABLED", 'Pretty permalinks are required for Patreon WordPress to work. Please visit <a href="'.admin_url('options-permalink.php').'" target="_blank">permalink options page</a> and set an option that is different from "Plain"' );
 define( "PATREON_ENSURE_REQUIREMENTS_MET", '<h3>Please ensure following requirements are met before starting setup:</h3>' );

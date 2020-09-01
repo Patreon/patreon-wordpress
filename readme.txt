@@ -4,7 +4,7 @@ Tags: patreon, membership, members
 Requires at least: 4.0
 Requires PHP: 5.4
 Tested up to: 5.4.2
-Stable tag: 1.6.2
+Stable tag: 1.6.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -78,6 +78,30 @@ To make a locked post public again, just choose "Everyone" from the select box a
 It is  difficult to protect videos due the intensive bandwidth requirements of hosting video  and having to rely on third parties such as Youtube or Vimeo. Youtube allows you to set videos to ‘private’ but Vimeo offers extra controls by only allowing videos to be played on specific domains. Visit this guide to [protecting your video content with Vimeo](https://help.vimeo.com/hc/en-us/articles/224817847-Privacy-settings-overview).
 
 == Upgrade Notice ==
+
+= 1.6.5 =
+
+* Addressed an issue with patrons with custom pledge not being able to access gated content due to currency differences
+* Fixed double image import problem when syncing posts. Now uses image hashes to identify unique images. This will cause re-importing of images once if a full import is re-done. Deleting existing Patreon imported images and then doing full-reimport if you synced your posts before is recommended.
+* Now shows WordPress, PHP, and Patreon plugins' version info in health check page.
+* WP, PHP and plugin version info is added to the support info copied when 'Copy' support info is clicked
+* Added a support block with above support info in copy-able form to main settings page with a link to support forum.
+* Made the error logging more detailed when logging api related errors and access issues
+* Now shows uuid and the caller function when logging api access errors
+
+= 1.6.4 =
+
+* Updated user pledge level check to work with different currencies
+* User pledge level check now uses tiers and converts it to $ value to match highest local tier
+* Enables currency feature compatibility for all existing installations and v1 and v2 clients
+
+= 1.6.3 =
+
+* Fixed an issue with connecting/reconnecting the site to Patreon using the setup wizard in Multisite installations
+* Multisite network admins can now connect subsites to Patreon using the setup wizard or connect/reconnect options
+* Subsite admins can now connect subsites to Patreon using the setup wizard or connect/reconnect options
+* Disconnect function in multisite now works while using them as Network admins and subsite admins
+* Added an exception to locked post interface text for 'Any patron' tier gated content. This fixes the 'You have to be patron of creator from $0.01 or more' issue in interface text
 
 = 1.6.2 =
 
@@ -321,6 +345,30 @@ Not at all - you can post different content totally independently at your site a
 Nothing will be changed at your site - the plugin will just connect your site to Patreon to allow communication in between your site and Patreon.
 
 == Changelog ==
+
+= 1.6.5 =
+
+* Addressed an issue with patrons with custom pledge not being able to access gated content due to currency differences
+* Fixed double image import problem when syncing posts. Now uses image hashes to identify unique images. This will cause re-importing of images once if a full import is re-done. Deleting existing Patreon imported images and then doing full-reimport if you synced your posts before is recommended.
+* Now shows WordPress, PHP, and Patreon plugins' version info in health check page.
+* WP, PHP and plugin version info is added to the support info copied when 'Copy' support info is clicked
+* Added a support block with above support info in copy-able form to main settings page with a link to support forum.
+* Made the error logging more detailed when logging api related errors and access issues
+* Now shows uuid and the caller function when logging api access errors
+
+= 1.6.4 =
+
+* Updated user pledge level check to work with different currencies
+* User pledge level check now uses tiers and converts it to $ value to match highest local tier
+* Enables currency feature compatibility for all existing installations and v1 and v2 clients
+
+= 1.6.3 =
+
+* Fixed an issue with connecting/reconnecting the site to Patreon using the setup wizard in Multisite installations
+* Multisite network admins can now connect subsites to Patreon using the setup wizard or connect/reconnect options
+* Subsite admins can now connect subsites to Patreon using the setup wizard or connect/reconnect options
+* Disconnect function in multisite now works while using them as Network admins and subsite admins
+* Added an exception to locked post interface text for 'Any patron' tier gated content. This fixes the 'You have to be patron of creator from $0.01 or more' issue in interface text
 
 = 1.6.2 =
 

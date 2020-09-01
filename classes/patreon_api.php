@@ -12,29 +12,11 @@ $load_api_version = get_option( 'patreon-installation-api-version', false );
 // Override api version even if the site is v1 in case delete / reconnect actions are requested. This is temporary until we have something on API side which will allow v1 sites to just reconnect to v2
 
 if ( isset( $_REQUEST['patreon_wordpress_action'] ) AND $_REQUEST['patreon_wordpress_action'] == 'disconnect_site_from_patreon' ) {
-	
-	// We repeat below code because we want it to be available !only! during reconnect/disconnect actions
-		
-	if(!function_exists('wp_get_current_user')) {
-		include(ABSPATH . "wp-includes/pluggable.php"); 
-	}
-	
-	if ( current_user_can( 'manage_options' ) ) {
-		$load_api_version = '2';
-	}
+	$load_api_version = '2';
 }
 
 if ( isset( $_REQUEST['patreon_wordpress_action'] ) AND $_REQUEST['patreon_wordpress_action'] == 'disconnect_site_from_patreon_for_reconnection' ) {
-
-	// We repeat below code because we want it to be available !only! during reconnect/disconnect actions
-		
-	if(!function_exists('wp_get_current_user')) {
-		include(ABSPATH . "wp-includes/pluggable.php"); 
-	}
-	
-	if ( current_user_can( 'manage_options' ) ) {
-		$load_api_version = '2';
-	}
+	$load_api_version = '2';
 }
 
 // Added to catch setup wizard/connection cases when user lands back at patreon-authorization
@@ -56,17 +38,7 @@ if ( strpos( $_SERVER['REQUEST_URI'], '/patreon-authorization/' ) !== false ) {
 }
 
 if ( isset( $returned_state_var ) AND isset( $returned_state_var['patreon_action'] ) AND ( $returned_state_var['patreon_action'] == 'reconnect_site' OR $returned_state_var['patreon_action'] == 'connect_site' ) ) {
-
-	// We repeat below code because we want it to be available !only! during reconnect/connect actions
-		
-	if(!function_exists('wp_get_current_user')) {
-		include(ABSPATH . "wp-includes/pluggable.php"); 
-	}
-	
-	if ( current_user_can( 'manage_options' ) ) {
-		$load_api_version = '2';
-	}
-	
+	$load_api_version = '2';
 }
 
 if ( $load_api_version AND $load_api_version == '2' ) {
@@ -91,8 +63,8 @@ else {
 
 			// We construct the old return from the new returns by combining /me and pledge details
 
-			$api_return = $this->__get_json( "identity?include=memberships&fields[user]=email,first_name,full_name,image_url,last_name,thumb_url,url,vanity,is_email_verified&fields[member]=currently_entitled_amount_cents,lifetime_support_cents,last_charge_status,patron_status,last_charge_date,pledge_relationship_start", true );
-			
+			$api_return = $this->__get_json( "identity?include=memberships.currently_entitled_tiers&fields[user]=email,first_name,full_name,image_url,last_name,thumb_url,url,vanity,is_email_verified&fields[member]=currently_entitled_amount_cents,lifetime_support_cents,last_charge_status,patron_status,last_charge_date,pledge_relationship_start", true );
+	
 			$creator_id = get_option( 'patreon-creator-id', false );
 			
 			if ( isset( $api_return['included'][0] ) AND is_array( $api_return['included'][0] ) ) {
@@ -107,8 +79,7 @@ else {
 				}
 				
 			}
-			
-				
+
 			return $api_return;
 		}
 		
@@ -196,7 +167,14 @@ else {
 				$result                    = array( 'error' => $response->get_error_message() );
 				$GLOBALS['patreon_notice'] = $response->get_error_message();
 				
-				Patreon_Wordpress::log_connection_error( $GLOBALS['patreon_notice'] );
+				$caller = 'none';
+				$backtrace = debug_backtrace( DEBUG_BACKTRACE_IGNORE_ARGS, 2 );
+				
+				if ( isset( $backtrace[1]['function'] ) ) {
+					$caller = $backtrace[1]['function'];
+				}
+				
+				Patreon_Wordpress::log_connection_error( $caller . ' - API v1 Class - ' . $GLOBALS['patreon_notice'] );
 				
 				return $result;
 				
@@ -205,7 +183,17 @@ else {
 			// Log the connection as having error if the return is not 200
 			
 			if ( isset( $response['response']['code'] ) AND $response['response']['code'] != '200' AND $response['response']['code'] != '201' ) {
-				Patreon_Wordpress::log_connection_error( 'Response code: ' . $response['response']['code'] . ' Response :' . $response['body'] );
+				
+				$caller = 'none';
+				$backtrace = debug_backtrace( DEBUG_BACKTRACE_IGNORE_ARGS, 2 );
+				
+				if ( isset( $backtrace[1]['function'] ) ) {
+					$caller = $backtrace[1]['function'];
+				}
+				
+				$uuid = wp_remote_retrieve_header( $response, 'x-patreon-uuid' );				
+				
+				Patreon_Wordpress::log_connection_error( $caller . ' -  API v1 Class - UUID ' .$uuid . ' - ' . 'Response code: ' . $response['response']['code'] . ' Response :' . $response['body'] );
 			}	
 			
 			return json_decode( $response['body'], true );

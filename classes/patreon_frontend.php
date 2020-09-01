@@ -430,6 +430,12 @@ class Patreon_Frontend {
 
 		}
 		
+		// Exception - when content is locked for 'any patron' and the user is not a patron, the interface text shows $0.01. For this special case, check and manipulate the chosen label to avoid this:
+		
+		if ( $label == PATREON_TEXT_OVER_BUTTON_1 AND $patreon_level == 0.01 AND !$is_patron ) {
+			$label = PATREON_TEXT_OVER_BUTTON_15;
+		}
+		
 		$label = apply_filters( 'ptrn/label_text_over_universal_button_raw', $label, $args['reason'], $user_logged_into_patreon, $is_patron, $args, $post, $creator_full_name, $patreon_level, $post_total_patronage_level, $creator_url, strip_tags( $tier_title ), self::patreonMakeCacheableFlowLink( $post ) );
 		
 		$label = str_replace( '%%creator_link%%', $creator_url, $label );

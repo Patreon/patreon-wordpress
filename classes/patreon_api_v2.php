@@ -19,8 +19,8 @@ class Patreon_API {
 
 		// We construct the old return from the new returns by combining /me and pledge details
 
-		$api_return = $this->__get_json( "identity?include=memberships&fields[user]=email,first_name,full_name,image_url,last_name,thumb_url,url,vanity,is_email_verified&fields[member]=currently_entitled_amount_cents,lifetime_support_cents,last_charge_status,patron_status,last_charge_date,pledge_relationship_start" );
-		
+		$api_return = $this->__get_json( "identity?include=memberships.currently_entitled_tiers&fields[user]=email,first_name,full_name,image_url,last_name,thumb_url,url,vanity,is_email_verified&fields[member]=currently_entitled_amount_cents,lifetime_support_cents,last_charge_status,patron_status,last_charge_date,pledge_relationship_start" );
+
 		$creator_id = get_option( 'patreon-creator-id', false );
 		
 		if ( isset( $api_return['included'][0] ) AND is_array( $api_return['included'][0] ) ) {
@@ -35,7 +35,7 @@ class Patreon_API {
 			}
 			
 		}
-		
+
 		return $api_return;
 	}
 	
@@ -287,8 +287,15 @@ class Patreon_API {
 			
 			$result                    = array( 'error' => $response->get_error_message() );
 			$GLOBALS['patreon_notice'] = $response->get_error_message();
+		
+			$caller = 'none';
+			$backtrace = debug_backtrace( DEBUG_BACKTRACE_IGNORE_ARGS, 2 );
 			
-			Patreon_Wordpress::log_connection_error( $GLOBALS['patreon_notice'] );
+			if ( isset( $backtrace[1]['function'] ) ) {
+				$caller = $backtrace[1]['function'];
+			}
+			
+			Patreon_Wordpress::log_connection_error( $caller . ' - API v2 Class - WP error message ' . $GLOBALS['patreon_notice'] );
 			
 			return $result;
 			
@@ -297,7 +304,18 @@ class Patreon_API {
 		// Log the connection as having error if the return is not 200
 		
 		if ( isset( $response['response']['code'] ) AND $response['response']['code'] != '200' AND $response['response']['code'] != '201' )  {
-			Patreon_Wordpress::log_connection_error( 'Response code: ' . $response['response']['code'] . ' Response :' . $response['body'] );
+			
+			$caller = 'none';
+			$backtrace = debug_backtrace( DEBUG_BACKTRACE_IGNORE_ARGS, 2 );
+			
+			if ( isset( $backtrace[1]['function'] ) ) {
+				$caller = $backtrace[1]['function'];
+			}
+
+			$uuid = wp_remote_retrieve_header( $response, 'x-patreon-uuid' );
+			
+			Patreon_Wordpress::log_connection_error( $caller . ' - API v2 Class - UUID ' .$uuid . ' - ' . 'Response code: ' . $response['response']['code'] . ' Response :' . $response['body'] );
+			
 		}
 		
 		// Return full result if full result was requested
