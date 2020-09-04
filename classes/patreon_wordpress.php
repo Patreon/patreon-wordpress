@@ -2719,9 +2719,9 @@ class Patreon_Wordpress {
 	public function get_file_id_from_media_library( $filename ) {
 		
 		global $wpdb;
-				
+	
 		$query = $wpdb->prepare(
-			"SELECT post_id FROM $wpdb->postmeta WHERE meta_key = '_wp_attached_file' AND meta_value = %s",
+			"SELECT ID FROM $wpdb->posts WHERE post_type = 'attachment' AND post_name = %s",
 			$filename
 		);
 

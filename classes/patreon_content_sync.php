@@ -200,7 +200,12 @@ class Patreon_Content_Sync {
 		$images = $Patreon_Wordpress->get_images_info_from_content( $post['post_content'] );
 		
 		if ( $images ) {
-			$post['post_content'] = $this->check_replace_patreon_images_with_local_images( $post['post_content'], $images );
+			
+			$image_replacement = $this->check_replace_patreon_images_with_local_images( $post['post_content'], $images );
+
+			$images               = $image_replacement['images'];
+			$post['post_content'] = $image_replacement['post_content'];
+			
 		}
 
 		if ( isset( $patreon_post['data']['attributes']['embed_data']['url'] ) ) {
@@ -325,7 +330,12 @@ class Patreon_Content_Sync {
 		$images = $Patreon_Wordpress->get_images_info_from_content( $post['post_content'] );
 
 		if ( $images ) {
-			$post['post_content'] = $this->check_replace_patreon_images_with_local_images( $post['post_content'], $images );
+			
+			$image_replacement = $this->check_replace_patreon_images_with_local_images( $post['post_content'], $images );
+			
+			$images               = $image_replacement['images'];
+			$post['post_content'] = $image_replacement['post_content'];
+			
 		}
 		
 		if ( isset( $patreon_post['data']['attributes']['embed_data']['url'] ) ) {
@@ -460,12 +470,13 @@ class Patreon_Content_Sync {
 				
 				// Get the image hash
 				
-				$attachment_id = $Patreon_Wordpress->get_remote_image_hash( $images[$key]['url'] );
+				$image_hash = $Patreon_Wordpress->get_remote_image_hash( $images[$key]['url'] );
 				
 				// Set the filename to local translated one with hash
-				$images[$key]['filename'] = $attachment_id . '.' . $images[$key]['extension'];
+				$images[$key]['filename'] = $image_hash . '.' . $images[$key]['extension'];
+				$images[$key]['name'] = $image_hash;
 				
-				$attachment_id = $Patreon_Wordpress->get_file_id_from_media_library( $images[$key]['filename'] );
+				$attachment_id = $Patreon_Wordpress->get_file_id_from_media_library( $image_hash );
 
 				if ( !$attachment_id ) {
 					
@@ -496,8 +507,10 @@ class Patreon_Content_Sync {
 			
 		}
 		
-		return $post_content;
-		
+		return array( 
+			'images' => $images,
+			'post_content' => $post_content,
+		);
 	}
 		
 	public function process_post_embeds( $post_content, $patreon_post ) {
@@ -518,16 +531,21 @@ class Patreon_Content_Sync {
 
 						// Get the image if not present in local library:
 						
-						
 						$path = parse_url( $patreon_post['data']['attributes']['embed_data']['html'], PHP_URL_PATH);
-
-						$filename = basename($path);
+						
+						$image_hash = $Patreon_Wordpress->get_remote_image_hash( $patreon_post['data']['attributes']['embed_data']['html'] );
+						
+						$filename_remote = basename($path['path']);
+						$filename_remote_path = pathinfo( $filename_remote );
+						
+						// Set the filename to local translated one with hash
+						$filename = $image_hash . '.' . $filename_remote_path['extension'];
 						
 						// This image checking and acquisition code can be bundled into a wrapper function later
 						
 						global $Patreon_Wordpress;
 						
-						$attachment_id = $Patreon_Wordpress->get_file_id_from_media_library( $filename );
+						$attachment_id = $Patreon_Wordpress->get_file_id_from_media_library( $image_hash );
 
 						if ( !$attachment_id ) {
 							
