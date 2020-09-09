@@ -3,8 +3,8 @@ Contributors: wordpressorg@patreon.com, codebard
 Tags: patreon, membership, members
 Requires at least: 4.0
 Requires PHP: 5.4
-Tested up to: 5.4.2
-Stable tag: 1.6.5
+Tested up to: 5.5.1
+Stable tag: 1.6.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -78,6 +78,14 @@ To make a locked post public again, just choose "Everyone" from the select box a
 It is  difficult to protect videos due the intensive bandwidth requirements of hosting video  and having to rely on third parties such as Youtube or Vimeo. Youtube allows you to set videos to ‘private’ but Vimeo offers extra controls by only allowing videos to be played on specific domains. Visit this guide to [protecting your video content with Vimeo](https://help.vimeo.com/hc/en-us/articles/224817847-Privacy-settings-overview).
 
 == Upgrade Notice ==
+
+= 1.6.6 =
+
+* Addressed an issue with imported post images being duplicated in WP sites which had 'Organize media by date' on. Images should now import normally. Next import may cause duplicate images once.
+* Added an 'Auto publish public posts' option to settings
+* Added an 'Auto publish patron only posts' option to settings
+* Post import now uses the new auto publish options to decide whether to publish imported posts automatically or not
+* Imported public and patron only posts not set to auto publish is set to 'Pending' status
 
 = 1.6.5 =
 
@@ -345,6 +353,14 @@ Not at all - you can post different content totally independently at your site a
 Nothing will be changed at your site - the plugin will just connect your site to Patreon to allow communication in between your site and Patreon.
 
 == Changelog ==
+
+= 1.6.6 =
+
+* Addressed an issue with imported post images being duplicated in WP sites which had 'Organize media by date' on. Images should now import normally. Next import may cause duplicate images once.
+* Added an 'Auto publish public posts' option to settings
+* Added an 'Auto publish patron only posts' option to settings
+* Post import now uses the new auto publish options to decide whether to publish imported posts automatically or not
+* Imported public and patron only posts not set to auto publish is set to 'Pending' status
 
 = 1.6.5 =
 
