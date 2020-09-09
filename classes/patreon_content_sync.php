@@ -184,11 +184,41 @@ class Patreon_Content_Sync {
 		$post_category     = get_option( 'patreon-sync-post-category', 'category' );
 		$post_term_id      = get_option( 'patreon-sync-post-term', '1' );
 		$post_author       = get_option( 'patreon-post-author-for-synced-posts', 1 );
+		$patron_only_post  = false;
+		
+		if ( $patreon_post['data']['attributes']['is_paid'] ) {
+			$patron_only_post = true;
+		}
+		else {
+			
+			// Not a pay per post - check tier level or patron only status
+			// For now do this in else, when api returns tiers replace with proper logic
+			
+			if ( $patreon_post['data']['attributes']['is_public'] ) {
+				$patron_only_post = false;
+			}
+			else {
+				$patron_only_post = true;
+			}
+
+		}
+		
+		$post_status = 'publish';
+
+		// Decide post status - publish or pending
+		
+		if ( $patron_only_post AND get_option( 'patreon-auto-publish-patron-only-posts', 'yes' ) == 'no' ) {
+			$post_status = 'pending';
+		}
+		
+		if ( !$patron_only_post AND get_option( 'patreon-auto-publish-public-posts', 'yes' ) == 'no' ) {
+			$post_status = 'pending';
+		}
 		
 		$post                  = array();
 		$post['post_title']    = $patreon_post['data']['attributes']['title'];
 		$post['post_content']  = $patreon_post['data']['attributes']['content'];
-		$post['post_status']   = 'publish';
+		$post['post_status']   = $post_status;
 		$post['post_author']   = $post_author;
 		$post['post_type']     = $post_type;
 		
@@ -285,22 +315,12 @@ class Patreon_Content_Sync {
 
 		// If post is not public - currently there is no $ value or tier returned by /posts endpoint, so just set it to $1 locally
 
-		if ( $patreon_post['data']['attributes']['is_paid'] ) {
+		if ( $patron_only_post ) {
 			// Pay per post set to patron only
 			update_post_meta( $inserted_post_id, 'patreon-level', 1 );
 		}
 		else {
-			
-			// Not a pay per post - check tier level or patron only status
-			// For now do this in else, when api returns tiers replace with proper logic
-			
-			if ( $patreon_post['data']['attributes']['is_public'] ) {
-				update_post_meta( $inserted_post_id, 'patreon-level', 0 );
-			}
-			else {
-				update_post_meta( $inserted_post_id, 'patreon-level', 1 );
-			}
-		
+			update_post_meta( $inserted_post_id, 'patreon-level', 0 );
 		}
 		
 		// Set category/taxonomy

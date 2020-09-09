@@ -63,6 +63,8 @@ class Patreon_Options {
         register_setting( 'patreon-options', 'patreon-post-author-for-synced-posts' );
         register_setting( 'patreon-options', 'patreon-hide-login-button' );
         register_setting( 'patreon-options', 'patreon-set-featured-image' );
+        register_setting( 'patreon-options', 'patreon-auto-publish-public-posts' );
+        register_setting( 'patreon-options', 'patreon-auto-publish-patron-only-posts' );
 		
     }
 	
@@ -503,6 +505,56 @@ class Patreon_Options {
 											</th>
 											<td>
 												
+											</td>
+                                        </tr>
+                                        <tr valign="top">
+											<th scope="row">
+												<strong>Auto publish public posts</strong>
+												<div class="patreon-options-info">Whether to auto publish public posts or leave them as draft so you can control when and how they are published</div>
+											</th>
+											<td>
+												<?php
+													
+													$auto_publish_public_posts_selected = '';
+													$auto_publish_public_posts_unselected = '';
+													
+													if ( get_option( 'patreon-auto-publish-public-posts', 'yes' ) == 'yes' ) {
+														$auto_publish_public_posts_selected = " selected";
+													}
+													else {
+														$auto_publish_public_posts_unselected = " selected";
+													}
+												
+												?>
+												<select name="patreon-auto-publish-public-posts">
+													<option value="yes" <?php echo $auto_publish_public_posts_selected; ?>>Yes</option>
+													<option value="no" <?php echo $auto_publish_public_posts_unselected; ?>>No</option>
+												</select>
+											</td>
+                                        </tr>
+                                        <tr valign="top">
+											<th scope="row">
+												<strong>Auto publish patron only posts</strong>
+												<div class="patreon-options-info">Whether to auto publish patron-only posts or leave them as draft so you can control when and how they are published</div>
+											</th>
+											<td>
+												<?php
+																										
+													$auto_publish_patron_only_posts_selected = '';
+													$auto_publish_patron_only_posts_unselected = '';
+													
+													if ( get_option( 'patreon-auto-publish-patron-only-posts', 'yes' ) == 'yes' ) {
+														$auto_publish_patron_only_posts_selected = " selected";
+													}
+													else {
+														$auto_publish_patron_only_posts_unselected = " selected";
+													}
+												
+												?>
+												<select name="patreon-auto-publish-patron-only-posts">
+													<option value="yes" <?php echo $auto_publish_patron_only_posts_selected; ?>>Yes</option>
+													<option value="no" <?php echo $auto_publish_patron_only_posts_unselected; ?>>No</option>
+												</select>
 											</td>
                                         </tr>
                                         <tr valign="top">
