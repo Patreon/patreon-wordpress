@@ -65,6 +65,7 @@ class Patreon_Options {
         register_setting( 'patreon-options', 'patreon-set-featured-image' );
         register_setting( 'patreon-options', 'patreon-auto-publish-public-posts' );
         register_setting( 'patreon-options', 'patreon-auto-publish-patron-only-posts' );
+        register_setting( 'patreon-options', 'patreon-override-synced-post-publish-date' );
 		
     }
 	
@@ -571,6 +572,31 @@ class Patreon_Options {
 												?>
 												<select name="patreon-post-author-for-synced-posts">
 													<?php echo $user_select ?>
+												</select>
+											</td>
+                                        </tr>
+                                        <tr valign="top">
+											<th scope="row">
+												<strong>Override imported post publish dates</strong>
+												<div class="patreon-options-info">If 'Yes', this will override the local imported posts' publish dates with the publish dates from Patreon</div>
+											</th>
+											<td>
+												<?php
+																										
+													$override_post_publish_dates_from_patreon_selected = '';
+													$override_post_publish_dates_from_patreon_unselected = '';
+													
+													if ( get_option( 'patreon-override-synced-post-publish-date', 'no' ) == 'yes' ) {
+														$override_post_publish_dates_from_patreon_selected = " selected";
+													}
+													else {
+														$override_post_publish_dates_from_patreon_unselected = " selected";
+													}
+												
+												?>
+												<select name="patreon-override-synced-post-publish-date">
+													<option value="yes" <?php echo $override_post_publish_dates_from_patreon_selected; ?>>Yes</option>
+													<option value="no" <?php echo $override_post_publish_dates_from_patreon_unselected; ?>>No</option>
 												</select>
 											</td>
                                         </tr>

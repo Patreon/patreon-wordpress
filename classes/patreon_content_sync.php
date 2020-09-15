@@ -203,6 +203,16 @@ class Patreon_Content_Sync {
 
 		}
 		
+		$post_date = date( 'Y-m-d H:i:s', time() );
+		
+		if ( get_option( 'patreon-override-synced-post-publish-date', 'no' ) == 'yes' ) {
+			
+			$utc_timezone = new DateTimeZone( "UTC" );
+			$datetime = new DateTime( $patreon_post['data']['attributes']['published_at'], $utc_timezone );
+			$post_date =  $datetime->format( 'Y-m-d H:i:s' );			
+			
+		}
+		
 		$post_status = 'publish';
 
 		// Decide post status - publish or pending
@@ -221,6 +231,7 @@ class Patreon_Content_Sync {
 		$post['post_status']   = $post_status;
 		$post['post_author']   = $post_author;
 		$post['post_type']     = $post_type;
+		$post['post_date']     = $post_date;
 		
 		// Parse and handle the images inside the post:
 		
