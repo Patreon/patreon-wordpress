@@ -4,7 +4,7 @@ Tags: patreon, membership, members
 Requires at least: 4.0
 Requires PHP: 5.4
 Tested up to: 5.5.1
-Stable tag: 1.6.6
+Stable tag: 1.6.7
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -78,6 +78,11 @@ To make a locked post public again, just choose "Everyone" from the select box a
 It is  difficult to protect videos due the intensive bandwidth requirements of hosting video  and having to rely on third parties such as Youtube or Vimeo. Youtube allows you to set videos to ‘private’ but Vimeo offers extra controls by only allowing videos to be played on specific domains. Visit this guide to [protecting your video content with Vimeo](https://help.vimeo.com/hc/en-us/articles/224817847-Privacy-settings-overview).
 
 == Upgrade Notice ==
+
+= 1.6.7 =
+
+* Added an option to override the imported posts' dates with the dates from Patreon instead of using the date which the post is imported. This will allow syncing your posts with the dates at Patreon if you choose. Defaults to off
+* Made image lock button appear only when image feature is enabled
 
 = 1.6.6 =
 
@@ -353,6 +358,11 @@ Not at all - you can post different content totally independently at your site a
 Nothing will be changed at your site - the plugin will just connect your site to Patreon to allow communication in between your site and Patreon.
 
 == Changelog ==
+
+= 1.6.7 =
+
+* Added an option to override the imported posts' dates with the dates from Patreon instead of using the date which the post is imported. This will allow syncing your posts with the dates at Patreon if you choose. Defaults to off
+* Made image lock button appear only when image feature is enabled
 
 = 1.6.6 =
 
