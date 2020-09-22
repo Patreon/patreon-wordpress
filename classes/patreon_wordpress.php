@@ -327,8 +327,12 @@ class Patreon_Wordpress {
 
 		if ( !$creator_tiers OR $creator_tiers == '' OR !is_array( $creator_tiers['included'][1] ) ) {
 			
-			// Trigger an update of credentials
-			self::update_creator_tiers_from_api();
+			// Refresh tiers if this is not a lite plan. We dont want this on every page load.
+			
+			if ( get_option( 'patreon-creator-has-tiers', 'yes' ) ) {
+				// Trigger an update of creator tiers
+				self::update_creator_tiers_from_api();
+			}
 			
 		}
 	}
@@ -707,6 +711,18 @@ class Patreon_Wordpress {
 			return self::$current_user_pledge_amount;
 		}
 		
+		// Exception - for lite tier creators, use currently_entitled_amount_cents until there is a better way to match custom $ without tiers to local info:
+		
+		if ( get_option( 'patreon-creator-has-tiers', 'yes' ) == 'no' ) {
+		
+			if( isset( $pledge['attributes']['amount_cents'] ) ) {
+				return self::$current_user_pledge_amount = $pledge['attributes']['amount_cents'];
+			}
+			// Catch all from old function format
+			return 0;
+		
+		}
+		
 		// Get currently entitled tiers:
 	
 		$currently_entitled_tiers = $pledge['relationships']['currently_entitled_tiers']['data'];
@@ -887,7 +903,7 @@ class Patreon_Wordpress {
 		// Check if this site is a v2 site - temporary until we move to make all installations v2
 		$api_version = get_option( 'patreon-installation-api-version', false );
 		
-		if( !$setup_done AND ( $api_version AND $api_version == '2' ) ) {
+		if( !$setup_done AND ( $api_version AND $api_version == '2' ) AND current_user_can( 'manage_options' ) ) {
 			
 			?>
 				 <div class="notice notice-success is-dismissible">
@@ -2119,8 +2135,6 @@ class Patreon_Wordpress {
 			exit;
 		}
 		
-		// Update creator tiers from api
-		
 		Patreon_Wordpress::update_creator_tiers_from_api();
 		
 		$post = get_post( $_REQUEST['pw_post_id'] );
@@ -2148,8 +2162,8 @@ class Patreon_Wordpress {
 		$select_options = PATREON_TEXT_YOU_HAVE_NO_REWARDS_IN_THIS_CAMPAIGN;
 		// 1st element is 'everyone' and 2nd element is 'Patrons' (with cent amount 1) in the rewards array.
 		
-		if ( is_array( $creator_tiers['included'] ) ) {
-					
+		if ( isset( $creator_tiers['included'] ) AND is_array( $creator_tiers['included'] ) ) {
+				
 			$select_options = '';
 			
 			// Lets get the current Patreon level for the post:
@@ -2250,7 +2264,7 @@ class Patreon_Wordpress {
 
 			// Creator info acquired. Update.
 			// We want to sort tiers according to their $ level.
-				
+
 			usort( $creator_info['included'], function( $a, $b ) {
 				return $a['attributes']['amount_cents'] - $b['attributes']['amount_cents'];
 			} );
@@ -2258,7 +2272,13 @@ class Patreon_Wordpress {
 			array_walk_recursive( $creator_info, 'self::format_creator_info_array' );
 
 			update_option( 'patreon-creator-tiers',  $creator_info );
-		
+			update_option( 'patreon-creator-has-tiers', 'yes' );
+		}
+		else {
+
+			// Creator doesnt have tiers. Save empty array so local checker functions can know there are no tiers
+			update_option( 'patreon-creator-tiers',  array() );
+			update_option( 'patreon-creator-has-tiers', 'no' );
 		}
 
 	}
@@ -2946,6 +2966,20 @@ class Patreon_Wordpress {
 			
 		}
 
+	}
+	public function creator_has_tiers() {
+		
+		// Checks if creator has tiers locally. This is a way to identify lite plans and avoid hammering the api with tier requests
+		
+		$creator_tiers = get_option( 'patreon-creator-tiers', false );
+
+		if ( !$creator_tiers OR $creator_tiers == '' OR !is_array( $creator_tiers['included'][1] ) ) {
+			return false;
+		}
+		else {
+			return true;
+		}
+		
 	}
 	
 }
