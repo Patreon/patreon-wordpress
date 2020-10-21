@@ -835,7 +835,12 @@ class Patreon_Options {
 		return;		
 	}
     function patreon_plugin_health_check_page(){
-
+		$api_client    = new Patreon_API( get_option( 'patreon-creators-access-token' , false ) );
+        $user_response = $api_client->fetch_tiers();
+		echo '<pre>';
+		print_r($user_response);
+		echo '</pre>';
+	
 		?>
 		<div class="patreon_admin_health_content_section">
 			<h1>Health check of your Patreon integration</h1>
