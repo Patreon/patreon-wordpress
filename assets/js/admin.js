@@ -150,6 +150,11 @@
 						jQuery( '#patreon_wp_post_import_status' ).css( 'color', '#f31d00' );
 						return;
 					}
+
+					if ( response == 'expired_or_lost_cursor_deleted') {
+						jQuery( '#patreon_wp_post_import_status' ).html( 'Expired or lost page cursor deleted. Post import will restart from scratch...' );
+						return;
+					}
 					
 					if ( response == 'couldnt_get_posts') {
 						jQuery( '#patreon_wp_post_import_status' ).html( 'Failed to get posts from Patreon...' );

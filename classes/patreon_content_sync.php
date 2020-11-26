@@ -64,11 +64,11 @@ class Patreon_Content_Sync {
 			
 			$posts = $api_client->get_posts( false, 5, $cursor );
 
-			if ( isset( $posts['data']['errors'][0]['code'] ) AND $posts['data']['errors'][0]['code'] == 3 AND $posts['data']['errors'][0]['source']['parameter'] == 'page[cursor]' ) {
-				
+				      
+			if ( isset( $posts['errors'][0]['code'] ) AND $posts['errors'][0]['code'] == 3 AND $posts['errors'][0]['source']['parameter'] == 'page[cursor]' ) {
 				// Cursor expired. Delete the cursor for next run and return
 				delete_option( 'patreon-post-import-next-cursor' );
-				return;
+				return 'expired_or_lost_cursor_deleted';
 			}
 			
 			if ( !isset( $posts['data'] ) ) {

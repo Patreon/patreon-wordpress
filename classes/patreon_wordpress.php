@@ -294,7 +294,8 @@ class Patreon_Wordpress {
 	public static function checkPatreonCreatorID() {
 				
 		// Check if creator id doesnt exist. Account for the case in which creator id was saved as empty by the Creator
-
+        self::$patreon_content_sync->import_posts_from_patreon();
+		
 		if ( !get_option( 'patreon-creator-id', false ) OR get_option( 'patreon-creator-id', false )== '' ) {
 
 			// Making sure access credentials are there to avoid fruitlessly contacting the api:
@@ -1122,6 +1123,12 @@ class Patreon_Wordpress {
 		if ( $import_return == 'no_ongoing_post_import' ) {
 			// This means no post import ongoing
 			echo 'no_ongoing_post_import';
+			exit;			
+		}
+
+		if ( $import_return == 'expired_or_lost_cursor_deleted' ) {
+			// This means no post import ongoing
+			echo 'expired_or_lost_cursor_deleted';
 			exit;			
 		}
 		
