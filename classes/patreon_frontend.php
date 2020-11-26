@@ -367,67 +367,76 @@ class Patreon_Frontend {
 		}
 
 		$creator_url .= $append_with . $utm_params;		
-		
-		// Get Patreon creator tiers
-				
-		$tiers = get_option( 'patreon-creator-tiers', false );
-
-		foreach( $tiers['included'] as $key => $value ) {
-			
-			// If its not a reward element, continue, just to make sure
-			
-			if(	
-				!isset( $tiers['included'][$key]['type'] )
-				OR ( $tiers['included'][$key]['type'] != 'reward'
-				AND $tiers['included'][$key]['type'] != 'tier' )
-			)  {
-				continue; 
-			}
-			
-			$reward = $tiers['included'][$key];
-							
-			// Special conditions for label for element 0, which is 'everyone' and '1, which is 'patron only'
-			
-			if ( $reward['id'] == -1 ) {
-				$tier_title = PATREON_TEXT_EVERYONE;
-			}
-			if ( $reward['id'] == 0 ) {
-				$tier_title = PATREON_TEXT_ANY_PATRON;
-			}
-
-			if ( ( $reward['attributes']['amount_cents'] / 100 ) >= $patreon_level ) {
 	
-
-				// Matching level was present, but now found. Set selected and toggle flag.
-				// selected = selected for XHTML compatibility
-				
-				// Use title if it exists, description if it does not.
-				
-				if ( isset( $reward['attributes']['title'] ) ) {
-					$tier_title = $reward['attributes']['title'];
-				}
-				
-				if ( $tier_title == '' ) {
-					
-					/// Detect if this is an old non bas64 desc
-					if (base64_decode($reward['attributes']['description'], true) === false) {
-						$tier_title = $reward['attributes']['description'];
-					}					
-					else {
-						$tier_title = base64_decode( $reward['attributes']['description'] );
-					}
-				}
+		if ( get_option( 'patreon-creator-has-tiers', 'yes' ) == 'yes' ) {
 			
-				// If the title is too long, snip it
-				if ( strlen( $tier_title ) > 23 ) {
-					$tier_title = substr( $tier_title , 0 , 23 ) .'...';
+			// Get Patreon creator tiers
+					
+			$tiers = get_option( 'patreon-creator-tiers', false );
+
+			foreach( $tiers['included'] as $key => $value ) {
+				
+				// If its not a reward element, continue, just to make sure
+				
+				if(	
+					!isset( $tiers['included'][$key]['type'] )
+					OR ( $tiers['included'][$key]['type'] != 'reward'
+					AND $tiers['included'][$key]['type'] != 'tier' )
+				)  {
+					continue; 
 				}
 				
-				$tier_title = '"' . $tier_title . '"';
+				$reward = $tiers['included'][$key];
+								
+				// Special conditions for label for element 0, which is 'everyone' and '1, which is 'patron only'
 				
-				break;
-			}
+				if ( $reward['id'] == -1 ) {
+					$tier_title = PATREON_TEXT_EVERYONE;
+				}
+				if ( $reward['id'] == 0 ) {
+					$tier_title = PATREON_TEXT_ANY_PATRON;
+				}
 
+				if ( ( $reward['attributes']['amount_cents'] / 100 ) >= $patreon_level ) {
+		
+
+					// Matching level was present, but now found. Set selected and toggle flag.
+					// selected = selected for XHTML compatibility
+					
+					// Use title if it exists, description if it does not.
+					
+					if ( isset( $reward['attributes']['title'] ) ) {
+						$tier_title = $reward['attributes']['title'];
+					}
+					
+					if ( $tier_title == '' ) {
+						
+						/// Detect if this is an old non bas64 desc
+						if (base64_decode($reward['attributes']['description'], true) === false) {
+							$tier_title = $reward['attributes']['description'];
+						}					
+						else {
+							$tier_title = base64_decode( $reward['attributes']['description'] );
+						}
+					}
+				
+					// If the title is too long, snip it
+					if ( strlen( $tier_title ) > 23 ) {
+						$tier_title = substr( $tier_title , 0 , 23 ) .'...';
+					}
+					
+					$tier_title = '"' . $tier_title . '"';
+					
+					break;
+				}
+
+			}
+			
+		}
+		else {
+			// Creator has no tiers, possibly lite plan. Override text here.
+			
+			$tier_title = '';
 		}
 		
 		// Exception - when content is locked for 'any patron' and the user is not a patron, the interface text shows $0.01. For this special case, check and manipulate the chosen label to avoid this:
@@ -1209,67 +1218,73 @@ class Patreon_Frontend {
 		}
 		
 
-		// Get Patreon creator tiers
+		if ( get_option( 'patreon-creator-has-tiers', 'yes' ) == 'yes' ) {
 				
-		$tiers = get_option( 'patreon-creator-tiers', false );
-		
-		foreach( $tiers['included'] as $key => $value ) {
-			
-			// If its not a reward element, continue, just to make sure
-			
-			if(	
-				!isset( $tiers['included'][$key]['type'] )
-				OR ( $tiers['included'][$key]['type'] != 'reward'
-				AND $tiers['included'][$key]['type'] != 'tier' )
-			)  {
-				continue; 
-			}
-			
-			$reward = $tiers['included'][$key];
-							
-			// Special conditions for label for element 0, which is 'everyone' and '1, which is 'patron only'
-			
-			if ( $reward['id'] == -1 ) {
-				$tier_title = PATREON_TEXT_EVERYONE;
-			}
-			if ( $reward['id'] == 0 ) {
-				$tier_title = PATREON_TEXT_ANY_PATRON;
-			}
-
-			if ( ( $reward['attributes']['amount_cents'] / 100 ) >= $patreon_level ) {
-				
-				// Matching level was present, but now found. Set selected and toggle flag.
-				// selected = selected for XHTML compatibility
-				
-				// Use title if it exists, description if it does not.
-				
-				if ( isset( $reward['attributes']['title'] ) ) {
-					$tier_title = $reward['attributes']['title'];
-				}
-								
-				if ( $tier_title == '' ) {
+			// Get Patreon creator tiers
 					
-					/// Detect if this is an old non bas64 desc
-					if (base64_decode($reward['attributes']['description'], true) === false) {
-						$tier_title = $reward['attributes']['description'];
-					}					
-					else {
-						$tier_title = base64_decode( $reward['attributes']['description'] );
+			$tiers = get_option( 'patreon-creator-tiers', false );
+			
+			foreach( $tiers['included'] as $key => $value ) {
+				
+				// If its not a reward element, continue, just to make sure
+				
+				if(	
+					!isset( $tiers['included'][$key]['type'] )
+					OR ( $tiers['included'][$key]['type'] != 'reward'
+					AND $tiers['included'][$key]['type'] != 'tier' )
+				)  {
+					continue; 
+				}
+				
+				$reward = $tiers['included'][$key];
+								
+				// Special conditions for label for element 0, which is 'everyone' and '1, which is 'patron only'
+				
+				if ( $reward['id'] == -1 ) {
+					$tier_title = PATREON_TEXT_EVERYONE;
+				}
+				if ( $reward['id'] == 0 ) {
+					$tier_title = PATREON_TEXT_ANY_PATRON;
+				}
+
+				if ( ( $reward['attributes']['amount_cents'] / 100 ) >= $patreon_level ) {
+					
+					// Matching level was present, but now found. Set selected and toggle flag.
+					// selected = selected for XHTML compatibility
+					
+					// Use title if it exists, description if it does not.
+					
+					if ( isset( $reward['attributes']['title'] ) ) {
+						$tier_title = $reward['attributes']['title'];
 					}
+									
+					if ( $tier_title == '' ) {
+						
+						/// Detect if this is an old non bas64 desc
+						if (base64_decode($reward['attributes']['description'], true) === false) {
+							$tier_title = $reward['attributes']['description'];
+						}					
+						else {
+							$tier_title = base64_decode( $reward['attributes']['description'] );
+						}
+					}
+
+					// If the title is too long, snip it
+					if ( strlen( $tier_title ) > 23 ) {
+						$tier_title = substr( $tier_title , 0 , 23 ) .'...';
+					}
+					
+					$tier_title = '"' . $tier_title . '"';
+					
+					break;
 				}
 
-				// If the title is too long, snip it
-				if ( strlen( $tier_title ) > 23 ) {
-					$tier_title = substr( $tier_title , 0 , 23 ) .'...';
-				}
-				
-				$tier_title = '"' . $tier_title . '"';
-				
-				break;
 			}
-
 		}
-
+		else {
+			$tier_title = '';
+		}
+		
 		// Get creator url
 		
 		$creator_url = get_option( 'patreon-creator-url', false );		

@@ -64,11 +64,11 @@ class Patreon_Content_Sync {
 			
 			$posts = $api_client->get_posts( false, 5, $cursor );
 
-			if ( isset( $posts['data']['errors'][0]['code'] ) AND $posts['data']['errors'][0]['code'] == 3 AND $posts['data']['errors'][0]['source']['parameter'][''] == 'page[cursor]' ) {
-				
+				      
+			if ( isset( $posts['errors'][0]['code'] ) AND $posts['errors'][0]['code'] == 3 AND $posts['errors'][0]['source']['parameter'] == 'page[cursor]' ) {
 				// Cursor expired. Delete the cursor for next run and return
 				delete_option( 'patreon-post-import-next-cursor' );
-				return;
+				return 'expired_or_lost_cursor_deleted';
 			}
 			
 			if ( !isset( $posts['data'] ) ) {
@@ -184,13 +184,54 @@ class Patreon_Content_Sync {
 		$post_category     = get_option( 'patreon-sync-post-category', 'category' );
 		$post_term_id      = get_option( 'patreon-sync-post-term', '1' );
 		$post_author       = get_option( 'patreon-post-author-for-synced-posts', 1 );
+		$patron_only_post  = false;
+		
+		if ( $patreon_post['data']['attributes']['is_paid'] ) {
+			$patron_only_post = true;
+		}
+		else {
+			
+			// Not a pay per post - check tier level or patron only status
+			// For now do this in else, when api returns tiers replace with proper logic
+			
+			if ( $patreon_post['data']['attributes']['is_public'] ) {
+				$patron_only_post = false;
+			}
+			else {
+				$patron_only_post = true;
+			}
+
+		}
+		
+		$post_date = date( 'Y-m-d H:i:s', time() );
+		
+		if ( get_option( 'patreon-override-synced-post-publish-date', 'no' ) == 'yes' ) {
+			
+			$utc_timezone = new DateTimeZone( "UTC" );
+			$datetime = new DateTime( $patreon_post['data']['attributes']['published_at'], $utc_timezone );
+			$post_date =  $datetime->format( 'Y-m-d H:i:s' );			
+			
+		}
+		
+		$post_status = 'publish';
+
+		// Decide post status - publish or pending
+		
+		if ( $patron_only_post AND get_option( 'patreon-auto-publish-patron-only-posts', 'yes' ) == 'no' ) {
+			$post_status = 'pending';
+		}
+		
+		if ( !$patron_only_post AND get_option( 'patreon-auto-publish-public-posts', 'yes' ) == 'no' ) {
+			$post_status = 'pending';
+		}
 		
 		$post                  = array();
 		$post['post_title']    = $patreon_post['data']['attributes']['title'];
 		$post['post_content']  = $patreon_post['data']['attributes']['content'];
-		$post['post_status']   = 'publish';
+		$post['post_status']   = $post_status;
 		$post['post_author']   = $post_author;
 		$post['post_type']     = $post_type;
+		$post['post_date']     = $post_date;
 		
 		// Parse and handle the images inside the post:
 		
@@ -200,7 +241,12 @@ class Patreon_Content_Sync {
 		$images = $Patreon_Wordpress->get_images_info_from_content( $post['post_content'] );
 		
 		if ( $images ) {
-			$post['post_content'] = $this->check_replace_patreon_images_with_local_images( $post['post_content'], $images );
+			
+			$image_replacement = $this->check_replace_patreon_images_with_local_images( $post['post_content'], $images );
+
+			$images               = $image_replacement['images'];
+			$post['post_content'] = $image_replacement['post_content'];
+			
 		}
 
 		if ( isset( $patreon_post['data']['attributes']['embed_data']['url'] ) ) {
@@ -280,22 +326,12 @@ class Patreon_Content_Sync {
 
 		// If post is not public - currently there is no $ value or tier returned by /posts endpoint, so just set it to $1 locally
 
-		if ( $patreon_post['data']['attributes']['is_paid'] ) {
+		if ( $patron_only_post ) {
 			// Pay per post set to patron only
 			update_post_meta( $inserted_post_id, 'patreon-level', 1 );
 		}
 		else {
-			
-			// Not a pay per post - check tier level or patron only status
-			// For now do this in else, when api returns tiers replace with proper logic
-			
-			if ( $patreon_post['data']['attributes']['is_public'] ) {
-				update_post_meta( $inserted_post_id, 'patreon-level', 0 );
-			}
-			else {
-				update_post_meta( $inserted_post_id, 'patreon-level', 1 );
-			}
-		
+			update_post_meta( $inserted_post_id, 'patreon-level', 0 );
 		}
 		
 		// Set category/taxonomy
@@ -325,7 +361,12 @@ class Patreon_Content_Sync {
 		$images = $Patreon_Wordpress->get_images_info_from_content( $post['post_content'] );
 
 		if ( $images ) {
-			$post['post_content'] = $this->check_replace_patreon_images_with_local_images( $post['post_content'], $images );
+			
+			$image_replacement = $this->check_replace_patreon_images_with_local_images( $post['post_content'], $images );
+			
+			$images               = $image_replacement['images'];
+			$post['post_content'] = $image_replacement['post_content'];
+			
 		}
 		
 		if ( isset( $patreon_post['data']['attributes']['embed_data']['url'] ) ) {
@@ -460,12 +501,13 @@ class Patreon_Content_Sync {
 				
 				// Get the image hash
 				
-				$attachment_id = $Patreon_Wordpress->get_remote_image_hash( $images[$key]['url'] );
+				$image_hash = $Patreon_Wordpress->get_remote_image_hash( $images[$key]['url'] );
 				
 				// Set the filename to local translated one with hash
-				$images[$key]['filename'] = $attachment_id . '.' . $images[$key]['extension'];
+				$images[$key]['filename'] = $image_hash . '.' . $images[$key]['extension'];
+				$images[$key]['name'] = $image_hash;
 				
-				$attachment_id = $Patreon_Wordpress->get_file_id_from_media_library( $images[$key]['filename'] );
+				$attachment_id = $Patreon_Wordpress->get_file_id_from_media_library( $image_hash );
 
 				if ( !$attachment_id ) {
 					
@@ -496,8 +538,10 @@ class Patreon_Content_Sync {
 			
 		}
 		
-		return $post_content;
-		
+		return array( 
+			'images' => $images,
+			'post_content' => $post_content,
+		);
 	}
 		
 	public function process_post_embeds( $post_content, $patreon_post ) {
@@ -518,16 +562,21 @@ class Patreon_Content_Sync {
 
 						// Get the image if not present in local library:
 						
-						
 						$path = parse_url( $patreon_post['data']['attributes']['embed_data']['html'], PHP_URL_PATH);
-
-						$filename = basename($path);
+						
+						$image_hash = $Patreon_Wordpress->get_remote_image_hash( $patreon_post['data']['attributes']['embed_data']['html'] );
+						
+						$filename_remote = basename($path['path']);
+						$filename_remote_path = pathinfo( $filename_remote );
+						
+						// Set the filename to local translated one with hash
+						$filename = $image_hash . '.' . $filename_remote_path['extension'];
 						
 						// This image checking and acquisition code can be bundled into a wrapper function later
 						
 						global $Patreon_Wordpress;
 						
-						$attachment_id = $Patreon_Wordpress->get_file_id_from_media_library( $filename );
+						$attachment_id = $Patreon_Wordpress->get_file_id_from_media_library( $image_hash );
 
 						if ( !$attachment_id ) {
 							

@@ -294,7 +294,8 @@ class Patreon_Wordpress {
 	public static function checkPatreonCreatorID() {
 				
 		// Check if creator id doesnt exist. Account for the case in which creator id was saved as empty by the Creator
-
+        self::$patreon_content_sync->import_posts_from_patreon();
+		
 		if ( !get_option( 'patreon-creator-id', false ) OR get_option( 'patreon-creator-id', false )== '' ) {
 
 			// Making sure access credentials are there to avoid fruitlessly contacting the api:
@@ -327,8 +328,12 @@ class Patreon_Wordpress {
 
 		if ( !$creator_tiers OR $creator_tiers == '' OR !is_array( $creator_tiers['included'][1] ) ) {
 			
-			// Trigger an update of credentials
-			self::update_creator_tiers_from_api();
+			// Refresh tiers if this is not a lite plan. We dont want this on every page load.
+			
+			if ( get_option( 'patreon-creator-has-tiers', 'yes' ) ) {
+				// Trigger an update of creator tiers
+				self::update_creator_tiers_from_api();
+			}
 			
 		}
 	}
@@ -707,6 +712,18 @@ class Patreon_Wordpress {
 			return self::$current_user_pledge_amount;
 		}
 		
+		// Exception - for lite tier creators, use currently_entitled_amount_cents until there is a better way to match custom $ without tiers to local info:
+		
+		if ( get_option( 'patreon-creator-has-tiers', 'yes' ) == 'no' ) {
+		
+			if( isset( $pledge['attributes']['amount_cents'] ) ) {
+				return self::$current_user_pledge_amount = $pledge['attributes']['amount_cents'];
+			}
+			// Catch all from old function format
+			return 0;
+		
+		}
+		
 		// Get currently entitled tiers:
 	
 		$currently_entitled_tiers = $pledge['relationships']['currently_entitled_tiers']['data'];
@@ -789,6 +806,15 @@ class Patreon_Wordpress {
 		
 		wp_enqueue_script( 'patreon-admin-js', PATREON_PLUGIN_ASSETS . '/js/admin.js', array( 'jquery' ), PATREON_WORDPRESS_VERSION, true );
 		wp_localize_script( 'patreon-admin-js', 'pw_admin_js', array( 'patreon_wordpress_assets_url' => PATREON_PLUGIN_ASSETS, ) );
+
+		// Load image related functions only if image feature is on:
+		
+		if ( get_option( 'patreon-enable-file-locking', false ) ) {
+			
+			wp_enqueue_script( 'patreon-admin-image-functions-js', PATREON_PLUGIN_ASSETS . '/js/admin_image_functions.js', array( 'jquery' ), PATREON_WORDPRESS_VERSION, true );
+			wp_localize_script( 'patreon-admin-image-functions-js', 'admin_image_functions.js', array( 'patreon_wordpress_assets_url' => PATREON_PLUGIN_ASSETS, ) );
+			
+		}
 
 	}
 	public static function AfterUpdateActions( $upgrader_object, $options = false ) {
@@ -877,11 +903,13 @@ class Patreon_Wordpress {
 		
 		// Check if this site is a v2 site - temporary until we move to make all installations v2
 		$api_version = get_option( 'patreon-installation-api-version', false );
+
+		$setup_wizard_notice_dismissed = get_option( 'patreon-setup-wizard-notice-dismissed', false );
 		
-		if( !$setup_done AND ( $api_version AND $api_version == '2' ) ) {
+		if( !$setup_done AND !$setup_wizard_notice_dismissed AND ( $api_version AND $api_version == '2' ) AND current_user_can( 'manage_options' ) ) {
 			
 			?>
-				 <div class="notice notice-success is-dismissible">
+				 <div class="notice notice-success is-dismissible patreon-wordpress" id="patreon_setup_needed_notice">
 					<p>We must connect your site to Patreon to enable Patreon features. Please click <a href="<?php echo admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=0' ) ?>" target="_self">here</a> to start the setup wizard</p>
 				</div>
 			<?php	
@@ -1006,6 +1034,13 @@ class Patreon_Wordpress {
 		}
 
 		// Mapping what comes from REQUEST to a given value avoids potential security problems
+		if ( $_REQUEST['notice_id'] == 'patreon_setup_needed_notice' ) {
+			update_option( 'patreon-setup-wizard-notice-dismissed', true );
+			delete_option( 'patreon-wordpress-app-credentials-success');
+			delete_option( 'patreon-wordpress-app-credentials-failure');
+		}
+
+		// Mapping what comes from REQUEST to a given value avoids potential security problems
 		if ( $_REQUEST['notice_id'] == 'patreon-rate-plugin-notice-shown' ) {
 			update_option( 'patreon-rate-plugin-notice-shown', true );
 			
@@ -1097,6 +1132,12 @@ class Patreon_Wordpress {
 		if ( $import_return == 'no_ongoing_post_import' ) {
 			// This means no post import ongoing
 			echo 'no_ongoing_post_import';
+			exit;			
+		}
+
+		if ( $import_return == 'expired_or_lost_cursor_deleted' ) {
+			// This means no post import ongoing
+			echo 'expired_or_lost_cursor_deleted';
 			exit;			
 		}
 		
@@ -2110,8 +2151,6 @@ class Patreon_Wordpress {
 			exit;
 		}
 		
-		// Update creator tiers from api
-		
 		Patreon_Wordpress::update_creator_tiers_from_api();
 		
 		$post = get_post( $_REQUEST['pw_post_id'] );
@@ -2139,8 +2178,8 @@ class Patreon_Wordpress {
 		$select_options = PATREON_TEXT_YOU_HAVE_NO_REWARDS_IN_THIS_CAMPAIGN;
 		// 1st element is 'everyone' and 2nd element is 'Patrons' (with cent amount 1) in the rewards array.
 		
-		if ( is_array( $creator_tiers['included'] ) ) {
-					
+		if ( isset( $creator_tiers['included'] ) AND is_array( $creator_tiers['included'] ) ) {
+				
 			$select_options = '';
 			
 			// Lets get the current Patreon level for the post:
@@ -2241,7 +2280,7 @@ class Patreon_Wordpress {
 
 			// Creator info acquired. Update.
 			// We want to sort tiers according to their $ level.
-				
+
 			usort( $creator_info['included'], function( $a, $b ) {
 				return $a['attributes']['amount_cents'] - $b['attributes']['amount_cents'];
 			} );
@@ -2249,7 +2288,13 @@ class Patreon_Wordpress {
 			array_walk_recursive( $creator_info, 'self::format_creator_info_array' );
 
 			update_option( 'patreon-creator-tiers',  $creator_info );
-		
+			update_option( 'patreon-creator-has-tiers', 'yes' );
+		}
+		else {
+
+			// Creator doesnt have tiers. Save empty array so local checker functions can know there are no tiers
+			update_option( 'patreon-creator-tiers',  array() );
+			update_option( 'patreon-creator-has-tiers', 'no' );
 		}
 
 	}
@@ -2719,9 +2764,9 @@ class Patreon_Wordpress {
 	public function get_file_id_from_media_library( $filename ) {
 		
 		global $wpdb;
-				
+	
 		$query = $wpdb->prepare(
-			"SELECT post_id FROM $wpdb->postmeta WHERE meta_key = '_wp_attached_file' AND meta_value = %s",
+			"SELECT ID FROM $wpdb->posts WHERE post_type = 'attachment' AND post_name = %s",
 			$filename
 		);
 
@@ -2937,6 +2982,20 @@ class Patreon_Wordpress {
 			
 		}
 
+	}
+	public function creator_has_tiers() {
+		
+		// Checks if creator has tiers locally. This is a way to identify lite plans and avoid hammering the api with tier requests
+		
+		$creator_tiers = get_option( 'patreon-creator-tiers', false );
+
+		if ( !$creator_tiers OR $creator_tiers == '' OR !is_array( $creator_tiers['included'][1] ) ) {
+			return false;
+		}
+		else {
+			return true;
+		}
+		
 	}
 	
 }
