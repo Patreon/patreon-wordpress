@@ -903,11 +903,13 @@ class Patreon_Wordpress {
 		
 		// Check if this site is a v2 site - temporary until we move to make all installations v2
 		$api_version = get_option( 'patreon-installation-api-version', false );
+
+		$setup_wizard_notice_dismissed = get_option( 'patreon-setup-wizard-notice-dismissed', false );
 		
-		if( !$setup_done AND ( $api_version AND $api_version == '2' ) AND current_user_can( 'manage_options' ) ) {
+		if( !$setup_done AND !$setup_wizard_notice_dismissed AND ( $api_version AND $api_version == '2' ) AND current_user_can( 'manage_options' ) ) {
 			
 			?>
-				 <div class="notice notice-success is-dismissible">
+				 <div class="notice notice-success is-dismissible patreon-wordpress" id="patreon_setup_needed_notice">
 					<p>We must connect your site to Patreon to enable Patreon features. Please click <a href="<?php echo admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=0' ) ?>" target="_self">here</a> to start the setup wizard</p>
 				</div>
 			<?php	
@@ -1029,6 +1031,13 @@ class Patreon_Wordpress {
 			
 			// Set the last notice shown date
 			self::set_last_non_system_notice_shown_date();
+		}
+
+		// Mapping what comes from REQUEST to a given value avoids potential security problems
+		if ( $_REQUEST['notice_id'] == 'patreon_setup_needed_notice' ) {
+			update_option( 'patreon-setup-wizard-notice-dismissed', true );
+			delete_option( 'patreon-wordpress-app-credentials-success');
+			delete_option( 'patreon-wordpress-app-credentials-failure');
 		}
 
 		// Mapping what comes from REQUEST to a given value avoids potential security problems
