@@ -1336,7 +1336,17 @@ class Patreon_Wordpress {
 		
 		$current_user = wp_get_current_user();
 		
-		$option_to_toggle = $_REQUEST['toggle_id'];
+		$option_to_toggle = sanitize_key( $_REQUEST['toggle_id'] );
+
+		// Bail out if the option to be toggled is not in the allowed options
+       if ( !array_key_exists($option_to_toggle, Patreon_Frontend::$allowed_toggles) ) {
+			return;
+	   }
+
+		// Bail out if the option to be toggled is not in the allowed options
+       if ( !wp_verify_nonce( sanitize_key( $_REQUEST['patreon_wordpress_ajax_nonce'] ) ) ) {
+			return;
+	   }
 		
 		$current_value = get_user_meta( $current_user->ID, $option_to_toggle, true );
 		
@@ -1347,7 +1357,7 @@ class Patreon_Wordpress {
 		}
 		
 		update_user_meta( $current_user->ID, $option_to_toggle, $new_value );
-		
+		exit;
 	}
 	public static function add_to_lock_or_not_results( $post_id, $result ) {
 		// Manages the lock_or_not post id <-> lock info var cache. The cache is run in a FIFO basis to prevent memory bloat in WP installs which may have long post listings. What it does is snip the first element in array and add the newly added var in the end

@@ -183,7 +183,7 @@ class Patron_Metabox {
 			}
 		?>
 		
-		<a href="" toggle="patreon-wordpress-advanced-options-toggle" togglestatus="<?php echo $advanced_post_options_toggle_status ?>" ontext="Hide advanced" offtext="Show advanced" class="patreon-wordpress-admin-toggle"><?php echo $advanced_post_options_toggle_text ?></a>
+		<a href="" toggle="patreon-wordpress-advanced-options-toggle" patreon_wordpress_ajax_nonce="<?php echo wp_create_nonce() ?>" togglestatus="<?php echo $advanced_post_options_toggle_status ?>" ontext="Hide advanced" offtext="Show advanced" class="patreon-wordpress-admin-toggle"><?php echo $advanced_post_options_toggle_text ?></a>
 		
 		<?php
 		
