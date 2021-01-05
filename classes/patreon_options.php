@@ -144,20 +144,20 @@ class Patreon_Options {
 									<div id="patreon_options_app_details_connect">
 								
 										We will now connect your site to Patreon by running connection wizard. Before starting, please make sure you deleted any existing app for this site in <a href="https://www.patreon.com/portal/registration/register-clients" target="_blank">this page at Patreon</a><br /><br />
-										<button id="patreon_wordpress_reconnect_to_patreon" class="button button-primary button-large" target="<?php echo admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=0' ); ?>">Start connection wizard</button> <button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon_options_app_details_connect patreon_options_app_details_main">Cancel</button>
+										<button id="patreon_wordpress_reconnect_to_patreon" class="button button-primary button-large" target="<?php echo admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=0'); ?>">Start connection wizard</button> <button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon_options_app_details_connect patreon_options_app_details_main">Cancel</button>
 										
 									</div>
 									<div id="patreon_options_app_details_reconnect">
 								
 										We will now reconnect your site to Patreon. This will refresh your site's connection to Patreon. Your settings and content gating values will remain unchanged. Patron only content will become accessible to everyone until you finish reconnecting your site to Patreon.<br /><br />
-										<button id="patreon_wordpress_disconnect_reconnect_to_patreon" class="button button-primary button-large" target="<?php echo admin_url( 'admin.php?page=patreon-plugin&patreon_wordpress_action=disconnect_site_from_patreon_for_reconnection' ); ?>">Confirm reconnection</button> <button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon_options_app_details_reconnect patreon_options_app_details_main">Cancel</button>
+										<button id="patreon_wordpress_disconnect_reconnect_to_patreon" class="button button-primary button-large" target="<?php echo admin_url( 'admin.php?page=patreon-plugin&patreon_wordpress_action=disconnect_site_from_patreon_for_reconnection&patreon_wordpress_reconnect_to_patreon_nonce=' . wp_create_nonce() ); ?>">Confirm reconnection</button> <button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon_options_app_details_reconnect patreon_options_app_details_main">Cancel</button>
 										
 									</div>
 									
 									<div id="patreon_options_app_details_disconnect">
 									
 										We will now remove all info related to currently linked creator account from your site. Post gating values in your posts will be left untouched. After this, you will be able to connect this site to another creator account you have. Gated posts should keep stay gated from the nearest tier you have in the creator account you connect to this site. Patron only content will become accessible to everyone until you reconnect your site to Patreon. <br /><br />
-										<button id="patreon_wordpress_disconnect_from_patreon" class="button button-primary button-large" target="<?php echo admin_url( 'admin.php?page=patreon-plugin&patreon_wordpress_action=disconnect_site_from_patreon' ); ?>">Confirm disconnection</button> <button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon_options_app_details_disconnect patreon_options_app_details_main">Cancel</button>
+										<button id="patreon_wordpress_disconnect_from_patreon" class="button button-primary button-large" target="<?php echo admin_url( 'admin.php?page=patreon-plugin&patreon_wordpress_action=disconnect_site_from_patreon&patreon_wordpress_disconnect_from_patreon_nonce=' . wp_create_nonce() ); ?>">Confirm disconnection</button> <button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon_options_app_details_disconnect patreon_options_app_details_main">Cancel</button>
 										
 									</div>
 									
@@ -499,7 +499,7 @@ class Patreon_Options {
 													<select  name="patreon_sync_post_term" id="patreon_sync_post_term" style="display: inline-block; margin-right: 5px;">
 														<?php echo $term_select ?>
 													</select>
-													<button id="patreon_wordpress_save_post_sync_category" class="button button-primary button-large" pw_input_target="#patreon_wordpress_post_import_category_status" target="">Save</button><div id="patreon_wordpress_post_import_category_status" style="color: #<?php echo $post_sync_category_status_color ?>;"></div>
+													<button id="patreon_wordpress_save_post_sync_category" patreon_wordpress_save_post_sync_category_nonce="<?php echo wp_create_nonce() ?>" class="button button-primary button-large" pw_input_target="#patreon_wordpress_post_import_category_status" target="">Save</button><div id="patreon_wordpress_post_import_category_status" style="color: #<?php echo $post_sync_category_status_color ?>;"></div>
 												</div>
 												
 												</div>
@@ -570,9 +570,9 @@ class Patreon_Options {
 													$user_select = $Patreon_Wordpress->make_user_select( $post_author_for_synced_posts );
 													
 												?>
-												<select name="patreon-post-author-for-synced-posts">
+												<select id="patreon_post_author_for_synced_posts" name="patreon-post-author-for-synced-posts" pw_input_target="#patreon_wordpress_post_author_status" patreon_wordpress_set_post_author_for_post_sync_nonce="<?php echo wp_create_nonce() ?>">
 													<?php echo $user_select ?>
-												</select>
+												</select><div id="patreon_wordpress_post_author_status"></div>
 											</td>
                                         </tr>
                                         <tr valign="top">

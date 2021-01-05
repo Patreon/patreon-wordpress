@@ -179,7 +179,11 @@ class Patreon_Protect {
 		}
 
 		if ( !( isset( $_REQUEST['patreon_action'] ) AND $_REQUEST['patreon_action'] == 'serve_patron_only_image' ) ) {
-			return;	
+			wp_die('No patreon_action provided with image request');
+		}
+
+		if ( !get_option( 'patreon-enable-file-locking', false ) ) {
+			wp_die('Image/file locking with Patreon is not enabled in your WP admin -> Patreon settings');
 		}
 
 		$upload_locations = wp_upload_dir();
@@ -189,6 +193,24 @@ class Patreon_Protect {
 		$upload_dir = substr( wp_make_link_relative( $upload_locations['baseurl'] ) , 1 );	
 
 		$image = get_site_url() . '/' . $upload_dir . '/' . $image;
+		
+		// Check if image exists in media library
+		
+		$attachment_id = attachment_url_to_postid( $image );
+	
+		// attachment_url_to_postid returns 0 if it cant find the attachment post id
+		
+		if ( $attachment_id == 0 ) {
+			
+			// Couldnt determine attachment post id. Try to get id from thumbnail
+			$attachment_id = Patreon_Protect::getAttachmentIDfromThumbnailURL( $image );
+	
+			//No go. Image cant be found in media library. bail out.
+			if ( $attachment_id == 0 OR !$attachment_id ) {
+				wp_die('Image not found in media library');
+			}
+			
+		}
 		
 		if ( current_user_can( 'manage_options' ) ) {
 			Patreon_Protect::readAndServeImage( $image );	
@@ -204,21 +226,6 @@ class Patreon_Protect {
 	
 		// Check if the image is protected:
 
-		$attachment_id = attachment_url_to_postid( $image );
-	
-		// attachment_url_to_postid returns 0 if it cant find the attachment post id
-		
-		if ( $attachment_id == 0 ) {
-			
-			// Couldnt determine attachment post id. Try to get id from thumbnail
-			$attachment_id = Patreon_Protect::getAttachmentIDfromThumbnailURL( $image );
-	
-			//No go. Have to get out and serve the image normally
-			if ( $attachment_id == 0 OR !$attachment_id ) {
-				Patreon_Protect::readAndServeImage( $image );
-			}
-			
-		}
 		
 		$patreon_level = get_post_meta( $attachment_id, 'patreon_level', true );
 		

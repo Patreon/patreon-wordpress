@@ -1146,7 +1146,13 @@ class Patreon_Wordpress {
 	public function save_post_sync_category() {
 		
 		if( !( is_admin() && current_user_can( 'manage_options' ) ) ) {
-			return;
+			echo 'You have to be an admin user to set this setting';
+			exit;
+		}
+		
+		if ( !wp_verify_nonce( sanitize_key( $_REQUEST['patreon_wordpress_save_post_sync_category_nonce'] ) ) ) {
+			echo 'Form security field expired - please refresh the page and try again';
+			exit;
 		}
 		
 		if ( !( 
@@ -1179,7 +1185,13 @@ class Patreon_Wordpress {
 	public function set_post_author_for_post_sync() {
 		
 		if( !( is_admin() && current_user_can( 'manage_options' ) ) ) {
-			return;
+			echo 'You have to be logged as an admin to set this setting';
+			exit;
+		}
+		
+		if ( !wp_verify_nonce( sanitize_key( $_REQUEST['patreon_wordpress_set_post_author_for_post_sync_nonce'] ) ) ) {
+			echo 'Form security field expired - please refresh the page and try again';
+			exit;
 		}
 		
 		if ( !( 
@@ -2346,6 +2358,11 @@ class Patreon_Wordpress {
 		// This function runs on init at order 0, and allows any action that does not require to be run in a particular order or any other function or operation to be run. 
 
 		if ( isset( $_REQUEST['patreon_wordpress_action'] ) AND $_REQUEST['patreon_wordpress_action'] == 'disconnect_site_from_patreon' AND is_admin() AND current_user_can( 'manage_options' ) ) {
+			
+		
+			if ( !isset($_REQUEST['patreon_wordpress_disconnect_from_patreon_nonce']) OR !wp_verify_nonce( sanitize_key( $_REQUEST['patreon_wordpress_disconnect_from_patreon_nonce'] ) ) ) {
+				wp_die('Form security field expired - please refresh the page and try again');
+			}
 
 			// Admin side, user is admin level. Perform action:
 			
@@ -2439,8 +2456,12 @@ class Patreon_Wordpress {
 			
 			
 		}
-		
+
 		if ( isset( $_REQUEST['patreon_wordpress_action'] ) AND $_REQUEST['patreon_wordpress_action'] == 'disconnect_site_from_patreon_for_reconnection' AND is_admin() AND current_user_can( 'manage_options' ) ) {
+
+			if ( !isset($_REQUEST['patreon_wordpress_reconnect_to_patreon_nonce']) OR !wp_verify_nonce( sanitize_key( $_REQUEST['patreon_wordpress_reconnect_to_patreon_nonce'] ) ) ) {
+				wp_die('Form security field expired - please refresh the page and try again');
+			}
 
 			// Admin side, user is admin level. Perform action:
 			
