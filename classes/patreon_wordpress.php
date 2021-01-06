@@ -1356,7 +1356,7 @@ class Patreon_Wordpress {
 	   }
 
 		// Bail out if the option to be toggled is not in the allowed options
-       if ( !wp_verify_nonce( sanitize_key( $_REQUEST['patreon_wordpress_ajax_nonce'] ) ) ) {
+       if ( !wp_verify_nonce( sanitize_key( $_REQUEST['patreon_wordpress_advanced_options_toggle_nonce'] ) ) ) {
 			return;
 	   }
 		

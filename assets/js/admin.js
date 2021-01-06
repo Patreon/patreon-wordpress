@@ -43,7 +43,7 @@
 			
 			var toggle_id = jQuery( this ).attr( 'toggle' );
 			var toggle_target = document.getElementById( toggle_id );
-			var patreon_wordpress_ajax_nonce = jQuery( this ).attr( 'patreon_wordpress_ajax_nonce' );
+			var patreon_wordpress_advanced_options_toggle_nonce = jQuery( this ).attr( 'patreon_wordpress_advanced_options_toggle_nonce' );
 
 			jQuery( toggle_target ).slideToggle();
 			
@@ -67,7 +67,7 @@
 				data: {
 					action: 'patreon_wordpress_toggle_option',
 					toggle_id: toggle_id,
-					patreon_wordpress_ajax_nonce: patreon_wordpress_ajax_nonce,
+					patreon_wordpress_advanced_options_toggle_nonce: patreon_wordpress_advanced_options_toggle_nonce,
 				}
 			});		
 			
