@@ -79,6 +79,10 @@ It is  difficult to protect videos due the intensive bandwidth requirements of h
 
 == Upgrade Notice ==
 
+= 1.7.1 =
+
+* Fixed a bug with not being able to save post category for post sync during setup wizard
+
 = 1.7.0 =
 
 * Fixed a bug with post author for synced posts not being possible to set
@@ -389,6 +393,10 @@ Not at all - you can post different content totally independently at your site a
 Nothing will be changed at your site - the plugin will just connect your site to Patreon to allow communication in between your site and Patreon.
 
 == Changelog ==
+
+= 1.7.1 =
+
+* Fixed a bug with not being able to save post category for post sync during setup wizard
 
 = 1.7.0 =
 
