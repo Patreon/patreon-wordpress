@@ -421,6 +421,11 @@
 	margin-top: 10px;
 	font-weight: bold;
 }
+#patreon_wordpress_post_author_status{
+	display: block;
+	margin-top: 10px;
+	font-weight: bold;
+}
 
 #patreon_api_version_warning {
 	display: block;

@@ -31,12 +31,19 @@
 			window.location.replace( target );
 		});
 		
+		jQuery(document).on( 'click', '#patreon_wordpress_disconnect_reconnect_to_patreon', function(e) {
+			e.preventDefault();
+			var target = jQuery(this).attr( 'target' );
+			window.location.replace( target );
+		});
+		
 		jQuery(document).on( 'click', '.patreon-wordpress-admin-toggle', function(e) {
 			
 			e.preventDefault();
 			
 			var toggle_id = jQuery( this ).attr( 'toggle' );
 			var toggle_target = document.getElementById( toggle_id );
+			var patreon_wordpress_advanced_options_toggle_nonce = jQuery( this ).attr( 'patreon_wordpress_advanced_options_toggle_nonce' );
 
 			jQuery( toggle_target ).slideToggle();
 			
@@ -60,6 +67,7 @@
 				data: {
 					action: 'patreon_wordpress_toggle_option',
 					toggle_id: toggle_id,
+					patreon_wordpress_advanced_options_toggle_nonce: patreon_wordpress_advanced_options_toggle_nonce,
 				}
 			});		
 			
@@ -250,6 +258,7 @@
 			
 			e.preventDefault();
 			var pw_input_target = jQuery( this ).attr( 'pw_input_target' );
+			var patreon_wordpress_save_post_sync_category_nonce = jQuery( this ).attr( 'patreon_wordpress_save_post_sync_category_nonce' );
 			var patreon_sync_post_type = jQuery('#patreon_sync_post_type').val();
 			var patreon_sync_post_category = jQuery('#patreon_sync_post_category').val();
 			var patreon_sync_post_term = jQuery('#patreon_sync_post_term').val();
@@ -263,6 +272,7 @@
 					patreon_sync_post_type: patreon_sync_post_type,
 					patreon_sync_post_category: patreon_sync_post_category,
 					patreon_sync_post_term: patreon_sync_post_term,
+					patreon_wordpress_save_post_sync_category_nonce: patreon_wordpress_save_post_sync_category_nonce,
 				},
 				beforeSend: function( xhr ) {
 					jQuery( '#patreon_wordpress_post_import_category_status' ).empty();					
@@ -347,16 +357,18 @@
 		});
 		
 		// Save patreon post author option upon change in post sync wizard screens
-		jQuery( "#patreon-post-author-for-synced-posts" ).on( 'change', function(e) {
+		jQuery( "#patreon_post_author_for_synced_posts" ).on( 'change', function(e) {
 			
 			// Just in case
 			e.preventDefault();
 			var pw_input_target = jQuery( this ).attr( 'pw_input_target' );
+			var patreon_wordpress_set_post_author_for_post_sync_nonce = jQuery( this ).attr( 'patreon_wordpress_set_post_author_for_post_sync_nonce' );
 			var option_value = jQuery(this).val();
 			
 			if (  option_value == '' ) {
 				// Do nothing if value is empty
 				jQuery( pw_input_target ).html('');
+				console.log('empty');
 				return;
 			}
 			
@@ -368,6 +380,7 @@
 				data: {
 					action: 'patreon_wordpress_set_post_author_for_post_sync',
 					patreon_post_author_for_post_sync: option_value,
+					patreon_wordpress_set_post_author_for_post_sync_nonce: patreon_wordpress_set_post_author_for_post_sync_nonce,
 				},
 				beforeSend: function( e ) {			
 				},

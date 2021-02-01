@@ -1146,7 +1146,13 @@ class Patreon_Wordpress {
 	public function save_post_sync_category() {
 		
 		if( !( is_admin() && current_user_can( 'manage_options' ) ) ) {
-			return;
+			echo 'You have to be an admin user to set this setting';
+			exit;
+		}
+		
+		if ( !wp_verify_nonce( sanitize_key( $_REQUEST['patreon_wordpress_save_post_sync_category_nonce'] ) ) ) {
+			echo 'Form security field expired - please refresh the page and try again';
+			exit;
 		}
 		
 		if ( !( 
@@ -1179,7 +1185,13 @@ class Patreon_Wordpress {
 	public function set_post_author_for_post_sync() {
 		
 		if( !( is_admin() && current_user_can( 'manage_options' ) ) ) {
-			return;
+			echo 'You have to be logged as an admin to set this setting';
+			exit;
+		}
+		
+		if ( !wp_verify_nonce( sanitize_key( $_REQUEST['patreon_wordpress_set_post_author_for_post_sync_nonce'] ) ) ) {
+			echo 'Form security field expired - please refresh the page and try again';
+			exit;
 		}
 		
 		if ( !( 
@@ -1336,7 +1348,17 @@ class Patreon_Wordpress {
 		
 		$current_user = wp_get_current_user();
 		
-		$option_to_toggle = $_REQUEST['toggle_id'];
+		$option_to_toggle = sanitize_key( $_REQUEST['toggle_id'] );
+
+		// Bail out if the option to be toggled is not in the allowed options
+       if ( !array_key_exists($option_to_toggle, Patreon_Frontend::$allowed_toggles) ) {
+			return;
+	   }
+
+		// Bail out if the option to be toggled is not in the allowed options
+       if ( !wp_verify_nonce( sanitize_key( $_REQUEST['patreon_wordpress_advanced_options_toggle_nonce'] ) ) ) {
+			return;
+	   }
 		
 		$current_value = get_user_meta( $current_user->ID, $option_to_toggle, true );
 		
@@ -1347,7 +1369,7 @@ class Patreon_Wordpress {
 		}
 		
 		update_user_meta( $current_user->ID, $option_to_toggle, $new_value );
-		
+		exit;
 	}
 	public static function add_to_lock_or_not_results( $post_id, $result ) {
 		// Manages the lock_or_not post id <-> lock info var cache. The cache is run in a FIFO basis to prevent memory bloat in WP installs which may have long post listings. What it does is snip the first element in array and add the newly added var in the end
@@ -1877,7 +1899,7 @@ class Patreon_Wordpress {
 	
 			echo '<div id="patreon_setup_logo"><img src="' . PATREON_PLUGIN_ASSETS . '/img/Patreon_Logo_100.png" /></div>';
 			
-			echo '<div id="patreon_setup_content"><h1 style="margin-top: 0px;">How should posts be synced?</h1><div id="patreon_setup_message">' . $api_version_warning . $setup_message . '<div class="patreon_post_sync_choice"><div class="patreon_post_sync_choice_title">Sync posts to this category</div>'. PATREON_POST_SYNC_5 .'<div style="display:block;margin-top:10px;width: 200px;"><select name="patreon_sync_post_type" id="patreon_sync_post_type" style="display: inline-block; margin-right: 5px; margin-bottom: 10px; font-size: 20px; width: 250px;">' . $post_type_select . '</select><select  name="patreon_sync_post_category" id="patreon_sync_post_category" style="display: inline-block; margin-right: 5px; margin-bottom: 10px; font-size: 20px; width: 250px;">' .$taxonomy_select . '</select><select  name="patreon_sync_post_term" id="patreon_sync_post_term" style="display: inline-block; margin-right: 5px; margin-bottom: 10px; font-size: 20px; width: 250px;">' . $term_select .'</select><button id="patreon_wordpress_save_post_sync_category" class="button button-primary button-large" style="display: inline-block; margin-right: 5px; margin-bottom: 10px; font-size: 20px; width: 250px;" pw_input_target="#patreon_wordpress_post_import_category_status" target="">Save</button><div id="patreon_wordpress_post_import_category_status" style="color: #<?php echo $post_sync_category_status_color ?>;"></div></div><div class="patreon_post_sync_choice"><div class="patreon_post_sync_choice_title">Author for imported posts</div>'. PATREON_POST_SYNC_6 .'<div style="display:block;margin-top:10px;"><select id="patreon-post-author-for-synced-posts" name="patreon-post-author-for-synced-posts" pw_input_target="#patreon-post-author-for-synced-posts-info" style="font-size:20px; display:inline-block;">' . $user_select .'</select><div id="patreon-post-author-for-synced-posts-info"></div></div></div><div class="patreon_post_sync_choice"><div class="patreon_post_sync_choice_title">Update local posts from the ones at Patreon</div>'. PATREON_POST_SYNC_2 .'<div style="display:block;margin-top:10px;width: 200px;"><select id="patreon-update-posts" name="patreon-update-posts" pw_input_target="#patreon-update-posts-info" style="font-size:20px; display:inline-block;"><option value="">Select</option><option value="yes" '. $update_posts_selected .'>Yes</option><option value="no"'. $update_posts_unselected .'>No</option></select><div id="patreon-update-posts-info"></div></div></div><div class="patreon_post_sync_choice"><div class="patreon_post_sync_choice_title">Delete local post when Patreon post is deleted</div>'. PATREON_POST_SYNC_3 .'<div style="display:block;margin-top:10px;width: 200px;"><select name="patreon-remove-deleted-posts" id="patreon-remove-deleted-posts" pw_input_target="#patreon-remove-deleted-posts-info" style="font-size:20px;"><option value="">Select</option><option value="yes" '. $delete_posts_selected .'>Yes</option><option value="no" '. $delete_posts_unselected .'>No</option></select><div id="patreon-remove-deleted-posts-info"></div></div></div></div><form style="display:inline-block;margin-right:10px;" method="post" action="'. admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=post_sync_2') .'"><p class="submit" style="margin-top: 10px;"><input type="submit" name="submit" id="submit" class="button button-large button-primary" value="Done!"></p></form></div>';
+			echo '<div id="patreon_setup_content"><h1 style="margin-top: 0px;">How should posts be synced?</h1><div id="patreon_setup_message">' . $api_version_warning . $setup_message . '<div class="patreon_post_sync_choice"><div class="patreon_post_sync_choice_title">Sync posts to this category</div>'. PATREON_POST_SYNC_5 .'<div style="display:block;margin-top:10px;width: 200px;"><select name="patreon_sync_post_type" id="patreon_sync_post_type" style="display: inline-block; margin-right: 5px; margin-bottom: 10px; font-size: 20px; width: 250px;">' . $post_type_select . '</select><select  name="patreon_sync_post_category" id="patreon_sync_post_category" style="display: inline-block; margin-right: 5px; margin-bottom: 10px; font-size: 20px; width: 250px;">' .$taxonomy_select . '</select><select  name="patreon_sync_post_term" id="patreon_sync_post_term" style="display: inline-block; margin-right: 5px; margin-bottom: 10px; font-size: 20px; width: 250px;">' . $term_select .'</select><button id="patreon_wordpress_save_post_sync_category" patreon_wordpress_save_post_sync_category_nonce="' . wp_create_nonce() . '" class="button button-primary button-large" style="display: inline-block; margin-right: 5px; margin-bottom: 10px; font-size: 20px; width: 250px;" pw_input_target="#patreon_wordpress_post_import_category_status" target="">Save</button><div id="patreon_wordpress_post_import_category_status" style="color: #<?php echo $post_sync_category_status_color ?>;"></div></div><div class="patreon_post_sync_choice"><div class="patreon_post_sync_choice_title">Author for imported posts</div>'. PATREON_POST_SYNC_6 .'<div style="display:block;margin-top:10px;"><select id="patreon-post-author-for-synced-posts" name="patreon-post-author-for-synced-posts" pw_input_target="#patreon-post-author-for-synced-posts-info" style="font-size:20px; display:inline-block;">' . $user_select .'</select><div id="patreon-post-author-for-synced-posts-info"></div></div></div><div class="patreon_post_sync_choice"><div class="patreon_post_sync_choice_title">Update local posts from the ones at Patreon</div>'. PATREON_POST_SYNC_2 .'<div style="display:block;margin-top:10px;width: 200px;"><select id="patreon-update-posts" name="patreon-update-posts" pw_input_target="#patreon-update-posts-info" style="font-size:20px; display:inline-block;"><option value="">Select</option><option value="yes" '. $update_posts_selected .'>Yes</option><option value="no"'. $update_posts_unselected .'>No</option></select><div id="patreon-update-posts-info"></div></div></div><div class="patreon_post_sync_choice"><div class="patreon_post_sync_choice_title">Delete local post when Patreon post is deleted</div>'. PATREON_POST_SYNC_3 .'<div style="display:block;margin-top:10px;width: 200px;"><select name="patreon-remove-deleted-posts" id="patreon-remove-deleted-posts" pw_input_target="#patreon-remove-deleted-posts-info" style="font-size:20px;"><option value="">Select</option><option value="yes" '. $delete_posts_selected .'>Yes</option><option value="no" '. $delete_posts_unselected .'>No</option></select><div id="patreon-remove-deleted-posts-info"></div></div></div></div><form style="display:inline-block;margin-right:10px;" method="post" action="'. admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=post_sync_2') .'"><p class="submit" style="margin-top: 10px;"><input type="submit" name="submit" id="submit" class="button button-large button-primary" value="Done!"></p></form></div>';
 		
 			echo '</div>';
 
@@ -2336,6 +2358,11 @@ class Patreon_Wordpress {
 		// This function runs on init at order 0, and allows any action that does not require to be run in a particular order or any other function or operation to be run. 
 
 		if ( isset( $_REQUEST['patreon_wordpress_action'] ) AND $_REQUEST['patreon_wordpress_action'] == 'disconnect_site_from_patreon' AND is_admin() AND current_user_can( 'manage_options' ) ) {
+			
+		
+			if ( !isset($_REQUEST['patreon_wordpress_disconnect_from_patreon_nonce']) OR !wp_verify_nonce( sanitize_key( $_REQUEST['patreon_wordpress_disconnect_from_patreon_nonce'] ) ) ) {
+				wp_die('Form security field expired - please refresh the page and try again');
+			}
 
 			// Admin side, user is admin level. Perform action:
 			
@@ -2429,8 +2456,12 @@ class Patreon_Wordpress {
 			
 			
 		}
-		
+
 		if ( isset( $_REQUEST['patreon_wordpress_action'] ) AND $_REQUEST['patreon_wordpress_action'] == 'disconnect_site_from_patreon_for_reconnection' AND is_admin() AND current_user_can( 'manage_options' ) ) {
+
+			if ( !isset($_REQUEST['patreon_wordpress_reconnect_to_patreon_nonce']) OR !wp_verify_nonce( sanitize_key( $_REQUEST['patreon_wordpress_reconnect_to_patreon_nonce'] ) ) ) {
+				wp_die('Form security field expired - please refresh the page and try again');
+			}
 
 			// Admin side, user is admin level. Perform action:
 			

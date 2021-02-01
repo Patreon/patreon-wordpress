@@ -2,9 +2,9 @@
 Contributors: wordpressorg@patreon.com, codebard
 Tags: patreon, membership, members
 Requires at least: 4.0
-Requires PHP: 5.4
-Tested up to: 5.5.1
-Stable tag: 1.6.9
+Requires PHP: 5.6
+Tested up to: 5.6
+Stable tag: 1.7.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -78,6 +78,27 @@ To make a locked post public again, just choose "Everyone" from the select box a
 It is  difficult to protect videos due the intensive bandwidth requirements of hosting video  and having to rely on third parties such as Youtube or Vimeo. Youtube allows you to set videos to ‘private’ but Vimeo offers extra controls by only allowing videos to be played on specific domains. Visit this guide to [protecting your video content with Vimeo](https://help.vimeo.com/hc/en-us/articles/224817847-Privacy-settings-overview).
 
 == Upgrade Notice ==
+
+= 1.7.1 =
+
+* Fixed a bug with not being able to save post category for post sync during setup wizard
+
+= 1.7.0 =
+
+* Fixed a bug with post author for synced posts not being possible to set
+* Added allowed toggle keys to frontend class. 
+* Added allowed key check to advanced options toggle function that receives ajax call.
+* Added nonce to advanced options toggle form. 
+* Added code to transmit nonce to ajax backend function. 
+* Added nonce check to toggle_option receiver function.
+* Fixed a bug that prevented reconnect site option from being used in Patreon Options
+* Added nonce check to reconnect site option for security
+* Added nonce check to disconnect site option for security
+* Added nonce check to synced post category saving option for security
+* Added nonce check to synced post author saving option for security
+* Added a check to see if an image exists in media library before serving an image with image lock feature
+* Added clarifications to errors when serving images instead of just returning. Now wp_die's out with message
+* Added check to image/file locking feature to see if image/file locking is enabled before allowing use of image/file locking function
 
 = 1.6.9 =
 
@@ -372,6 +393,27 @@ Not at all - you can post different content totally independently at your site a
 Nothing will be changed at your site - the plugin will just connect your site to Patreon to allow communication in between your site and Patreon.
 
 == Changelog ==
+
+= 1.7.1 =
+
+* Fixed a bug with not being able to save post category for post sync during setup wizard
+
+= 1.7.0 =
+
+* Fixed a bug with post author for synced posts not being possible to set
+* Added allowed toggle keys to frontend class. 
+* Added allowed key check to advanced options toggle function that receives ajax call.
+* Added nonce to advanced options toggle form. 
+* Added code to transmit nonce to ajax backend function. 
+* Added nonce check to toggle_option receiver function.
+* Fixed a bug that prevented reconnect site option from being used in Patreon Options
+* Added nonce check to reconnect site option for security
+* Added nonce check to disconnect site option for security
+* Added nonce check to synced post category saving option for security
+* Added nonce check to synced post author saving option for security
+* Added a check to see if an image exists in media library before serving an image with image lock feature
+* Added clarifications to errors when serving images instead of just returning. Now wp_die's out with message
+* Added check to image/file locking feature to see if image/file locking is enabled before allowing use of image/file locking function
 
 = 1.6.9 =
 
