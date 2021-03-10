@@ -19,21 +19,37 @@ class Patreon_API {
 
 		// We construct the old return from the new returns by combining /me and pledge details
 
-		$api_return = $this->__get_json( "identity?include=memberships.currently_entitled_tiers&fields[user]=email,first_name,full_name,image_url,last_name,thumb_url,url,vanity,is_email_verified&fields[member]=currently_entitled_amount_cents,lifetime_support_cents,last_charge_status,patron_status,last_charge_date,pledge_relationship_start" );
+		$api_return = $this->__get_json( "identity?include=memberships.currently_entitled_tiers,memberships.campaign&fields[user]=email,first_name,full_name,image_url,last_name,thumb_url,url,vanity,is_email_verified&fields[member]=currently_entitled_amount_cents,lifetime_support_cents,campaign_lifetime_support_cents,last_charge_status,patron_status,last_charge_date,pledge_relationship_start" );
 
 		$creator_id = get_option( 'patreon-creator-id', false );
+		$campaign_id = get_option( 'patreon-campaign-id', false );
+
 		
 		if ( isset( $api_return['included'][0] ) AND is_array( $api_return['included'][0] ) ) {
 			
-			$api_return['included'][0]["relationships"]["creator"]["data"]["id"] = $creator_id;
-			$api_return['included'][0]['type']                                   = 'pledge';
-			$api_return['included'][0]['attributes']['amount_cents']             = $api_return['included'][0]['attributes']['currently_entitled_amount_cents'];
-			$api_return['included'][0]['attributes']['created_at']               = $api_return['included'][0]['attributes']['pledge_relationship_start'];
-			
-			if ( $api_return['included'][0]['attributes']['last_charge_status'] != 'Paid' ) {
-				$api_return['included'][0]['attributes']['declined_since'] = $api_return['included'][0]['attributes']['last_charge_date'];
+			// Iterate through included memberships and find the one that matches the campaign.
+
+			foreach ($api_return['included'] as $key => $value) {
+
+				if ( $api_return['included'][$key]['type'] == 'member' AND $api_return['included'][$key]['relationships']['campaign']['data']['id'] == $campaign_id ) {
+					
+					// The below procedure will take take the matching membership out of the array, put it to the top and reindex numberic keys. This will allow backwards compatibility to be kept
+					$membership = $api_return['included'][$key];
+					unset( $api_return['included'][$key] );
+					array_unshift( $api_return['included'], $membership);
+					array_values( $api_return['included']);
+
+					$api_return['included'][0]["relationships"]["creator"]["data"]["id"] = $creator_id;
+					$api_return['included'][0]['type']                                   = 'pledge';
+					$api_return['included'][0]['attributes']['amount_cents']             = $api_return['included'][0]['attributes']['currently_entitled_amount_cents'];
+					$api_return['included'][0]['attributes']['created_at']               = $api_return['included'][0]['attributes']['pledge_relationship_start'];
+					$api_return['included'][0]['attributes']['lifetime_support_cents']               = $api_return['included'][0]['attributes']['campaign_lifetime_support_cents'];
+					
+					if ( $api_return['included'][0]['attributes']['last_charge_status'] != 'Paid' ) {
+						$api_return['included'][0]['attributes']['declined_since'] = $api_return['included'][0]['attributes']['last_charge_date'];
+					}
+				}
 			}
-			
 		}
 
 		return $api_return;
