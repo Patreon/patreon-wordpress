@@ -556,7 +556,7 @@ class Patreon_Frontend {
 		if ( isset( $_REQUEST['patreon_error'] ) ) {
 			
 			// If any specific error message is sent from Patreon, prepare it
-			$patreon_error = ' - Patreon returned: ' . $_REQUEST['patreon_error'];
+			$patreon_error = ' - Patreon returned: ' . preg_replace("/[^A-Za-z0-9 ]/", '', $_REQUEST['patreon_error'] );
 			
 		}
 
