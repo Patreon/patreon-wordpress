@@ -683,6 +683,8 @@ RewriteRule ^" . $upload_dir . "/(.*)$ index.php?patreon_action=serve_patron_onl
 			return;
 		}
 		
+		$_REQUEST['patreon_attachment_patreon_level'] = preg_replace("/[^0-9.]/", '', $_REQUEST['patreon_attachment_patreon_level'] );
+		
 		if ( update_post_meta( $_REQUEST['patreon_attachment_id'], 'patreon_level',  $_REQUEST['patreon_attachment_patreon_level'] ) ) {
 			$update_status = 'updated';
 		}
