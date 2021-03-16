@@ -2,7 +2,7 @@
 Contributors: wordpressorg@patreon.com, codebard
 Tags: patreon, membership, members
 Requires at least: 4.0
-Requires PHP: 5.7
+Requires PHP: 5.4
 Tested up to: 5.7
 Stable tag: 1.7.2
 License: GPLv2 or later
