@@ -812,7 +812,7 @@ class Patreon_Wordpress {
 		if ( get_option( 'patreon-enable-file-locking', false ) ) {
 			
 			wp_enqueue_script( 'patreon-admin-image-functions-js', PATREON_PLUGIN_ASSETS . '/js/admin_image_functions.js', array( 'jquery' ), PATREON_WORDPRESS_VERSION, true );
-			wp_localize_script( 'patreon-admin-image-functions-js', 'admin_image_functions.js', array( 'patreon_wordpress_assets_url' => PATREON_PLUGIN_ASSETS, ) );
+			wp_localize_script( 'patreon-admin-image-functions-js', 'admin_image_functions', array( 'patreon_wordpress_assets_url' => PATREON_PLUGIN_ASSETS, ) );
 			
 		}
 
