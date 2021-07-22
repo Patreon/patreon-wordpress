@@ -2806,8 +2806,11 @@ class Patreon_Wordpress {
 		if ( !$existing_author_found ) {
 			
 			$existing_author = get_user_by( 'ID', $selected_user );
-			$select .= '<option value="' . $existing_author->data->ID . '" selected>'. $existing_author->data->user_nicename . ' (' . $existing_author->data->display_name .')</option>';
 			
+			if ( $existing_author ) {
+			
+				$select .= '<option value="' . $existing_author->data->ID . '" selected>'. $existing_author->data->user_nicename . ' (' . $existing_author->data->display_name .')</option>';
+			}
 		}
 		
 		
