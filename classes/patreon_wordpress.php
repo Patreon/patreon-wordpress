@@ -2781,11 +2781,11 @@ class Patreon_Wordpress {
 		$existing_author_found = false;
 
 		if ( count( $users ) > 0 ) {
+			
 			foreach( $users as $key => $value ) {
 				
 				$selected = '';
 				
-					
 					if ( $users[$key]->data->ID == $selected_user AND $return ) {
 						$selected = ' selected';
 						$existing_author_found = true;
@@ -2799,6 +2799,7 @@ class Patreon_Wordpress {
 				$user_count++;
 				
 			}
+			
 		}
 		// If a different user than which users were filtered with $args was selected before $args was added to get_users above, get that user and manually add it to the select box:
 		
