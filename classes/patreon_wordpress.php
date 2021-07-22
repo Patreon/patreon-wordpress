@@ -2779,34 +2779,33 @@ class Patreon_Wordpress {
 		$user_count = 1;
 		
 		$existing_author_found = false;
-		
-		foreach( $users as $key => $value ) {
-			
-			$selected = '';
-			
-			
-			if ( count( $users ) > 0 ) {
+
+		if ( count( $users ) > 0 ) {
+			foreach( $users as $key => $value ) {
 				
-				if ( $users[$key]->data->ID == $selected_user AND $return ) {
-					$selected = ' selected';
-					$existing_author_found = true;
+				$selected = '';
+				
+					
+					if ( $users[$key]->data->ID == $selected_user AND $return ) {
+						$selected = ' selected';
+						$existing_author_found = true;
+					}
+					
+					$select .= '<option value="' . $users[$key]->data->ID . '" ' . $selected . ' >'. $users[$key]->data->user_nicename . ' (' . $users[$key]->data->display_name .')</option>';
+
+				if ( $user_count > 100 ) {
+					break;
 				}
+				$user_count++;
 				
-				$select .= '<option value="' . $users[$key]->data->ID . '" ' . $selected . ' >'. $users[$key]->data->display_name . '</option>';
 			}
-			if ( $user_count > 100 ) {
-				break;
-			}
-			$user_count++;
-			
 		}
-		
 		// If a different user than which users were filtered with $args was selected before $args was added to get_users above, get that user and manually add it to the select box:
 		
 		if ( !$existing_author_found ) {
 			
 			$existing_author = get_user_by( 'ID', $selected_user );
-			$select .= '<option value="' . $existing_author->data->ID . '" selected>'. $users[$key]->data->user_nicename . ' (' . $users[$key]->data->display_name .')</option>';
+			$select .= '<option value="' . $existing_author->data->ID . '" selected>'. $existing_author->data->user_nicename . ' (' . $existing_author->data->display_name .')</option>';
 			
 		}
 		
