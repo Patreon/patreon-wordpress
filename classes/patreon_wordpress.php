@@ -812,7 +812,7 @@ class Patreon_Wordpress {
 		if ( get_option( 'patreon-enable-file-locking', false ) ) {
 			
 			wp_enqueue_script( 'patreon-admin-image-functions-js', PATREON_PLUGIN_ASSETS . '/js/admin_image_functions.js', array( 'jquery' ), PATREON_WORDPRESS_VERSION, true );
-			wp_localize_script( 'patreon-admin-image-functions-js', 'admin_image_functions.js', array( 'patreon_wordpress_assets_url' => PATREON_PLUGIN_ASSETS, ) );
+			wp_localize_script( 'patreon-admin-image-functions-js', 'admin_image_functions', array( 'patreon_wordpress_assets_url' => PATREON_PLUGIN_ASSETS, ) );
 			
 		}
 
@@ -2767,22 +2767,52 @@ class Patreon_Wordpress {
 			$return = false;
 		}
 		
-		$users = get_users();
+		$args = array(
+			'role__in'  => array( 'Super Admin', 'Administrator', 'Editor', 'Author', 'Contributor'),
+			'orderby'   => 'user_nicename',
+			'order'     => 'ASC'
+		);
 		
-		foreach( $users as $key => $value ) {
+		$users = get_users( $args );
+
+        // Track how many users we list to prevent resource limit violations
+		$user_count = 1;
+		
+		$existing_author_found = false;
+
+		if ( count( $users ) > 0 ) {
 			
-			$selected = '';
-			
-			if ( count( $users ) > 0 ) {
+			foreach( $users as $key => $value ) {
 				
-				if ( $users[$key]->data->ID == $selected_user AND $return ) {
-					$selected = ' selected';
+				$selected = '';
+				
+					if ( $users[$key]->data->ID == $selected_user AND $return ) {
+						$selected = ' selected';
+						$existing_author_found = true;
+					}
+					
+					$select .= '<option value="' . $users[$key]->data->ID . '" ' . $selected . ' >'. $users[$key]->data->user_nicename . ' (' . $users[$key]->data->display_name .')</option>';
+
+				if ( $user_count > 100 ) {
+					break;
 				}
+				$user_count++;
 				
-				$select .= '<option value="' . $users[$key]->data->ID . '" ' . $selected . ' >'. $users[$key]->data->display_name . '</option>';	
 			}
 			
 		}
+		// If a different user than which users were filtered with $args was selected before $args was added to get_users above, get that user and manually add it to the select box:
+		
+		if ( !$existing_author_found ) {
+			
+			$existing_author = get_user_by( 'ID', $selected_user );
+			
+			if ( $existing_author ) {
+			
+				$select .= '<option value="' . $existing_author->data->ID . '" selected>'. $existing_author->data->user_nicename . ' (' . $existing_author->data->display_name .')</option>';
+			}
+		}
+		
 		
 		if ( $return ) {
 			return $select;
