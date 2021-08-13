@@ -931,13 +931,28 @@ class Patreon_Wordpress {
 		if( !$addon_upsell_shown AND !self::check_plugin_exists('patron-plugin-pro') AND $current_screen->id != 'plugins' AND ( (self::check_days_after_last_non_system_notice( 7 ) AND self::calculate_days_after_first_activation( 30 ) ) OR $existing_install ) AND !$already_showed_non_system_notice ) {
 
 			?>
-				<div class="notice notice-success is-dismissible patreon-wordpress" id="patreon-addon-upsell-shown"><img class="addon_upsell" src="<?php echo PATREON_PLUGIN_ASSETS ?>/img/Patron-Plugin-Pro-128.png" style="float:left; margin-right: 20px;" alt="Patron Plugin Pro" />
-					<p><h2 style="margin-top: 0px; font-size: 150%; font-weight: bold;">Boost your pledges and patrons at Patreon with Patron Pro!</h2><div style="font-size: 125% !important">Get Patron Pro third party addon for Patreon WordPress to increase your patrons and pledges! Enjoy powerful features like partial post locking, sneak peeks, advanced locking methods, login lock, vip users and more.<br /><br /><a href="https://codebard.com/patron-pro-addon-for-patreon-wordpress?utm_source=<?php urlencode( site_url() ) ?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=patreon_wordpress_addon_upsell_notice_patron_pro&utm_term=" target="_blank">Check out all features here</a></div></p>
+			
+				<div class="notice notice-success is-dismissible patreon-wordpress" id="patreon-addon-upsell-shown"><p><div style="display: flex; flex-wrap: wrap; flex-direction: row;"><a href="https://codebard.com/patron-pro-addon-for-patreon-wordpress?utm_source=<?php urlencode( site_url())?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=patreon_wordpress_addon_upsell_notice_patron_pro&utm_term=" target="_blank"><img class="addon_upsell" src="<?php echo PATREON_PLUGIN_ASSETS ?>/img/Patron-Plugin-Pro-128.png" style="width:128px; height:128px;margin: 10px; margin-right: 20px;" alt="Patron Plugin Pro" /></a><div style="max-width: 700px; width: 100%;"><div style="max-width:550px; width: auto; float:left; display:inline-box"><h2 style="margin-top: 0px; font-size: 150%; font-weight: bold;">Boost your Patreon pledges and patrons with Patron Pro!</h2></div><div style="width:100%; font-size: 125% !important;clear:both; ">Get <a href="https://codebard.com/patron-pro-addon-for-patreon-wordpress?utm_source=<?php urlencode( site_url() ) ?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=patreon_wordpress_addon_upsell_notice_patron_pro&utm_term=" target="_blank">Patron Pro</a> addon for Patreon WordPress to increase your patrons and pledges! Enjoy features like lock/show last X posts, lock/show after X days, lock by date, lock by post type, category, tag, partial post locking, sneak peeks, advanced locking methods, login lock, vip users and more.<br /><br /><a href="https://codebard.com/patron-pro-addon-for-patreon-wordpress?utm_source=<?php urlencode( site_url())?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=patreon_wordpress_addon_upsell_notice_patron_pro&utm_term=" target="_blank">Check out all features here</a></div></div></div></p>
+				</div>
+			<?php		
+			
+			$already_showed_non_system_notice = true;
+			
+		}
+				
+		$pcm_addon_upsell_shown = get_option( 'patron_content_manager_pitch_shown', false );
+
+		// The addon upsell must be admin wide, permanently dismissable, and must not appear in plugin manager page in admin
+		
+		if( !$pcm_addon_upsell_shown AND !self::check_plugin_exists('patron-content-manager') AND $current_screen->id != 'plugins' AND ( (self::check_days_after_last_non_system_notice( 7 ) AND self::calculate_days_after_first_activation( 30 ) ) OR $existing_install ) AND !$already_showed_non_system_notice AND !isset($GLOBALS['patron_content_manager_pitch_being_shown']) ) {
+
+			?>
+				<div class="notice notice-success is-dismissible patreon-wordpress" id="patron_content_manager_pitch_shown"><p><div style="display: flex; flex-wrap: wrap; flex-direction: row;"><a href="https://codebard.com/patron-content-manager?utm_source=<?php urlencode( site_url() ) ?>&utm_medium=patreon_wordpress&utm_campaign=&utm_content=patreon_wordpress_addon_upsell_notice_patron_content_manager&utm_term=" target="_blank"><img class="addon_upsell" src="<?php echo PATREON_PLUGIN_ASSETS ?>/img/Easily-manage-gated-posts.jpg" style="width:200px; height:106px;margin: 10px; border: 1px solid #000000; margin-right: 20px;" alt="Patron Content Manager" /></a><div style="max-width: 700px; width: 100%;"><div style="max-width:500px; width: auto; float:left; display:inline-box"><h2 style="margin-top: 0px; font-size: 150%; font-weight: bold;">Easily manage your patron only content with Patron Content Manager</h2></div><div style="width:100%; font-size: 125% !important;clear:both; ">Get new <a href="https://codebard.com/patron-content-manager?utm_source=<?php urlencode( site_url() ) ?>&utm_medium=patreon_wordpress&utm_campaign=&utm_content=patreon_wordpress_addon_upsell_notice_patron_content_manager&utm_term=" target="_blank">Patron Content Manager</a> plugin for Patreon and easily re-gate content, gate old content, use detailed locking options, use content locking wizard to manage your patron only content & increase your patrons and pledges.<br /><br /><a href="https://codebard.com/patron-content-manager?utm_source=<?php urlencode( site_url() ) ?>&utm_medium=patreon_wordpress&utm_campaign=&utm_content=patreon_wordpress_addon_upsell_notice_patron_content_manager&utm_term=" target="_blank">Check out all features here</a></div></div></div></p>
 				</div>
 			<?php	
 			
 			$already_showed_non_system_notice = true;
-			
+			$GLOBALS['patron_content_manager_pitch_being_shown'] = true;
 		}
 				
 		$rate_plugin_notice_shown = get_option( 'patreon-rate-plugin-notice-shown', false );
@@ -1028,6 +1043,12 @@ class Patreon_Wordpress {
 
 		if ( $_REQUEST['notice_id'] == 'patreon-addon-upsell-shown' ) {
 			update_option( 'patreon-addon-upsell-shown', true);
+			
+			// Set the last notice shown date
+			self::set_last_non_system_notice_shown_date();
+		}
+		if ( $_REQUEST['notice_id'] == 'patron_content_manager_pitch_shown' ) {
+			update_option( 'patron_content_manager_pitch_shown', true);
 			
 			// Set the last notice shown date
 			self::set_last_non_system_notice_shown_date();
