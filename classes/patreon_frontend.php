@@ -765,11 +765,11 @@ class Patreon_Frontend {
 		$href        = apply_filters( 'ptrn/patron_link', $href );
 		$utm_content = 'post_unlock_button';
 		
-		if ( isset( $args ) AND $args['link_interface_item'] == 'image_unlock_button' ) {
+		if ( isset( $args ) AND isset( $args['link_interface_item']) AND $args['link_interface_item'] == 'image_unlock_button' ) {
 			$utm_content = 'image_unlock_button';
 		}
 		
-		if ( isset( $args ) AND $args['link_interface_item'] == 'direct_unlock_button' ) {
+		if ( isset( $args ) AND isset($args['link_interface_item']) AND $args['link_interface_item'] == 'direct_unlock_button' ) {
 			$utm_content = 'direct_unlock_button';
 		}
 		
