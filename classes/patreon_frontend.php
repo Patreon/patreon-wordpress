@@ -25,8 +25,8 @@ class Patreon_Frontend {
 		add_action( 'register_form', array( $this, 'displayPatreonLoginButtonInLoginForm' ) );
 		add_filter( 'the_content', array( $this, 'protectContentFromUsers'), PHP_INT_MAX - 5 );
 		// This filter will inject currency sign into label over button until proper internationalization is done
-		add_filter( 'ptrn/label_text_over_universal_button', array( $this, 'replace_in_currency_sign'), 10 );
-		add_filter( 'ptrn/valid_patron_final_footer', array( $this, 'replace_in_currency_sign'), 10 );
+		add_filter( 'ptrn/label_text_over_universal_button', array( $this, 'replace_in_currency_sign'), PHP_INT_MAX - 5 );
+		add_filter( 'ptrn/valid_patron_final_footer', array( $this, 'replace_in_currency_sign'),  PHP_INT_MAX - 5 );
 		add_shortcode( 'patreon_login_button', array( $this,'LoginButtonShortcode' ) );
 		add_filter('get_avatar', array( $this, 'show_patreon_avatar' ), 10, 5);
 
