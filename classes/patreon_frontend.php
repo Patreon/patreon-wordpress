@@ -441,7 +441,7 @@ class Patreon_Frontend {
 		else {
 			// Creator has no tiers, possibly lite plan. Override text here.
 			
-			$tier_title = '';
+			$tier_title = '$'.$patreon_level;
 		}
 		
 		// Exception - when content is locked for 'any patron' and the user is not a patron, the interface text shows $0.01. For this special case, check and manipulate the chosen label to avoid this:
