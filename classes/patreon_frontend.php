@@ -25,8 +25,8 @@ class Patreon_Frontend {
 		add_action( 'register_form', array( $this, 'displayPatreonLoginButtonInLoginForm' ) );
 		add_filter( 'the_content', array( $this, 'protectContentFromUsers'), PHP_INT_MAX - 5 );
 		// This filter will inject currency sign into label over button until proper internationalization is done
-		add_filter( 'ptrn/label_text_over_universal_button', array( $this, 'replace_in_currency_sign'), 10 );
-		add_filter( 'ptrn/valid_patron_final_footer', array( $this, 'replace_in_currency_sign'), 10 );
+		add_filter( 'ptrn/label_text_over_universal_button', array( $this, 'replace_in_currency_sign'), PHP_INT_MAX - 5 );
+		add_filter( 'ptrn/valid_patron_final_footer', array( $this, 'replace_in_currency_sign'),  PHP_INT_MAX - 5 );
 		add_shortcode( 'patreon_login_button', array( $this,'LoginButtonShortcode' ) );
 		add_filter('get_avatar', array( $this, 'show_patreon_avatar' ), 10, 5);
 
@@ -441,7 +441,7 @@ class Patreon_Frontend {
 		else {
 			// Creator has no tiers, possibly lite plan. Override text here.
 			
-			$tier_title = '';
+			$tier_title = '$'.$patreon_level;
 		}
 		
 		// Exception - when content is locked for 'any patron' and the user is not a patron, the interface text shows $0.01. For this special case, check and manipulate the chosen label to avoid this:
@@ -765,11 +765,11 @@ class Patreon_Frontend {
 		$href        = apply_filters( 'ptrn/patron_link', $href );
 		$utm_content = 'post_unlock_button';
 		
-		if ( isset( $args ) AND $args['link_interface_item'] == 'image_unlock_button' ) {
+		if ( isset( $args ) AND isset( $args['link_interface_item']) AND $args['link_interface_item'] == 'image_unlock_button' ) {
 			$utm_content = 'image_unlock_button';
 		}
 		
-		if ( isset( $args ) AND $args['link_interface_item'] == 'direct_unlock_button' ) {
+		if ( isset( $args ) AND isset($args['link_interface_item']) AND $args['link_interface_item'] == 'direct_unlock_button' ) {
 			$utm_content = 'direct_unlock_button';
 		}
 		

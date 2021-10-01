@@ -264,7 +264,7 @@ class Patreon_Login {
 			
 			// Import user email only if the email was verified
 
-			if ( $user_response['data']['attributes']['is_email_verified'] ) {
+			if ( isset($user_response['data']['attributes']['is_email_verified']) AND $user_response['data']['attributes']['is_email_verified'] ) {
 				$user_email = $user_response['data']['attributes']['email'];
 			}
 			
