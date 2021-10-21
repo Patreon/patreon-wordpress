@@ -773,9 +773,17 @@ class Patreon_Wordpress {
 		
 		// Check whether the pledge value that comes in is higher than the max entitled tier value - for custom pledge amounts
 		// This is not currency aware, but should cover cases in which there is large difference in between the custom pledge and the local tier level for which the content is locked for
+		if ( isset( $pledge['attributes']['amount_cents'] )) {
+			$pledge_amount = $pledge['attributes']['amount_cents'];
 
-		if ( isset( $pledge['attributes']['amount_cents'] ) AND $pledge['attributes']['amount_cents'] > $max_entitled_tier_value ) {
-			$max_entitled_tier_value = $pledge['attributes']['amount_cents'];
+			// Convert annual pledges into a monthly total
+			if (isset($pledge['attributes']['pledge_cadence']) AND $pledge['attributes']['pledge_cadence'] > 1) {
+				$pledge_amount = $pledge_amount/ $pledge['attributes']['pledge_cadence'];
+			}
+
+			if ($pledge_amount > $max_entitled_tier_value ) {
+				$max_entitled_tier_value = $pledge_amount;
+			}
 		}
 	
 		return self::$current_user_pledge_amount = $max_entitled_tier_value;
