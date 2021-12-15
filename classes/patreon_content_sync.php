@@ -302,7 +302,8 @@ class Patreon_Content_Sync {
 				
 				if ( $patreon_post['data']['attributes']['is_paid'] ) {
 					// Pay per post set to patron only
-					update_post_meta( $inserted_attachment_id, 'patreon-level', 1 );
+					// Add only if not exists
+					add_post_meta( $inserted_attachment_id, 'patreon-level', 1, true );
 				}
 				else {
 					
@@ -310,10 +311,10 @@ class Patreon_Content_Sync {
 					// For now do this in else, when api returns tiers replace with proper logic
 					
 					if ( $patreon_post['data']['attributes']['is_public'] ) {
-						update_post_meta( $inserted_attachment_id, 'patreon-level', 0 );
+						add_post_meta( $inserted_attachment_id, 'patreon-level', 0, true );
 					}
 					else {
-						update_post_meta( $inserted_attachment_id, 'patreon-level', 1 );
+						add_post_meta( $inserted_attachment_id, 'patreon-level', 1, true );
 					}
 				
 				}
@@ -327,11 +328,11 @@ class Patreon_Content_Sync {
 		// If post is not public - currently there is no $ value or tier returned by /posts endpoint, so just set it to $1 locally
 
 		if ( $patron_only_post ) {
-			// Pay per post set to patron only
-			update_post_meta( $inserted_post_id, 'patreon-level', 1 );
+			// Pay per post set to patron only - update only if not exists
+			add_post_meta( $inserted_post_id, 'patreon-level', 1, true );
 		}
 		else {
-			update_post_meta( $inserted_post_id, 'patreon-level', 0 );
+			add_post_meta( $inserted_post_id, 'patreon-level', 0, true );
 		}
 		
 		// Set category/taxonomy
