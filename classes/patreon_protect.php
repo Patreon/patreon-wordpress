@@ -196,9 +196,9 @@ class Patreon_Protect {
 		
 		// Check if image exists in media library
 		
-		$attachment_id = attachment_url_to_postid( $image );
+		$attachment_id = Patreon_Protect::get_attachment_id_from_url( $image );
 	
-		// attachment_url_to_postid returns 0 if it cant find the attachment post id
+		// The above returns 0 if it cant find the attachment post id
 		
 		if ( $attachment_id == 0 ) {
 			
@@ -731,9 +731,9 @@ RewriteRule ^" . $upload_dir . "/(.*)$ index.php?patreon_action=serve_patron_onl
 		}
 		// Get attachment from attachment url.
 		
-		$attachment_id = attachment_url_to_postid( $attachment_url );
+		$attachment_id = Patreon_Wordpress::get_attachment_id_from_url( $attachment_url );
 		
-		// attachment_url_to_postid returns 0 if it cant find the attachment post id
+		// The above returns 0 if it cant find the attachment post id
 		
 		if ( $attachment_id == 0 ) {
 			
@@ -836,9 +836,9 @@ RewriteRule ^" . $upload_dir . "/(.*)$ index.php?patreon_action=serve_patron_onl
 		
 		foreach ( $images as $key => $value ) {
 
-			$attachment_id = attachment_url_to_postid( $images[$key] );
+			$attachment_id = Patreon_Protect::get_attachment_id_from_url( $images[$key] );
 			
-			// attachment_url_to_postid returns 0 if it cant find the attachment post id
+			// The above returns 0 if it cant find the attachment post id
 			
 			if ( $attachment_id == 0 ) {
 				
@@ -940,5 +940,64 @@ RewriteRule ^" . $upload_dir . "/(.*)$ index.php?patreon_action=serve_patron_onl
 		return 0;
 		
 	}
+	// Taken and modified from https://wordpress.stackexchange.com/questions/6645/turn-a-url-into-an-attachment-post-id/7094#7094
+	// wp attachment_url_to_postid fails for intermediate size images at the time of this commit - this is a replacement
+	public static function get_attachment_id_from_url( $url ) {
+
+        $dir = wp_upload_dir();
+
+        // baseurl never has a trailing slash
+        if ( false === strpos( $url, $dir['baseurl'] . '/' ) ) {
+            // URL points to a place outside of upload directory
+            return 0;
+        }
+
+        $file  = basename( $url );
+        $query = array(
+            'post_type'  => 'attachment',
+            'fields'     => 'ids',
+            'meta_query' => array(
+                array(
+                    'key'     => '_wp_attached_file',
+                    'value'   => $file,
+                    'compare' => 'LIKE',
+                ),
+            )
+        );
+
+        // query attachments
+        $ids = get_posts( $query );
+
+        if ( ! empty( $ids ) ) {
+
+            foreach ( $ids as $id ) {
+
+                // first entry of returned array is the URL
+                if ( $url === array_shift( wp_get_attachment_image_src( $id, 'full' ) ) )
+                    return $id;
+            }
+        }
+
+        $query['meta_query'][0]['key'] = '_wp_attachment_metadata';
+
+        // query attachments again
+        $ids = get_posts( $query );
+
+        if ( empty( $ids) )
+            return 0;
+
+        foreach ( $ids as $id ) {
+
+            $meta = wp_get_attachment_metadata( $id );
+
+            foreach ( $meta['sizes'] as $size => $values ) {
+
+                if ( $values['file'] === $file && $url === array_shift( wp_get_attachment_image_src( $id, $size ) ) )
+                    return $id;
+            }
+        }
+
+        return 0;
+    }
 	
 }

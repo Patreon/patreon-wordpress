@@ -286,7 +286,7 @@ class Patreon_Options {
 											<th scope="row">
 												<strong>Enable image locking features</strong>
 												<br>
-												<div class="patreon-options-info">If on, you will be able to lock your images and provide patron only images anywhere in your posts like webcomics or visual content. If you aren't using image locking or having complications due to your web host infrastructure, you can keep this feature off. Whenever you turn this feature on or off, you should visit 'Permalinks' settings in your WordPress site and save your permalinks just once by clicking 'Save'. Otherwise your images may appear broken.</div>
+												<div class="patreon-options-info">If on, you will be able to lock your images and provide patron only images anywhere in your posts like webcomics or visual content. This may use noticeable server resources at your web host. If you aren't using image locking or having complications due to your web host infrastructure, you turn this feature off. Whenever you turn this feature on or off, you should visit 'Permalinks' settings in your WordPress site and save your permalinks just once by clicking 'Save'. Otherwise your images may appear broken.</div>
 											</th>
 											<td>
 												<input type="checkbox" name="patreon-enable-file-locking" value="1"<?php checked( get_option( 'patreon-enable-file-locking', false ) ); ?> />
