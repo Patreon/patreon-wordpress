@@ -447,7 +447,7 @@ class Patreon_Protect {
 		$lock_width  = 64;
 		$lock_height = 80;
 
-		$lock_icon = imagecreatefrompng( $lock_icon );
+		$lock_icon = @imagecreatefrompng( $lock_icon );
 		
 		// Use width or height depending on which is larger:
 		$dimension_to_use_for_scaling = $width;
