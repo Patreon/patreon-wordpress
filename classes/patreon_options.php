@@ -52,9 +52,9 @@ class Patreon_Options {
         register_setting( 'patreon-options', 'patreon-protect-default-image-patreon-level' );
         register_setting( 'patreon-options', 'patreon-enable-file-locking');
         register_setting( 'patreon-options', 'patreon-enable-strict-oauth' );
-        register_setting( 'patreon-options', 'patreon-lock-entire-site' );
+        register_setting( 'patreon-options', 'patreon-lock-entire-site', array(&$this, 'site_locking_value') );
         register_setting( 'patreon-options', 'patreon-custom-universal-banner' );
-        register_setting( 'patreon-options', 'patreon-custom-page-name', array(&$this, 'sanitize') );
+        register_setting( 'patreon-options', 'patreon-custom-page-name', array(&$this, 'sanitize_page_name') );
         register_setting( 'patreon-options', 'patreon-prevent-caching-gated-content' );
         register_setting( 'patreon-options', 'patreon-currency-sign' );
         register_setting( 'patreon-options', 'patreon-sync-posts' );
@@ -980,10 +980,17 @@ class Patreon_Options {
 		?></div><?php
 		
     }
-	public function sanitize( $input ) {
-
-		return sanitize_text_field( $input );
-		
-	}
 	
+	public function sanitize_page_name( $input ) {
+		$input = htmlspecialchars($input);
+		// Further sanitization here if needed in future
+		return $input;
+	}
+
+	public function site_locking_value( $input ) {
+		$input = preg_replace("/[^0-9,.]/", '', $input);
+		// Further sanitization here if needed in future
+		return $input;
+	}
+
 }
