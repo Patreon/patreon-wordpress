@@ -589,7 +589,7 @@ class Patreon_Wordpress {
 		
 		if ( isset( $pledge['attributes']['declined_since'])  && !is_null( $pledge['attributes']['declined_since'] ) ) {
 			do_action('ptrn/declined_since', $pledge, $pledge['attributes']['declined_since']);
-			return false;
+			// return false;
 		}
 		
 		if ( $pledge != false ) {
@@ -1616,8 +1616,8 @@ class Patreon_Wordpress {
 		
 		if ( $declined ) {
 			
-			$hide_content = true;
-			$reason = 'payment_declined';
+			// $hide_content = true;
+			// $reason = 'payment_declined';
 			
 		}
 		
@@ -1629,8 +1629,7 @@ class Patreon_Wordpress {
 		}
 	
 		if ( !( $user_patronage == false
-			|| $user_patronage < ( $patreon_level * 100 )
-			|| $declined ) AND is_user_logged_in() ) {
+			|| $user_patronage < ( $patreon_level * 100 ) ) AND is_user_logged_in() ) {
 				
 			$hide_content = false;
 			$reason = 'valid_patron';
