@@ -982,7 +982,8 @@ class Patreon_Options {
     }
 	
 	public function sanitize_page_name( $input ) {
-		$input = htmlspecialchars($input);
+		// Allow only permitted chars - Escape any potential special char among the allowed just in case
+		$input = preg_replace("/[^A-Za-z0-9_\-\ \!\?\$\,\.\#\(\)\^\&\=\[\]\%\@\+]/", '', $input);
 		// Further sanitization here if needed in future
 		return $input;
 	}
