@@ -81,6 +81,7 @@ It is  difficult to protect videos due the intensive bandwidth requirements of h
 
 = 1.8.3 =
 
+* Removed declined payment related checks to match behavior to the behavior at patreon.com. Patrons should keep access until declined payment retries are completed
 * Made custom page name sanitization more strict per request from WP org repo
 
 = 1.8.2 =
@@ -453,6 +454,7 @@ Nothing will be changed at your site - the plugin will just connect your site to
 
 = 1.8.3 =
 
+* Removed declined payment related checks to match behavior to the behavior at patreon.com. Patrons should keep access until declined payment retries are completed
 * Made custom page name sanitization more strict per request from WP org repo
 
 = 1.8.2 =
