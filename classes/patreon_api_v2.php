@@ -61,10 +61,6 @@ class Patreon_API {
 		
 	public function fetch_creator_info() {
 		
-		if ( Patreon_API::throttle_call( 'fetch_creator_info' ) ) {
-            return 'throttled_locally';
-		}
-		
 		$api_return = $this->__get_json( "campaigns?include=creator&fields[campaign]=created_at,creation_name,discord_server_id,image_small_url,image_url,is_charged_immediately,is_monthly,is_nsfw,main_video_embed,main_video_url,one_liner,one_liner,patron_count,pay_per_name,pledge_url,published_at,summary,thanks_embed,thanks_msg,thanks_video_url,has_rss,has_sent_rss_notify,rss_feed_title,rss_artwork_url,patron_count,discord_server_id,google_analytics_id&fields[user]=about,created,email,first_name,full_name,image_url,last_name,social_connections,thumb_url,url,vanity,is_email_verified" );
 
 		return $api_return;
@@ -245,21 +241,22 @@ class Patreon_API {
 	public function throttle_call( $call ) {
 		
 		// Throttles the call
-				
-		$limits = array( 
 		
-			'fetch_creator_info' => array( 'limit' => 300, 'period' => 5 * 60 * 60 ),
-		
-		);
+		$limits = $this->get_call_limits();
+
+		if ( !array_key_exists($call, $limits) ) {
+			$call = 'default';
+		}
 		
 		// Get the time of the last matching call
-		$last_called = get_option( 'patreon_api_call_count_' . $call, false );
+		$last_called = get_option( 'patreon_api_call_count_' . str_replace( '/', '_', $call ), false );
+
 		
-		if ( $last_called AND isset($last_call['counter_start']) AND $last_call['counter_start'] >= (time() - $limits[$call]['period'])) {
+		if ( $last_called AND isset($last_called['counter_start']) AND $last_called['counter_start'] >= ( time() - $limits[$call]['period'] )) {
 			
 			// There is a counter that started in the last 5 minutes.
 			
-			if ( $last_call['count'] >= $limits[$call]['limit'] ) {
+			if ( $last_called['count'] >= $limits[$call]['limit'] ) {
 				// Throttle
 				return true;
 			}
@@ -271,10 +268,68 @@ class Patreon_API {
 		return false;
 
 	}
+	
+	public function get_call_limits() {
+		
+		return array( 
+		
+			'campaigns' => array( 'limit' => 300,   'period' => 5 * 60 ),
+			'default'   => array( 'limit' => 300,   'period' => 5 * 60 ),
+			'identity'  => array( 'limit' => 10000, 'period' => 1 * 60 ),
+			'campaigns/members'  => array( 'limit' => 10, 'period' => 1 * 60 ),
+		
+		);
+	}
+	
+	public function increment_call_count( $call ) {
+		
+		// Get the time of the last matching call
+		$last_called = get_option( 'patreon_api_call_count_' . str_replace( '/', '_', $call ), false );
+		
+
+		$limits = $this->get_call_limits();
+
+		if ( !array_key_exists($call, $limits) ) {
+			$call = 'default';
+		}
+
+		if ( !$last_called OR !isset($last_called['counter_start']) OR $last_called['counter_start'] < ( time() - $limits[$call]['period'] )) {
+			
+			// A call counter for this call does not exist or expired. Start a counter.
+
+			$last_called = array( 'counter_start' => time(), 'count' => 1 );
+			
+			update_option( 'patreon_api_call_count_' . str_replace( '/', '_', $call ) , $last_called );
+			
+			return;
+		}
+		
+		// A counter that started in the last 5 minutes exists. Increment the counter.
+		
+		$last_called['count']++;
+
+		update_option( 'patreon_api_call_count_' . str_replace( '/', '_', $call ), $last_called );
+		
+	}
 		
 	public function __get_json( $suffix, $args = array() ) {
 		
 		// Defaults
+
+		// Get the call endpoint
+		$call = 'default';
+		$limits = $this->get_call_limits();
+
+        $received_call = explode('?', $suffix);
+		
+		if ( isset($received_call[0]) AND array_key_exists($received_call[0], $limits) ) {
+			$call = $received_call[0];
+		}
+
+		
+		if ( $this->throttle_call( $call ) ) {
+            return 'throttled_locally';
+		}
 		
 		$method = 'GET';
 		$params = false;
@@ -329,6 +384,8 @@ class Patreon_API {
 			}
 			
 		}
+
+		$this->increment_call_count( $call );
 		
 		$result   = $response;
 
