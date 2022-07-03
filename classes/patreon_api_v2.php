@@ -381,8 +381,9 @@ class Patreon_API {
 
 		$headers = array(
 			'Authorization' => 'Bearer ' . $this->access_token,
-			'User-Agent' => 'Patreon-Wordpress, version ' . PATREON_WORDPRESS_VERSION . PATREON_WORDPRESS_BETA_STRING . ', platform ' . php_uname('s') . '-' . php_uname( 'r' ),
+			'User-Agent' => 'Patreon-Wordpress, version ' . PATREON_WORDPRESS_VERSION . PATREON_WORDPRESS_BETA_STRING . ', platform ' . php_uname('s') . '-' . php_uname( 'r' ) . ' PW-Site: ' . get_site_url() . ' PW-Campaign-Id: ' . get_option( 'patreon-campaign-id', '' ) . ' PW-WP-Version: '. get_bloginfo( 'version' ) . ' PW-PHP-Version: '. phpversion(),
 		);
+		
 		
 		$api_request = array(
 			'headers' => $headers,
