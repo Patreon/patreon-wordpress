@@ -92,7 +92,7 @@ class Patron_Metabox {
 			if ( !$no_tiers ) {
 			?>
 			
-				<p> If you set a precise amount in advanced settings below, or had one set before, that will be used instead.</p>
+				<p> Get <a href="https://codebard.com/patron-pro-addon-for-patreon-wordpress?utm_source=<?php urlencode( site_url())?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=patreon_wordpress_patreon_level_metabox_callout&utm_term=">Patron Pro Addon</a> for more advanced locking methods.</p>
 			
 			<?php
 			
@@ -108,7 +108,7 @@ class Patron_Metabox {
 		<div <?php echo $advanced_post_options_toggle_status_display ?>id="patreon-wordpress-advanced-options-toggle">
 		<?php
 		
-			$label    = 'Require the below precise $ monthly membership or over to view this post. (optional - overrides the above select box when used)  <a href="https://www.patreondevelopers.com/t/patreon-wordpress-locking-options-guide/1135#heading--section-11?utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=post_locking_metabox_link_2&utm_term=" target="_blank">(?)</a>';
+			$label    = '(If you set a precise amount in advanced settings below, or had one set before, that will be used instead.) <br><br>Require the below precise $ monthly membership or over to view this post. (optional - overrides the above select box when used)  <a href="https://www.patreondevelopers.com/t/patreon-wordpress-locking-options-guide/1135#heading--section-11?utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=post_locking_metabox_link_2&utm_term=" target="_blank">(?)</a>';
 			
 			$readonly = '';
 			

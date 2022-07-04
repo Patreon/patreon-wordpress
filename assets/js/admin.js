@@ -578,6 +578,13 @@
 			jQuery( "#patreon_copied" ).text( "Copied!" ).show().fadeOut( 1000 );
 		});
 
+		jQuery( '#patreon_patron_pro_upsell' ).on( 'click', function (e) {
+			e.preventDefault();
+			target_url = jQuery(this).attr('go_to_url')
+			window.location.replace(target_url)
+			
+		});
+
 		// Only trigger if the select dropdown is actually present
 		
 		jQuery(document).on( 'click', '#patreon_level_refresh', function(e) {

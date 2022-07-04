@@ -1576,21 +1576,28 @@ class Patreon_Frontend {
 		}
 		
 		// User logged in and has Patreon connected. Display logout link.
-		return str_replace( '%%click_here%%', '<a href="'. wp_logout_url( get_permalink() ) .'">'. PATREON_CLICK_HERE . '</a>', PATREON_LOGIN_WIDGET_LOGOUT );		
+		return str_replace( '%%click_here%%', '<a href="'. wp_logout_url( get_permalink() ) .'">'. PATREON_CLICK_HERE . '</a>', PATREON_LOGIN_WIDGET_LOGOUT );
 		
 	}
 	
 	public function replace_in_currency_sign( $label ) {
 		
-		$currency_sign = '$';
+		$currency_sign_front = '$';
+		$currency_sign_behind = '';
 		
-		$saved_currency_sign = get_option( 'patreon-currency-sign', false );
+		$saved_currency_sign_front = get_option( 'patreon-currency-sign', false );
+		$currency_sign_behind = get_option( 'patreon-currency-sign-behind', false );
 		
-		if ( $saved_currency_sign ) {
-			$currency_sign = $saved_currency_sign;
+		if ( $saved_currency_sign_front ) {
+			$currency_sign_front = $saved_currency_sign_front;
 		}
+		if ( $currency_sign_behind ) {
+			$currency_sign_behind = $currency_sign_behind;
+		}
+		$formatted_text = str_replace( '%%currency_sign_front%%', $currency_sign_front, $label );
+		$formatted_text = str_replace( '%%currency_sign_behind%%',  ' ' .$currency_sign_behind, $formatted_text );
 		
-		return str_replace( '$', $currency_sign, $label );
+		return $formatted_text;
 	
 	}
 	
