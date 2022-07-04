@@ -68,6 +68,7 @@ class Patreon_Content_Sync {
 			if ( isset( $posts['errors'][0]['code'] ) AND $posts['errors'][0]['code'] == 3 AND $posts['errors'][0]['source']['parameter'] == 'page[cursor]' ) {
 				// Cursor expired. Delete the cursor for next run and return
 				delete_option( 'patreon-post-import-next-cursor' );
+				delete_option( 'patreon-post-import-in-progress' );
 				return 'expired_or_lost_cursor_deleted';
 			}
 			
