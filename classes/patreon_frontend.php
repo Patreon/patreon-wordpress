@@ -1580,7 +1580,7 @@ class Patreon_Frontend {
 		
 	}
 	
-	public function replace_in_currency_sign( $label ) {
+	public static function replace_in_currency_sign( $label ) {
 		
 		$currency_sign_front = '$';
 		$currency_sign_behind = '';
