@@ -442,7 +442,7 @@ class Patreon_Wordpress {
 		$api_client    = new Patreon_API( get_option( 'patreon-creators-access-token' , false ) );
         $user_response = $api_client->fetch_creator_info();
 
-        if ( empty( $user_response ) ) {
+        if ( empty( $user_response ) OR $user_response == 'throttled_locally' ) {
         	return false;
         }
 
@@ -1147,6 +1147,10 @@ class Patreon_Wordpress {
 		
 		if ( $import_return == 'couldnt_get_posts' ) { 
 			echo 'couldnt_get_posts';
+			exit;		
+		}
+		if ( $import_return == 'throttled_internally' ) { 
+			echo 'throttled_internally';
 			exit;		
 		}
 		
@@ -2323,6 +2327,11 @@ class Patreon_Wordpress {
 				$api_client = new Patreon_API( get_option( 'patreon-creators-access-token', false ) );
 				$creator_info = $api_client->fetch_tiers();
 				
+		}
+		
+		if ( isset( $creator_info ) AND $creator_info == 'throttled_locally' ) {
+			// Return by doing nothing until the api can be contacted again
+			return;
 		}
 
 		if ( isset( $creator_info ) AND isset( $creator_info['included'] ) AND is_array( $creator_info['included'] ) AND isset( $creator_info['included'][1]['type'] ) AND $creator_info['included'][1]['type'] == 'reward' ) {
