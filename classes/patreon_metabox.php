@@ -89,7 +89,7 @@ class Patron_Metabox {
 		
 		<?php
 		
-			if ( !$no_tiers ) {
+			if ( !self::check_plugin_exists('patron-plugin-pro') ) {
 			?>
 			
 				<p> Get <a href="https://codebard.com/patron-pro-addon-for-patreon-wordpress?utm_source=<?php urlencode( site_url())?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=patreon_wordpress_patreon_level_metabox_callout&utm_term=">Patron Pro Addon</a> for more advanced locking methods.</p>
