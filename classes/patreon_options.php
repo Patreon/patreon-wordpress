@@ -250,16 +250,35 @@ class Patreon_Options {
 										?></div>
 									
                                 </div>
-                                <!-- .inside -->
-                                <h2 class="handle patreon_wordpress_option_heading"><span>Get Patron Pro addon to boost your patrons & pledges</span></h2>
+								<?php
+								if ( !Patreon_Wordpress::check_plugin_exists('patron-plugin-pro') ) {
+									?>
+				
+									<!-- .inside -->
+									<h2 class="handle patreon_wordpress_option_heading"><span>Get Patron Pro addon to boost your patrons & pledges</span></h2>
 
-                                <div class="inside">
+									<div class="inside">
 
-									Install <a href="https://codebard.com/patron-pro-addon-for-patreon-wordpress?utm_source=<?php urlencode( site_url())?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=patreon_wordpress_settings_page_insert_link&utm_term=">Patron Pro Addon</a> to boost your pledges and patrons by using advanced locking methods, sneak peeks, partial post locking, VIP and custom level members, login lock and many other powerful features. <br /> <br />
-									<button class="button button-primary button-large" id="patreon_patron_pro_upsell" go_to_url="https://codebard.com/patron-pro-addon-for-patreon-wordpress?utm_source=<?php urlencode( site_url())?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=patreon_wordpress_settings_page_insert_button&utm_term=">Download</button>
-									
-                                </div>
-                                <!-- .inside -->
+										Install <a href="https://codebard.com/patron-pro-addon-for-patreon-wordpress?utm_source=<?php urlencode( site_url())?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=patreon_wordpress_settings_page_insert_link&utm_term=">Patron Pro Addon</a> to boost your pledges and patrons by using advanced locking methods, sneak peeks, partial post locking, VIP and custom level members, login lock and many other powerful features. <br /> <br />
+										<button class="button button-primary button-large" id="patreon_patron_pro_upsell" go_to_url="https://codebard.com/patron-pro-addon-for-patreon-wordpress?utm_source=<?php urlencode( site_url())?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=patreon_wordpress_settings_page_insert_button&utm_term=">Download</button>
+										
+									</div>
+									<!-- .inside -->
+				
+									<?php
+			
+								}
+								else {
+									?>
+									<!-- .inside -->
+									<h2 class="handle patreon_wordpress_option_heading"><span>Use advanced locking methods</span></h2>
+
+									<div class="inside">
+										<p> Use <a href="https://codebard.com/patron-plugin-pro-documentation/category/manual?utm_source=<?php urlencode( site_url())?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=patreon_wordpress_patreon_options_callout&utm_term=" target="_blank">Patron Pro's advanced locking methods</a> to fine-tune your content gating through your <a href="https://test.codebard.com/wp-admin/admin.php?page=settings_cb_p6&cb_p6_tab=content_locking">Patron Pro options admin menu.</></p>
+									</div>
+									<?php
+								}
+								?>
 
                             </div>
                             <!-- .postbox -->
