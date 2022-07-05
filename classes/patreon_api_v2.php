@@ -60,7 +60,7 @@ class Patreon_API {
 	}
 		
 	public function fetch_creator_info() {
-			
+		
 		$api_return = $this->__get_json( "campaigns?include=creator&fields[campaign]=created_at,creation_name,discord_server_id,image_small_url,image_url,is_charged_immediately,is_monthly,is_nsfw,main_video_embed,main_video_url,one_liner,one_liner,patron_count,pay_per_name,pledge_url,published_at,summary,thanks_embed,thanks_msg,thanks_video_url,has_rss,has_sent_rss_notify,rss_feed_title,rss_artwork_url,patron_count,discord_server_id,google_analytics_id&fields[user]=about,created,email,first_name,full_name,image_url,last_name,social_connections,thumb_url,url,vanity,is_email_verified" );
 
 		return $api_return;
@@ -238,10 +238,127 @@ class Patreon_API {
 
 		return $this->__get_json( "clients/".$client_id, $args );
 	}
+
+	public function get_call_limits() {
+		
+		$campaign_id = get_option( 'patreon-campaign-id', '' );
+
+		return array( 
+		
+			'campaigns'                              => array( 'limit' => 30,   'period' => 5 * 60 ),
+			'campaigns/'. $campaign_id . '/members'  => array( 'limit' => 30, 'period' => 1 * 60 ),
+			'campaigns/'. $campaign_id               => array( 'limit' => 30, 'period' => 1 * 60 ),
+			'campaigns/'. $campaign_id . '/posts'    => array( 'limit' => 30, 'period' => 1 * 60 ),
+			'posts'                                  => array( 'limit' => 30, 'period' => 1 * 60 ),
+			'webhooks'                               => array( 'limit' => 12, 'period' => 1 * 60 ),
+			'clients'                                => array( 'limit' => 12, 'period' => 1 * 60 ),
+		
+		);
+	}
+	
+	public function throttle_call( $call ) {
+		
+		// Throttles the call
+
+		$limits = $this->get_call_limits();
+		
+		$break_the_call_up = explode( '/', $call );
+		
+		// If the call is for webhooks/ or clients/, throttle it over the root endpoints:
+		
+		if ( $break_the_call_up[0] == 'webhooks' ) {
+			$call = 'webhooks';
+		}
+		
+		if ( $break_the_call_up[0] == 'clients' ) {
+			$call = 'clients';
+		}
+		
+		if ( !array_key_exists( $call, $limits ) ) {
+			// Not in the least. Leave the throttling of this call to the api
+			return false;
+		}
+
+		// Get the time of the last matching call
+		$last_called = get_option( 'patreon_api_call_count_' . str_replace( '/', '_', $call ), false );
+
+		if ( $last_called AND isset($last_called['counter_start']) AND $last_called['counter_start'] >= ( time() - $limits[$call]['period'] )) {
+			
+			// There is a counter that started in the last 5 minutes.
+			
+			if ( $last_called['count'] >= $limits[$call]['limit'] ) {
+				// Throttle
+				return true;
+			}
+			
+		}
+		
+		// Either there is no counter, or the number of calls are within the limit. Don't throttle.
+		
+		return false;
+
+	}
+	
+	public function increment_call_count( $call ) {
+		
+		$break_the_call_up = explode( '/', $call );
+		
+		// If the call is for webhooks/ or clients/, throttle it over the root endpoints:
+		
+		if ( $break_the_call_up[0] == 'webhooks' ) {
+			$call = 'webhooks';
+		}
+		
+		if ( $break_the_call_up[0] == 'clients' ) {
+			$call = 'clients';
+		}
+
+		// Get the time of the last matching call
+		$last_called = get_option( 'patreon_api_call_count_' . str_replace( '/', '_', $call ), false );
+
+		$limits = $this->get_call_limits();
+
+		if ( !array_key_exists( $call, $limits ) ) {
+			// Not in the list. Leave the throttling of this call to the api
+			return;
+		}
+
+		if ( !$last_called OR !isset($last_called['counter_start']) OR $last_called['counter_start'] < ( time() - $limits[$call]['period'] )) {
+			
+			// A call counter for this call does not exist or expired. Start a counter.
+
+			$last_called = array( 'counter_start' => time(), 'count' => 1 );
+			
+			update_option( 'patreon_api_call_count_' . str_replace( '/', '_', $call ) , $last_called );
+
+			return;
+		}
+		
+		// A counter that started in the last 5 minutes exists. Increment the counter.
+		
+		$last_called['count']++;
+
+		update_option( 'patreon_api_call_count_' . str_replace( '/', '_', $call ), $last_called );
+		
+	}
 		
 	public function __get_json( $suffix, $args = array() ) {
 		
 		// Defaults
+
+		// Get the call endpoint
+
+		$limits = $this->get_call_limits();
+
+        $received_call = explode( '?', $suffix );
+
+		if ( isset($received_call[0]) ) {
+			$call = $received_call[0];
+		}
+
+		if ( $this->throttle_call( $call ) ) {
+            return 'throttled_locally';
+		}
 		
 		$method = 'GET';
 		$params = false;
@@ -264,8 +381,9 @@ class Patreon_API {
 
 		$headers = array(
 			'Authorization' => 'Bearer ' . $this->access_token,
-			'User-Agent' => 'Patreon-Wordpress, version ' . PATREON_WORDPRESS_VERSION . PATREON_WORDPRESS_BETA_STRING . ', platform ' . php_uname('s') . '-' . php_uname( 'r' ),
+			'User-Agent' => 'Patreon-Wordpress, version ' . PATREON_WORDPRESS_VERSION . PATREON_WORDPRESS_BETA_STRING . ', platform ' . php_uname('s') . '-' . php_uname( 'r' ) . ' PW-Site: ' . get_site_url() . ' PW-Campaign-Id: ' . get_option( 'patreon-campaign-id', '' ) . ' PW-WP-Version: '. get_bloginfo( 'version' ) . ' PW-PHP-Version: '. phpversion(),
 		);
+		
 		
 		$api_request = array(
 			'headers' => $headers,
@@ -296,6 +414,8 @@ class Patreon_API {
 			}
 			
 		}
+
+		$this->increment_call_count( $call );
 		
 		$result   = $response;
 

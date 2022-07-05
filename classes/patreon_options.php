@@ -57,6 +57,7 @@ class Patreon_Options {
         register_setting( 'patreon-options', 'patreon-custom-page-name', array(&$this, 'sanitize_page_name') );
         register_setting( 'patreon-options', 'patreon-prevent-caching-gated-content' );
         register_setting( 'patreon-options', 'patreon-currency-sign' );
+        register_setting( 'patreon-options', 'patreon-currency-sign-behind' );
         register_setting( 'patreon-options', 'patreon-sync-posts' );
         register_setting( 'patreon-options', 'patreon-remove-deleted-posts' );
         register_setting( 'patreon-options', 'patreon-update-posts' );
@@ -249,7 +250,35 @@ class Patreon_Options {
 										?></div>
 									
                                 </div>
-                                <!-- .inside -->
+								<?php
+								if ( !Patreon_Wordpress::check_plugin_exists('patron-plugin-pro') ) {
+									?>
+				
+									<!-- .inside -->
+									<h2 class="handle patreon_wordpress_option_heading"><span>Get Patron Pro addon to boost your patrons & pledges</span></h2>
+
+									<div class="inside">
+
+										Install <a href="https://codebard.com/patron-pro-addon-for-patreon-wordpress?utm_source=<?php urlencode( site_url())?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=patreon_wordpress_settings_page_insert_link&utm_term=">Patron Pro Addon</a> to boost your pledges and patrons by using advanced locking methods, sneak peeks, partial post locking, VIP and custom level members, login lock and many other powerful features. <br /> <br />
+										<button class="button button-primary button-large" id="patreon_patron_pro_upsell" go_to_url="https://codebard.com/patron-pro-addon-for-patreon-wordpress?utm_source=<?php urlencode( site_url())?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=patreon_wordpress_settings_page_insert_button&utm_term=">Download</button>
+										
+									</div>
+									<!-- .inside -->
+				
+									<?php
+			
+								}
+								else {
+									?>
+									<!-- .inside -->
+									<h2 class="handle patreon_wordpress_option_heading"><span>Use advanced locking methods</span></h2>
+
+									<div class="inside">
+										<p> Use <a href="https://codebard.com/patron-plugin-pro-documentation/category/manual?utm_source=<?php urlencode( site_url())?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=patreon_wordpress_patreon_options_callout&utm_term=" target="_blank">Patron Pro's advanced locking methods</a> to fine-tune your content gating through your <a href="https://test.codebard.com/wp-admin/admin.php?page=settings_cb_p6&cb_p6_tab=content_locking">Patron Pro options admin menu.</></p>
+									</div>
+									<?php
+								}
+								?>
 
                             </div>
                             <!-- .postbox -->
@@ -390,49 +419,23 @@ class Patreon_Options {
                                         </tr>
                                         <tr valign="top">
 											<th scope="row">
-												<strong>Currency sign</strong>
-												<div class="patreon-options-info">You can set the currency sign to match your campaign currency here. This will be used in gated posts to show the pledge amount needed to unlock the post</div>
+												<strong>Currency sign front</strong>
+												<div class="patreon-options-info">You can set the currency sign to match your campaign currency here. This will be used in gated posts to show the pledge amount needed to unlock the post. You can put spaces if your currency needs spacing.</div>
 											</th>
 											<td>
-												<?php
-													
-													// Iterating through all cases here to not provide 3 choices by showing current/default as a 4th selection choice in select box
-													
-													$currency_sign = '$';
-													
-													$currency_dollar_selected = '';
-													$currency_euro_selected = '';
-													$currency_pound_selected = '';
-													
-													$saved_currency_sign = get_option( 'patreon-currency-sign', false );
-											
-													if ( $saved_currency_sign ) {
-														// Currency set. Set the sign to value from db
-														$currency_sign = $saved_currency_sign;
-													}
-													
-													// Set whichever currency is set as selected
-													if ( $currency_sign == '$' ) {
-														$currency_dollar_selected = " selected";
-													}
-													
-													// Set whichever currency is set as selected
-													if ( $currency_sign == '€' ) {
-														$currency_euro_selected = " selected";
-													}
-													
-													// Set whichever currency is set as selected
-													if ( $currency_sign == '£' ) {
-														$currency_pound_selected = " selected";
-													}
-													
-												
-												?>
-												<select name="patreon-currency-sign">
-													<option value="$" <?php echo $currency_dollar_selected; ?>>$</option>
-													<option value="€" <?php echo $currency_euro_selected; ?>>€</option>
-													<option value="£" <?php echo $currency_pound_selected; ?>>£</option>
-												</select>
+
+												<input type="text" name="patreon-currency-sign" id="patreon-currency-sign" value="<?php echo esc_attr( get_option( 'patreon-currency-sign', '$' ) ); ?>" />
+											</td>
+                                        </tr>
+										
+                                        <tr valign="top">
+											<th scope="row">
+												<strong>Currency sign behind</strong>
+												<div class="patreon-options-info">If your currency is one that has its sign behind the amount, you can set the currency sign here. This will be used in gated posts to show the pledge amount needed to unlock the post.  You can put spaces if your currency needs spacing.</div>
+											</th>
+											<td>
+
+												<input type="text" name="patreon-currency-sign-behind" id="patreon-currency-sign-behind" value="<?php echo esc_attr( get_option( 'patreon-currency-sign-behind', '' ) ); ?>" />
 											</td>
                                         </tr>
 										

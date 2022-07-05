@@ -164,6 +164,11 @@
 						return;
 					}
 					
+					if ( response == 'throttled_internally') {
+						jQuery( '#patreon_wp_post_import_status' ).html( 'Patreon api was contacted too frequently. Please wait a few minutes and try again...' );
+						jQuery( '#patreon_wp_post_import_status' ).css( 'color', '#f31d00' );
+						return;
+					}
 					if ( response == 'couldnt_get_posts') {
 						jQuery( '#patreon_wp_post_import_status' ).html( 'Failed to get posts from Patreon...' );
 						jQuery( '#patreon_wp_post_import_status' ).css( 'color', '#f31d00' );
@@ -576,6 +581,13 @@
 			  // Remove the textarea
 			  document.body.removeChild(textarea);
 			jQuery( "#patreon_copied" ).text( "Copied!" ).show().fadeOut( 1000 );
+		});
+
+		jQuery( '#patreon_patron_pro_upsell' ).on( 'click', function (e) {
+			e.preventDefault();
+			target_url = jQuery(this).attr('go_to_url')
+			window.location.replace(target_url)
+			
 		});
 
 		// Only trigger if the select dropdown is actually present
