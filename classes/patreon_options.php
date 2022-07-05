@@ -274,7 +274,7 @@ class Patreon_Options {
 									<h2 class="handle patreon_wordpress_option_heading"><span>Use advanced locking methods</span></h2>
 
 									<div class="inside">
-										<p> Use <a href="https://codebard.com/patron-plugin-pro-documentation/category/manual?utm_source=<?php urlencode( site_url())?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=patreon_wordpress_patreon_options_callout&utm_term=" target="_blank">Patron Pro's advanced locking methods</a> to fine-tune your content gating through your <a href="https://test.codebard.com/wp-admin/admin.php?page=settings_cb_p6&cb_p6_tab=content_locking">Patron Pro options admin menu.</></p>
+										<p> Use <a href="https://codebard.com/patron-plugin-pro-documentation/category/manual?utm_source=<?php urlencode( site_url())?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=patreon_wordpress_patreon_options_callout&utm_term=" target="_blank">Patron Pro's advanced locking methods</a> to fine-tune your content gating through your <a href="https://test.codebard.com/wp-admin/admin.php?page=settings_cb_p6&cb_p6_tab=content_locking">Patron Pro options admin menu.</a></p>
 									</div>
 									<?php
 								}
