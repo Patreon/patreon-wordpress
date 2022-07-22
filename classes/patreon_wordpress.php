@@ -1464,10 +1464,12 @@ class Patreon_Wordpress {
 		$user                           = wp_get_current_user();
 		$user_pledge_relationship_start = Patreon_Wordpress::get_user_pledge_relationship_start( $user );
 		$user_patronage                 = Patreon_Wordpress::getUserPatronage( $user );
+		$user_response                  = Patreon_Wordpress::getPatreonUser( $user );
 		$is_patron                      = Patreon_Wordpress::isPatron( $user );
 		$user_lifetime_patronage        = Patreon_Wordpress::get_user_lifetime_patronage( $user );
 		$declined                       = Patreon_Wordpress::checkDeclinedPatronage( $user );
 		$active_patron_at_post_date     = false;
+		$post_locked_with               = array();
 		
 		// Just bail out if this is not the main query for content and no post id was given
 		if ( !is_main_query() AND !$post_id ) {
@@ -1480,9 +1482,11 @@ class Patreon_Wordpress {
 					),
 					$post_id, 
 					$declined,
-					$user 
+					$user,
+					$user_response,
+					$post_locked_with
 				)
-			);			
+			);
 			
 		}
 		
@@ -1494,7 +1498,39 @@ class Patreon_Wordpress {
 			// If post could be acquired from global, 
 			global $post;
 		}
+		
+		// First check if entire site is locked, get the level for locking.
+		
+		$patreon_level = get_option( 'patreon-lock-entire-site', false );
+		
+		// Check if specific level is given for this post:
+		
+		$post_level = '';
+		
+		if ( isset( $post->ID ) ) {
+			$post_level = get_post_meta( $post->ID, 'patreon-level', true );
+		}
+		
+		// get post meta returns empty if no value is found. If so, set the value to 0.
+		
+		if ( $post_level == '' ) {
+			$post_level = 0;
+		}
+		
+		// Check if post was set for active patrons only
+		$patreon_active_patrons_only = get_post_meta( $post->ID, 'patreon-active-patrons-only', true );
+		
+		// Check if specific total patronage is given for this post:
+		$post_total_patronage_level = get_post_meta( $post->ID, 'patreon-total-patronage-level', true );
+		
+		$post_locked_with = array(
+			'site_patreon_level' => $patreon_level,
+			'post_level' => $post_level,
+			'active_patrons_only' => $patreon_active_patrons_only,
+			'post_total_patronage_level' => $post_total_patronage_level,
 			
+		);
+		
 		$exclude = array(
 		);
 		
@@ -1511,28 +1547,12 @@ class Patreon_Wordpress {
 					),
 					$post_id, 
 					$declined,
-					$user 
+					$user,
+					$user_response,
+					$post_locked_with
 				)
 			);
 			
-		}
-		
-		// First check if entire site is locked, get the level for locking.
-		
-		$patreon_level = get_option( 'patreon-lock-entire-site', false );
-		
-		// Check if specific level is given for this post:
-		
-		$post_level = '';
-		
-		if ( isset( $post->ID ) ) {
-			$post_level = get_post_meta( $post->ID, 'patreon-level', true );
-		}
-				
-		// get post meta returns empty if no value is found. If so, set the value to 0.
-		
-		if ( $post_level == '' ) {
-			$post_level = 0;				
 		}
 
 		// Check if both post level and site lock level are set to 0 or nonexistent. If so return normal content.
@@ -1550,9 +1570,11 @@ class Patreon_Wordpress {
 					),
 					$post_id, 
 					$declined,
-					$user 
+					$user,
+					$user_response,
+					$post_locked_with
 				)
-			);			
+			);
 		}
 		
 		// If we are at this point, then this post is protected. 
@@ -1560,6 +1582,12 @@ class Patreon_Wordpress {
 		// Below define can be defined in any plugin to bypass core locking function and use a custom one from plugin
 		// It is independent of the plugin load order since it checks if it is defined.
 		// It can be defined by any plugin until right before the_content filter is run.
+		
+		// If post level is not 0, override patreon level and hence site locking value with post's. This will allow Creators to lock entire site and then set a different value for individual posts for access. Ie, site locking is $5, but one particular post can be $10, and it will require $10 to see. 
+		
+		if ( $post_level !=0 ) {
+			$patreon_level = $post_level;
+		}
 
 		if ( apply_filters( 'ptrn/bypass_filtering', defined( 'PATREON_BYPASS_FILTERING' ) ) ) {
 			
@@ -1571,7 +1599,9 @@ class Patreon_Wordpress {
 					),
 					$post_id, 
 					$declined,
-					$user 
+					$user,
+					$user_response,
+					$post_locked_with
 				)
 			);
 		}
@@ -1588,23 +1618,14 @@ class Patreon_Wordpress {
 					),
 					$post_id, 
 					$declined,
-					$user 
+					$user,
+					$user_response,
+					$post_locked_with
 				)
 			);
 			
 		}
-							
-		// Passed checks. If post level is not 0, override patreon level and hence site locking value with post's. This will allow Creators to lock entire site and then set a different value for individual posts for access. Ie, site locking is $5, but one particular post can be $10, and it will require $10 to see. 
 		
-		if ( $post_level !=0 ) {
-			$patreon_level = $post_level;
-		}
-		
-		// Check if post was set for active patrons only
-		$patreon_active_patrons_only = get_post_meta( $post->ID, 'patreon-active-patrons-only', true );
-		
-		// Check if specific total patronage is given for this post:
-		$post_total_patronage_level = get_post_meta( $post->ID, 'patreon-total-patronage-level', true );
 		
 		$hide_content = true;
 		$reason = 'active_pledge_not_enough';
@@ -1674,7 +1695,7 @@ class Patreon_Wordpress {
 			'user_total_historical_pledge' => $user_lifetime_patronage,
 		);
 		
-		$result = apply_filters( 'ptrn/lock_or_not', $result , $post_id, $declined, $user );
+		$result = apply_filters( 'ptrn/lock_or_not', $result , $post_id, $declined, $user, $user_response, $post_locked_with );
 		
 		return self::add_to_lock_or_not_results( $post_id, $result);
 		
