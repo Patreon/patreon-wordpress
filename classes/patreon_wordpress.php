@@ -133,8 +133,23 @@ class Patreon_Wordpress {
 		
 		if ( isset( self::$patreon_user_info_cache[$user->ID] ) ) {
 			return self::$patreon_user_info_cache[$user->ID];
-		}		
+		}
+		
+		// Use the cached patron info if it exists, if its newer than 2 seconds, and the user has not returned from any Patreon flow (login or pledge)
+		// 2 secs should cover the case in which the patrons make a new pledge at patreon.com and visit/refresh a remote app or a site page.
+		
+		// Returns empty string if it does not exist
+		$user_response_timestamp = get_user_meta( $user->ID, 'patreon_latest_patron_info_timestamp', true );
+		
+		if ( ( $user_response_timestamp AND $user_response_timestamp != '' ) AND $user_response_timestamp >= ( time() - 2 ) ) {
+			// Cached patron info is fresh. Use it.
 			
+			$user_response = get_user_meta( $user->ID, 'patreon_latest_patron_info', true );
+
+			// Add the info to the page-run cache and return it
+			return Patreon_Wordpress::add_to_patreon_user_info_cache( $user->ID, $user_response );
+		}
+		
 		/* get user meta data and query patreon api */
 		$patreon_access_token  = get_user_meta( $user->ID, 'patreon_access_token', true );
 		
@@ -155,10 +170,9 @@ class Patreon_Wordpress {
 			// For now we are always getting user from APi fresh:
 			$user_response = $api_client->fetch_user();
 			
-			// Here we check the returned result if its valid 
+			// Here we check the returned result if its valid
 
 			if ( isset( $user_response['included'][0] ) AND is_array( $user_response['included'][0] ) ) {
-				
 				// Valid return. Save it with timestamp
 				
 				update_user_meta( $user->ID, 'patreon_latest_patron_info', $user_response );
@@ -202,7 +216,7 @@ class Patreon_Wordpress {
 					return Patreon_Wordpress::add_to_patreon_user_info_cache( $user->ID, $user_response );
 					
 				}
-				
+			
 			}
 	
 			// For whatsoever reason the returns are not valid and we cant refresh the user
@@ -213,6 +227,7 @@ class Patreon_Wordpress {
 			
 			// Check if there is a valid saved user return and whether it has a timestamp within desired range
 			if ( isset( $user_response['included'][0] ) AND is_array( $user_response['included'][0] ) AND $user_response_timestamp >= ( time() - ( 3600 * 24 * 3 ) ) ) {
+				
 				return Patreon_Wordpress::add_to_patreon_user_info_cache( $user->ID, $user_response );
 			}
 			
