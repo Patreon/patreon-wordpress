@@ -135,19 +135,31 @@ class Patreon_Wordpress {
 			return self::$patreon_user_info_cache[$user->ID];
 		}
 		
+		// Check if the user just returned from any Patreon oAuth flow (pledge, login, register etc)
+		
+		$user_just_returned_from_patreon_flow = false;
+		
+		$user_last_returned_from_flow = get_user_meta( $user->ID, 'patreon_user_last_returned_from_any_flow', true );
+		
+		if ( ( $user_last_returned_from_flow AND $user_last_returned_from_flow != '' ) AND $user_last_returned_from_flow >= ( time() - 2 ) ) {
+			// User returned from a Patreon flow within the last 2 seconds
+			$user_just_returned_from_patreon_flow = true;
+		}
+
 		// Use the cached patron info if it exists, if its newer than 2 seconds, and the user has not returned from any Patreon flow (login or pledge)
 		// 2 secs should cover the case in which the patrons make a new pledge at patreon.com and visit/refresh a remote app or a site page.
 		
 		// Returns empty string if it does not exist
 		$user_response_timestamp = get_user_meta( $user->ID, 'patreon_latest_patron_info_timestamp', true );
 		
-		if ( ( $user_response_timestamp AND $user_response_timestamp != '' ) AND $user_response_timestamp >= ( time() - 2 ) ) {
+		if ( !$user_just_returned_from_patreon_flow AND ( $user_response_timestamp AND $user_response_timestamp != '' ) AND $user_response_timestamp >= ( time() - 2 ) ) {
 			// Cached patron info is fresh. Use it.
-			
+		
 			$user_response = get_user_meta( $user->ID, 'patreon_latest_patron_info', true );
 
 			// Add the info to the page-run cache and return it
 			return Patreon_Wordpress::add_to_patreon_user_info_cache( $user->ID, $user_response );
+		
 		}
 		
 		/* get user meta data and query patreon api */
@@ -157,17 +169,7 @@ class Patreon_Wordpress {
 			
 			$api_client = new Patreon_API( $patreon_access_token );
 
-			// Below is a code that caches user object for 60 seconds. This can be commented out depending on the response from Infrastructure team about contacting api to check for user on every page load
-			/*
-			$cache_key = 'patreon_user_'.$user->ID;
-			$user      = get_transient( $cache_key );
-			if ( false === $user ) {
-				$user = $api_client->fetch_user();
-				set_transient( $cache_key, $user, 60 );
-			}
-			*/
-
-			// For now we are always getting user from APi fresh:
+			// Get the user from the API
 			$user_response = $api_client->fetch_user();
 			
 			// Here we check the returned result if its valid
