@@ -133,35 +133,8 @@ class Patreon_Wordpress {
 		
 		if ( isset( self::$patreon_user_info_cache[$user->ID] ) ) {
 			return self::$patreon_user_info_cache[$user->ID];
-		}
-		
-		// Check if the user just returned from any Patreon oAuth flow (pledge, login, register etc)
-		
-		$user_just_returned_from_patreon_flow = false;
-		
-		$user_last_returned_from_flow = get_user_meta( $user->ID, 'patreon_user_last_returned_from_any_flow', true );
-		
-		if ( ( $user_last_returned_from_flow AND $user_last_returned_from_flow != '' ) AND $user_last_returned_from_flow >= ( time() - 2 ) ) {
-			// User returned from a Patreon flow within the last 2 seconds
-			$user_just_returned_from_patreon_flow = true;
-		}
-
-		// Use the cached patron info if it exists, if its newer than 2 seconds, and the user has not returned from any Patreon flow (login or pledge)
-		// 2 secs should cover the case in which the patrons make a new pledge at patreon.com and visit/refresh a remote app or a site page.
-		
-		// Returns empty string if it does not exist
-		$user_response_timestamp = get_user_meta( $user->ID, 'patreon_latest_patron_info_timestamp', true );
-		
-		if ( !$user_just_returned_from_patreon_flow AND ( $user_response_timestamp AND $user_response_timestamp != '' ) AND $user_response_timestamp >= ( time() - 2 ) ) {
-			// Cached patron info is fresh. Use it.
-		
-			$user_response = get_user_meta( $user->ID, 'patreon_latest_patron_info', true );
-
-			// Add the info to the page-run cache and return it
-			return Patreon_Wordpress::add_to_patreon_user_info_cache( $user->ID, $user_response );
-		
-		}
-		
+		}		
+			
 		/* get user meta data and query patreon api */
 		$patreon_access_token  = get_user_meta( $user->ID, 'patreon_access_token', true );
 		
@@ -169,12 +142,23 @@ class Patreon_Wordpress {
 			
 			$api_client = new Patreon_API( $patreon_access_token );
 
-			// Get the user from the API
+			// Below is a code that caches user object for 60 seconds. This can be commented out depending on the response from Infrastructure team about contacting api to check for user on every page load
+			/*
+			$cache_key = 'patreon_user_'.$user->ID;
+			$user      = get_transient( $cache_key );
+			if ( false === $user ) {
+				$user = $api_client->fetch_user();
+				set_transient( $cache_key, $user, 60 );
+			}
+			*/
+
+			// For now we are always getting user from APi fresh:
 			$user_response = $api_client->fetch_user();
 			
-			// Here we check the returned result if its valid
+			// Here we check the returned result if its valid 
 
 			if ( isset( $user_response['included'][0] ) AND is_array( $user_response['included'][0] ) ) {
+				
 				// Valid return. Save it with timestamp
 				
 				update_user_meta( $user->ID, 'patreon_latest_patron_info', $user_response );
@@ -218,7 +202,7 @@ class Patreon_Wordpress {
 					return Patreon_Wordpress::add_to_patreon_user_info_cache( $user->ID, $user_response );
 					
 				}
-			
+				
 			}
 	
 			// For whatsoever reason the returns are not valid and we cant refresh the user
@@ -229,7 +213,6 @@ class Patreon_Wordpress {
 			
 			// Check if there is a valid saved user return and whether it has a timestamp within desired range
 			if ( isset( $user_response['included'][0] ) AND is_array( $user_response['included'][0] ) AND $user_response_timestamp >= ( time() - ( 3600 * 24 * 3 ) ) ) {
-				
 				return Patreon_Wordpress::add_to_patreon_user_info_cache( $user->ID, $user_response );
 			}
 			
@@ -1481,12 +1464,10 @@ class Patreon_Wordpress {
 		$user                           = wp_get_current_user();
 		$user_pledge_relationship_start = Patreon_Wordpress::get_user_pledge_relationship_start( $user );
 		$user_patronage                 = Patreon_Wordpress::getUserPatronage( $user );
-		$user_response                  = Patreon_Wordpress::getPatreonUser( $user );
 		$is_patron                      = Patreon_Wordpress::isPatron( $user );
 		$user_lifetime_patronage        = Patreon_Wordpress::get_user_lifetime_patronage( $user );
 		$declined                       = Patreon_Wordpress::checkDeclinedPatronage( $user );
 		$active_patron_at_post_date     = false;
-		$post_locked_with               = array();
 		
 		// Just bail out if this is not the main query for content and no post id was given
 		if ( !is_main_query() AND !$post_id ) {
@@ -1499,11 +1480,9 @@ class Patreon_Wordpress {
 					),
 					$post_id, 
 					$declined,
-					$user,
-					$user_response,
-					$post_locked_with
+					$user 
 				)
-			);
+			);			
 			
 		}
 		
@@ -1515,39 +1494,7 @@ class Patreon_Wordpress {
 			// If post could be acquired from global, 
 			global $post;
 		}
-		
-		// First check if entire site is locked, get the level for locking.
-		
-		$patreon_level = get_option( 'patreon-lock-entire-site', false );
-		
-		// Check if specific level is given for this post:
-		
-		$post_level = '';
-		
-		if ( isset( $post->ID ) ) {
-			$post_level = get_post_meta( $post->ID, 'patreon-level', true );
-		}
-		
-		// get post meta returns empty if no value is found. If so, set the value to 0.
-		
-		if ( $post_level == '' ) {
-			$post_level = 0;
-		}
-		
-		// Check if post was set for active patrons only
-		$patreon_active_patrons_only = get_post_meta( $post->ID, 'patreon-active-patrons-only', true );
-		
-		// Check if specific total patronage is given for this post:
-		$post_total_patronage_level = get_post_meta( $post->ID, 'patreon-total-patronage-level', true );
-		
-		$post_locked_with = array(
-			'site_patreon_level' => $patreon_level,
-			'post_level' => $post_level,
-			'active_patrons_only' => $patreon_active_patrons_only,
-			'post_total_patronage_level' => $post_total_patronage_level,
 			
-		);
-		
 		$exclude = array(
 		);
 		
@@ -1564,12 +1511,28 @@ class Patreon_Wordpress {
 					),
 					$post_id, 
 					$declined,
-					$user,
-					$user_response,
-					$post_locked_with
+					$user 
 				)
 			);
 			
+		}
+		
+		// First check if entire site is locked, get the level for locking.
+		
+		$patreon_level = get_option( 'patreon-lock-entire-site', false );
+		
+		// Check if specific level is given for this post:
+		
+		$post_level = '';
+		
+		if ( isset( $post->ID ) ) {
+			$post_level = get_post_meta( $post->ID, 'patreon-level', true );
+		}
+				
+		// get post meta returns empty if no value is found. If so, set the value to 0.
+		
+		if ( $post_level == '' ) {
+			$post_level = 0;				
 		}
 
 		// Check if both post level and site lock level are set to 0 or nonexistent. If so return normal content.
@@ -1587,11 +1550,9 @@ class Patreon_Wordpress {
 					),
 					$post_id, 
 					$declined,
-					$user,
-					$user_response,
-					$post_locked_with
+					$user 
 				)
-			);
+			);			
 		}
 		
 		// If we are at this point, then this post is protected. 
@@ -1599,12 +1560,6 @@ class Patreon_Wordpress {
 		// Below define can be defined in any plugin to bypass core locking function and use a custom one from plugin
 		// It is independent of the plugin load order since it checks if it is defined.
 		// It can be defined by any plugin until right before the_content filter is run.
-		
-		// If post level is not 0, override patreon level and hence site locking value with post's. This will allow Creators to lock entire site and then set a different value for individual posts for access. Ie, site locking is $5, but one particular post can be $10, and it will require $10 to see. 
-		
-		if ( $post_level !=0 ) {
-			$patreon_level = $post_level;
-		}
 
 		if ( apply_filters( 'ptrn/bypass_filtering', defined( 'PATREON_BYPASS_FILTERING' ) ) ) {
 			
@@ -1616,9 +1571,7 @@ class Patreon_Wordpress {
 					),
 					$post_id, 
 					$declined,
-					$user,
-					$user_response,
-					$post_locked_with
+					$user 
 				)
 			);
 		}
@@ -1635,14 +1588,23 @@ class Patreon_Wordpress {
 					),
 					$post_id, 
 					$declined,
-					$user,
-					$user_response,
-					$post_locked_with
+					$user 
 				)
 			);
 			
 		}
+							
+		// Passed checks. If post level is not 0, override patreon level and hence site locking value with post's. This will allow Creators to lock entire site and then set a different value for individual posts for access. Ie, site locking is $5, but one particular post can be $10, and it will require $10 to see. 
 		
+		if ( $post_level !=0 ) {
+			$patreon_level = $post_level;
+		}
+		
+		// Check if post was set for active patrons only
+		$patreon_active_patrons_only = get_post_meta( $post->ID, 'patreon-active-patrons-only', true );
+		
+		// Check if specific total patronage is given for this post:
+		$post_total_patronage_level = get_post_meta( $post->ID, 'patreon-total-patronage-level', true );
 		
 		$hide_content = true;
 		$reason = 'active_pledge_not_enough';
@@ -1712,7 +1674,7 @@ class Patreon_Wordpress {
 			'user_total_historical_pledge' => $user_lifetime_patronage,
 		);
 		
-		$result = apply_filters( 'ptrn/lock_or_not', $result , $post_id, $declined, $user, $user_response, $post_locked_with );
+		$result = apply_filters( 'ptrn/lock_or_not', $result , $post_id, $declined, $user );
 		
 		return self::add_to_lock_or_not_results( $post_id, $result);
 		
