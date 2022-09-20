@@ -62,7 +62,7 @@ class Patron_Metabox {
 		
 		if ( $no_tiers ) {
 			
-			$label    = 'Patreon Lite plan does not support tiers. If you want to gate your content for different tiers <a href="https://www.patreon.com/edit/tiers?utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=post_locking_metabox_patreon_plan_upgrade_message&utm_term=" target="_blank">upgrade your Patreon plan to Pro and above here.</a>';
+			$label    = 'To use tiers, your Patreon account must be Pro Plan or above and your site must be connected to Patreon. <a href="https://www.patreon.com/edit/tiers?utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=post_locking_metabox_patreon_plan_upgrade_message&utm_term=" target="_blank">Upgrade your plan here</a> or force-reconnect your site <a href="https://www.patreondevelopers.com/t/how-to-upgrade-your-patreon-wordpress-to-use-api-v2/3249?utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=post_locking_metabox_patreon_plan_upgrade_message&utm_term=" target="_blank">here</a>.';
 			
 			$advanced_post_options_toggle_status = 'on';
 		
