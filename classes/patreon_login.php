@@ -128,9 +128,6 @@ class Patreon_Login {
 			
 			do_action( 'patreon_action_after_wp_logged_user_is_updated', $filter_args );
 			
-			// Save this time when patron returned from a Patreon flow to use for deciding when to call the api in unlock actions
-			update_user_meta( $user->ID, 'patreon_user_last_returned_from_any_flow', time() );
-			
 			wp_redirect( $redirect );
 			exit;
 						
@@ -213,11 +210,7 @@ class Patreon_Login {
 						'tokens' => $tokens,
 					);
 					
-					do_action( 'patreon_do_action_after_user_logged_in_via_patreon', $filter_args );
-					
-
-					// Save this time when patron returned from a Patreon flow to use for deciding when to call the api in unlock actions
-					update_user_meta( $user->ID, 'patreon_user_last_returned_from_any_flow', time() );
+					do_action( 'patreon_do_action_after_user_logged_in_via_patreon', $filter_args );					
 						
 					wp_redirect( $redirect );
 					exit;
@@ -336,10 +329,7 @@ class Patreon_Login {
 					'tokens' => $tokens,
 				);
 				
-				do_action( 'patreon_do_action_after_new_user_created_from_patreon_logged_in', $filter_args );
-				
-				// Save this time when patron returned from a Patreon flow to use for deciding when to call the api in unlock actions
-				update_user_meta( $user->ID, 'patreon_user_last_returned_from_any_flow', time() );
+				do_action( 'patreon_do_action_after_new_user_created_from_patreon_logged_in', $filter_args );				
 
 				wp_redirect( $redirect );
 				exit;	
@@ -376,10 +366,6 @@ class Patreon_Login {
 				
 				do_action( 'patreon_do_action_after_existing_user_from_patreon_logged_in', $filter_args );				
 
-				// Save this time when patron returned from a Patreon flow to use for deciding when to call the api in unlock actions
-				update_user_meta( $user->ID, 'patreon_user_last_returned_from_any_flow', time() );
-
-				
 				wp_redirect( $redirect );
 				exit;
 				
