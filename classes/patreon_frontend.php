@@ -1393,7 +1393,7 @@ class Patreon_Frontend {
 		if ( isset( $_REQUEST['patreon-msg'] ) && $_REQUEST['patreon-msg'] == 'login_with_patreon' ) {
 			$button .= '<p class="patreon-msg">You can now login with your WordPress username/password.</p>';
 		} else {
-			$button .= apply_filters( 'ptrn/login_button', '<a href="' . self::patreonMakeCacheableLoginLink() . '" class="ptrn-button"><img src="' . $log_in_img . '" width="272" height="42" /></a>' );
+			$button .= apply_filters( 'ptrn/login_button', '<a href="' . self::patreonMakeCacheableLoginLink() . '" class="ptrn-button"><img src="' . $log_in_img . '" width="272" height="42" alt="Login with Patreon" /></a>' );
 		}
 		return $button;
 		
