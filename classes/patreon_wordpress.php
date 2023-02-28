@@ -1758,7 +1758,7 @@ class Patreon_Wordpress {
 			'parent_client_id'      =>  PATREON_PLUGIN_CLIENT_ID,
 		);
 		
-		return $app_info;
+		return apply_filters( 'ptrn/filter_collect_app_info_result', $app_info );
 	}
 
 	public static function check_setup() {
