@@ -18,10 +18,11 @@ class Patreon_Wordpress {
 	public static $patreon_user_profiles;
 	public static $patreon_admin_pointers;
 	public static $patreon_content_sync;
-	public static $current_user_pledge_amount = -1;
+	public static $current_user_pledge_amount =  -1;
 	public static $current_user_patronage_declined = -1;
 	public static $current_user_is_patron = -1;
 	public static $patreon_user_info_cache = array();
+	public static $patreon_pledge_info_cache = array();
 	public static $current_member_details = -1;
 	public static $current_user_patronage_duration = -1;
 	public static $current_user_lifetime_patronage = -1;
@@ -562,20 +563,32 @@ class Patreon_Wordpress {
 		
 	}
 	public static function getUserPatronage( $user = false ) {
+	
+		$using_current_user = false;
 		
-		if ( self::$current_user_pledge_amount != -1 ) {
-			return self::$current_user_pledge_amount;
-		}
-
 		// If user is not given, try to get the current user attribute ID will be 0 if there is no logged in user
 		if ( $user == false ) {
+			$using_current_user = true;
 			$user = wp_get_current_user();
 		}
+
 		// If still no user object, return false
 		if ( $user->ID == 0 ) {
 			return false;
 		}
+		
+		// Compatibility - use the old current_user_pledge_amount_static if user is not given and we are using the current user
+		if ( $using_current_user ) {
+			
+			if ( self::$current_user_pledge_amount != -1 ) {
+				return self::$current_user_pledge_amount;
+			}
+		}
 
+		if ( isset( self::$patreon_pledge_info_cache[$user->ID] ) ) {
+			return self::$patreon_pledge_info_cache[$user->ID];
+		}
+		
 		$creator_id = get_option( 'patreon-creator-id', false );
 
 		if ( $creator_id == false ) {
@@ -610,7 +623,17 @@ class Patreon_Wordpress {
 		}
 		
 		if ( $pledge != false ) {
-			return self::getUserPatronageLevel( $pledge );
+			
+			$pledge_level = self::getUserPatronageLevel( $pledge );
+			
+			// Compatibility - use the old current_user_pledge_amount_static if user is not given and we are using the current user
+			if ( $using_current_user ) {
+				self::$current_user_pledge_amount = $pledge_level;
+			}
+			
+			Patreon_Wordpress::add_to_patreon_pledge_info_cache( $user->ID, $pledge_level );
+			
+			return $pledge_level;
 		}
 
 		return false;
@@ -723,17 +746,13 @@ class Patreon_Wordpress {
 		}
 	}
 	public static function getUserPatronageLevel( $pledge ) {
-		
-		if ( self::$current_user_pledge_amount != -1 ) {
-			return self::$current_user_pledge_amount;
-		}
-		
+				
 		// Exception - for lite tier creators, use currently_entitled_amount_cents until there is a better way to match custom $ without tiers to local info:
 		
 		if ( get_option( 'patreon-creator-has-tiers', 'yes' ) == 'no' ) {
 		
 			if( isset( $pledge['attributes']['amount_cents'] ) ) {
-				return self::$current_user_pledge_amount = $pledge['attributes']['amount_cents'];
+				return $pledge['attributes']['amount_cents'];
 			}
 			// Catch all from old function format
 			return 0;
@@ -802,7 +821,7 @@ class Patreon_Wordpress {
 			}
 		}
 	
-		return self::$current_user_pledge_amount = $max_entitled_tier_value;
+		return $max_entitled_tier_value;
 		
 	}
 	public static function isPatron( $user = false ) {
@@ -1739,7 +1758,7 @@ class Patreon_Wordpress {
 			'parent_client_id'      =>  PATREON_PLUGIN_CLIENT_ID,
 		);
 		
-		return $app_info;
+		return apply_filters( 'ptrn/filter_collect_app_info_result', $app_info );
 	}
 
 	public static function check_setup() {
@@ -2750,6 +2769,21 @@ class Patreon_Wordpress {
 		return self::$patreon_user_info_cache[$user_id] = $user_info;
 		
 	}	
+	public static function add_to_patreon_pledge_info_cache( $user_id, $pledge ) {
+		
+		// This function manages the array that is used as the cache for info of Patreon users in a given page run. What it does is to accept the id of the WP user and a given Patreon user info, then add it to the a cache array 
+		
+		// If the cache array is larger than 50, snip the first item. This may be increased in future
+		
+		if ( !empty( self::$patreon_pledge_info_cache ) && (count( self::$patreon_pledge_info_cache ) > 50)  ) {
+			array_shift( self::$patreon_pledge_info_cache );
+		}
+		
+		// Add the new request and return it
+		
+		return self::$patreon_pledge_info_cache[$user_id] = $pledge;
+		
+    } 
 		
 	public function make_taxonomy_select( $selected_post_type = 'post', $selected_taxonomy = 'category' ) {
 		
