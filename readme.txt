@@ -84,6 +84,7 @@ It is  difficult to protect videos due the intensive bandwidth requirements of h
 * Added pledge info cache. Made getUserPatronage use pledge info cache. Added code to use current_user_pledge_amount for compatibility reasons if a user is not provided and current user is being used. Fixes the bug with providing $user to getUserPatronage and still ending up with current user's pledge result instead of the provided user's.
 * Added filter to allow modification of app info collection results to be used in setup wizard.
 * Alt attribute added to login button (contrib from androidacy-user at Github)
+* Added aria labels for screen readers for accessibility
 
 = 1.8.5 =
 
@@ -482,6 +483,7 @@ Nothing will be changed at your site - the plugin will just connect your site to
 * Added pledge info cache. Made getUserPatronage use pledge info cache. Added code to use current_user_pledge_amount for compatibility reasons if a user is not provided and current user is being used. Fixes the bug with providing $user to getUserPatronage and still ending up with current user's pledge result instead of the provided user's.
 * Added filter to allow modification of app info collection results to be used in setup wizard.
 * Alt attribute added to login button (contrib from androidacy-user at Github)
+* Added aria labels for screen readers for accessibility
 
 = 1.8.5 =
 

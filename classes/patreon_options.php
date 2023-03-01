@@ -111,7 +111,7 @@ class Patreon_Options {
 									
 									<div id="patreon_options_app_details_main">
 									
-										<button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon-connection-details">Connection details</button><?php // Immediately inserted here to not cause any funny html rendering
+										<button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon-connection-details" aria-label="Patreon connection details">Connection details</button><?php // Immediately inserted here to not cause any funny html rendering
 										
 										if (   
 											( !get_option( 'patreon-client-id', false ) OR get_option( 'patreon-client-id' , false ) == '' ) AND
@@ -119,7 +119,7 @@ class Patreon_Options {
 											( !get_option( 'patreon-creators-access-token', false ) OR get_option( 'patreon-creators-access-token' , false ) == '' ) AND
 											( !get_option( 'patreon-creators-refresh-token', false ) OR get_option( 'patreon-creators-refresh-token' , false ) == '' )
 										) {
-											?> <button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon_options_app_details_connect patreon_options_app_details_main">Connect site</button> 
+											?> <button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon_options_app_details_connect patreon_options_app_details_main"  aria-label="Connect your site to Patreon">Connect site</button> 
 											<?php
 										
 										}
@@ -134,7 +134,7 @@ class Patreon_Options {
 											&& get_option( 'patreon-creators-access-token' , false ) != ''
 											&& get_option( 'patreon-creators-refresh-token' , false ) != ''
 										) {
-											?> <button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon_options_app_details_reconnect patreon_options_app_details_main">Reconnect site</button> <button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon_options_app_details_disconnect patreon_options_app_details_main">Disconnect site</button> <?php
+											?> <button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon_options_app_details_reconnect patreon_options_app_details_main" aria-label="Reconnect your site to Patreon">Reconnect site</button> <button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon_options_app_details_disconnect patreon_options_app_details_main" aria-label="Disconnect your site from Patreon">Disconnect site</button> <?php
 										
 										}
 										
@@ -145,20 +145,20 @@ class Patreon_Options {
 									<div id="patreon_options_app_details_connect">
 								
 										We will now connect your site to Patreon by running connection wizard. Before starting, please make sure you deleted any existing app for this site in <a href="https://www.patreon.com/portal/registration/register-clients" target="_blank">this page at Patreon</a><br /><br />
-										<button id="patreon_wordpress_reconnect_to_patreon" class="button button-primary button-large" target="<?php echo admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=0'); ?>">Start connection wizard</button> <button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon_options_app_details_connect patreon_options_app_details_main">Cancel</button>
+										<button id="patreon_wordpress_reconnect_to_patreon" class="button button-primary button-large" target="<?php echo admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=0'); ?>"  aria-label="Start connection wizard">Start connection wizard</button> <button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon_options_app_details_connect patreon_options_app_details_main">Cancel</button>
 										
 									</div>
 									<div id="patreon_options_app_details_reconnect">
 								
 										We will now reconnect your site to Patreon. This will refresh your site's connection to Patreon. Your settings and content gating values will remain unchanged. Patron only content will become accessible to everyone until you finish reconnecting your site to Patreon.<br /><br />
-										<button id="patreon_wordpress_disconnect_reconnect_to_patreon" class="button button-primary button-large" target="<?php echo admin_url( 'admin.php?page=patreon-plugin&patreon_wordpress_action=disconnect_site_from_patreon_for_reconnection&patreon_wordpress_reconnect_to_patreon_nonce=' . wp_create_nonce() ); ?>">Confirm reconnection</button> <button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon_options_app_details_reconnect patreon_options_app_details_main">Cancel</button>
+										<button id="patreon_wordpress_disconnect_reconnect_to_patreon" class="button button-primary button-large" target="<?php echo admin_url( 'admin.php?page=patreon-plugin&patreon_wordpress_action=disconnect_site_from_patreon_for_reconnection&patreon_wordpress_reconnect_to_patreon_nonce=' . wp_create_nonce() ); ?>"  aria-label="Confirm connection">Confirm reconnection</button> <button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon_options_app_details_reconnect patreon_options_app_details_main" aria-label="Cancel">Cancel</button>
 										
 									</div>
 									
 									<div id="patreon_options_app_details_disconnect">
 									
 										We will now remove all info related to currently linked creator account from your site. Post gating values in your posts will be left untouched. After this, you will be able to connect this site to another creator account you have. Gated posts should keep stay gated from the nearest tier you have in the creator account you connect to this site. Patron only content will become accessible to everyone until you reconnect your site to Patreon. <br /><br />
-										<button id="patreon_wordpress_disconnect_from_patreon" class="button button-primary button-large" target="<?php echo admin_url( 'admin.php?page=patreon-plugin&patreon_wordpress_action=disconnect_site_from_patreon&patreon_wordpress_disconnect_from_patreon_nonce=' . wp_create_nonce() ); ?>">Confirm disconnection</button> <button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon_options_app_details_disconnect patreon_options_app_details_main">Cancel</button>
+										<button id="patreon_wordpress_disconnect_from_patreon" class="button button-primary button-large"  aria-label="Confirm disconnection" target="<?php echo admin_url( 'admin.php?page=patreon-plugin&patreon_wordpress_action=disconnect_site_from_patreon&patreon_wordpress_disconnect_from_patreon_nonce=' . wp_create_nonce() ); ?>">Confirm disconnection</button> <button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon_options_app_details_disconnect patreon_options_app_details_main" aria-label="Cancel">Cancel</button>
 										
 									</div>
 									
@@ -166,16 +166,16 @@ class Patreon_Options {
 
                                         <tr valign="top">
 											<th scope="row"><strong></strong></th>
-											<td>You can find the app settings at Patreon <a href="https://www.patreon.com/platform/documentation/clients?utm_source=<?php urlencode( site_url() ) ?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=settings_screen_app_settings_link&utm_term=" target="_blank">here</a></td>
+											<td>You can find the app settings at Patreon <a href="https://www.patreon.com/platform/documentation/clients?utm_source=<?php urlencode( site_url() ) ?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=settings_screen_app_settings_link&utm_term=" target="_blank" aria-label="Visit app settings at Patreon. Not necessary if you already set up your connection">here</a></td>
                                         </tr>
                                         <tr valign="top">
 											<th scope="row"><strong>Redirect URI</strong></th>
-											<td><input type="text" value="<?php echo site_url() . '/patreon-authorization/'; ?>" disabled class="large-text" /></td>
+											<td><input type="text" value="<?php echo site_url() . '/patreon-authorization/'; ?>" disabled class="large-text"  aria-label="Redirect uri" /></td>
                                         </tr>
 
                                         <tr valign="top">
 											<th scope="row"><strong>Client ID</strong></th>
-											<td><input type="text" name="patreon-client-id" value="<?php echo esc_attr( get_option( 'patreon-client-id', '' ) ); ?>" class="large-text" /></td>
+											<td><input type="text" name="patreon-client-id" value="<?php echo esc_attr( get_option( 'patreon-client-id', '' ) ); ?>" class="large-text"  aria-label="Client ID" /></td>
                                         </tr>
 
                                         <tr valign="top">
@@ -184,12 +184,12 @@ class Patreon_Options {
                                         </tr>
                                         <tr valign="top">
 											<th scope="row"><strong>Creator's Access Token</strong></th>
-											<td><input type="text" name="patreon-creators-access-token" value="<?php echo esc_attr( get_option( 'patreon-creators-access-token', '' ) ); ?>" class="large-text" /></td>
+											<td><input type="text" name="patreon-creators-access-token"  aria-label="Creator access token" value="<?php echo esc_attr( get_option( 'patreon-creators-access-token', '' ) ); ?>" class="large-text" /></td>
                                         </tr>
 
                                         <tr valign="top">
 											<th scope="row"><strong>Creator's Refresh Token</strong></th>
-											<td><input type="text" name="patreon-creators-refresh-token" value="<?php echo esc_attr( get_option( 'patreon-creators-refresh-token', '' ) ); ?>" class="large-text" /></td>
+											<td><input type="text" name="patreon-creators-refresh-token"  aria-label="Creator refresh token" value="<?php echo esc_attr( get_option( 'patreon-creators-refresh-token', '' ) ); ?>" class="large-text" /></td>
                                         </tr>
                                         <tr valign="top">
 											<th scope="row"><?php submit_button( 'Update Settings', 'primary', 'submit_second', false ); ?></th>
@@ -217,7 +217,7 @@ class Patreon_Options {
 
                                 <div class="inside">
 
-									Get support at <a href="https://www.patreondevelopers.com/c/patreon-wordpress-plugin-support/11" target="_blank">the official forum</a> by copying your plugin info below and adding to your support thread by pasting to share with support team.<br /><div id="patreon_copied"></div>
+									Get support at <a href="https://www.patreondevelopers.com/c/patreon-wordpress-plugin-support/11" target="_blank"  aria-label="Visit the official forum to get support">the official forum</a> by copying your plugin info below and adding to your support thread by pasting to share with support team.<br /><div id="patreon_copied"></div>
 									<button class="button button-primary button-large" id="patreon_copy_health_check_output">Copy</button>
 									<div id="patreon_health_check_output_for_support">WP <?php echo get_bloginfo( 'version' ); ?> with PHP <?php echo phpversion(); echo "\r\n"; ?>Patreon WordPress <?php echo PATREON_WORDPRESS_VERSION ?> with API v<?php echo get_option( 'patreon-installation-api-version', false ); echo "\r\n";
 
@@ -259,8 +259,8 @@ class Patreon_Options {
 
 									<div class="inside">
 
-										Install <a href="https://codebard.com/patron-pro-addon-for-patreon-wordpress?utm_source=<?php urlencode( site_url())?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=patreon_wordpress_settings_page_insert_link&utm_term=">Patron Pro Addon</a> to boost your pledges and patrons by using advanced locking methods, sneak peeks, partial post locking, VIP and custom level members, login lock and many other powerful features. <br /> <br />
-										<button class="button button-primary button-large" id="patreon_patron_pro_upsell" go_to_url="https://codebard.com/patron-pro-addon-for-patreon-wordpress?utm_source=<?php urlencode( site_url())?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=patreon_wordpress_settings_page_insert_button&utm_term=">Download</button>
+										Install <a href="https://codebard.com/patron-pro-addon-for-patreon-wordpress?utm_source=<?php urlencode( site_url())?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=patreon_wordpress_settings_page_insert_link&utm_term="  aria-label="Upgrade to Patron Plugin Pro here">Patron Pro Addon</a> to boost your pledges and patrons by using advanced locking methods, sneak peeks, partial post locking, VIP and custom level members, login lock and many other powerful features. <br /> <br />
+										<button class="button button-primary button-large" id="patreon_patron_pro_upsell" go_to_url="https://codebard.com/patron-pro-addon-for-patreon-wordpress?utm_source=<?php urlencode( site_url())?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=patreon_wordpress_settings_page_insert_button&utm_term="  aria-label="Download">Download</button>
 										
 									</div>
 									<!-- .inside -->
@@ -274,7 +274,7 @@ class Patreon_Options {
 									<h2 class="handle patreon_wordpress_option_heading"><span>Use advanced locking methods</span></h2>
 
 									<div class="inside">
-										<p> Use <a href="https://codebard.com/patron-plugin-pro-documentation/category/manual?utm_source=<?php urlencode( site_url())?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=patreon_wordpress_patreon_options_callout&utm_term=" target="_blank">Patron Pro's advanced locking methods</a> to fine-tune your content gating through your <a href="https://test.codebard.com/wp-admin/admin.php?page=settings_cb_p6&cb_p6_tab=content_locking">Patron Pro options admin menu.</a></p>
+										<p> Use <a href="https://codebard.com/patron-plugin-pro-documentation/category/manual?utm_source=<?php urlencode( site_url())?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=patreon_wordpress_patreon_options_callout&utm_term=" target="_blank" aria-label="Upgrade to Patron Plugin Pro here">Patron Pro's advanced locking methods</a> to fine-tune your content gating through your <a href="https://patron-plugin-pro-demo.codebard.com/" aria-label="Check out Patron Plugin Pro demo and see advanced locking settings">Patron Pro options admin menu.</a></p>
 									</div>
 									<?php
 								}
