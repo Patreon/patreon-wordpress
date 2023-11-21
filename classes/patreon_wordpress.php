@@ -930,7 +930,7 @@ class Patreon_Wordpress {
 		// Queue this message immediately after activation if not already shown
 		
 		if( $show_site_disconnect_success_notice ) {
-			
+			// Info notice - not permanent - doesnt require nonce verification
 			?>
 				 <div class="notice notice-success is-dismissible  patreon-wordpress" id="patreon_site_disconnect_success_notice">
 					<p><?php echo PATREON_SITE_DISCONNECTED_FROM_PATREON_TEXT; ?></p>
@@ -950,9 +950,9 @@ class Patreon_Wordpress {
 		$setup_wizard_notice_dismissed = get_option( 'patreon-setup-wizard-notice-dismissed', false );
 		
 		if( !$setup_done AND !$setup_wizard_notice_dismissed AND ( $api_version AND $api_version == '2' ) AND current_user_can( 'manage_options' ) ) {
-			
+			// This notice needs a nonce but the link to start setup doesnt need a nonce - any admin level user with manage options should be able to go to the setup wizard from anywhere
 			?>
-				 <div class="notice notice-success is-dismissible patreon-wordpress" id="patreon_setup_needed_notice">
+				 <div class="notice notice-success is-dismissible patreon-wordpress" id="patreon_setup_needed_notice" patreon_wordpress_nonce_setup_needed="<?php echo wp_create_nonce('patreon_wordpress_nonce_setup_needed'); ?>">
 					<p>We must connect your site to Patreon to enable Patreon features. Please click <a href="<?php echo admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=0' ) ?>" target="_self">here</a> to start the setup wizard</p>
 				</div>
 			<?php	
@@ -975,7 +975,7 @@ class Patreon_Wordpress {
 
 			?>
 			
-				<div class="notice notice-success is-dismissible patreon-wordpress" id="patreon-addon-upsell-shown"><p><div style="display: flex; flex-wrap: wrap; flex-direction: row;"><a href="https://codebard.com/patron-pro-addon-for-patreon-wordpress?utm_source=<?php urlencode( site_url())?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=patreon_wordpress_addon_upsell_notice_patron_pro&utm_term=" target="_blank"><img class="addon_upsell" src="<?php echo PATREON_PLUGIN_ASSETS ?>/img/Patron-Plugin-Pro-128.png" style="width:128px; height:128px;margin: 10px; margin-right: 20px;" alt="Patron Plugin Pro" /></a><div style="max-width: 700px; width: 100%;"><div style="max-width:550px; width: auto; float:left; display:inline-box"><h2 style="margin-top: 0px; font-size: 150%; font-weight: bold;">Boost your Patreon pledges and patrons with Patron Pro!</h2></div><div style="width:100%; font-size: 125% !important;clear:both; ">Get <a href="https://codebard.com/patron-pro-addon-for-patreon-wordpress?utm_source=<?php urlencode( site_url() ) ?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=patreon_wordpress_addon_upsell_notice_patron_pro&utm_term=" target="_blank">Patron Pro</a> addon for Patreon WordPress to increase your patrons and pledges! Enjoy features like lock/show last X posts, lock/show after X days, lock by date, lock by post type, category, tag, partial post locking, sneak peeks, advanced locking methods, login lock, vip users and more.<br /><br /><a href="https://codebard.com/patron-pro-addon-for-patreon-wordpress?utm_source=<?php urlencode( site_url())?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=patreon_wordpress_addon_upsell_notice_patron_pro&utm_term=" target="_blank">Check out all features here</a></div></div></div></p>
+				<div class="notice notice-success is-dismissible patreon-wordpress" id="patreon-addon-upsell-shown" patreon_wordpress_nonce_patron_pro_addon_notice_shown="<?php echo wp_create_nonce('patreon_wordpress_nonce_patron_pro_addon_notice_shown'); ?>"><p><div style="display: flex; flex-wrap: wrap; flex-direction: row;"><a href="https://codebard.com/patron-pro-addon-for-patreon-wordpress?utm_source=<?php urlencode( site_url())?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=patreon_wordpress_addon_upsell_notice_patron_pro&utm_term=" target="_blank"><img class="addon_upsell" src="<?php echo PATREON_PLUGIN_ASSETS ?>/img/Patron-Plugin-Pro-128.png" style="width:128px; height:128px;margin: 10px; margin-right: 20px;" alt="Patron Plugin Pro" /></a><div style="max-width: 700px; width: 100%;"><div style="max-width:550px; width: auto; float:left; display:inline-box"><h2 style="margin-top: 0px; font-size: 150%; font-weight: bold;">Boost your Patreon pledges and patrons with Patron Pro!</h2></div><div style="width:100%; font-size: 125% !important;clear:both; ">Get <a href="https://codebard.com/patron-pro-addon-for-patreon-wordpress?utm_source=<?php urlencode( site_url() ) ?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=patreon_wordpress_addon_upsell_notice_patron_pro&utm_term=" target="_blank">Patron Pro</a> addon for Patreon WordPress to increase your patrons and pledges! Enjoy features like lock/show last X posts, lock/show after X days, lock by date, lock by post type, category, tag, partial post locking, sneak peeks, advanced locking methods, login lock, vip users and more.<br /><br /><a href="https://codebard.com/patron-pro-addon-for-patreon-wordpress?utm_source=<?php urlencode( site_url())?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=patreon_wordpress_addon_upsell_notice_patron_pro&utm_term=" target="_blank">Check out all features here</a></div></div></div></p>
 				</div>
 			<?php		
 			
@@ -990,7 +990,7 @@ class Patreon_Wordpress {
 		if( !$pcm_addon_upsell_shown AND !self::check_plugin_exists('patron-content-manager') AND $current_screen->id != 'plugins' AND ( (self::check_days_after_last_non_system_notice( 7 ) AND self::calculate_days_after_first_activation( 30 ) ) OR $existing_install ) AND !$already_showed_non_system_notice AND !isset($GLOBALS['patron_content_manager_pitch_being_shown']) AND !is_plugin_active( 'patron-plugin-pro/index.php' )) {
 
 			?>
-				<div class="notice notice-success is-dismissible patreon-wordpress" id="patron_content_manager_pitch_shown"><p><div style="display: flex; flex-wrap: wrap; flex-direction: row;"><a href="https://codebard.com/patron-content-manager?utm_source=<?php urlencode( site_url() ) ?>&utm_medium=patreon_wordpress&utm_campaign=&utm_content=patreon_wordpress_addon_upsell_notice_patron_content_manager&utm_term=" target="_blank"><img class="addon_upsell" src="<?php echo PATREON_PLUGIN_ASSETS ?>/img/Easily-manage-gated-posts.jpg" style="width:200px; height:106px;margin: 10px; border: 1px solid #000000; margin-right: 20px;" alt="Patron Content Manager" /></a><div style="max-width: 700px; width: 100%;"><div style="max-width:500px; width: auto; float:left; display:inline-box"><h2 style="margin-top: 0px; font-size: 150%; font-weight: bold;">Easily manage your patron only content with Patron Content Manager</h2></div><div style="width:100%; font-size: 125% !important;clear:both; ">Get new <a href="https://codebard.com/patron-content-manager?utm_source=<?php urlencode( site_url() ) ?>&utm_medium=patreon_wordpress&utm_campaign=&utm_content=patreon_wordpress_addon_upsell_notice_patron_content_manager&utm_term=" target="_blank">Patron Content Manager</a> plugin for Patreon and easily re-gate content, gate old content, use detailed locking options, use content locking wizard to manage your patron only content & increase your patrons and pledges.<br /><br /><a href="https://codebard.com/patron-content-manager?utm_source=<?php urlencode( site_url() ) ?>&utm_medium=patreon_wordpress&utm_campaign=&utm_content=patreon_wordpress_addon_upsell_notice_patron_content_manager&utm_term=" target="_blank">Check out all features here</a></div></div></div></p>
+				<div class="notice notice-success is-dismissible patreon-wordpress" id="patron_content_manager_pitch_shown" patreon_wordpress_nonce_patron_content_manager_addon_notice_shown="<?php echo wp_create_nonce('patreon_wordpress_nonce_patron_content_manager_addon_notice_shown'); ?>"><p><div style="display: flex; flex-wrap: wrap; flex-direction: row;"><a href="https://codebard.com/patron-content-manager?utm_source=<?php urlencode( site_url() ) ?>&utm_medium=patreon_wordpress&utm_campaign=&utm_content=patreon_wordpress_addon_upsell_notice_patron_content_manager&utm_term=" target="_blank"><img class="addon_upsell" src="<?php echo PATREON_PLUGIN_ASSETS ?>/img/Easily-manage-gated-posts.jpg" style="width:200px; height:106px;margin: 10px; border: 1px solid #000000; margin-right: 20px;" alt="Patron Content Manager" /></a><div style="max-width: 700px; width: 100%;"><div style="max-width:500px; width: auto; float:left; display:inline-box"><h2 style="margin-top: 0px; font-size: 150%; font-weight: bold;">Easily manage your patron only content with Patron Content Manager</h2></div><div style="width:100%; font-size: 125% !important;clear:both; ">Get new <a href="https://codebard.com/patron-content-manager?utm_source=<?php urlencode( site_url() ) ?>&utm_medium=patreon_wordpress&utm_campaign=&utm_content=patreon_wordpress_addon_upsell_notice_patron_content_manager&utm_term=" target="_blank">Patron Content Manager</a> plugin for Patreon and easily re-gate content, gate old content, use detailed locking options, use content locking wizard to manage your patron only content & increase your patrons and pledges.<br /><br /><a href="https://codebard.com/patron-content-manager?utm_source=<?php urlencode( site_url() ) ?>&utm_medium=patreon_wordpress&utm_campaign=&utm_content=patreon_wordpress_addon_upsell_notice_patron_content_manager&utm_term=" target="_blank">Check out all features here</a></div></div></div></p>
 				</div>
 			<?php	
 			
@@ -1006,7 +1006,7 @@ class Patreon_Wordpress {
 		if( !$rate_plugin_notice_shown AND self::check_days_after_last_non_system_notice( 7 ) AND self::calculate_days_after_first_activation( 37 ) AND !$already_showed_non_system_notice ) {
 
 			?>
-				 <div class="notice notice-info is-dismissible patreon-wordpress" id="patreon-rate-plugin-notice-shown">
+				 <div class="notice notice-info is-dismissible patreon-wordpress" id="patreon-rate-plugin-notice-shown" patreon_wordpress_nonce_rate_plugin_notice="<?php echo wp_create_nonce('patreon_wordpress_nonce_rate_plugin_notice'); ?>">
 					<p>Did Patreon WordPress help your site? Help creators like yourself find out about it <a href="https://wordpress.org/support/plugin/patreon-connect/reviews/#new-post?utm_source=<?php urlencode( site_url() ) ?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=patreon_wordpress_review_infobox_link&utm_term=" target="_blank">by giving us a good rating!</a></p>
 				</div>
 			<?php	
@@ -1020,7 +1020,7 @@ class Patreon_Wordpress {
 		if( Patreon_Compatibility::$toggle_warning AND self::check_days_after_last_system_notice( 7 ) AND ( !isset( $_REQUEST['page'] ) OR $_REQUEST['page'] != 'patreon-plugin-health' ) ) {
 
 			?>
-				 <div class="notice notice-error patreon-wordpress is-dismissible" id="patreon-critical-issues">
+				 <div class="notice notice-error patreon-wordpress is-dismissible" id="patreon-critical-issues" patreon_wordpress_nonce_plugin_critical_issues="<?php echo wp_create_nonce('patreon_wordpress_nonce_plugin_critical_issues'); ?>">
 					<p>There are important issues affecting your Patreon integration. Please visit <a href="<?php echo admin_url( 'admin.php?page=patreon-plugin-health' ) ?>">health check page</a> to see the issues and solutions.</p>
 				</div>
 			<?php	
@@ -1029,7 +1029,7 @@ class Patreon_Wordpress {
 
 		// This is a plugin system info notice. 
 		if( get_option( 'patreon-wordpress-app-credentials-success', false ) ) {
-			
+			// Non-important non-permanent info notice - doesnt need nonce verification
 			?>
 				 <div class="notice notice-success is-dismissible patreon-wordpress" id="patreon-wordpress-credentials-success">
 				 <h3>Your Patreon client details were successfully saved!</h3>
@@ -1042,7 +1042,7 @@ class Patreon_Wordpress {
 		
 		// This is a plugin system info notice. 
 		if( get_option( 'patreon-wordpress-app-credentials-failure', false ) ) {
-			
+			// Non-important non-permanent info notice - doesnt need nonce verification
 			?>
 				 <div class="notice notice-error is-dismissible patreon-wordpress" id="patreon-wordpress-credentials-failure">
 				 <h3>Sorry - couldn't connect your site to Patreon</h3>
@@ -1085,12 +1085,19 @@ class Patreon_Wordpress {
 		}
 
 		if ( $_REQUEST['notice_id'] == 'patreon-addon-upsell-shown' ) {
+			if ( !isset($_REQUEST['patreon_wordpress_nonce_patron_pro_addon_notice_shown']) OR !wp_verify_nonce( sanitize_key( $_REQUEST['patreon_wordpress_nonce_patron_pro_addon_notice_shown'] ), 'patreon_wordpress_nonce_patron_pro_addon_notice_shown' ) ) {
+				return;
+			}
+			
 			update_option( 'patreon-addon-upsell-shown', true);
 			
 			// Set the last notice shown date
 			self::set_last_non_system_notice_shown_date();
 		}
 		if ( $_REQUEST['notice_id'] == 'patron_content_manager_pitch_shown' ) {
+			if ( !isset($_REQUEST['patreon_wordpress_nonce_patron_content_manager_addon_notice_shown']) OR !wp_verify_nonce( sanitize_key( $_REQUEST['patreon_wordpress_nonce_patron_content_manager_addon_notice_shown'] ), 'patreon_wordpress_nonce_patron_content_manager_addon_notice_shown' ) ) {
+				return;
+			}
 			update_option( 'patron_content_manager_pitch_shown', true);
 			
 			// Set the last notice shown date
@@ -1099,6 +1106,9 @@ class Patreon_Wordpress {
 
 		// Mapping what comes from REQUEST to a given value avoids potential security problems
 		if ( $_REQUEST['notice_id'] == 'patreon_setup_needed_notice' ) {
+			if ( !isset($_REQUEST['patreon_wordpress_nonce_setup_needed']) OR !wp_verify_nonce( sanitize_key( $_REQUEST['patreon_wordpress_nonce_setup_needed'] ), 'patreon_wordpress_nonce_setup_needed' ) ) {
+				return;
+			}
 			update_option( 'patreon-setup-wizard-notice-dismissed', true );
 			delete_option( 'patreon-wordpress-app-credentials-success');
 			delete_option( 'patreon-wordpress-app-credentials-failure');
@@ -1106,6 +1116,10 @@ class Patreon_Wordpress {
 
 		// Mapping what comes from REQUEST to a given value avoids potential security problems
 		if ( $_REQUEST['notice_id'] == 'patreon-rate-plugin-notice-shown' ) {
+			
+			if ( !isset($_REQUEST['patreon_wordpress_nonce_rate_plugin_notice']) OR !wp_verify_nonce( sanitize_key( $_REQUEST['patreon_wordpress_nonce_rate_plugin_notice'] ), 'patreon_wordpress_nonce_rate_plugin_notice' ) ) {
+				return;
+			}
 			update_option( 'patreon-rate-plugin-notice-shown', true );
 			
 			// Set the last notice shown date
@@ -1114,6 +1128,10 @@ class Patreon_Wordpress {
 		
 		// Mapping what comes from REQUEST to a given value avoids potential security problems
 		if ( $_REQUEST['notice_id'] == 'patreon-critical-issues' ) {
+
+			if ( !isset($_REQUEST['patreon_wordpress_nonce_plugin_critical_issues']) OR !wp_verify_nonce( sanitize_key( $_REQUEST['patreon_wordpress_nonce_plugin_critical_issues'] ), 'patreon_wordpress_nonce_plugin_critical_issues' ) ) {
+				return;
+			}
 			update_option( 'patreon-critical-issues', true );
 			
 			// Set the last notice shown date
@@ -1126,7 +1144,10 @@ class Patreon_Wordpress {
 		if( !( is_admin() && current_user_can( 'manage_options' ) ) ) {
 			return;
 		}
-	
+
+		if ( !isset($_REQUEST['patreon_wordpress_nonce_post_sync']) OR !wp_verify_nonce( sanitize_key( $_REQUEST['patreon_wordpress_nonce_post_sync'] ), 'patreon_wordpress_nonce_post_sync' ) ) {
+			return;
+		}		
 		update_option( 'patreon-post-import-in-progress', true );
 		delete_option( 'patreon-post-import-next-cursor' );
 		
@@ -1139,7 +1160,10 @@ class Patreon_Wordpress {
 		if( !( is_admin() && current_user_can( 'manage_options' ) ) ) {
 			return;
 		}
-			
+
+		if ( !isset($_REQUEST['patreon_wordpress_nonce_post_sync']) OR !wp_verify_nonce( sanitize_key( $_REQUEST['patreon_wordpress_nonce_post_sync'] ), 'patreon_wordpress_nonce_post_sync' ) ) {
+			return;
+		}			
 		// Check the last time this function was triggered:
 		
 		$last_triggered = get_option( 'patreon-manual-import-batch-last-triggered', 0 );
@@ -1217,8 +1241,8 @@ class Patreon_Wordpress {
 			echo 'You have to be an admin user to set this setting';
 			exit;
 		}
-		
-		if ( !wp_verify_nonce( sanitize_key( $_REQUEST['patreon_wordpress_save_post_sync_category_nonce'] ) ) ) {
+
+		if ( !isset($_REQUEST['patreon_wordpress_nonce_save_post_sync_options']) OR !wp_verify_nonce( sanitize_key( $_REQUEST['patreon_wordpress_nonce_save_post_sync_options'] ) ) ) {
 			echo 'Form security field expired - please refresh the page and try again';
 			exit;
 		}
@@ -1256,9 +1280,9 @@ class Patreon_Wordpress {
 			echo 'You have to be logged as an admin to set this setting';
 			exit;
 		}
-		
-		if ( !wp_verify_nonce( sanitize_key( $_REQUEST['patreon_wordpress_set_post_author_for_post_sync_nonce'] ) ) ) {
-			echo 'Form security field expired - please refresh the page and try again';
+
+		if ( !isset($_REQUEST['patreon_wordpress_nonce_save_post_sync_options']) OR !wp_verify_nonce( sanitize_key( $_REQUEST['patreon_wordpress_nonce_save_post_sync_options'] ) ) ) {
+			echo 'Form expired - please refresh the page and try again';
 			exit;
 		}
 		
@@ -1282,17 +1306,21 @@ class Patreon_Wordpress {
 		if( !( is_admin() && current_user_can( 'manage_options' ) ) ) {
 			return;
 		}
-		
+
+		if ( !isset($_REQUEST['patreon_wordpress_nonce_save_post_sync_options']) OR !wp_verify_nonce( sanitize_key( $_REQUEST['patreon_wordpress_nonce_save_post_sync_options'] ) ) ) {
+			echo 'Form expired - please refresh the page and try again';
+			exit;
+		}
+
 		if ( $_REQUEST['update_posts_option_value'] == 'yes' ) {
 			update_option( 'patreon-update-posts', 'yes' );
 		}
 	
-		
 		if ( $_REQUEST['update_posts_option_value'] == 'no' ) {
 			update_option( 'patreon-update-posts', 'no' );
 		}
 	
-		echo 'Success';
+		echo 'Saved!';
 		exit;
 			
 	}
@@ -1301,7 +1329,12 @@ class Patreon_Wordpress {
 		if( !( is_admin() && current_user_can( 'manage_options' ) ) ) {
 			return;
 		}
-		
+
+		if ( !isset($_REQUEST['patreon_wordpress_nonce_save_post_sync_options']) OR !wp_verify_nonce( sanitize_key( $_REQUEST['patreon_wordpress_nonce_save_post_sync_options'] ) ) ) {
+			echo 'Form expired - please refresh the page and try again';
+			exit;
+		}
+
 		if ( $_REQUEST['delete_posts_option_value'] == 'yes' ) {
 			update_option( 'patreon-remove-deleted-posts', 'yes' );
 		}
@@ -1311,7 +1344,7 @@ class Patreon_Wordpress {
 			update_option( 'patreon-remove-deleted-posts', 'no' );
 		}		
 			
-		echo 'Success';
+		echo 'Saved!';
 		exit;
 			
 	}
@@ -1799,7 +1832,9 @@ class Patreon_Wordpress {
 		$setup_message = PATREON_SETUP_INITIAL_MESSAGE;
 		
 		if ( !isset( $_REQUEST['setup_stage'] ) OR $_REQUEST['setup_stage'] == '0' ) {
-			
+
+			// This should be allowed to be viewed without a nonce
+
 			$requirements_check = Patreon_Compatibility::check_requirements();
 			$requirement_notices = '';
 			
@@ -1986,8 +2021,8 @@ class Patreon_Wordpress {
 			echo '<div id="patreon_setup_screen">';
 	
 			echo '<div id="patreon_setup_logo"><img src="' . PATREON_PLUGIN_ASSETS . '/img/Patreon_Logo_100.png" /></div>';
-			
-			echo '<div id="patreon_setup_content"><h1 style="margin-top: 0px;">How should posts be synced?</h1><div id="patreon_setup_message">' . $api_version_warning . $setup_message . '<div class="patreon_post_sync_choice"><div class="patreon_post_sync_choice_title">Sync posts to this category</div>'. PATREON_POST_SYNC_5 .'<div style="display:block;margin-top:10px;width: 200px;"><select name="patreon_sync_post_type" id="patreon_sync_post_type" style="display: inline-block; margin-right: 5px; margin-bottom: 10px; font-size: 20px; width: 250px;">' . $post_type_select . '</select><select  name="patreon_sync_post_category" id="patreon_sync_post_category" style="display: inline-block; margin-right: 5px; margin-bottom: 10px; font-size: 20px; width: 250px;">' .$taxonomy_select . '</select><select  name="patreon_sync_post_term" id="patreon_sync_post_term" style="display: inline-block; margin-right: 5px; margin-bottom: 10px; font-size: 20px; width: 250px;">' . $term_select .'</select><button id="patreon_wordpress_save_post_sync_category" patreon_wordpress_save_post_sync_category_nonce="' . wp_create_nonce() . '" class="button button-primary button-large" style="display: inline-block; margin-right: 5px; margin-bottom: 10px; font-size: 20px; width: 250px;" pw_input_target="#patreon_wordpress_post_import_category_status" target="">Save</button><div id="patreon_wordpress_post_import_category_status" style="color: #<?php echo $post_sync_category_status_color ?>;"></div></div><div class="patreon_post_sync_choice"><div class="patreon_post_sync_choice_title">Author for imported posts</div>'. PATREON_POST_SYNC_6 .'<div style="display:block;margin-top:10px;"><select id="patreon-post-author-for-synced-posts" name="patreon-post-author-for-synced-posts" pw_input_target="#patreon-post-author-for-synced-posts-info" style="font-size:20px; display:inline-block;">' . $user_select .'</select><div id="patreon-post-author-for-synced-posts-info"></div></div></div><div class="patreon_post_sync_choice"><div class="patreon_post_sync_choice_title">Update local posts from the ones at Patreon</div>'. PATREON_POST_SYNC_2 .'<div style="display:block;margin-top:10px;width: 200px;"><select id="patreon-update-posts" name="patreon-update-posts" pw_input_target="#patreon-update-posts-info" style="font-size:20px; display:inline-block;"><option value="">Select</option><option value="yes" '. $update_posts_selected .'>Yes</option><option value="no"'. $update_posts_unselected .'>No</option></select><div id="patreon-update-posts-info"></div></div></div><div class="patreon_post_sync_choice"><div class="patreon_post_sync_choice_title">Delete local post when Patreon post is deleted</div>'. PATREON_POST_SYNC_3 .'<div style="display:block;margin-top:10px;width: 200px;"><select name="patreon-remove-deleted-posts" id="patreon-remove-deleted-posts" pw_input_target="#patreon-remove-deleted-posts-info" style="font-size:20px;"><option value="">Select</option><option value="yes" '. $delete_posts_selected .'>Yes</option><option value="no" '. $delete_posts_unselected .'>No</option></select><div id="patreon-remove-deleted-posts-info"></div></div></div></div><form style="display:inline-block;margin-right:10px;" method="post" action="'. admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=post_sync_2') .'"><p class="submit" style="margin-top: 10px;"><input type="submit" name="submit" id="submit" class="button button-large button-primary" value="Done!"></p></form></div>';
+			$patreon_wordpress_nonce_save_post_sync_options = wp_create_nonce();
+			echo '<div id="patreon_setup_content"><h1 style="margin-top: 0px;">How should posts be synced?</h1><div id="patreon_setup_message">' . $api_version_warning . $setup_message . '<div class="patreon_post_sync_choice"><div class="patreon_post_sync_choice_title">Sync posts to this category</div>'. PATREON_POST_SYNC_5 .'<div style="display:block;margin-top:10px;width: 200px;"><select name="patreon_sync_post_type" id="patreon_sync_post_type" style="display: inline-block; margin-right: 5px; margin-bottom: 10px; font-size: 20px; width: 250px;">' . $post_type_select . '</select><select  name="patreon_sync_post_category" id="patreon_sync_post_category" style="display: inline-block; margin-right: 5px; margin-bottom: 10px; font-size: 20px; width: 250px;">' .$taxonomy_select . '</select><select name="patreon_sync_post_term" id="patreon_sync_post_term" style="display: inline-block; margin-right: 5px; margin-bottom: 10px; font-size: 20px; width: 250px;">' . $term_select .'</select><button id="patreon_wordpress_save_post_sync_category"  patreon_wordpress_nonce_save_post_sync_options="' . $patreon_wordpress_nonce_save_post_sync_options . '" class="button button-primary button-large" style="display: inline-block; margin-right: 5px; margin-bottom: 10px; font-size: 20px; width: 250px;" pw_input_target="#patreon_wordpress_post_import_category_status" target="">Save</button><div id="patreon_wordpress_post_import_category_status" style="color: #<?php echo $post_sync_category_status_color ?>;"></div></div><div class="patreon_post_sync_choice"><div class="patreon_post_sync_choice_title">Author for imported posts</div>'. PATREON_POST_SYNC_6 .'<div style="display:block;margin-top:10px;"><select id="patreon-post-author-for-synced-posts" patreon_wordpress_nonce_save_post_sync_options="' . $patreon_wordpress_nonce_save_post_sync_options . '" name="patreon-post-author-for-synced-posts" pw_input_target="#patreon-post-author-for-synced-posts-info" style="font-size:20px; display:inline-block;">' . $user_select .'</select><div id="patreon-post-author-for-synced-posts-info" style="clear:both;display:block;width:auto;"></div></div></div><div class="patreon_post_sync_choice"><div class="patreon_post_sync_choice_title">Update local posts from the ones at Patreon</div>'. PATREON_POST_SYNC_2 .'<div style="display:block;margin-top:10px;width: 200px;"><select id="patreon-update-posts" patreon_wordpress_nonce_save_post_sync_options="' . $patreon_wordpress_nonce_save_post_sync_options . '" name="patreon-update-posts" pw_input_target="#patreon-update-posts-info" style="font-size:20px; display:inline-block;"><option value="">Select</option><option value="yes" '. $update_posts_selected .'>Yes</option><option value="no"'. $update_posts_unselected .'>No</option></select><div id="patreon-update-posts-info" style=:clear:both;display:block;width:auto;""></div></div></div><div class="patreon_post_sync_choice"><div class="patreon_post_sync_choice_title">Delete local post when Patreon post is deleted</div>'. PATREON_POST_SYNC_3 .'<div style="display:block;margin-top:10px;width: 200px;"><select name="patreon-remove-deleted-posts" id="patreon-remove-deleted-posts" patreon_wordpress_nonce_save_post_sync_options="' . $patreon_wordpress_nonce_save_post_sync_options . '" pw_input_target="#patreon-remove-deleted-posts-info" style="font-size:20px;"><option value="">Select</option><option value="yes" '. $delete_posts_selected .'>Yes</option><option value="no" '. $delete_posts_unselected .'>No</option></select><div id="patreon-remove-deleted-posts-info" style="clear:both;display:block;width:auto;"></div></div></div></div><form style="display:inline-block;margin-right:10px;" method="post" action="'. admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=post_sync_2') .'"><p class="submit" style="margin-top: 10px;"><input type="submit" name="submit" id="submit" class="button button-large button-primary" value="Done!"></p></form></div>';
 		
 			echo '</div>';
 
