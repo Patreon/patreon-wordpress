@@ -614,8 +614,9 @@
 		jQuery(document).on( 'click', '#patreon_level_refresh', function(e) {
 			
 			var pw_input_target = jQuery( "#patreon_level_select" );
-			var pw_post_id = pw_input_target.attr( 'pw_post_id' );
-			
+			var pw_post_id = pw_input_target.attr( 'pw_post_id' );		
+			var patreon_wordpress_nonce_populate_tier_dropdown = jQuery( this ).attr( 'patreon_wordpress_nonce_populate_tier_dropdown' );
+			console.log(patreon_wordpress_nonce_populate_tier_dropdown);
 			jQuery.ajax({
 				url: ajaxurl,
 				async: true, // Just to make sure
@@ -624,6 +625,7 @@
 				data: {
 					action: 'patreon_wordpress_populate_patreon_level_select',
 					pw_post_id: pw_post_id,
+					patreon_wordpress_nonce_populate_tier_dropdown: patreon_wordpress_nonce_populate_tier_dropdown,
 				},
 				beforeSend: function( e ) {
 					jQuery( pw_input_target ).html( '<option value="">Loading...</option>' );				

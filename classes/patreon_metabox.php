@@ -84,7 +84,7 @@ class Patron_Metabox {
 		<p>
 			<label for="patreon-level"><?php _e( $label, '1' ); ?></label>
 			<br><br>
-			<div id="patreon_level_select_wrapper"><select id="patreon_level_select" name="patreon-level"<?php echo $disabled ?> pw_post_id="<?php echo $object->ID; ?>"><option value="<?php echo get_post_meta( $object->ID, 'patreon-level', true ); ?>"><?php echo Patreon_Wordpress::make_tiers_select( $post ); ?></option></select> <img id="patreon_level_refresh" src="<?php echo PATREON_PLUGIN_ASSETS; ?>/img/refresh_tiers_18.png" style="width: 18px; height: 18px;" /></div>
+			<div id="patreon_level_select_wrapper"><select id="patreon_level_select" name="patreon-level"<?php echo $disabled ?> pw_post_id="<?php echo $object->ID; ?>"><option value="<?php echo get_post_meta( $object->ID, 'patreon-level', true ); ?>"><?php echo Patreon_Wordpress::make_tiers_select( $post ); ?></option></select> <img id="patreon_level_refresh" src="<?php echo PATREON_PLUGIN_ASSETS; ?>/img/refresh_tiers_18.png" style="width: 18px; height: 18px;" patreon_wordpress_nonce_populate_tier_dropdown="<?php echo wp_create_nonce( 'patreon_wordpress_nonce_populate_tier_dropdown' ); ?>" /></div>
 		</p>
 		
 		<?php

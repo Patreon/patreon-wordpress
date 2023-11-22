@@ -1350,11 +1350,8 @@ class Patreon_Wordpress {
 	}
 	public function toggle_check_api_credentials_on_setting_save(  $old_value, $new_value ) {
 		
-		// This function fires after any of the client details are updated. 
-		
-		if ( !( is_admin() AND current_user_can( 'manage_options' ) ) ) {
-			return;			
-		}
+		// This function fires after any of the client details are updated.
+		// Doesnt need capability checks - should be allowed to be used programmatically
 
 		// This filter only runs when settings are actually updated, but just in case:
 		// Try contacting the api 
@@ -1370,10 +1367,7 @@ class Patreon_Wordpress {
 	public function post_credential_update_api_connectivity_check() {
 
 		// This function checks if the saved app credentials are valid if the check toggle is set
-		
-		if ( !( is_admin() AND current_user_can( 'manage_options' ) ) ) {
-			return;			
-		}
+		// Doesnt need capability checks - should be allowed to be used programmatically
 
 		if( get_option( 'patreon-wordpress-do-api-connectivity-check', false ) ) {
 			
@@ -2281,12 +2275,18 @@ class Patreon_Wordpress {
 	public static function populate_patreon_level_select_from_ajax() {
 		// This function accepts the ajax request from the metabox and calls the relevant function to populate the tiers select
 		
-		if( !( is_admin() && current_user_can( 'manage_options' ) ) ) {
-			return;
+		if( !current_user_can( 'manage_options' ) ) {
+			echo 'Not enough permissions';
+			exit;
 		}
-		
+
+		if ( !isset($_POST['patreon_wordpress_nonce_populate_tier_dropdown']) OR !wp_verify_nonce( $_POST['patreon_wordpress_nonce_populate_tier_dropdown'], 'patreon_wordpress_nonce_populate_tier_dropdown') ) {
+			echo $_POST['patreon_wordpress_nonce_populate_tier_dropdown'] . ' # ' . 'Form security field expired - please refresh the page and try again';
+			exit;
+		}
+
 		// Just bail out if the action is not relevant, just in case
-		if ( $_REQUEST['action'] != 'patreon_wordpress_populate_patreon_level_select' ) {
+		if ( !isset( $_REQUEST['action'] ) OR $_REQUEST['action'] != 'patreon_wordpress_populate_patreon_level_select' ) {
 			return;
 		}
 		
@@ -2305,10 +2305,6 @@ class Patreon_Wordpress {
 		
 	}
 	public static function make_tiers_select( $post = false, $args = array() ) {
-		
-		if( !( is_admin() && current_user_can( 'manage_options' ) ) ) {
-			return;
-		}
 		
 		if ( !$post ) {
 			global $post;
