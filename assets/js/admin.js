@@ -616,7 +616,7 @@
 			var pw_input_target = jQuery( "#patreon_level_select" );
 			var pw_post_id = pw_input_target.attr( 'pw_post_id' );		
 			var patreon_wordpress_nonce_populate_tier_dropdown = jQuery( this ).attr( 'patreon_wordpress_nonce_populate_tier_dropdown' );
-			console.log(patreon_wordpress_nonce_populate_tier_dropdown);
+
 			jQuery.ajax({
 				url: ajaxurl,
 				async: true, // Just to make sure
