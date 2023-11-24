@@ -2281,7 +2281,7 @@ class Patreon_Wordpress {
 		}
 
 		if ( !isset($_POST['patreon_wordpress_nonce_populate_tier_dropdown']) OR !wp_verify_nonce( $_POST['patreon_wordpress_nonce_populate_tier_dropdown'], 'patreon_wordpress_nonce_populate_tier_dropdown') ) {
-			echo $_POST['patreon_wordpress_nonce_populate_tier_dropdown'] . ' # ' . 'Form security field expired - please refresh the page and try again';
+			'Form security field expired - please refresh the page and try again';
 			exit;
 		}
 

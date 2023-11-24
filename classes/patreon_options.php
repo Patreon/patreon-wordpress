@@ -24,7 +24,7 @@ class Patreon_Options {
 
 		add_submenu_page( '', 'Patreon Settings', 'Patreon Settings', 'administrator', 'patreon_wordpress_setup_wizard', array('Patreon_Wordpress', 'setup_wizard') );
 		
-		add_submenu_page( null, 'Patreon WordPress Admin Message', 'Admin message', 'manage_options', 'patreon-plugin-admin-message', array( $this, 'patreon_plugin_admin_message_page' ) );
+		add_submenu_page( '', 'Patreon WordPress Admin Message', 'Admin message', 'manage_options', 'patreon-plugin-admin-message', array( $this, 'patreon_plugin_admin_message_page' ) );
 
 		add_submenu_page( 'patreon-plugin', 'Patreon WordPress Post Sync', 'Post Sync', 'manage_options', 'patreon_wordpress_setup_wizard&setup_stage=post_sync_1', array( $this, 'patreon_plugin_post_sync_page' ) );
 		
@@ -610,7 +610,7 @@ class Patreon_Options {
 											</th>
 											<td>
 												<?php
-																									
+
 													$update_posts_selected = '';
 													$update_posts_unselected = '';
 													
