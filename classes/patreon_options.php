@@ -24,7 +24,7 @@ class Patreon_Options {
 
 		add_submenu_page( '', 'Patreon Settings', 'Patreon Settings', 'administrator', 'patreon_wordpress_setup_wizard', array('Patreon_Wordpress', 'setup_wizard') );
 		
-		add_submenu_page( null, 'Patreon WordPress Admin Message', 'Admin message', 'manage_options', 'patreon-plugin-admin-message', array( $this, 'patreon_plugin_admin_message_page' ) );
+		add_submenu_page( '', 'Patreon WordPress Admin Message', 'Admin message', 'manage_options', 'patreon-plugin-admin-message', array( $this, 'patreon_plugin_admin_message_page' ) );
 
 		add_submenu_page( 'patreon-plugin', 'Patreon WordPress Post Sync', 'Post Sync', 'manage_options', 'patreon_wordpress_setup_wizard&setup_stage=post_sync_1', array( $this, 'patreon_plugin_post_sync_page' ) );
 		
@@ -502,7 +502,7 @@ class Patreon_Options {
 													<select  name="patreon_sync_post_term" id="patreon_sync_post_term" style="display: inline-block; margin-right: 5px;">
 														<?php echo $term_select ?>
 													</select>
-													<button id="patreon_wordpress_save_post_sync_category" patreon_wordpress_save_post_sync_category_nonce="<?php echo wp_create_nonce() ?>" class="button button-primary button-large" pw_input_target="#patreon_wordpress_post_import_category_status" target="">Save</button><div id="patreon_wordpress_post_import_category_status" style="color: #<?php echo $post_sync_category_status_color ?>;"></div>
+													<button id="patreon_wordpress_save_post_sync_category" patreon_wordpress_nonce_save_post_sync_options="<?php echo wp_create_nonce() ?>" class="button button-primary button-large" pw_input_target="#patreon_wordpress_post_import_category_status" target="">Save</button><div id="patreon_wordpress_post_import_category_status" style="color: #<?php echo $post_sync_category_status_color ?>;"></div>
 												</div>
 												
 												</div>
@@ -610,7 +610,7 @@ class Patreon_Options {
 											</th>
 											<td>
 												<?php
-																									
+
 													$update_posts_selected = '';
 													$update_posts_unselected = '';
 													
@@ -684,14 +684,14 @@ class Patreon_Options {
 													
 													$post_import_status = 'No post import ongoing';
 													$post_import_status_color = "9d9d9d";
-													$post_import_button = '<button id="patreon_wordpress_start_post_import" class="button button-primary button-large" pw_input_target="#patreon_wp_post_import_status" target="">Start an import</button>';
+													$post_import_button = '<button id="patreon_wordpress_start_post_import" class="button button-primary button-large" pw_input_target="#patreon_wp_post_import_status" target="" patreon_wordpress_nonce_post_sync="' . wp_create_nonce('patreon_wordpress_nonce_post_sync') .'">Start an import</button>';
 													$import_post_info_text = "Start an import of your posts from Patreon if you haven't done it before. After import of existing posts is complete, new posts will automatically be imported and existing posts automatically updated so you don't need to do this again.";
 													$import_post_info_header = "Start a post import";
 													
 													if ( get_option( 'patreon-post-import-in-progress', false ) ) {
 														$post_import_status = "There is an ongoing post import";
 														$post_import_status_color = "129500";
-														$post_import_button = '<button id="patreon_wordpress_import_next_batch_of_posts" class="button button-primary button-large" pw_input_target="#patreon_wp_post_import_status" target="">Import next batch</button>';
+														$post_import_button = '<button id="patreon_wordpress_import_next_batch_of_posts" class="button button-primary button-large" pw_input_target="#patreon_wp_post_import_status" target="" patreon_wordpress_nonce_post_sync="' . wp_create_nonce('patreon_wordpress_nonce_post_sync') .'">Import next batch</button>';
 														$import_post_info_text = "Posts will be imported automatically every 5 minutes. If they are not, or you want to do it faster, click to import next batch of posts. This will import the next batch of posts in the queue. You can do this every 10 seconds.";
 														$import_post_info_header = "Ongoing post import";
 													}

@@ -266,7 +266,7 @@ class Patreon_Frontend {
 			global $post;
 		}
 		
-		if ( $args['reason'] == 'user_not_logged_in' ) {
+		if ( isset( $args['reason'] ) AND $args['reason'] == 'user_not_logged_in' ) {
 			
 			$label = PATREON_TEXT_OVER_BUTTON_1;
 			
@@ -285,7 +285,7 @@ class Patreon_Frontend {
 			
 		}
 
-		if ( $args['reason'] == 'not_a_patron' ) {
+		if ( isset( $args['reason'] ) AND $args['reason'] == 'not_a_patron' ) {
 			
 			$label = PATREON_TEXT_OVER_BUTTON_1;
 			
@@ -304,11 +304,11 @@ class Patreon_Frontend {
 			
 		}
 		
-		if ( $args['reason'] == 'payment_declined' ) {
+		if ( isset( $args['reason'] ) AND $args['reason'] == 'payment_declined' ) {
 			$label = PATREON_TEXT_OVER_BUTTON_3;
 		}
 		
-		if ( $args['reason'] == 'active_pledge_not_enough' ) {
+		if ( isset( $args['reason'] ) AND $args['reason'] == 'active_pledge_not_enough' ) {
 			
 			$label = PATREON_TEXT_OVER_BUTTON_1A;
 			
@@ -328,7 +328,7 @@ class Patreon_Frontend {
 			
 		}
 		
-		if ( $args['reason'] == 'not_active_patron_at_post_date' ) {
+		if ( isset( $args['reason'] ) AND $args['reason'] == 'not_active_patron_at_post_date' ) {
 			
 			$label = PATREON_TEXT_OVER_BUTTON_8;
 			

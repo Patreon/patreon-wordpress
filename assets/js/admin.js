@@ -4,6 +4,13 @@
 
 		jQuery(document).on( 'click', '.patreon-wordpress .notice-dismiss', function(e) {
 
+
+			var patreon_wordpress_nonce_disconnect_success_notice = jQuery( this ).parent().attr( 'patreon_wordpress_nonce_disconnect_success_notice' );
+			var patreon_wordpress_nonce_setup_needed = jQuery( this ).parent().attr( 'patreon_wordpress_nonce_setup_needed' );
+			var patreon_wordpress_nonce_patron_pro_addon_notice_shown = jQuery( this ).parent().attr( 'patreon_wordpress_nonce_patron_pro_addon_notice_shown' );
+			var patreon_wordpress_nonce_patron_content_manager_addon_notice_shown = jQuery( this ).parent().attr( 'patreon_wordpress_nonce_patron_content_manager_addon_notice_shown' );
+			var patreon_wordpress_nonce_rate_plugin_notice = jQuery( this ).parent().attr( 'patreon_wordpress_nonce_rate_plugin_notice' );
+			var patreon_wordpress_nonce_plugin_critical_issues = jQuery( this ).parent().attr( 'patreon_wordpress_nonce_plugin_critical_issues' );
 			jQuery.ajax({
 				url: ajaxurl,
 				type:"POST",
@@ -11,6 +18,11 @@
 				data: {
 					action: 'patreon_wordpress_dismiss_admin_notice',
 					notice_id: jQuery( this ).parent().attr( "id" ),
+					patreon_wordpress_nonce_disconnect_success_notice: patreon_wordpress_nonce_disconnect_success_notice,
+					patreon_wordpress_nonce_setup_needed: patreon_wordpress_nonce_setup_needed,
+					patreon_wordpress_nonce_patron_pro_addon_notice_shown: patreon_wordpress_nonce_patron_pro_addon_notice_shown,
+					patreon_wordpress_nonce_patron_content_manager_addon_notice_shown: patreon_wordpress_nonce_patron_content_manager_addon_notice_shown,
+					patreon_wordpress_nonce_plugin_critical_issues: patreon_wordpress_nonce_plugin_critical_issues,
 				}
 			});
 		});	
@@ -77,6 +89,7 @@
 			
 			e.preventDefault();
 			var pw_input_target = jQuery( this ).attr( 'pw_input_target' );
+			var patreon_wordpress_nonce_post_sync = jQuery( this ).attr( 'patreon_wordpress_nonce_post_sync' );
 			
 			jQuery.ajax({
 				url: ajaxurl,
@@ -84,6 +97,7 @@
 				dataType : 'html',
 				data: {
 					action: 'patreon_wordpress_start_post_import',
+					patreon_wordpress_nonce_post_sync: patreon_wordpress_nonce_post_sync,
 				},
 				success: function( response ) {
 					
@@ -113,6 +127,7 @@
 			
 			e.preventDefault();
 			var pw_input_target = jQuery( this ).attr( 'pw_input_target' );
+			var patreon_wordpress_nonce_post_sync = jQuery( this ).attr( 'patreon_wordpress_nonce_post_sync' );
 			
 			jQuery.ajax({
 				url: ajaxurl,
@@ -120,6 +135,7 @@
 				dataType : 'html',
 				data: {
 					action: 'patreon_wordpress_import_next_batch_of_posts',
+					patreon_wordpress_nonce_post_sync: patreon_wordpress_nonce_post_sync,
 				},
 				beforeSend: function(e) {
 					jQuery( '#patreon_wp_post_import_status' ).html( 'Importing next batch...' );
@@ -263,7 +279,7 @@
 			
 			e.preventDefault();
 			var pw_input_target = jQuery( this ).attr( 'pw_input_target' );
-			var patreon_wordpress_save_post_sync_category_nonce = jQuery( this ).attr( 'patreon_wordpress_save_post_sync_category_nonce' );
+			var patreon_wordpress_nonce_save_post_sync_options = jQuery( this ).attr( 'patreon_wordpress_nonce_save_post_sync_options' );
 			var patreon_sync_post_type = jQuery('#patreon_sync_post_type').val();
 			var patreon_sync_post_category = jQuery('#patreon_sync_post_category').val();
 			var patreon_sync_post_term = jQuery('#patreon_sync_post_term').val();
@@ -277,7 +293,7 @@
 					patreon_sync_post_type: patreon_sync_post_type,
 					patreon_sync_post_category: patreon_sync_post_category,
 					patreon_sync_post_term: patreon_sync_post_term,
-					patreon_wordpress_save_post_sync_category_nonce: patreon_wordpress_save_post_sync_category_nonce,
+					patreon_wordpress_nonce_save_post_sync_options: patreon_wordpress_nonce_save_post_sync_options,
 				},
 				beforeSend: function( xhr ) {
 					jQuery( '#patreon_wordpress_post_import_category_status' ).empty();					
@@ -323,8 +339,8 @@
 			// Just in case
 			e.preventDefault();
 			var pw_input_target = jQuery( this ).attr( 'pw_input_target' );
-			var option_value = jQuery(this).val();
-			
+			var option_value = jQuery(this).val();		
+			var patreon_wordpress_nonce_save_post_sync_options = jQuery( this ).attr( 'patreon_wordpress_nonce_save_post_sync_options' );
 			if (  option_value == '' ) {
 				// Do nothing if value is empty
 				jQuery( pw_input_target ).html('');
@@ -339,17 +355,18 @@
 				data: {
 					action: 'patreon_wordpress_set_update_posts_option',
 					update_posts_option_value: option_value,
+					patreon_wordpress_nonce_save_post_sync_options: patreon_wordpress_nonce_save_post_sync_options,
 				},
 				beforeSend: function( e ) {			
 				},
 				success: function( response ) {
 					jQuery( pw_input_target ).empty();
-					jQuery( pw_input_target ).html( 'Saved!' );
+					jQuery( pw_input_target ).html( response );
 					
 				},
 				error: function( response ) {
 					jQuery( pw_input_target ).empty();
-					jQuery( pw_input_target ).html( 'Sorry - could not save' );
+					jQuery( pw_input_target ).html( response );
 				},
 				statusCode: {
 					500: function(error) {
@@ -362,12 +379,12 @@
 		});
 		
 		// Save patreon post author option upon change in post sync wizard screens
-		jQuery( "#patreon_post_author_for_synced_posts" ).on( 'change', function(e) {
+		jQuery( "#patreon-post-author-for-synced-posts" ).on( 'change', function(e) {
 			
 			// Just in case
 			e.preventDefault();
 			var pw_input_target = jQuery( this ).attr( 'pw_input_target' );
-			var patreon_wordpress_set_post_author_for_post_sync_nonce = jQuery( this ).attr( 'patreon_wordpress_set_post_author_for_post_sync_nonce' );
+			var patreon_wordpress_nonce_save_post_sync_options = jQuery( this ).attr( 'patreon_wordpress_nonce_save_post_sync_options' );
 			var option_value = jQuery(this).val();
 			
 			if (  option_value == '' ) {
@@ -385,18 +402,18 @@
 				data: {
 					action: 'patreon_wordpress_set_post_author_for_post_sync',
 					patreon_post_author_for_post_sync: option_value,
-					patreon_wordpress_set_post_author_for_post_sync_nonce: patreon_wordpress_set_post_author_for_post_sync_nonce,
+					patreon_wordpress_nonce_save_post_sync_options: patreon_wordpress_nonce_save_post_sync_options,
 				},
 				beforeSend: function( e ) {			
 				},
 				success: function( response ) {
 					jQuery( pw_input_target ).empty();
-					jQuery( pw_input_target ).html( 'Saved!' );
+					jQuery( pw_input_target ).html( response );
 					
 				},
 				error: function( response ) {
 					jQuery( pw_input_target ).empty();
-					jQuery( pw_input_target ).html( 'Sorry - could not save' );
+					jQuery( pw_input_target ).html( response );
 				},
 				statusCode: {
 					500: function(error) {
@@ -415,7 +432,8 @@
 			e.preventDefault();
 			var pw_input_target = jQuery( this ).attr( 'pw_input_target' );
 			var option_value = jQuery(this).val();
-
+			var patreon_wordpress_nonce_save_post_sync_options = jQuery( this ).attr( 'patreon_wordpress_nonce_save_post_sync_options' );
+			
 			if (  option_value == '' ) {
 				// Do nothing if value is empty
 				jQuery( pw_input_target ).html('');
@@ -430,17 +448,18 @@
 				data: {
 					action: 'patreon_wordpress_set_delete_posts_option',
 					delete_posts_option_value: option_value,
+					patreon_wordpress_nonce_save_post_sync_options: patreon_wordpress_nonce_save_post_sync_options,
 				},
 				beforeSend: function( e ) {			
 				},
 				success: function( response ) {
 					jQuery( pw_input_target ).empty();
-					jQuery( pw_input_target ).html( 'Saved!' );
+					jQuery( pw_input_target ).html( response );
 					
 				},
 				error: function( response ) {
 					jQuery( pw_input_target ).empty();
-					jQuery( pw_input_target ).html( 'Sorry - could not save' );
+					jQuery( pw_input_target ).html( response );
 				},
 				statusCode: {
 					500: function(error) {
@@ -595,8 +614,9 @@
 		jQuery(document).on( 'click', '#patreon_level_refresh', function(e) {
 			
 			var pw_input_target = jQuery( "#patreon_level_select" );
-			var pw_post_id = pw_input_target.attr( 'pw_post_id' );
-			
+			var pw_post_id = pw_input_target.attr( 'pw_post_id' );		
+			var patreon_wordpress_nonce_populate_tier_dropdown = jQuery( this ).attr( 'patreon_wordpress_nonce_populate_tier_dropdown' );
+
 			jQuery.ajax({
 				url: ajaxurl,
 				async: true, // Just to make sure
@@ -605,6 +625,7 @@
 				data: {
 					action: 'patreon_wordpress_populate_patreon_level_select',
 					pw_post_id: pw_post_id,
+					patreon_wordpress_nonce_populate_tier_dropdown: patreon_wordpress_nonce_populate_tier_dropdown,
 				},
 				beforeSend: function( e ) {
 					jQuery( pw_input_target ).html( '<option value="">Loading...</option>' );				
