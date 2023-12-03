@@ -56,6 +56,7 @@ class Patreon_Options {
         register_setting( 'patreon-options', 'patreon-custom-universal-banner' );
         register_setting( 'patreon-options', 'patreon-custom-page-name', array(&$this, 'sanitize_page_name') );
         register_setting( 'patreon-options', 'patreon-prevent-caching-gated-content' );
+        register_setting( 'patreon-options', 'patreon-cookie-login-remember' );
         register_setting( 'patreon-options', 'patreon-currency-sign' );
         register_setting( 'patreon-options', 'patreon-currency-sign-behind' );
         register_setting( 'patreon-options', 'patreon-sync-posts' );
@@ -417,6 +418,33 @@ class Patreon_Options {
 												</select>
 											</td>
                                         </tr>
+										
+										<tr valign="top">
+											<th scope="row">
+												<strong>Patreon Login cookie expiration</strong>
+												<div class="patreon-options-info">How long will the user remain logged in, before needing to login using Patreon again. Recommended: 2 days</div>
+											</th>
+											<td>
+												<?php
+													
+													$cookie_two_days_selected = '';
+													$cookie_two_weeks_selected = '';
+													
+													if ( get_option( 'patreon-cookie-login-remember', 'yes' ) == 'yes' ) {
+														$cookie_two_weeks_selected = " selected";
+													}
+													else {
+														$cookie_two_days_selected = " selected";
+													}
+												
+												?>
+												<select name="patreon-cookie-login-remember">
+													<option value="no" <?php echo $cookie_two_days_selected; ?>>2 days</option>
+													<option value="yes" <?php echo $cookie_two_weeks_selected; ?>>2 weeks</option>
+												</select>
+											</td>
+                                        </tr>
+										
                                         <tr valign="top">
 											<th scope="row">
 												<strong>Currency sign front</strong>

@@ -194,7 +194,12 @@ class Patreon_Login {
 
 					/* log user into existing wordpress account with matching username */
 					wp_set_current_user( $user->ID, $user->user_login );
-					wp_set_auth_cookie( $user->ID );
+					/* check if the longer cookie expiration time option is selected */
+					if ( get_option( 'patreon-cookie-login-remember', 'yes' ) != 'yes' ) {
+						wp_set_auth_cookie( $user->ID );
+					} else {
+						wp_set_auth_cookie( $user->ID, true ); /* second parameter set to true means "Remember Me", which sets the auth cookie expiration to 2 weeks */
+					}
 					do_action( 'wp_login', $user->user_login, $user );
  
 					// Import Patreon avatar for this user since it is a new user
