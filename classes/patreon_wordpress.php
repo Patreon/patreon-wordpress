@@ -97,6 +97,8 @@ class Patreon_Wordpress {
 		add_action( "wp_ajax_nopriv_patreon_wordpress_start_post_import", array( $this , "start_post_import" ) );
 		add_action( "wp_ajax_patreon_wordpress_import_next_batch_of_posts", array( $this, "import_next_batch_of_posts" ) );
 		add_action( "wp_ajax_nopriv_patreon_wordpress_import_next_batch_of_posts", array( $this , "import_next_batch_of_posts" ) );
+		add_action( "wp_ajax_patreon_wordpress_cancel_manual_post_import", array( $this, "cancel_manual_post_import" ) );
+		add_action( "wp_ajax_nopriv_patreon_wordpress_cancel_manual_post_import", array( $this , "cancel_manual_post_import" ) );
 		add_action( "wp_ajax_patreon_wordpress_set_update_posts_option", array( $this, "set_update_posts_option" ) );
 		add_action( "wp_ajax_nopriv_patreon_wordpress_set_update_posts_option", array( $this , "set_update_posts_option" ) );
 		add_action( "wp_ajax_patreon_wordpress_set_delete_posts_option", array( $this, "set_delete_posts_option" ) );
@@ -848,7 +850,10 @@ class Patreon_Wordpress {
 	public static function enqueueAdminScripts() {
 		
 		wp_enqueue_script( 'patreon-admin-js', PATREON_PLUGIN_ASSETS . '/js/admin.js', array( 'jquery' ), PATREON_WORDPRESS_VERSION, true );
-		wp_localize_script( 'patreon-admin-js', 'pw_admin_js', array( 'patreon_wordpress_assets_url' => PATREON_PLUGIN_ASSETS, ) );
+		wp_localize_script( 'patreon-admin-js', 'pw_admin_js', array( 
+			'patreon_wordpress_assets_url' => PATREON_PLUGIN_ASSETS,
+			'patreon_wordpress_nonce_post_sync' => wp_create_nonce( 'patreon_wordpress_nonce_post_sync' ),
+		) );
 
 		// Load image related functions only if image feature is on:
 		
@@ -858,6 +863,8 @@ class Patreon_Wordpress {
 			wp_localize_script( 'patreon-admin-image-functions-js', 'admin_image_functions', array( 'patreon_wordpress_assets_url' => PATREON_PLUGIN_ASSETS, ) );
 			
 		}
+
+
 
 	}
 	public static function AfterUpdateActions( $upgrader_object, $options = false ) {
@@ -1142,12 +1149,15 @@ class Patreon_Wordpress {
 	public function start_post_import() {
 		
 		if( !( is_admin() && current_user_can( 'manage_options' ) ) ) {
-			return;
+			echo 'need_admin_privileges';
+			exit;
 		}
 
-		if ( !isset($_REQUEST['patreon_wordpress_nonce_post_sync']) OR !wp_verify_nonce( sanitize_key( $_REQUEST['patreon_wordpress_nonce_post_sync'] ), 'patreon_wordpress_nonce_post_sync' ) ) {
-			return;
-		}		
+		if( !check_ajax_referer( 'patreon_wordpress_nonce_post_sync', 'patreon_wordpress_nonce_post_sync' ) ) {
+			echo 'nonce_fail';
+			exit;
+		}
+
 		update_option( 'patreon-post-import-in-progress', true );
 		delete_option( 'patreon-post-import-next-cursor' );
 		
@@ -1158,12 +1168,15 @@ class Patreon_Wordpress {
 	public function import_next_batch_of_posts() {
 		
 		if( !( is_admin() && current_user_can( 'manage_options' ) ) ) {
-			return;
+			echo 'need_admin_privileges';
+			exit;
 		}
 
-		if ( !isset($_REQUEST['patreon_wordpress_nonce_post_sync']) OR !wp_verify_nonce( sanitize_key( $_REQUEST['patreon_wordpress_nonce_post_sync'] ), 'patreon_wordpress_nonce_post_sync' ) ) {
-			return;
-		}			
+		if( !check_ajax_referer( 'patreon_wordpress_nonce_post_sync', 'patreon_wordpress_nonce_post_sync' ) ) {
+			echo 'nonce_fail';
+			exit;
+		}
+
 		// Check the last time this function was triggered:
 		
 		$last_triggered = get_option( 'patreon-manual-import-batch-last-triggered', 0 );
@@ -1232,6 +1245,33 @@ class Patreon_Wordpress {
 			echo 'expired_or_lost_cursor_deleted';
 			exit;			
 		}
+		
+		
+	}
+	public function cancel_manual_post_import() {
+		
+		
+		if( !( is_admin() && current_user_can( 'manage_options' ) ) ) {
+			echo 'need_admin_privileges';
+			exit;
+		}
+
+		if( !check_ajax_referer( 'patreon_wordpress_nonce_post_sync', 'patreon_wordpress_nonce_post_sync' ) ) {
+			echo 'nonce_fail';
+			exit;
+		}
+
+		
+		update_option( 'patreon-post-import-in-progress', false );
+		delete_option( 'patreon-post-import-next-cursor' );
+		
+		if ( !get_option( 'patreon-post-import-in-progress', false ) AND !get_option( 'patreon-post-import-next-cursor', false ) ) {
+			echo 'manual_post_import_canceled';
+			exit;
+		}
+	
+		echo 'couldnt_cancel_manual_post_import';
+		exit;
 		
 		
 	}

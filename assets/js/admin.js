@@ -89,7 +89,6 @@
 			
 			e.preventDefault();
 			var pw_input_target = jQuery( this ).attr( 'pw_input_target' );
-			var patreon_wordpress_nonce_post_sync = jQuery( this ).attr( 'patreon_wordpress_nonce_post_sync' );
 			
 			jQuery.ajax({
 				url: ajaxurl,
@@ -97,7 +96,7 @@
 				dataType : 'html',
 				data: {
 					action: 'patreon_wordpress_start_post_import',
-					patreon_wordpress_nonce_post_sync: patreon_wordpress_nonce_post_sync,
+					patreon_wordpress_nonce_post_sync: pw_admin_js.patreon_wordpress_nonce_post_sync,
 				},
 				success: function( response ) {
 					
@@ -109,12 +108,24 @@
 						return;
 					}
 					
+					if ( response == 'need_admin_privileges') {
+						jQuery( '#patreon_wp_post_import_status' ).html( 'You need admin privileges to be able to do this' );
+						jQuery( '#patreon_wp_post_import_status' ).css( 'color', '#f31d00' );
+						return;
+					}
+					
+					if ( response == 'nonce_fail') {
+						jQuery( '#patreon_wp_post_import_status' ).html( 'Form expired - please reload the page and try again' );
+						jQuery( '#patreon_wp_post_import_status' ).css( 'color', '#f31d00' );
+						return;
+					}
+					
 					jQuery( '#patreon_wp_post_import_status' ).html( 'Started a post import' );
 					jQuery( '#patreon_wp_post_import_status' ).css( 'color', '#129500' );
 					
 					// Replace the button with post batch import button
 					
-					jQuery( '#patreon_post_import_button_container' ).html( '<button id="patreon_wordpress_import_next_batch_of_posts" class="button button-primary button-large" pw_input_target="#patreon_wp_post_import_status" target="">Import next batch</button>' );
+					jQuery( '#patreon_post_import_button_container' ).html( '<button id="patreon_wordpress_import_next_batch_of_posts" class="button button-primary button-large" pw_input_target="#patreon_wp_post_import_status" target="" style="margin-right: 10px;">Import next batch</button><button id="patreon_wordpress_cancel_manual_post_import" class="button button-primary button-large" pw_input_target="#patreon_wp_post_import_status" target="">Cancel</button>' );
 					jQuery( '#post_import_status_heading' ).html( 'Ongoing post import' );
 					jQuery( '#post_import_info_text' ).html( "Posts will be imported automatically every 5 minutes. If they are not, or you want to do it faster, click to import next batch of posts. This will import the next batch of posts in the queue. You can do this every 10 seconds." );
 					
@@ -127,7 +138,6 @@
 			
 			e.preventDefault();
 			var pw_input_target = jQuery( this ).attr( 'pw_input_target' );
-			var patreon_wordpress_nonce_post_sync = jQuery( this ).attr( 'patreon_wordpress_nonce_post_sync' );
 			
 			jQuery.ajax({
 				url: ajaxurl,
@@ -135,7 +145,7 @@
 				dataType : 'html',
 				data: {
 					action: 'patreon_wordpress_import_next_batch_of_posts',
-					patreon_wordpress_nonce_post_sync: patreon_wordpress_nonce_post_sync,
+					patreon_wordpress_nonce_post_sync: pw_admin_js.patreon_wordpress_nonce_post_sync,
 				},
 				beforeSend: function(e) {
 					jQuery( '#patreon_wp_post_import_status' ).html( 'Importing next batch...' );
@@ -150,6 +160,20 @@
 						jQuery( '#patreon_wp_post_import_status' ).css( 'color', '#f31d00' );
 						return;
 					}
+					
+					
+					if ( response == 'need_admin_privileges') {
+						jQuery( '#patreon_wp_post_import_status' ).html( 'You need admin privileges to be able to do this' );
+						jQuery( '#patreon_wp_post_import_status' ).css( 'color', '#f31d00' );
+						return;
+					}
+					
+					if ( response == 'nonce_fail') {
+						jQuery( '#patreon_wp_post_import_status' ).html( 'Form expired - please reload the page and try again' );
+						jQuery( '#patreon_wp_post_import_status' ).css( 'color', '#f31d00' );
+						return;
+					}
+					
 					
 					if ( response == 'time_limit_error') {
 						jQuery( '#patreon_wp_post_import_status' ).html( 'You can trigger next batch every 10 seconds. Please wait a few seconds more.' );
@@ -207,6 +231,124 @@
 					if ( response == 'imported_posts') {
 						jQuery( '#patreon_wp_post_import_status' ).html( 'Imported next batch' );
 						jQuery( '#patreon_wp_post_import_status' ).css( 'color', '#129500' );
+						return;
+					}
+					
+					jQuery( '#patreon_wp_post_import_status' ).html( 'An unexpected issue occurred' );
+					jQuery( '#patreon_wp_post_import_status' ).css( 'color', '#f31d00' );
+					
+				},
+			});		
+			
+		});
+		jQuery(document).on( 'click', '#patreon_wordpress_cancel_manual_post_import', function(e) {
+			
+			e.preventDefault();
+			var pw_input_target = jQuery( this ).attr( 'pw_input_target' );
+			
+			jQuery.ajax({
+				url: ajaxurl,
+				type:"POST",
+				dataType : 'html',
+				data: {
+					action: 'patreon_wordpress_cancel_manual_post_import',
+					patreon_wordpress_nonce_post_sync: pw_admin_js.patreon_wordpress_nonce_post_sync,
+				},
+				beforeSend: function(e) {
+				},
+				success: function( response ) {
+					
+					jQuery( '#patreon_wp_post_import_status' ).empty();
+					
+					if ( response == 'apiv2fail') {
+						jQuery( '#patreon_wp_post_import_status' ).html( 'Wrong api version! Please upgrade to v2 using the tutorial <a href="https://www.patreondevelopers.com/t/how-to-upgrade-your-patreon-wordpress-to-use-api-v2/3249" target="_blank">here</a>' );
+						jQuery( '#patreon_wp_post_import_status' ).css( 'color', '#f31d00' );
+						return;
+					}
+					
+					if ( response == 'time_limit_error') {
+						jQuery( '#patreon_wp_post_import_status' ).html( 'You can trigger next batch every 10 seconds. Please wait a few seconds more.' );
+						jQuery( '#patreon_wp_post_import_status' ).css( 'color', '#f31d00' );
+						return;
+					}
+					
+					
+					if ( response == 'need_admin_privileges') {
+						jQuery( '#patreon_wp_post_import_status' ).html( 'You need admin privileges to be able to do this' );
+						jQuery( '#patreon_wp_post_import_status' ).css( 'color', '#f31d00' );
+						return;
+					}
+					
+					if ( response == 'nonce_fail') {
+						jQuery( '#patreon_wp_post_import_status' ).html( 'Form expired - please reload the page and try again' );
+						jQuery( '#patreon_wp_post_import_status' ).css( 'color', '#f31d00' );
+						return;
+					}
+					
+					if ( response == 'no_ongoing_post_import') {
+						jQuery( '#patreon_wp_post_import_status' ).html( 'There is no ongoing post import' );
+						jQuery( '#patreon_wp_post_import_status' ).css( 'color', '#f31d00' );
+						
+						// Replace the post import setting info with original
+						jQuery( '#patreon_post_import_button_container' ).html( '<button id="patreon_wordpress_start_post_import" class="button button-primary button-large" pw_input_target="#patreon_wp_post_import_status" target="">Start an import</button>' );
+						jQuery( '#post_import_status_heading' ).html( 'Start a post import' );
+						jQuery( '#post_import_info_text' ).html( "Start an import of your posts from Patreon if you haven't done it before. After import of existing posts is complete, new posts will automatically be imported and existing posts automatically updated so you don't need to do this again." );
+						
+						return;
+					}
+					
+					if ( response == 'did_not_import_any_post') {
+						jQuery( '#patreon_wp_post_import_status' ).html( 'Failed to import any post...' );
+						jQuery( '#patreon_wp_post_import_status' ).css( 'color', '#f31d00' );
+						return;
+					}
+
+					if ( response == 'expired_or_lost_cursor_deleted') {
+						jQuery( '#patreon_wp_post_import_status' ).html( 'Expired or lost page cursor deleted. Post import will restart from scratch...' );
+						return;
+					}
+					
+					if ( response == 'throttled_internally') {
+						jQuery( '#patreon_wp_post_import_status' ).html( 'Patreon api was contacted too frequently. Please wait a few minutes and try again...' );
+						jQuery( '#patreon_wp_post_import_status' ).css( 'color', '#f31d00' );
+						return;
+					}
+					if ( response == 'couldnt_get_posts') {
+						jQuery( '#patreon_wp_post_import_status' ).html( 'Failed to get posts from Patreon...' );
+						jQuery( '#patreon_wp_post_import_status' ).css( 'color', '#f31d00' );
+						return;
+					}
+					
+					if ( response == 'post_import_ended') {
+						
+						jQuery( '#patreon_wp_post_import_status' ).html( 'Post import ended' );
+						jQuery( '#patreon_wp_post_import_status' ).css( 'color', '#129500' );
+						
+						// Replace the post import setting info with original
+						jQuery( '#patreon_post_import_button_container' ).html( '<button id="patreon_wordpress_start_post_import" class="button button-primary button-large" pw_input_target="#patreon_wp_post_import_status" target="">Start an import</button>' );
+						jQuery( '#post_import_status_heading' ).html( 'Start a post import' );
+						jQuery( '#post_import_info_text' ).html( "Start an import of your posts from Patreon if you haven't done it before. After import of existing posts is complete, new posts will automatically be imported and existing posts automatically updated so you don't need to do this again." );
+						
+						return;
+					}
+					
+					if ( response == 'imported_posts') {
+						jQuery( '#patreon_wp_post_import_status' ).html( 'Imported next batch' );
+						jQuery( '#patreon_wp_post_import_status' ).css( 'color', '#129500' );
+						return;
+					}
+					
+					if ( response == 'manual_post_import_canceled') {
+						jQuery( '#patreon_wp_post_import_status' ).html( 'Canceled' );
+						jQuery( '#patreon_post_import_button_container' ).html( '<button id="patreon_wordpress_start_post_import" class="button button-primary button-large" pw_input_target="#patreon_wp_post_import_status" target="">Start an import</button>' );
+						jQuery( '#post_import_status_heading' ).html( 'Start a post import' );
+						jQuery( '#patreon_wp_post_import_status' ).css( 'color', '#129500' );
+						return;
+					}
+					
+					if ( response == 'couldnt_cancel_manual_post_import') {
+						jQuery( '#patreon_wp_post_import_status' ).html( 'Could not cancel import' );
+						jQuery( '#patreon_wp_post_import_status' ).css( 'color', '#f31d00' );
 						return;
 					}
 					
