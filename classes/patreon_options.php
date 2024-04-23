@@ -684,6 +684,7 @@ class Patreon_Options {
 													
 													$post_import_status = 'No post import ongoing';
 													$post_import_status_color = "9d9d9d";
+													$post_import_cancel = '';
 													$post_import_button = '<button id="patreon_wordpress_start_post_import" class="button button-primary button-large" pw_input_target="#patreon_wp_post_import_status" target="" patreon_wordpress_nonce_post_sync="' . wp_create_nonce('patreon_wordpress_nonce_post_sync') .'">Start an import</button>';
 													$import_post_info_text = "Start an import of your posts from Patreon if you haven't done it before. After import of existing posts is complete, new posts will automatically be imported and existing posts automatically updated so you don't need to do this again.";
 													$import_post_info_header = "Start a post import";
@@ -691,7 +692,8 @@ class Patreon_Options {
 													if ( get_option( 'patreon-post-import-in-progress', false ) ) {
 														$post_import_status = "There is an ongoing post import";
 														$post_import_status_color = "129500";
-														$post_import_button = '<button id="patreon_wordpress_import_next_batch_of_posts" class="button button-primary button-large" pw_input_target="#patreon_wp_post_import_status" target="" patreon_wordpress_nonce_post_sync="' . wp_create_nonce('patreon_wordpress_nonce_post_sync') .'">Import next batch</button>';
+														$post_import_button = '<button id="patreon_wordpress_import_next_batch_of_posts" class="button button-primary button-large" pw_input_target="#patreon_wp_post_import_status" target="" style="margin-right: 10px;">Import next batch</button>';
+														$post_import_cancel = '<button id="patreon_wordpress_cancel_manual_post_import" class="button button-primary button-large" pw_input_target="#patreon_wp_post_import_status" target="">Cancel</button>';
 														$import_post_info_text = "Posts will be imported automatically every 5 minutes. If they are not, or you want to do it faster, click to import next batch of posts. This will import the next batch of posts in the queue. You can do this every 10 seconds.";
 														$import_post_info_header = "Ongoing post import";
 													}
@@ -710,7 +712,7 @@ class Patreon_Options {
 											</th>
 											<td>
 												
-												<div id="patreon_post_import_button_container"><?php echo $post_import_button; ?></div>
+												<div id="patreon_post_import_button_container"><?php echo $post_import_button; ?><?php echo $post_import_cancel; ?></div>
 											</td>
                                         </tr>
                                     </table>
