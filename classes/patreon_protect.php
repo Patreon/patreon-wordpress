@@ -19,7 +19,7 @@ class Patreon_Protect {
 			add_action( 'wp_ajax_patreon_catch_image_click', 'Patreon_Protect::CatchImageClick' );
 			
 		}
-		// Only image-reader is left always on for backward compatibility in case a user already has images linked directly - it can be put into the conditional block above in later versios 
+		// Only image-reader is left always on for backward compatibility in case a user already has images linked directly - it can be put into the conditional block above in later versions 
 		add_action( 'plugins_loaded',  array( $this, 'servePatronOnlyImage' ) );
 	}
 	function GalleryItemSavePatreonEdit( $form_fields, $post ) {
@@ -408,14 +408,16 @@ class Patreon_Protect {
 				'w' => intval( $width / 2 ),
 				'h' => intval( $height / 2 )
 			)
-		);                       
+		);
+
+		$gaussian_blur_value = apply_filters( 'ptrn/image_locking_gaussian_blur_value', 999 );
 
 		/* Scale by 25% and apply Gaussian blur */
 		$sm = imagecreatetruecolor( $size['sm']['w'], $size['sm']['h'] );
 		imagecopyresampled( $sm, $image, 0, 0, 0, 0, $size['sm']['w'], $size['sm']['h'], $width, $height );
 
 		for ( $x=1; $x <=30; $x++ ){
-			imagefilter( $sm, IMG_FILTER_GAUSSIAN_BLUR, 999 );
+			imagefilter( $sm, IMG_FILTER_GAUSSIAN_BLUR, $gaussian_blur_value );
 		} 
 
 		imagefilter( $sm, IMG_FILTER_SMOOTH,99 );
@@ -427,7 +429,7 @@ class Patreon_Protect {
 		imagedestroy($sm);
 
 		for ( $x=1; $x <=64; $x++ ) {
-			imagefilter( $md, IMG_FILTER_GAUSSIAN_BLUR, 999 );
+			imagefilter( $md, IMG_FILTER_GAUSSIAN_BLUR, $gaussian_blur_value );
 		} 
 
 		imagefilter( $md, IMG_FILTER_SMOOTH,99 );

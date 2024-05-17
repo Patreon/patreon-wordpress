@@ -2629,6 +2629,12 @@ class Patreon_Wordpress {
 
 		if ( isset( $_REQUEST['patreon_wordpress_action'] ) AND $_REQUEST['patreon_wordpress_action'] == 'disconnect_site_from_patreon_for_reconnection' AND is_admin() AND current_user_can( 'manage_options' ) ) {
 
+			// We dont need to do this anymore. So for the time being, just redirect to the connection wizard for compatibility concerns. The entire block can be removed after a few versions
+
+			// Redirect to connect wizard
+			wp_redirect( admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=reconnect_0') );
+			exit;
+
 			if ( !isset($_REQUEST['patreon_wordpress_reconnect_to_patreon_nonce']) OR !wp_verify_nonce( sanitize_key( $_REQUEST['patreon_wordpress_reconnect_to_patreon_nonce'] ) ) ) {
 				wp_die('Form security field expired - please refresh the page and try again');
 			}
