@@ -363,7 +363,6 @@ class Patreon_Routing {
 
 							if ( $existing_client_id != $client_id ) {
 								$client_id_updated = update_option('patreon-client-id', sanitize_text_field( $client_id ) );
-								$client_id_updated = false;
 							}
 							else {
 								$client_id_updated = true;
