@@ -134,7 +134,7 @@ class Patreon_Options {
 											&& get_option( 'patreon-creators-access-token' , false ) != ''
 											&& get_option( 'patreon-creators-refresh-token' , false ) != ''
 										) {
-											?> <button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon_options_app_details_reconnect patreon_options_app_details_main" aria-label="Reconnect your site to Patreon">Reconnect site</button> <button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon_options_app_details_disconnect patreon_options_app_details_main" aria-label="Disconnect your site from Patreon">Disconnect site</button> <?php
+											?> <button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon_options_app_details_reconnect patreon_options_app_details_main" aria-label="Connect or Reconnect your site to Patreon">(re)Connect site</button> <button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon_options_app_details_disconnect patreon_options_app_details_main" aria-label="Disconnect your site from Patreon">Disconnect site</button> <?php
 										
 										}
 										
@@ -151,7 +151,7 @@ class Patreon_Options {
 									<div id="patreon_options_app_details_reconnect">
 								
 										We will now reconnect your site to Patreon. This will refresh your site's connection to Patreon. Your settings and content gating values will remain unchanged. Patron only content will become accessible to everyone until you finish reconnecting your site to Patreon.<br /><br />
-										<button id="patreon_wordpress_disconnect_reconnect_to_patreon" class="button button-primary button-large" target="<?php echo admin_url( 'admin.php?page=patreon-plugin&patreon_wordpress_action=disconnect_site_from_patreon_for_reconnection&patreon_wordpress_reconnect_to_patreon_nonce=' . wp_create_nonce() ); ?>"  aria-label="Confirm connection">Confirm reconnection</button> <button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon_options_app_details_reconnect patreon_options_app_details_main" aria-label="Cancel">Cancel</button>
+										<button id="patreon_wordpress_disconnect_reconnect_to_patreon" class="button button-primary button-large" target="<?php echo admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=reconnect_0&patreon_wordpress_reconnect_to_patreon_nonce=' . wp_create_nonce() ); ?>"  aria-label="Confirm connection">Confirm</button> <button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon_options_app_details_reconnect patreon_options_app_details_main" aria-label="Cancel">Cancel</button>
 										
 									</div>
 									

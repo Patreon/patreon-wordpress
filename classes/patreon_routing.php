@@ -64,7 +64,7 @@ class Patreon_Routing {
 	}
 
 	function parse_request( &$wp ) {
-		
+
 		if ( strpos( $_SERVER['REQUEST_URI'],'/patreon-flow/' ) !== false ) {
 			
 			// First slap the noindex header so search engines wont index this page:
@@ -252,7 +252,7 @@ class Patreon_Routing {
 					do_action( 'patreon_do_action_before_universal_flow', $filter_args );
 					
 					$flow_link = Patreon_Frontend::MakeUniversalFlowLink( $send_pledge_level, $state, $client_id, $post, array('link_interface_item' => $link_interface_item ) );
-				
+
 					wp_redirect( $flow_link );
 					exit;
 					
@@ -358,9 +358,19 @@ class Patreon_Routing {
 							}
 							
 							// All good. Update the client details locally
+
+							$existing_client_id = get_option( 'patreon-client-id', false );
+
+							if ( $existing_client_id != $client_id ) {
+								$client_id_updated = update_option('patreon-client-id', sanitize_text_field( $client_id ) );
+								$client_id_updated = false;
+							}
+							else {
+								$client_id_updated = true;
+							}
 							
 							
-							if ( update_option('patreon-client-id', sanitize_text_field( $client_id ) ) AND
+							if ( $client_id_updated AND
 								update_option('patreon-client-secret', sanitize_text_field( $client_secret ) ) AND
 								update_option('patreon-creators-access-token', sanitize_text_field( $creator_access_token ) ) AND
 								update_option('patreon-creators-refresh-token', sanitize_text_field( $creator_refresh_token ) )
@@ -483,8 +493,9 @@ class Patreon_Routing {
 							
 							// All good. Update the client details locally
 							
+							$existing_client_id = get_option( 'patreon-client-id', false );
 							
-							if ( update_option('patreon-client-id', sanitize_text_field( $client_id ) ) AND
+							if ( $existing_client_id == $client_id AND
 								update_option('patreon-client-secret', sanitize_text_field( $client_secret ) ) AND
 								update_option('patreon-creators-access-token', sanitize_text_field( $creator_access_token ) ) AND
 								update_option('patreon-creators-refresh-token', sanitize_text_field( $creator_refresh_token ) )
