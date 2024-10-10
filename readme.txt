@@ -1,10 +1,10 @@
-=== Patreon WordPress ===
+=== Patreon WP ===
 Contributors: patreon, codebard
 Tags: patreon, membership, members
 Requires at least: 4.0
 Requires PHP: 7.4
-Tested up to: 6.5.3
-Stable tag: 1.9.1
+Tested up to: 6.6.2
+Stable tag: 1.9.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -12,7 +12,7 @@ Connect your WordPress site to Patreon and increase your members and pledges!
 
 == Description ==
 
-With Patreon WordPress, you can bring Patreon features to your WordPress website and integrate them to make them work together. You can even easily import your existing Patreon posts and keep your Patreon posts synced to your WP site automatically! Your patron-only content at your WordPress site will encourage your visitors to become your patrons to unlock your content.
+With Patreon WP, you can bring Patreon features to your WordPress website and integrate them to make them work together. You can even easily import your existing Patreon posts and keep your Patreon posts synced to your WP site automatically! Your patron-only content at your WordPress site will encourage your visitors to become your patrons to unlock your content.
 
 You can lock any single post or all of your posts! You can also lock any custom post type. Your visitors can log into your site via Patreon, making it easier for them to use your site in addition to accessing your locked content.
 
@@ -32,13 +32,13 @@ This plugin is developed and maintained by Patreon.
 - Choose the author to be used for synced posts
 - Your posts will be automatically updated as you add/update/delete your Patreon posts
 - Set custom HTML that non-patrons see instead of the post, prompting them to become a patron
-- Patreon WordPress is compatible with Paid Memberships Pro - you can gate your content with either plugin
+- Patreon WP is compatible with Paid Memberships Pro - you can gate your content with either plugin
 - Patreon pledges are matched with Paid Memberships Pro monthly memberships - works out of the box with no changes
 - Any Patreon patron or Paid Memberships Pro member who qualifies for content via either plugin will access content
 
 > *<b>You can post entirely independently on your WordPress site from your Patreon page.*</b> There is no need for WordPress and Patreon posts to correspond to one another in content or in locked status. The choice is up to you as a creator.
 
-Got ideas? Post them on our [Patreon WordPress Ideas Thread](https://www.patreondevelopers.com/t/wordpress-plugin-feature-ideas/215)
+Got ideas? Post them on our [Patreon WP Ideas Thread](https://www.patreondevelopers.com/t/wordpress-plugin-feature-ideas/215)
 
 = FEATURES FOR PATRONS =
 
@@ -57,7 +57,7 @@ Learn more in our [developer portal](https://www.patreon.com/portal).
 
 This plugin is provided by Patreon for free.
 
-= Install the Patreon WordPress Plugin =
+= Install the Patreon WP Plugin =
 
 1. Install & activate the plugin
 2. The setup wizard will kick in, helping you to easily connect your WordPress site and Patreon in only two clicks
@@ -78,6 +78,10 @@ To make a locked post public again, just choose "Everyone" from the select box a
 It is  difficult to protect videos due the intensive bandwidth requirements of hosting video  and having to rely on third parties such as Youtube or Vimeo. Youtube allows you to set videos to ‘private’ but Vimeo offers extra controls by only allowing videos to be played on specific domains. Visit this guide to [protecting your video content with Vimeo](https://help.vimeo.com/hc/en-us/articles/224817847-Privacy-settings-overview).
 
 == Upgrade Notice ==
+
+= 1.9.2 =
+
+* Readme update
 
 = 1.9.1 =
 
@@ -374,7 +378,7 @@ It is  difficult to protect videos due the intensive bandwidth requirements of h
 
 = 1.5.0 =
 
-* Patreon WordPress is now compatible with Paid Memberships Pro
+* Patreon WP is now compatible with Paid Memberships Pro
 * Both plugins cooperate over monthly membership and monthly pledge formats
 * Paid Memberships Pro gated content can be unlocked via Patreon if user has qualifying pledge level that matches PMP gated content
 * Patreon gated content can be unlocked by a matching PMP membership level
@@ -479,19 +483,19 @@ Minor internal feature update
 
 = Does it work with any theme? =
 
-Patreon WordPress works with any theme.
+Patreon WP works with any theme.
 
 = Does it work with this particular plugin? =
 
-Patreon WordPress should not affect functioning of any of your other plugins. Patreon WordPress sticks to WP coding standards and would play nice with any other plugin that does the same.
+Patreon WP should not affect functioning of any of your other plugins. Patreon WP sticks to WP coding standards and would play nice with any other plugin that does the same.
 
 = Does it work with this particular membership plugin? =
 
-Yes, you can use Patreon WordPress side by side with any other membership plugin.
+Yes, you can use Patreon WP side by side with any other membership plugin.
 
 = Does it work with WooCommerce? =
 
-You can easily install and use Patreon WordPress alongside WooCommerce at the same time.
+You can easily install and use Patreon WP alongside WooCommerce at the same time.
 
 = Do my patrons get charged again if they unlock a post on my site? = 
 
@@ -510,6 +514,10 @@ Nothing will be changed at your site - the plugin will just connect your site to
 You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team help validate, triage and handle any security vulnerabilities. [Report a security vulnerability.](https://patchstack.com/database/vdp/patreon-connect)
 
 == Changelog ==
+
+= 1.9.2 =
+
+* Readme update
 
 = 1.9.1 =
 
@@ -804,7 +812,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 = 1.5.0 =
 
-* Patreon WordPress is now compatible with Paid Memberships Pro
+* Patreon WP is now compatible with Paid Memberships Pro
 * Both plugins cooperate over monthly membership and monthly pledge formats
 * Paid Memberships Pro gated content can be unlocked via Patreon if user has qualifying pledge level that matches PMP gated content
 * Patreon gated content can be unlocked by a matching PMP membership level

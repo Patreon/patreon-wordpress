@@ -1,10 +1,10 @@
 <?php
 
 /*
-Plugin Name: Patreon Wordpress
+Plugin Name: Patreon WP
 Plugin URI: https://www.patreon.com/apps/wordpress
 Description: Patron-only content, directly on your website.
-Version: 1.9.1
+Version: 1.9.2
 Author: Patreon <platform@patreon.com>
 Author URI: https://patreon.com
 */
@@ -68,7 +68,7 @@ define( "PATREON_ADMIN_BYPASSES_FILTER_MESSAGE", 'This content is for Patrons on
 define( "PATREON_CREATOR_BYPASSES_FILTER_MESSAGE", 'This content is for Patrons only, it\'s not locked for you because you are logged in as the Patreon creator' );
 define( "PATREON_NO_LOCKING_LEVEL_SET_FOR_THIS_POST", 'Post is already public. If you would like to lock this post, please set a pledge level for it' );
 define( "PATREON_NO_POST_ID_TO_UNLOCK_POST", 'Sorry - could not get the post id for this locked post' );
-define( "PATREON_WORDPRESS_VERSION", '1.9.1' );
+define( "PATREON_WORDPRESS_VERSION", '1.9.2' );
 define( "PATREON_WORDPRESS_BETA_STRING", '' );
 define( "PATREON_WORDPRESS_PLUGIN_SLUG", plugin_basename( __FILE__ ) );
 define( "PATREON_PRIVACY_POLICY_ADDENDUM", '<h2>Patreon features in this website</h2>In order to enable you to use this website with Patreon services, we save certain functionally important Patreon information about you in this website if you log in with Patreon.
@@ -95,7 +95,7 @@ define( "PATREON_TEXT_OVER_BUTTON_13", 'This content is available exclusively to
 define( "PATREON_TEXT_OVER_BUTTON_14", 'This content is available exclusively to members of <a href="%%creator_link%%" target="_blank">%%creator%% Patreon</a> at %%tier_level%% or higher tier at the time this content was posted, or having at least %%currency_sign_front%%%%total_pledge%%%%currency_sign_behind%% pledged in total. Your account currently does not qualify.' );
 define( "PATREON_TEXT_OVER_BUTTON_15", 'To view this content, you must be a member of <b><a href="%%creator_link%%" target="_blank">%%creator%% Patreon</a></b>' );
 define( "PATREON_COULDNT_ACQUIRE_USER_DETAILS", 'Sorry. Could not acquire your info from Patreon. Please try again later.' );
-define( "PATREON_PRETTY_PERMALINKS_NEED_TO_BE_ENABLED", 'Pretty permalinks are required for Patreon WordPress to work. Please visit <a href="'.admin_url('options-permalink.php').'" target="_blank">permalink options page</a> and set an option that is different from "Plain"' );
+define( "PATREON_PRETTY_PERMALINKS_NEED_TO_BE_ENABLED", 'Pretty permalinks are required for Patreon WP to work. Please visit <a href="'.admin_url('options-permalink.php').'" target="_blank">permalink options page</a> and set an option that is different from "Plain"' );
 define( "PATREON_ENSURE_REQUIREMENTS_MET", '<h3>Please ensure following requirements are met before starting setup:</h3>' );
 define( "PATREON_ERROR_MISSING_CREDENTIALS", 'One or more of app credentials were not received. Please try again.' );
 define( "PATREON_SETUP_INITIAL_MESSAGE", 'By <a href="https://support.patreon.com/hc/en-us/articles/360032404632-How-your-WordPress-site-will-be-connected-to-Patreon?utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=setup_wizard_screen_1_how_to_connect_website_to_patreon_link&utm_term="  style="text-decoration: none;" target="_blank">connecting your site to Patreon</a>, you can bring Patreon features to your website & post member-only content at your website to <a href="https://blog.patreon.com/patreon-wordpress-plugin/?utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=setup_wizard_screen_1_link_patreon_blog_article_for_patreon_wordpress&utm_term=" target="_blank" style="text-decoration: none;">increase your patrons and monthly revenue</a>. We will now take you to Patreon in order to automatically connect your site. Please make sure you are <a href="https://www.patreon.com/login?utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=setup_wizard_screen_1_creator_login_link&utm_term=" target="_blank"  style="text-decoration: none;">logged in</a> to your creator account at Patreon before starting, or <a href="https://www.patreon.com/signup?ru=%2Fcreate?utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=setup_wizard_screen_1_creator_signup_link&utm_term=" target="_blank" style="text-decoration: none;">register here</a> if you don\'t already have a creator account.' );
