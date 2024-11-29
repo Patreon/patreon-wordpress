@@ -956,7 +956,7 @@ class Patreon_Wordpress {
 
 		$setup_wizard_notice_dismissed = get_option( 'patreon-setup-wizard-notice-dismissed', false );
 		
-		if( !$setup_done AND !$setup_wizard_notice_dismissed AND ( $api_version AND $api_version == '2' ) AND current_user_can( 'manage_options' ) ) {
+		if( !$setup_done AND !$setup_wizard_notice_dismissed AND current_user_can( 'manage_options' ) ) {
 			// This notice needs a nonce but the link to start setup doesnt need a nonce - any admin level user with manage options should be able to go to the setup wizard from anywhere
 			?>
 				 <div class="notice notice-success is-dismissible patreon-wordpress" id="patreon_setup_needed_notice" patreon_wordpress_nonce_setup_needed="<?php echo wp_create_nonce('patreon_wordpress_nonce_setup_needed'); ?>">
@@ -967,7 +967,25 @@ class Patreon_Wordpress {
 			// Dont show any more notices until setup is done
 			return;
 		}
-		
+
+		// Important notice to ensure that the plugin is using the correct version of the api
+
+		$api_version_notice_dismissed = get_option( 'api-version-update-notice-dismissed', false );
+		$api_version_notice_dismissed_time = get_option( 'api-version-update-notice-dismissed-time', 0 );
+
+
+		if( $setup_done AND ( !$api_version OR $api_version == '' OR $api_version == '1' ) AND current_user_can( 'manage_options' ) AND (!$api_version_notice_dismissed OR (!$api_version_notice_dismissed_time OR $api_version_notice_dismissed_time < (time()-(24*3600*7)))) ) {
+			// This notice needs a nonce but the link to start setup doesnt need a nonce - any admin level user with manage options should be able to go to the setup wizard from anywhere
+			?>
+				<div class="notice notice-warning is-dismissible patreon-wordpress" id="patreon_wordpress_patreon_api_version_update_notice" patreon_wordpress_nonce_patreon_api_version_update="<?php echo wp_create_nonce('patreon_wordpress_nonce_patreon_api_version_update'); ?>">
+					<p>Your site's connection to Patreon must be upgraded to ensure that Patreon features will work! Please click <a href="<?php echo admin_url( 'admin.php?page=patreon_wordpress_setup_wizard&setup_stage=0' ) ?>" target="_self">here</a> to start the setup wizard to reconnect your site again</p>
+				</div>
+			<?php	
+			
+			// Dont show any more notices until reconnection is done
+			return;
+		}
+	
 		$already_showed_non_system_notice = false;
 
 		// Wp org wants non-error / non-functionality related notices to be shown infrequently and one per admin-wide page load, and be dismissable permanently. 		
@@ -1119,6 +1137,16 @@ class Patreon_Wordpress {
 			update_option( 'patreon-setup-wizard-notice-dismissed', true );
 			delete_option( 'patreon-wordpress-app-credentials-success');
 			delete_option( 'patreon-wordpress-app-credentials-failure');
+		}
+
+		// Mapping what comes from REQUEST to a given value avoids potential security problems
+		if ( $_REQUEST['notice_id'] == 'patreon_wordpress_patreon_api_version_update_notice' ) {
+			if ( !isset($_REQUEST['patreon_wordpress_nonce_patreon_api_version_update']) OR !wp_verify_nonce( sanitize_key( $_REQUEST['patreon_wordpress_nonce_patreon_api_version_update'] ), 'patreon_wordpress_nonce_patreon_api_version_update' ) ) {
+				return;
+			}
+
+			update_option( 'api-version-update-notice-dismissed', true );
+			update_option( 'api-version-update-notice-dismissed-time', time());
 		}
 
 		// Mapping what comes from REQUEST to a given value avoids potential security problems
@@ -1577,7 +1605,7 @@ class Patreon_Wordpress {
 		// Just bail out if this is not the main query for content and no post id was given
 		if ( !is_main_query() AND !$post_id ) {
 			
-			return self::add_to_lock_or_not_results( $post_id, apply_filters( 
+			return self::add_to_lock_or_not_results( $post_id, apply_filters(
 					'ptrn/lock_or_not', 
 					array(
 						'lock' => false,
@@ -1969,9 +1997,9 @@ class Patreon_Wordpress {
 			
 			echo '<a href="https://support.patreon.com/hc/en-us/articles/360032409172-Patreon-WordPress-Quickstart?utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=setup_wizard_screen_3_quickstart_article_link&utm_term=" target="_blank"><div class="patreon_success_insert"><div class="patreon_success_insert_logo"><img src="' . PATREON_PLUGIN_ASSETS . '/img/Learn-how-to-use-Patreon-WordPress.jpg" /></div><div class="patreon_success_insert_heading"><h3>Quickstart guide</h3></div><div class="patreon_success_insert_content"><br clear="both">Click here to read our quickstart guide and learn how to lock your content</div></div></a>';
 
-			echo '<a href="https://codebard.com/patron-pro-addon-for-patreon-wordpress?utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=setup_wizard_screen_3_patron_pro_pitch_link&utm_term=" target="_blank"><div class="patreon_success_insert"><div class="patreon_success_insert_logo"><img src="' . PATREON_PLUGIN_ASSETS . '/img/Patron-Plugin-Pro-120.png" /></div><div class="patreon_success_insert_heading"><h3>Patron Plugin Pro</h3></div><div class="patreon_success_insert_content"><br clear="both">Power up your integration and increase your income with premium addon Patron Plugin Pro</div></div></a>';
+			echo '<a href="https://codebard.com/patron-pro-addon-for-patreon-wordpress?utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=setup_wizard_screen_3_patron_pro_pitch_link&utm_term=" target="_blank"><div class="patreon_success_insert"><div class="patreon_success_insert_logo"><img src="' . PATREON_PLUGIN_ASSETS . '/img/Patron-Plugin-Pro-120.png" /></div><div class="patreon_success_insert_heading"><h3>Patron Plugin Pro</h3></div><div class="patreon_success_insert_content"><br clear="both">Boost your campaign with more Patreon features at your WP site and increase your income with premium addon Patron Plugin Pro</div></div></a>';
 			
-			echo '<a href="https://wordpress.org/plugins/patron-button-and-widgets-by-codebard/?utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=setup_wizard_screen_3_patron_button_wp_repo_link&utm_term=" target="_blank"><div class="patreon_success_insert"><div class="patreon_success_insert_logo"><img src="' . PATREON_PLUGIN_ASSETS . '/img/Patron-Button-Widgets-and-Plugin.png" /></div><div class="patreon_success_insert_heading"><h3>Patron Widgets</h3></div><div class="patreon_success_insert_content"><br clear="both">Add Patreon buttons and widgets to your site with free Widgets addon</div></div></a>';
+			echo '<a href="https://codebard.com/patreon-button-and-plugin-for-wordpress?utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=setup_wizard_screen_3_patron_button_wp_repo_link&utm_term=" target="_blank"><div class="patreon_success_insert"><div class="patreon_success_insert_logo"><img src="' . PATREON_PLUGIN_ASSETS . '/img/Patron-Button-Widgets-and-Plugin.png" /></div><div class="patreon_success_insert_heading"><h3>Patron Widgets</h3></div><div class="patreon_success_insert_content"><br clear="both">Add Patreon buttons and widgets to your site with the free Widgets addon</div></div></a>';
 			
 			echo '</div>';
 
@@ -2225,7 +2253,7 @@ class Patreon_Wordpress {
 		// Check if this site is a v2 site
 		$api_version = get_option( 'patreon-installation-api-version', false );
 		
-		if( !$patreon_setup_done AND ( $api_version AND $api_version == '2' ) ) {
+		if( !$patreon_setup_done ) {
 			// Setup complete flag not received. Set flag for redirection in next page load
 			update_option( 'patreon-redirect_to_setup_wizard', true );
 		}

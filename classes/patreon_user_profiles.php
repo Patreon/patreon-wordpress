@@ -124,7 +124,7 @@ class Patreon_User_Profiles {
 								<tr>
 									<th><label id="patreon_wordpress_disconnect_patreon_account_label" for="patreon_user"><?php echo $disconnect_label; ?></label></th>
 									<td id="patreon_wordpress_disconnect_patreon_account_content">
-										<button id="patreon_wordpress_disconnect_patreon_account" patreon_disconnect_user_id="<?php echo $user_id; ?>" class="button button-primary button-large" target="">Disconnect from Patreon</button><br /><br /><?php echo $disconnect_warning; ?>
+										<button id="patreon_wordpress_disconnect_patreon_account" patreon_disconnect_user_id="<?php echo $user_id; ?>" class="button button-primary button-large" target="" patreon_wordpress_nonce_disconnect_user_account_from_patreon="<?php echo wp_create_nonce('patreon_wordpress_nonce_disconnect_user_account_from_patreon'); ?>">Disconnect from Patreon</button><br /><br /><?php echo $disconnect_warning; ?>
 									</td>
 								</tr>
 							</table>

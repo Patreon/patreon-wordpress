@@ -502,6 +502,10 @@ class Patreon_Login {
 	public static function disconnect_account_from_patreon() {
 		
 		// Disconnects an account from Patreon.
+	
+		if ( !isset($_REQUEST['patreon_wordpress_nonce_disconnect_user_account_from_patreon']) OR !wp_verify_nonce( sanitize_key( $_REQUEST['patreon_wordpress_nonce_disconnect_user_account_from_patreon'] ), 'patreon_wordpress_nonce_disconnect_user_account_from_patreon' ) ) {
+			return;
+		}
 		
 		$user = wp_get_current_user();
 

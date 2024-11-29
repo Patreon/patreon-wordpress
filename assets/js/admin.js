@@ -11,6 +11,7 @@
 			var patreon_wordpress_nonce_patron_content_manager_addon_notice_shown = jQuery( this ).parent().attr( 'patreon_wordpress_nonce_patron_content_manager_addon_notice_shown' );
 			var patreon_wordpress_nonce_rate_plugin_notice = jQuery( this ).parent().attr( 'patreon_wordpress_nonce_rate_plugin_notice' );
 			var patreon_wordpress_nonce_plugin_critical_issues = jQuery( this ).parent().attr( 'patreon_wordpress_nonce_plugin_critical_issues' );
+			var patreon_wordpress_nonce_patreon_api_version_update = jQuery(this).parent().attr( 'patreon_wordpress_nonce_patreon_api_version_update' );
 			jQuery.ajax({
 				url: ajaxurl,
 				type:"POST",
@@ -23,6 +24,7 @@
 					patreon_wordpress_nonce_patron_pro_addon_notice_shown: patreon_wordpress_nonce_patron_pro_addon_notice_shown,
 					patreon_wordpress_nonce_patron_content_manager_addon_notice_shown: patreon_wordpress_nonce_patron_content_manager_addon_notice_shown,
 					patreon_wordpress_nonce_plugin_critical_issues: patreon_wordpress_nonce_plugin_critical_issues,
+					patreon_wordpress_nonce_patreon_api_version_update: patreon_wordpress_nonce_patreon_api_version_update,
 				}
 			});
 		});	
@@ -372,12 +374,17 @@
 				data: {
 					action: 'patreon_wordpress_disconnect_patreon_account',
 					patreon_disconnect_user_id: jQuery( this ).attr( 'patreon_disconnect_user_id' ),
+					patreon_wordpress_nonce_disconnect_user_account_from_patreon: jQuery(this).attr( 'patreon_wordpress_nonce_disconnect_user_account_from_patreon' ),
 				},
 				beforeSend: function(e) {
 					jQuery( '#patreon_wordpress_user_profile_account_connection_wrapper' ).html( 'A moment...' );
 				},
 				success: function( response ) {
-					jQuery( '#patreon_wordpress_user_profile_account_connection_wrapper' ).html( response );
+					var message = response;
+					if (response == 0 ) {
+						message = 'This form seems to have expired - please refresh the form and Disconnect again';
+					}
+					jQuery('#patreon_wordpress_user_profile_account_connection_wrapper').html(message );
 				},
 			});		
 			
