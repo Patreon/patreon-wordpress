@@ -3,8 +3,8 @@ Contributors: patreon, codebard
 Tags: patreon, membership, members
 Requires at least: 4.0
 Requires PHP: 7.4
-Tested up to: 6.5.3
-Stable tag: 1.9.1
+Tested up to: 6.7.1
+Stable tag: 1.9.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -12,7 +12,7 @@ Connect your WordPress site to Patreon and increase your members and pledges!
 
 == Description ==
 
-With Patreon WordPress, you can bring Patreon features to your WordPress website and integrate them to make them work together. You can even easily import your existing Patreon posts and keep your Patreon posts synced to your WP site automatically! Your patron-only content at your WordPress site will encourage your visitors to become your patrons to unlock your content.
+Bring Patreon features to your WordPress website and make them work together. You can even easily import your existing Patreon posts and keep your Patreon posts synced to your WP site automatically! Your patron-only content at your WordPress site will encourage your visitors to become your patrons to unlock your content.
 
 You can lock any single post or all of your posts! You can also lock any custom post type. Your visitors can log into your site via Patreon, making it easier for them to use your site in addition to accessing your locked content.
 
@@ -78,6 +78,12 @@ To make a locked post public again, just choose "Everyone" from the select box a
 It is  difficult to protect videos due the intensive bandwidth requirements of hosting video  and having to rely on third parties such as Youtube or Vimeo. Youtube allows you to set videos to ‘private’ but Vimeo offers extra controls by only allowing videos to be played on specific domains. Visit this guide to [protecting your video content with Vimeo](https://help.vimeo.com/hc/en-us/articles/224817847-Privacy-settings-overview).
 
 == Upgrade Notice ==
+
+= 1.9.2 =
+
+* Added notice to ensure that the site's api version will be the correct one - calls out for action to reconnect site if its not
+* Corrected the code that gets the user's patronage info and maps it to correct parameters - now it wont fail if the patronage entry does not include campaign id
+* Added nonce to disconnect Patreon user account action for security
 
 = 1.9.1 =
 
@@ -510,6 +516,12 @@ Nothing will be changed at your site - the plugin will just connect your site to
 You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team help validate, triage and handle any security vulnerabilities. [Report a security vulnerability.](https://patchstack.com/database/vdp/patreon-connect)
 
 == Changelog ==
+
+= 1.9.2 =
+
+* Added notice to ensure that the site's api version will be the correct one - calls out for action to reconnect site if its not
+* Corrected the code that gets the user's patronage info and maps it to correct parameters - now it wont fail if the patronage entry does not include campaign id
+* Added nonce to disconnect Patreon user account action for security
 
 = 1.9.1 =
 

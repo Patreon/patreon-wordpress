@@ -31,7 +31,7 @@ class Patreon_API {
 
 			foreach ($api_return['included'] as $key => $value) {
 
-				if ( $api_return['included'][$key]['type'] == 'member' AND $api_return['included'][$key]['relationships']['campaign']['data']['id'] == $campaign_id ) {
+				if ( $api_return['included'][$key]['type'] == 'member' AND ( isset( $api_return['included'][$key]['relationships']['campaign'] ) AND $campaign_id AND $api_return['included'][$key]['relationships']['campaign']['data']['id'] == $campaign_id ) ) {
 					
 					// The below procedure will take take the matching membership out of the array, put it to the top and reindex numberic keys. This will allow backwards compatibility to be kept
 					$membership = $api_return['included'][$key];
@@ -43,7 +43,7 @@ class Patreon_API {
 					$api_return['included'][0]['type']                                   = 'pledge';
 					$api_return['included'][0]['attributes']['amount_cents']             = $api_return['included'][0]['attributes']['currently_entitled_amount_cents'];
 					$api_return['included'][0]['attributes']['created_at']               = $api_return['included'][0]['attributes']['pledge_relationship_start'];
-					$api_return['included'][0]['attributes']['lifetime_support_cents']               = $api_return['included'][0]['attributes']['campaign_lifetime_support_cents'];
+					$api_return['included'][0]['attributes']['lifetime_support_cents']   = $api_return['included'][0]['attributes']['campaign_lifetime_support_cents'];
 					
 					if ( $api_return['included'][0]['attributes']['last_charge_status'] != 'Paid' ) {
 						$api_return['included'][0]['attributes']['declined_since'] = $api_return['included'][0]['attributes']['last_charge_date'];
