@@ -23,6 +23,7 @@
 					patreon_wordpress_nonce_setup_needed: patreon_wordpress_nonce_setup_needed,
 					patreon_wordpress_nonce_patron_pro_addon_notice_shown: patreon_wordpress_nonce_patron_pro_addon_notice_shown,
 					patreon_wordpress_nonce_patron_content_manager_addon_notice_shown: patreon_wordpress_nonce_patron_content_manager_addon_notice_shown,
+					patreon_wordpress_nonce_rate_plugin_notice: patreon_wordpress_nonce_rate_plugin_notice,
 					patreon_wordpress_nonce_plugin_critical_issues: patreon_wordpress_nonce_plugin_critical_issues,
 					patreon_wordpress_nonce_patreon_api_version_update: patreon_wordpress_nonce_patreon_api_version_update,
 				}
