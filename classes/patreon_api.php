@@ -49,6 +49,10 @@ if ( $load_api_version AND $load_api_version == '2' ) {
 }
 else {
 	
+
+				
+	Patreon_Wordpress::log_connection_error( 'Either your site has an old connection version or it lost its connection info. Please reconnect your site at WP admin -> Patreon Settings -> (re)Connect' );
+	
 	class Patreon_API {
 
 		public $access_token;
@@ -141,7 +145,12 @@ else {
 			
 		}
 
-		public function __get_json( $suffix, $v2 = false ) {		
+		public function __get_json( $suffix, $v2 = false ) {
+
+			// v1 is deprecated. Return false
+			$result = array( 'error' => 'Either your site has an old connection version or it lost its connection info. Please reconnect your site at WP admin -> Patreon Settings -> (re)Connect' );
+
+			return $result;
 
 			$api_endpoint = "https://api.patreon.com/oauth2/api/" . $suffix;
 
