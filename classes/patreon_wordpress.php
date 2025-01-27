@@ -3157,6 +3157,10 @@ class Patreon_Wordpress {
 		if (is_admin()) {
 			return;
 		}
+
+		if ( get_option( 'patreon-creator-access-token-401', false ) ) {
+			return;		
+		}
 		
 		$api_version = get_option( 'patreon-installation-api-version', '1' );
 
@@ -3202,12 +3206,13 @@ class Patreon_Wordpress {
 			
 			return;			
 		}
-		
+
 		// If webhook already added, skip
+
 		if ( get_option( 'patreon-post-sync-webhook-saved', false ) ) {
 			return;			
 		}
-		
+
 		$creator_access_token = get_option( 'patreon-creators-access-token', false );
 		
 		$api_client = new Patreon_API( $creator_access_token );

@@ -382,6 +382,8 @@ class Patreon_Routing {
 								update_option( 'patreon-setup-done', true );
 								update_option( 'patreon-redirect_to_setup_wizard', false );
 								update_option( 'patreon-setup-wizard-last-call-result', $client_result );
+
+								delete_option( 'patreon-creator-access-token-401' );
 								
 								// Redirect to success screen
 								
@@ -507,6 +509,8 @@ class Patreon_Routing {
 								update_option( 'patreon-setup-done', true );
 								update_option( 'patreon-redirect_to_setup_wizard', false );
 								update_option( 'patreon-setup-wizard-last-call-result', $client_result );
+
+								delete_option( 'patreon-creator-access-token-401' );
 								
 								// Redirect to success screen
 								
