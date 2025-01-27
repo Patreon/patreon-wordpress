@@ -196,7 +196,13 @@ class Patreon_API {
 			'params' => $postfields,
 		);
 		
-		return $this->__get_json( "webhooks", $args );
+		$response = $this->__get_json( "webhooks", $args );
+
+		if ( isset( $response['errors'] ) AND isset( $response['errors'][0] ) AND isset( $response['errors'][0]['status'] ) AND $response['errors'][0]['status'] == '401' ) {
+			update_option( 'patreon-creator-access-token-401', true );
+		}
+		
+		return $response;
 	}
 	public function delete_post_webhook( $webhook_id ) {
 		

@@ -46,7 +46,11 @@ class Patron_Metabox {
 		
 		global $post;
 		
-		$label    = 'Require the below membership tier or higher to view this post. (Makes entire post patron only)  <a href="https://www.patreondevelopers.com/t/patreon-wordpress-locking-options-guide/1135#heading--section-1?utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=post_locking_metabox_link_1&utm_term=" target="_blank">(?)</a>';		
+		$label    = 'Require the below membership tier or higher to view this post. (Makes entire post patron only)  <a href="https://www.patreondevelopers.com/t/patreon-wordpress-locking-options-guide/1135#heading--section-1?utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=post_locking_metabox_link_1&utm_term=" target="_blank">(?)</a>';
+		
+		if ( get_option( 'patreon-creator-access-token-401', false ) ) {
+			$label = '<div style="color: #ffa00f;">Sorry, it looks like your site\'s connection to Patreon is broken. Please <a href="' . admin_url( 'admin.php?page=patreon-plugin' ). '">click here</a> to reconnect by using the "(re)Connect site" button.</div><br>' . $label;
+		}
 		
 		// Override messaging for lite plans
 		

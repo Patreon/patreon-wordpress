@@ -110,6 +110,14 @@ class Patreon_Options {
                                 <div class="inside">
 									
 									<div id="patreon_options_app_details_main">
+
+										<?php
+
+											if ( get_option( 'patreon-creator-access-token-401', false ) ) {
+												echo '<div style="color: #ffa00f;">Sorry, it looks like your site\'s connection to Patreon is broken. Please reconnect by using the "(re)Connect site" button.</div><br>';
+											}
+										?>
+		
 									
 										<button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon-connection-details" aria-label="Patreon connection details">Connection details</button><?php // Immediately inserted here to not cause any funny html rendering
 										
