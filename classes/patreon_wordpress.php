@@ -988,41 +988,6 @@ class Patreon_Wordpress {
 	
 		$already_showed_non_system_notice = false;
 
-		// Wp org wants non-error / non-functionality related notices to be shown infrequently and one per admin-wide page load, and be dismissable permanently. 		
-
-		$addon_upsell_shown = get_option( 'patreon-addon-upsell-shown', false );
-		$existing_install = get_option( 'patreon-existing-installation', false );
-		$current_screen = get_current_screen();
-		
-		// The addon upsell must be admin wide, permanently dismissable, and must not appear in plugin manager page in admin
-		
-		if( !$addon_upsell_shown AND !self::check_plugin_exists('patron-plugin-pro') AND $current_screen->id != 'plugins' AND ( (self::check_days_after_last_non_system_notice( 7 ) AND self::calculate_days_after_first_activation( 30 ) ) OR $existing_install ) AND !$already_showed_non_system_notice ) {
-
-			?>
-			
-				<div class="notice notice-success is-dismissible patreon-wordpress" id="patreon-addon-upsell-shown" patreon_wordpress_nonce_patron_pro_addon_notice_shown="<?php echo wp_create_nonce('patreon_wordpress_nonce_patron_pro_addon_notice_shown'); ?>"><p><div style="display: flex; flex-wrap: wrap; flex-direction: row;"><a href="https://codebard.com/patron-pro-addon-for-patreon-wordpress?utm_source=<?php urlencode( site_url())?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=patreon_wordpress_addon_upsell_notice_patron_pro&utm_term=" target="_blank"><img class="addon_upsell" src="<?php echo PATREON_PLUGIN_ASSETS ?>/img/Patron-Plugin-Pro-128.png" style="width:128px; height:128px;margin: 10px; margin-right: 20px;" alt="Patron Plugin Pro" /></a><div style="max-width: 700px; width: 100%;"><div style="max-width:550px; width: auto; float:left; display:inline-box"><h2 style="margin-top: 0px; font-size: 150%; font-weight: bold;">Boost your Patreon pledges and patrons with Patron Pro!</h2></div><div style="width:100%; font-size: 125% !important;clear:both; ">Get <a href="https://codebard.com/patron-pro-addon-for-patreon-wordpress?utm_source=<?php urlencode( site_url() ) ?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=patreon_wordpress_addon_upsell_notice_patron_pro&utm_term=" target="_blank">Patron Pro</a> addon for Patreon WordPress to increase your patrons and pledges! Enjoy features like lock/show last X posts, lock/show after X days, lock by date, lock by post type, category, tag, partial post locking, sneak peeks, advanced locking methods, login lock, vip users and more.<br /><br /><a href="https://codebard.com/patron-pro-addon-for-patreon-wordpress?utm_source=<?php urlencode( site_url())?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=patreon_wordpress_addon_upsell_notice_patron_pro&utm_term=" target="_blank">Check out all features here</a></div></div></div></p>
-				</div>
-			<?php		
-			
-			$already_showed_non_system_notice = true;
-			
-		}
-				
-		$pcm_addon_upsell_shown = get_option( 'patron_content_manager_pitch_shown', false );
-
-		// The addon upsell must be admin wide, permanently dismissable, and must not appear in plugin manager page in admin
-		
-		if( !$pcm_addon_upsell_shown AND !self::check_plugin_exists('patron-content-manager') AND $current_screen->id != 'plugins' AND ( (self::check_days_after_last_non_system_notice( 7 ) AND self::calculate_days_after_first_activation( 30 ) ) OR $existing_install ) AND !$already_showed_non_system_notice AND !isset($GLOBALS['patron_content_manager_pitch_being_shown']) AND !is_plugin_active( 'patron-plugin-pro/index.php' )) {
-
-			?>
-				<div class="notice notice-success is-dismissible patreon-wordpress" id="patron_content_manager_pitch_shown" patreon_wordpress_nonce_patron_content_manager_addon_notice_shown="<?php echo wp_create_nonce('patreon_wordpress_nonce_patron_content_manager_addon_notice_shown'); ?>"><p><div style="display: flex; flex-wrap: wrap; flex-direction: row;"><a href="https://codebard.com/patron-content-manager?utm_source=<?php urlencode( site_url() ) ?>&utm_medium=patreon_wordpress&utm_campaign=&utm_content=patreon_wordpress_addon_upsell_notice_patron_content_manager&utm_term=" target="_blank"><img class="addon_upsell" src="<?php echo PATREON_PLUGIN_ASSETS ?>/img/Easily-manage-gated-posts.jpg" style="width:200px; height:106px;margin: 10px; border: 1px solid #000000; margin-right: 20px;" alt="Patron Content Manager" /></a><div style="max-width: 700px; width: 100%;"><div style="max-width:500px; width: auto; float:left; display:inline-box"><h2 style="margin-top: 0px; font-size: 150%; font-weight: bold;">Easily manage your patron only content with Patron Content Manager</h2></div><div style="width:100%; font-size: 125% !important;clear:both; ">Get new <a href="https://codebard.com/patron-content-manager?utm_source=<?php urlencode( site_url() ) ?>&utm_medium=patreon_wordpress&utm_campaign=&utm_content=patreon_wordpress_addon_upsell_notice_patron_content_manager&utm_term=" target="_blank">Patron Content Manager</a> plugin for Patreon and easily re-gate content, gate old content, use detailed locking options, use content locking wizard to manage your patron only content & increase your patrons and pledges.<br /><br /><a href="https://codebard.com/patron-content-manager?utm_source=<?php urlencode( site_url() ) ?>&utm_medium=patreon_wordpress&utm_campaign=&utm_content=patreon_wordpress_addon_upsell_notice_patron_content_manager&utm_term=" target="_blank">Check out all features here</a></div></div></div></p>
-				</div>
-			<?php	
-			
-			$already_showed_non_system_notice = true;
-			$GLOBALS['patron_content_manager_pitch_being_shown'] = true;
-		}
-				
 		$rate_plugin_notice_shown = get_option( 'patreon-rate-plugin-notice-shown', false );
 		
 		// The below will trigger a rating notice once if it was not shown and the plugin was installed more than 37 days ago.
@@ -1554,17 +1519,9 @@ class Patreon_Wordpress {
 		
 		$links = array_merge( array(
 			'<a href="' . esc_url( admin_url('admin.php?page=patreon-plugin') ) . '">' . __( 'Settings', 'textdomain' ) . '</a>'), $links );
-		
-		// Check if the currently only available addon Patron Pro is installed, if so, dont add the link
-		
-		if ( self::check_plugin_exists('patron-plugin-pro') ) {
-			return $links;
-		}
-		
-		$links = array_merge( array(
-			'<a href="https://codebard.com/patron-pro-addon-for-patreon-wordpress?utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=plugin_listing_addon_upsell_link&utm_term=" target="_blank">Upgrade to Pro</a>',
-		), $links );
+				
 		return $links;
+
 		
 	}
 	public static function lock_or_not( $post_id = false ) {
@@ -1997,10 +1954,6 @@ class Patreon_Wordpress {
 			
 			echo '<a href="https://support.patreon.com/hc/en-us/articles/360032409172-Patreon-WordPress-Quickstart?utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=setup_wizard_screen_3_quickstart_article_link&utm_term=" target="_blank"><div class="patreon_success_insert"><div class="patreon_success_insert_logo"><img src="' . PATREON_PLUGIN_ASSETS . '/img/Learn-how-to-use-Patreon-WordPress.jpg" /></div><div class="patreon_success_insert_heading"><h3>Quickstart guide</h3></div><div class="patreon_success_insert_content"><br clear="both">Click here to read our quickstart guide and learn how to lock your content</div></div></a>';
 
-			echo '<a href="https://codebard.com/patron-pro-addon-for-patreon-wordpress?utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=setup_wizard_screen_3_patron_pro_pitch_link&utm_term=" target="_blank"><div class="patreon_success_insert"><div class="patreon_success_insert_logo"><img src="' . PATREON_PLUGIN_ASSETS . '/img/Patron-Plugin-Pro-120.png" /></div><div class="patreon_success_insert_heading"><h3>Patron Plugin Pro</h3></div><div class="patreon_success_insert_content"><br clear="both">Boost your campaign with more Patreon features at your WP site and increase your income with premium addon Patron Plugin Pro</div></div></a>';
-			
-			echo '<a href="https://codebard.com/patreon-button-and-plugin-for-wordpress?utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=setup_wizard_screen_3_patron_button_wp_repo_link&utm_term=" target="_blank"><div class="patreon_success_insert"><div class="patreon_success_insert_logo"><img src="' . PATREON_PLUGIN_ASSETS . '/img/Patron-Button-Widgets-and-Plugin.png" /></div><div class="patreon_success_insert_heading"><h3>Patron Widgets</h3></div><div class="patreon_success_insert_content"><br clear="both">Add Patreon buttons and widgets to your site with the free Widgets addon</div></div></a>';
-			
 			echo '</div>';
 
 		}
@@ -2192,10 +2145,7 @@ class Patreon_Wordpress {
 			
 			echo '<a href="https://support.patreon.com/hc/en-us/articles/360032409172-Patreon-WordPress-Quickstart?utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=setup_wizard_screen_3_quickstart_insert&utm_term=" target="_blank"><div class="patreon_success_insert"><div class="patreon_success_insert_logo"><img src="' . PATREON_PLUGIN_ASSETS . '/img/Learn-how-to-use-Patreon-WordPress.jpg" /></div><div class="patreon_success_insert_heading"><h3>Quickstart guide</h3></div><div class="patreon_success_insert_content"><br clear="both">Click here to read our quickstart guide and learn how to lock your content</div></div></a>';
 
-			echo '<a href="https://codebard.com/patron-pro-addon-for-patreon-wordpress?utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=setup_wizard_screen_3_patron_pro_upsell&utm_term=" target="_blank"><div class="patreon_success_insert"><div class="patreon_success_insert_logo"><img src="' . PATREON_PLUGIN_ASSETS . '/img/Patron-Plugin-Pro-120.png" /></div><div class="patreon_success_insert_heading"><h3>Patron Plugin Pro</h3></div><div class="patreon_success_insert_content"><br clear="both">Power up your integration and increase your income with premium addon Patron Plugin Pro</div></div></a>';
-			
-			echo '<a href="https://wordpress.org/plugins/patron-button-and-widgets-by-codebard/?utm_source=' . urlencode( site_url() ) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=setup_wizard_screen_3_patron_button_upsell&utm_term=" target="_blank"><div class="patreon_success_insert"><div class="patreon_success_insert_logo"><img src="' . PATREON_PLUGIN_ASSETS . '/img/Patron-Button-Widgets-and-Plugin.png" /></div><div class="patreon_success_insert_heading"><h3>Patron Widgets</h3></div><div class="patreon_success_insert_content"><br clear="both">Add Patreon buttons and widgets to your site with free Widgets addon</div></div></a>';
-			
+
 			echo '</div>';
 
 		}

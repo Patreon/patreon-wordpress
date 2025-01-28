@@ -258,35 +258,6 @@ class Patreon_Options {
 										?></div>
 									
                                 </div>
-								<?php
-								if ( !Patreon_Wordpress::check_plugin_exists('patron-plugin-pro') ) {
-									?>
-				
-									<!-- .inside -->
-									<h2 class="handle patreon_wordpress_option_heading"><span>Get Patron Pro addon to boost your patrons & pledges</span></h2>
-
-									<div class="inside">
-
-										Install <a href="https://codebard.com/patron-pro-addon-for-patreon-wordpress?utm_source=<?php urlencode( site_url())?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=patreon_wordpress_settings_page_insert_link&utm_term="  aria-label="Upgrade to Patron Plugin Pro here">Patron Pro Addon</a> to boost your pledges and patrons by using advanced locking methods, sneak peeks, partial post locking, VIP and custom level members, login lock and many other powerful features. <br /> <br />
-										<button class="button button-primary button-large" id="patreon_patron_pro_upsell" go_to_url="https://codebard.com/patron-pro-addon-for-patreon-wordpress?utm_source=<?php urlencode( site_url())?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=patreon_wordpress_settings_page_insert_button&utm_term="  aria-label="Download">Download</button>
-										
-									</div>
-									<!-- .inside -->
-				
-									<?php
-			
-								}
-								else {
-									?>
-									<!-- .inside -->
-									<h2 class="handle patreon_wordpress_option_heading"><span>Use advanced locking methods</span></h2>
-
-									<div class="inside">
-										<p> Use <a href="https://codebard.com/patron-plugin-pro-documentation/category/manual?utm_source=<?php urlencode( site_url())?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=patreon_wordpress_patreon_options_callout&utm_term=" target="_blank" aria-label="Upgrade to Patron Plugin Pro here">Patron Pro's advanced locking methods</a> to fine-tune your content gating through your <a href="https://patron-plugin-pro-demo.codebard.com/" aria-label="Check out Patron Plugin Pro demo and see advanced locking settings">Patron Pro options admin menu.</a></p>
-									</div>
-									<?php
-								}
-								?>
 
                             </div>
                             <!-- .postbox -->
@@ -757,22 +728,6 @@ class Patreon_Options {
                                     <p><strong>SUPPORT &amp; TECHNICAL HELP</strong> <br>
                                     We actively support this plugin on our <a href="https://www.patreondevelopers.com/c/patreon-wordpress-plugin-support?utm_source=<?php urlencode( site_url() ) ?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=settings_screen_support_link&utm_term=" target="_blank">Patreon Wordpress Support Forum</a>.</p>
                                     <p><strong>DOCUMENTATION</strong> <br>Technical documentation and code examples available @ <a href="https://patreon.com/apps/wordpress?utm_source=<?php urlencode( site_url() ) ?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=settings_screen_about_patreon_wordpress_link&utm_term=" target="_blank">https://patreon.com/apps/wordpress</a></p>
-                                </div>
-								<!-- .inside -->
-
-                            </div>
-							
-                            <!-- .postbox -->
-                            <div class="postbox">
-
-                                <!-- Toggle -->
-
-                                <h2 class="handle patreon_wordpress_option_heading">Featured Third Party Addon</h2>
-
-                               <div class="inside">
-									<p><strong>Patron Pro</strong></p>
-
-                                    <p>Get Patron Pro addon for Patreon WordPress to increase your patrons and pledges!</p><p>Enjoy powerful features like partial post locking, sneak peeks, advanced locking methods, login lock, vip users and more.<br /><br /><a href="https://codebard.com/patron-pro-addon-for-patreon-wordpress?utm_source=<?php urlencode( site_url() ) ?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=settings_screen_patron_pro_link&utm_term=" target="_blank">Check out all features here</a></p>
                                 </div>
 								<!-- .inside -->
 
