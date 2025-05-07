@@ -60,17 +60,17 @@ class patreon_wordpress_login_widget extends WP_Widget
 
         ?>
         <p>
-          <label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:'); ?></label> 
+          <label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:'); ?></label>
           <input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo $title; ?>" />
         </p>
 		<p>
-          <label for="<?php echo $this->get_field_id('message'); ?>"><?php echo 'Message over login button - optional'; ?></label> 
+          <label for="<?php echo $this->get_field_id('message'); ?>"><?php echo 'Message over login button - optional'; ?></label>
           <input class="widefat" id="<?php echo $this->get_field_id('message'); ?>" name="<?php echo $this->get_field_name('message'); ?>" type="text" value="<?php echo $message ?>" />
         </p>
 		<p>
           <?php echo Patreon_Frontend::login_widget(); ?>
-        </p>		
-		
+        </p>
+
         <?php
     }
 

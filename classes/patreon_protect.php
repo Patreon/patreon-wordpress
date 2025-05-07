@@ -654,7 +654,7 @@ class Patreon_Protect
 
         $append = PHP_EOL . "# BEGIN Patreon WordPress Image Protection
 RewriteEngine On
-RewriteBase /		
+RewriteBase /
 RewriteCond %{REQUEST_FILENAME} (\.png|\.jpg|\.gif|\.jpeg|\.bmp) [NC]
 RewriteRule ^" . $upload_dir . "/(.*)$ index.php?patreon_action=serve_patron_only_image&patron_only_image=$1 [QSA,L]
 # END Patreon WordPress".PHP_EOL;
@@ -915,7 +915,7 @@ RewriteRule ^" . $upload_dir . "/(.*)$ index.php?patreon_action=serve_patron_onl
         }
 
         ?>
-		
+
 		<div id="patreon-image-toolbar">
 			<div id="patreon-image-lock-icon"><img src="<?php echo PATREON_PLUGIN_ASSETS . '/img/patreon-image-lock-icon.png'; ?>" /></div>
 		</div>
