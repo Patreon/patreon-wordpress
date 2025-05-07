@@ -69,7 +69,7 @@ class Patron_Metabox
 
         if ($no_tiers) {
 
-            $label    = 'To use tiers, your Patreon account must be Pro Plan or above and your site must be connected to Patreon. <a href="https://www.patreon.com/edit/tiers?utm_source=' . urlencode(site_url()) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=post_locking_metabox_patreon_plan_upgrade_message&utm_term=" target="_blank">Upgrade your plan here</a> or force-reconnect your site <a href="https://www.patreondevelopers.com/t/how-to-upgrade-your-patreon-wordpress-to-use-api-v2/3249?utm_source=' . urlencode(site_url()) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=post_locking_metabox_patreon_plan_upgrade_message&utm_term=" target="_blank">here</a>.';
+            $label    = 'To use tiers, your Patreon account must be Pro Plan or above and your site must be connected to Patreon. <a href="https://'.PATREON_HOST.'/edit/tiers?utm_source=' . urlencode(site_url()) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=post_locking_metabox_patreon_plan_upgrade_message&utm_term=" target="_blank">Upgrade your plan here</a> or force-reconnect your site <a href="https://www.patreondevelopers.com/t/how-to-upgrade-your-patreon-wordpress-to-use-api-v2/3249?utm_source=' . urlencode(site_url()) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=post_locking_metabox_patreon_plan_upgrade_message&utm_term=" target="_blank">here</a>.';
 
             $advanced_post_options_toggle_status = 'on';
 
@@ -93,7 +93,7 @@ class Patron_Metabox
 			<br><br>
 			<div id="patreon_level_select_wrapper"><select id="patreon_level_select" name="patreon-level"<?php echo $disabled ?> pw_post_id="<?php echo $object->ID; ?>"><option value="<?php echo get_post_meta($object->ID, 'patreon-level', true); ?>"><?php echo Patreon_Wordpress::make_tiers_select($post); ?></option></select> <img id="patreon_level_refresh" src="<?php echo PATREON_PLUGIN_ASSETS; ?>/img/refresh_tiers_18.png" style="width: 18px; height: 18px;" patreon_wordpress_nonce_populate_tier_dropdown="<?php echo wp_create_nonce('patreon_wordpress_nonce_populate_tier_dropdown'); ?>" /></div>
 		</p>
-		
+
 		<?php
 
 
@@ -102,8 +102,8 @@ class Patron_Metabox
         if ($advanced_post_options_toggle_status == '' or $advanced_post_options_toggle_status == 'off') {
             $advanced_post_options_toggle_status_display = 'style=" display: none;" ';
         }
-        ?> 		
-		
+        ?>
+
 		<div <?php echo $advanced_post_options_toggle_status_display ?>id="patreon-wordpress-advanced-options-toggle">
 		<?php
 
@@ -124,13 +124,13 @@ class Patron_Metabox
 
         }
         ?>
-		
+
 			<p>
 				<label for="patreon-level-exact"><?php _e($label, '1'); ?></label>
 				<br><br>
-				<strong>&#36; </strong><input type="text" id="patreon-level-exact" name="patreon-level-exact" value="<?php echo get_post_meta($object->ID, 'patreon-level', true); ?>" <?php echo $readonly ?>>		
+				<strong>&#36; </strong><input type="text" id="patreon-level-exact" name="patreon-level-exact" value="<?php echo get_post_meta($object->ID, 'patreon-level', true); ?>" <?php echo $readonly ?>>
 			</p>
-		
+
 			<?php
 
             $label    = 'Require a pledge active at the time of this post’s creation to view this post. (optional) This will make it so that only patrons who were patrons at or before the post date of this post can access this post. <a href="https://www.patreondevelopers.com/t/patreon-wordpress-locking-options-guide/1135#heading--section-2?utm_source=' . urlencode(site_url()) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=post_locking_metabox_link_3&utm_term=" target="_blank">(?)</a>';
@@ -168,11 +168,11 @@ class Patron_Metabox
 				<br><br>
 				<strong>&#36; </strong><input type="text" id="patreon-total-patronage-level" name="patreon-total-patronage-level" value="<?php echo get_post_meta($object->ID, 'patreon-total-patronage-level', true); ?>" <?php echo $readonly ?>>
 			</p>
-		
+
 		</div>
 		<br />
 
-		
+
 		<?php
 
         $advanced_post_options_toggle_text = 'Hide advanced';
@@ -181,9 +181,9 @@ class Patron_Metabox
             $advanced_post_options_toggle_text = 'Show advanced';
         }
         ?>
-		
+
 		<a href="" toggle="patreon-wordpress-advanced-options-toggle" patreon_wordpress_advanced_options_toggle_nonce="<?php echo wp_create_nonce() ?>" togglestatus="<?php echo $advanced_post_options_toggle_status ?>" ontext="Hide advanced" offtext="Show advanced" class="patreon-wordpress-admin-toggle"><?php echo $advanced_post_options_toggle_text ?></a>
-		
+
 		<?php
 
     }

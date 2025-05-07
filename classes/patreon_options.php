@@ -109,10 +109,10 @@ class Patreon_Options
                         <div class="meta-box-sortables ui-sortable">
 
                             <div class="postbox">
-                    
+
 								<h2 class="handle patreon_wordpress_option_heading"><span>Patreon Connection</span></h2>
                                 <div class="inside">
-									
+
 									<div id="patreon_options_app_details_main">
 
 										<?php
@@ -121,8 +121,8 @@ class Patreon_Options
                                                 echo '<div style="color: #ffa00f;">Sorry, it looks like your site\'s connection to Patreon is broken. Please reconnect by using the "(re)Connect site" button.</div><br>';
                                             }
         ?>
-		
-									
+
+
 										<button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon-connection-details" aria-label="Patreon connection details">Connection details</button><?php // Immediately inserted here to not cause any funny html rendering
 
         if (
@@ -131,7 +131,7 @@ class Patreon_Options
             (!get_option('patreon-creators-access-token', false) or get_option('patreon-creators-access-token', false) == '') and
             (!get_option('patreon-creators-refresh-token', false) or get_option('patreon-creators-refresh-token', false) == '')
         ) {
-            ?> <button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon_options_app_details_connect patreon_options_app_details_main"  aria-label="Connect your site to Patreon">Connect site</button> 
+            ?> <button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon_options_app_details_connect patreon_options_app_details_main"  aria-label="Connect your site to Patreon">Connect site</button>
 											<?php
 
         }
@@ -151,29 +151,29 @@ class Patreon_Options
         }
 
         ?>
-										
+
 									</div>
-									
+
 									<div id="patreon_options_app_details_connect">
-								
-										We will now connect your site to Patreon by running connection wizard. Before starting, please make sure you deleted any existing app for this site in <a href="https://www.patreon.com/portal/registration/register-clients" target="_blank">this page at Patreon</a><br /><br />
+
+										We will now connect your site to Patreon by running connection wizard. Before starting, please make sure you deleted any existing app for this site in <a href="https://".PATREON_HOST."/portal/registration/register-clients" target="_blank">this page at Patreon</a><br /><br />
 										<button id="patreon_wordpress_reconnect_to_patreon" class="button button-primary button-large" target="<?php echo admin_url('admin.php?page=patreon_wordpress_setup_wizard&setup_stage=0'); ?>"  aria-label="Start connection wizard">Start connection wizard</button> <button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon_options_app_details_connect patreon_options_app_details_main">Cancel</button>
-										
+
 									</div>
 									<div id="patreon_options_app_details_reconnect">
-								
+
 										We will now reconnect your site to Patreon. This will refresh your site's connection to Patreon. Your settings and content gating values will remain unchanged. Patron only content will become accessible to everyone until you finish reconnecting your site to Patreon.<br /><br />
 										<button id="patreon_wordpress_disconnect_reconnect_to_patreon" class="button button-primary button-large" target="<?php echo admin_url('admin.php?page=patreon_wordpress_setup_wizard&setup_stage=reconnect_0&patreon_wordpress_reconnect_to_patreon_nonce=' . wp_create_nonce()); ?>"  aria-label="Confirm connection">Confirm</button> <button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon_options_app_details_reconnect patreon_options_app_details_main" aria-label="Cancel">Cancel</button>
-										
+
 									</div>
-									
+
 									<div id="patreon_options_app_details_disconnect">
-									
+
 										We will now remove all info related to currently linked creator account from your site. Post gating values in your posts will be left untouched. After this, you will be able to connect this site to another creator account you have. Gated posts should keep stay gated from the nearest tier you have in the creator account you connect to this site. Patron only content will become accessible to everyone until you reconnect your site to Patreon. <br /><br />
 										<button id="patreon_wordpress_disconnect_from_patreon" class="button button-primary button-large"  aria-label="Confirm disconnection" target="<?php echo admin_url('admin.php?page=patreon-plugin&patreon_wordpress_action=disconnect_site_from_patreon&patreon_wordpress_disconnect_from_patreon_nonce=' . wp_create_nonce()); ?>">Confirm disconnection</button> <button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon_options_app_details_disconnect patreon_options_app_details_main" aria-label="Cancel">Cancel</button>
-										
+
 									</div>
-									
+
                                     <table class="widefat" id="patreon-connection-details">
 
                                         <tr valign="top">
@@ -218,7 +218,7 @@ class Patreon_Options
                             <!-- .postbox -->
 
                         </div>
-						
+
                         <!-- .meta-box-sortables .ui-sortable -->
 
                         <div class="meta-box-sortables ui-sortable">
@@ -264,7 +264,7 @@ class Patreon_Options
             }
         }
         ?></div>
-									
+
                                 </div>
 
                             </div>
@@ -272,8 +272,8 @@ class Patreon_Options
 
                         </div>
                         <!-- .meta-box-sortables .ui-sortable -->
-		
-										
+
+
                         <!-- .meta-box-sortables .ui-sortable -->
 
                         <div class="meta-box-sortables ui-sortable">
@@ -316,7 +316,7 @@ class Patreon_Options
             $site_locking_info = 'Post locking won\'t work without Creator ID. Please confirm you have it <a href="'.admin_url("?page=patreon-plugin").'">here</a>';
             $readonly = " readonly";
         }
-        ?>										
+        ?>
                                         <tr valign="top">
 											<th scope="row">
 												<strong>Make entire site Patron-only with Pledge Level</strong>
@@ -355,8 +355,8 @@ class Patreon_Options
 											</td>
                                         </tr>
                                         <?php } ?>
-										
-                                       
+
+
                                         <tr valign="top">
 											<th scope="row">
 												<strong>Hide 'Login with Patreon' Button</strong>
@@ -366,8 +366,8 @@ class Patreon_Options
 												<input type="checkbox" name="patreon-hide-login-button" value="1"<?php checked(get_option('patreon-hide-login-button', false)); ?> />
 											</td>
                                         </tr>
-                                    
-										
+
+
                                         <tr valign="top">
 											<th scope="row">
 												<strong>Custom Patreon Page name</strong>
@@ -412,7 +412,7 @@ class Patreon_Options
 												<input type="text" name="patreon-currency-sign" id="patreon-currency-sign" value="<?php echo esc_attr(get_option('patreon-currency-sign', '$')); ?>" />
 											</td>
                                         </tr>
-										
+
                                         <tr valign="top">
 											<th scope="row">
 												<strong>Currency sign behind</strong>
@@ -423,7 +423,7 @@ class Patreon_Options
 												<input type="text" name="patreon-currency-sign-behind" id="patreon-currency-sign-behind" value="<?php echo esc_attr(get_option('patreon-currency-sign-behind', '')); ?>" />
 											</td>
                                         </tr>
-										
+
 										<?php
 
                                             $api_version_warning = '';
@@ -432,7 +432,7 @@ class Patreon_Options
             $api_version_warning = '<div id="patreon_api_version_warning" class="patreon_api_version_warning_inside_options"><div class="patreon_api_version_warning_important">' . PATREON_WARNING_IMPORTANT . '</div>' . PATREON_API_VERSION_WARNING . '</div>';
         }
         ?>
-										
+
                                         <tr valign="top">
 											<th scope="row">
 												<strong>Sync Patreon posts</strong>
@@ -488,11 +488,11 @@ class Patreon_Options
 													</select>
 													<button id="patreon_wordpress_save_post_sync_category" patreon_wordpress_nonce_save_post_sync_options="<?php echo wp_create_nonce() ?>" class="button button-primary button-large" pw_input_target="#patreon_wordpress_post_import_category_status" target="">Save</button><div id="patreon_wordpress_post_import_category_status" style="color: #<?php echo $post_sync_category_status_color ?>;"></div>
 												</div>
-												
+
 												</div>
 											</th>
 											<td>
-												
+
 											</td>
                                         </tr>
                                         <tr valign="top">
@@ -689,7 +689,7 @@ class Patreon_Options
 												<div class="patreon-options-info"><div id="post_import_info_text"><?php echo $import_post_info_text; ?></div><div id="patreon_wp_post_import_status" style="color: #<?php echo $post_import_status_color ?>;"><?php echo $post_import_status; ?></div></div>
 											</th>
 											<td>
-												
+
 												<div id="patreon_post_import_button_container"><?php echo $post_import_button; ?><?php echo $post_import_cancel; ?></div>
 											</td>
                                         </tr>
@@ -731,7 +731,7 @@ class Patreon_Options
 								<!-- .inside -->
 
                             </div>
-							
+
                             <!-- .postbox -->
                             <div class="postbox">
 
@@ -809,11 +809,11 @@ class Patreon_Options
         ?>
 		<div class="patreon_admin_health_content_section">
 			<h1>Health check of your Patreon integration</h1>
-			Below are settings or issues which may affect your Patreon integration. Please check the recommendations and implement them to have your integration function better. You can get help for any of these items <a href="https://www.patreondevelopers.com/c/patreon-wordpress-plugin-support" target="_blank">by visiting our support forum</a> and posting a thread. 
+			Below are settings or issues which may affect your Patreon integration. Please check the recommendations and implement them to have your integration function better. You can get help for any of these items <a href="https://www.patreondevelopers.com/c/patreon-wordpress-plugin-support" target="_blank">by visiting our support forum</a> and posting a thread.
 			<br><br>
 			Your site is using:<br /><br /> WP <?php echo get_bloginfo('version'); ?> with PHP <?php echo phpversion(); ?><br />
 			Patreon WordPress <?php echo PATREON_WORDPRESS_VERSION ?> with API v<?php echo get_option('patreon-installation-api-version', false) ?><br />
-			
+
 			<?php
 
                 // Conditionals for any addons / other relevant Patreon plugins
@@ -839,20 +839,20 @@ class Patreon_Options
         }
 
         ?>
-			
+
 			<br><br>
 			You can <a href="" id="patreon_copy_health_check_output">click here</a> to copy the output of this page to share with support team or post it in the forum. <div id="patreon_copied"></div>
-			
+
 		</div>
 		<?php
 
         if (count(Patreon_Compatibility::$site_health_info) == 0) {
             ?>
-		
+
 		<div class="patreon_admin_health_content_box">
 		<h2>Your Patreon integration health is great!</h2>
 		</div>
-		
+
 		<?php
 
         }
@@ -872,12 +872,12 @@ class Patreon_Options
 
             foreach ($health_info as $key => $value) {
                 ?>
-			
+
 				<div class="patreon_admin_health_content_box">
 					<div class="patreon_toggle_admin_sections" target=".patreon_admin_health_content_box_hidden"><h3><?php echo $health_info[$key]['heading'] ?><span class="dashicons dashicons-arrow-down-alt2 patreon_setting_section_toggle_icon"></span></h3></div>
 					<div class="patreon_admin_health_content_box_hidden"><?php echo $health_info[$key]['notice'] ?></div>
 				</div>
-			
+
 			<?php
 
             }
@@ -886,7 +886,7 @@ class Patreon_Options
 
         // Print out the last 50 connection errors if they exist
         ?>
-		
+
 		<div class="patreon_admin_health_content_box">
 			<div class="patreon_toggle_admin_sections" target=".patreon_admin_health_content_box_hidden"><h3><?php echo PATREON_LAST_50_CONNECTION_ERRORS_HEADING ?><span class="dashicons dashicons-arrow-down-alt2 patreon_setting_section_toggle_icon"></span></h3></div>
 			<div class="patreon_admin_health_content_box_hidden"><?php echo PATREON_LAST_50_CONNECTION_ERRORS ?>
@@ -911,13 +911,13 @@ class Patreon_Options
         ?>
 			</div>
 			</div>
-			
+
 		<?php
 
 
         // Output a hidden, non formatted version of the health info to be used by the users to c/p to support
         ?>
-		
+
 		<div id="patreon_health_check_output_for_support">WP <?php echo get_bloginfo('version'); ?> with PHP <?php echo phpversion();
         echo "\r\n"; ?>Patreon WordPress <?php echo PATREON_WORDPRESS_VERSION ?> with API v<?php echo get_option('patreon-installation-api-version', false);
         echo "\r\n";
