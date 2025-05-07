@@ -158,10 +158,10 @@ if ($load_api_version and $load_api_version == '2') {
 
             return $result;
 
-            $api_endpoint = "https://api.patreon.com/oauth2/api/" . $suffix;
+            $api_endpoint = "https://".PATREON_HOST."/api/oauth2/api/" . $suffix;
 
             if ($v2) {
-                $api_endpoint = "https://www.patreon.com/api/oauth2/v2/" . $suffix;
+                $api_endpoint = "https://".PATREON_HOST."/api/oauth2/v2/" . $suffix;
             }
 
             $headers = array(

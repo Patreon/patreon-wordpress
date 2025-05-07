@@ -29,6 +29,7 @@ register_activation_hook(__FILE__, array( 'Patreon_Wordpress', 'activate' ));
 
 register_deactivation_hook(__FILE__, array( 'Patreon_Wordpress', 'deactivate' ));
 
+define("PATREON_HOST", "patreon.com");
 define("PATREON_PLUGIN_URL", plugin_dir_url(__FILE__));
 define("PATREON_PLUGIN_ASSETS", plugin_dir_url(__FILE__).'assets');
 define("PATREON_PLUGIN_ASSETS_DIR", plugin_dir_path(__FILE__).'assets');

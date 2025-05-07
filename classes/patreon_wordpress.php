@@ -1978,7 +1978,7 @@ class Patreon_Wordpress
 
             echo '<div id="patreon_setup_logo"><img src="' . PATREON_PLUGIN_ASSETS . '/img/Patreon_Logo_100.png" /></div>';
 
-            $api_endpoint = "https://www.patreon.com/oauth2/";
+            $api_endpoint = "https://".PATREON_HOST."/oauth2/";
 
             echo '<div id="patreon_setup_content"><h1 style="margin-top: 0px;">Let\'s connect your site to Patreon!</h1><div id="patreon_setup_message">' . $setup_message . '</div>' . $requirement_notices . '<form style="display:block;" method="get" action="'. $api_endpoint .'register-client-creation"><p class="submit" style="margin-top: 10px;"><input type="submit" name="submit" id="submit" class="button button-large button-primary" value="Let\'s start!"></p>' . $config_input . '<input type="hidden" name="client_id" value="' . PATREON_PLUGIN_CLIENT_ID . '" /><input type="hidden" name="redirect_uri" value="' . site_url() . '/patreon-authorization/' . '" /><input type="hidden" name="state" value="' . urlencode(base64_encode(json_encode($state))) . '" /><input type="hidden" name="scopes" value="w:identity.clients" /><input type="hidden" name="response_type" value="code" /></form></div>';
 
@@ -2168,7 +2168,7 @@ class Patreon_Wordpress
 
             echo '<div id="patreon_setup_logo"><img src="' . PATREON_PLUGIN_ASSETS . '/img/Patreon_Logo_100.png" /></div>';
 
-            $api_endpoint = "https://www.patreon.com/oauth2/";
+            $api_endpoint = "https://".PATREON_HOST."/oauth2/";
 
             echo '<div id="patreon_setup_content"><h1 style="margin-top: 0px;">Reconnecting your site to Patreon</h1><div id="patreon_setup_message">' . $setup_message . '</div>' . $requirement_notices . '<form style="display:block;" method="get" action="'. $api_endpoint .'register-client-creation"><p class="submit" style="margin-top: 10px;"><input type="submit" name="submit" id="submit" class="button button-large button-primary" value="Let\'s start!"></p>' . $config_input . '<input type="hidden" name="client_id" value="' . PATREON_PLUGIN_CLIENT_ID . '" /><input type="hidden" name="redirect_uri" value="' . site_url() . '/patreon-authorization/' . '" /><input type="hidden" name="state" value="' . urlencode(base64_encode(json_encode($state))) . '" /><input type="hidden" name="scopes" value="w:identity.clients" /><input type="hidden" name="response_type" value="code" /></form></div>';
 
