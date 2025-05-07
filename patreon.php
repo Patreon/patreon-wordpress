@@ -79,7 +79,6 @@ These include your Patreon user id, Patreon username, your first, last names and
 If you request that your data be deleted from this website, this data will also be deleted and Patreon functionality will not work. You would need to register on this website and log in to this website with Patreon again in order to re-populate this data and have Patreon functionality working again.');
 define("PATREON_NO_CODE_RECEIVED_FROM_PATREON", "Sorry -  No authorization code received from Patreon.");
 define("PATREON_NO_FLOW_ACTION_PROVIDED", "Nothing to do since no Patreon action was requested.");
-define("PATREON_DIRECT_UNLOCKS_NOT_ON", 'In order to use this feature, direct unlocks need to be turned on. Please refer to <a href="https://www.patreon.com/apps/wordpress?utm_source=' . urlencode(site_url()) . '&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=direct_unlock_setting_notification_link&utm_term=">the developer documentation</a>. ');
 define("PATREON_TEXT_LOCKED_POST_ACTIVE_PATRONS", 'while having been active patrons on %%post_date%%');
 define("PATREON_TEXT_LOCKED_POST_ACTIVE_PATRONS_WITH_TOTAL_PLEDGE", 'or Patrons with total pledge of %%currency_sign_front%%%%total_pledge%%%%currency_sign_behind%%');
 define("PATREON_CONTRIBUTION_REQUIRED_STOP_MARK", '!');

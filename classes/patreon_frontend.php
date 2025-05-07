@@ -47,7 +47,6 @@ class Patreon_Frontend
             'admin_bypass_filter_message'                => PATREON_ADMIN_BYPASSES_FILTER_MESSAGE,
             'no_code_receved_from_patreon'               => PATREON_NO_CODE_RECEIVED_FROM_PATREON,
             'no_patreon_action_provided_for_flow'        => PATREON_NO_FLOW_ACTION_PROVIDED,
-            'patreon_direct_unlocks_not_turned_on'       => PATREON_DIRECT_UNLOCKS_NOT_ON,
             'patreon_couldnt_acquire_user_details'       => PATREON_COULDNT_ACQUIRE_USER_DETAILS,
             'pretty_permalinks_are_required'             => PATREON_PRETTY_PERMALINKS_NEED_TO_BE_ENABLED,
             'error_missing_credentials'                  => PATREON_ERROR_MISSING_CREDENTIALS,
