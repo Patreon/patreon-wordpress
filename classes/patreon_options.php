@@ -97,7 +97,7 @@ class Patreon_Options
         <div class="wrap">
 
             <div id="icon-options-general" class="icon32"></div>
-			<h1>Patreon Wordpress Settings</h1>
+			<h1>Patreon WordPress Settings</h1>
 
             <div id="poststuff">
 
@@ -722,7 +722,7 @@ class Patreon_Options
                                 <h2 class="handle patreon_wordpress_option_heading">About Patreon Wordpress</h2>
 
                                <div class="inside">
-									<p>Patreon Wordpress developed by Patreon</p>
+									<p>Patreon WordPress developed by Patreon</p>
 
                                     <p><strong>SUPPORT &amp; TECHNICAL HELP</strong> <br>
                                     We actively support this plugin on our <a href="https://www.patreondevelopers.com/c/patreon-wordpress-plugin-support?utm_source=<?php urlencode(site_url()) ?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=settings_screen_support_link&utm_term=" target="_blank">Patreon Wordpress Support Forum</a>.</p>

@@ -1,4 +1,4 @@
-# Patreon Wordpress Plugin
+# Patreon WordPress Plugin
 ## Development
 Before committing any changes, make sure that pre-commit can run.
 
