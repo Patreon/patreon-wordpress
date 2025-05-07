@@ -964,10 +964,10 @@ class Patreon_Wordpress
         if ($show_site_disconnect_success_notice) {
             // Info notice - not permanent - doesnt require nonce verification
             ?>
-				 <div class="notice notice-success is-dismissible  patreon-wordpress" id="patreon_site_disconnect_success_notice">
-					<p><?php echo PATREON_SITE_DISCONNECTED_FROM_PATREON_TEXT; ?></p>
-				</div>
-			<?php
+                 <div class="notice notice-success is-dismissible  patreon-wordpress" id="patreon_site_disconnect_success_notice">
+                    <p><?php echo PATREON_SITE_DISCONNECTED_FROM_PATREON_TEXT; ?></p>
+                </div>
+            <?php
 
             delete_option('patreon-show-site-disconnect-success-notice');
 
@@ -984,10 +984,10 @@ class Patreon_Wordpress
         if (!$setup_done and !$setup_wizard_notice_dismissed and current_user_can('manage_options')) {
             // This notice needs a nonce but the link to start setup doesnt need a nonce - any admin level user with manage options should be able to go to the setup wizard from anywhere
             ?>
-				 <div class="notice notice-success is-dismissible patreon-wordpress" id="patreon_setup_needed_notice" patreon_wordpress_nonce_setup_needed="<?php echo wp_create_nonce('patreon_wordpress_nonce_setup_needed'); ?>">
-					<p>We must connect your site to Patreon to enable Patreon features. Please click <a href="<?php echo admin_url('admin.php?page=patreon_wordpress_setup_wizard&setup_stage=0') ?>" target="_self">here</a> to start the setup wizard</p>
-				</div>
-			<?php
+                 <div class="notice notice-success is-dismissible patreon-wordpress" id="patreon_setup_needed_notice" patreon_wordpress_nonce_setup_needed="<?php echo wp_create_nonce('patreon_wordpress_nonce_setup_needed'); ?>">
+                    <p>We must connect your site to Patreon to enable Patreon features. Please click <a href="<?php echo admin_url('admin.php?page=patreon_wordpress_setup_wizard&setup_stage=0') ?>" target="_self">here</a> to start the setup wizard</p>
+                </div>
+            <?php
 
             // Dont show any more notices until setup is done
             return;
@@ -1002,10 +1002,10 @@ class Patreon_Wordpress
         if ($setup_done and (!$api_version or $api_version == '' or $api_version == '1') and current_user_can('manage_options') and (!$api_version_notice_dismissed or (!$api_version_notice_dismissed_time or $api_version_notice_dismissed_time < (time() - (24 * 3600 * 7))))) {
             // This notice needs a nonce but the link to start setup doesnt need a nonce - any admin level user with manage options should be able to go to the setup wizard from anywhere
             ?>
-				<div class="notice notice-warning is-dismissible patreon-wordpress" id="patreon_wordpress_patreon_api_version_update_notice" patreon_wordpress_nonce_patreon_api_version_update="<?php echo wp_create_nonce('patreon_wordpress_nonce_patreon_api_version_update'); ?>">
-					<p>Your site's connection to Patreon must be upgraded to ensure that Patreon features will work! Please click <a href="<?php echo admin_url('admin.php?page=patreon_wordpress_setup_wizard&setup_stage=0') ?>" target="_self">here</a> to start the setup wizard to reconnect your site again</p>
-				</div>
-			<?php
+                <div class="notice notice-warning is-dismissible patreon-wordpress" id="patreon_wordpress_patreon_api_version_update_notice" patreon_wordpress_nonce_patreon_api_version_update="<?php echo wp_create_nonce('patreon_wordpress_nonce_patreon_api_version_update'); ?>">
+                    <p>Your site's connection to Patreon must be upgraded to ensure that Patreon features will work! Please click <a href="<?php echo admin_url('admin.php?page=patreon_wordpress_setup_wizard&setup_stage=0') ?>" target="_self">here</a> to start the setup wizard to reconnect your site again</p>
+                </div>
+            <?php
 
             // Dont show any more notices until reconnection is done
             return;
@@ -1021,10 +1021,10 @@ class Patreon_Wordpress
         if (!$rate_plugin_notice_shown and self::check_days_after_last_non_system_notice(7) and self::calculate_days_after_first_activation(37) and !$already_showed_non_system_notice) {
 
             ?>
-				 <div class="notice notice-info is-dismissible patreon-wordpress" id="patreon-rate-plugin-notice-shown" patreon_wordpress_nonce_rate_plugin_notice="<?php echo wp_create_nonce('patreon_wordpress_nonce_rate_plugin_notice'); ?>">
-					<p>Did Patreon WordPress help your site? Help creators like yourself find out about it <a href="https://wordpress.org/support/plugin/patreon-connect/reviews/#new-post?utm_source=<?php urlencode(site_url()) ?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=patreon_wordpress_review_infobox_link&utm_term=" target="_blank">by giving us a good rating!</a></p>
-				</div>
-			<?php
+                 <div class="notice notice-info is-dismissible patreon-wordpress" id="patreon-rate-plugin-notice-shown" patreon_wordpress_nonce_rate_plugin_notice="<?php echo wp_create_nonce('patreon_wordpress_nonce_rate_plugin_notice'); ?>">
+                    <p>Did Patreon WordPress help your site? Help creators like yourself find out about it <a href="https://wordpress.org/support/plugin/patreon-connect/reviews/#new-post?utm_source=<?php urlencode(site_url()) ?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=patreon_wordpress_review_infobox_link&utm_term=" target="_blank">by giving us a good rating!</a></p>
+                </div>
+            <?php
 
             $already_showed_non_system_notice = true;
 
@@ -1035,10 +1035,10 @@ class Patreon_Wordpress
         if (Patreon_Compatibility::$toggle_warning and self::check_days_after_last_system_notice(7) and (!isset($_REQUEST['page']) or $_REQUEST['page'] != 'patreon-plugin-health')) {
 
             ?>
-				 <div class="notice notice-error patreon-wordpress is-dismissible" id="patreon-critical-issues" patreon_wordpress_nonce_plugin_critical_issues="<?php echo wp_create_nonce('patreon_wordpress_nonce_plugin_critical_issues'); ?>">
-					<p>There are important issues affecting your Patreon integration. Please visit <a href="<?php echo admin_url('admin.php?page=patreon-plugin-health') ?>">health check page</a> to see the issues and solutions.</p>
-				</div>
-			<?php
+                 <div class="notice notice-error patreon-wordpress is-dismissible" id="patreon-critical-issues" patreon_wordpress_nonce_plugin_critical_issues="<?php echo wp_create_nonce('patreon_wordpress_nonce_plugin_critical_issues'); ?>">
+                    <p>There are important issues affecting your Patreon integration. Please visit <a href="<?php echo admin_url('admin.php?page=patreon-plugin-health') ?>">health check page</a> to see the issues and solutions.</p>
+                </div>
+            <?php
 
         }
 
@@ -1046,11 +1046,11 @@ class Patreon_Wordpress
         if (get_option('patreon-wordpress-app-credentials-success', false)) {
             // Non-important non-permanent info notice - doesnt need nonce verification
             ?>
-				 <div class="notice notice-success is-dismissible patreon-wordpress" id="patreon-wordpress-credentials-success">
-				 <h3>Your Patreon client details were successfully saved!</h3>
-					<p>Patreon WordPress is now ready to go and your site is connected to Patreon! You can now lock any post by using the "Patreon Level" meta box in your post editor!</p>
-				</div>
-			<?php
+                 <div class="notice notice-success is-dismissible patreon-wordpress" id="patreon-wordpress-credentials-success">
+                 <h3>Your Patreon client details were successfully saved!</h3>
+                    <p>Patreon WordPress is now ready to go and your site is connected to Patreon! You can now lock any post by using the "Patreon Level" meta box in your post editor!</p>
+                </div>
+            <?php
 
             delete_option('patreon-wordpress-app-credentials-success');
         }
@@ -1059,11 +1059,11 @@ class Patreon_Wordpress
         if (get_option('patreon-wordpress-app-credentials-failure', false)) {
             // Non-important non-permanent info notice - doesnt need nonce verification
             ?>
-				 <div class="notice notice-error is-dismissible patreon-wordpress" id="patreon-wordpress-credentials-failure">
-				 <h3>Sorry - couldn't connect your site to Patreon</h3>
-					<p>Patreon WordPress wasn't able to contact Patreon with the app details you provided. This may be because there is an error in the app details, or because there is something preventing proper connectivity in between your site/server and Patreon API. You can get help by visiting our support forum <a href="https://www.patreondevelopers.com/c/patreon-wordpress-plugin-support?utm_source=<?php urlencode(site_url()) ?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=connection_details_not_correct_admin_notice_link&utm_term=" target="_blank">here</a></p>
-				</div>
-			<?php
+                 <div class="notice notice-error is-dismissible patreon-wordpress" id="patreon-wordpress-credentials-failure">
+                 <h3>Sorry - couldn't connect your site to Patreon</h3>
+                    <p>Patreon WordPress wasn't able to contact Patreon with the app details you provided. This may be because there is an error in the app details, or because there is something preventing proper connectivity in between your site/server and Patreon API. You can get help by visiting our support forum <a href="https://www.patreondevelopers.com/c/patreon-wordpress-plugin-support?utm_source=<?php urlencode(site_url()) ?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=connection_details_not_correct_admin_notice_link&utm_term=" target="_blank">here</a></p>
+                </div>
+            <?php
 
             delete_option('patreon-wordpress-app-credentials-failure');
 
@@ -2604,7 +2604,7 @@ class Patreon_Wordpress
             // Ask the API to delete this client:
 
             $creator_access_token = get_option('patreon-creators-access-token', false);
-            $client_id 			  = get_option('patreon-client-id', false);
+            $client_id               = get_option('patreon-client-id', false);
 
             // Exceptions until v1 v2 transition is complete
 
@@ -2709,7 +2709,7 @@ class Patreon_Wordpress
             // Ask the API to delete this client:
 
             $creator_access_token = get_option('patreon-creators-access-token', false);
-            $client_id 			  = get_option('patreon-client-id', false);
+            $client_id               = get_option('patreon-client-id', false);
 
             // Exceptions until v1 v2 transition is complete
 

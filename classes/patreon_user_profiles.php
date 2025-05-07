@@ -25,38 +25,38 @@ class Patreon_User_Profiles
 
             ?>
 
-			<br />
+            <br />
 
-			<h3><?php _e("Patreon Profile", "blank"); ?></h3>
+            <h3><?php _e("Patreon Profile", "blank"); ?></h3>
 
-			<table class="form-table">
-				<tr>
-					<th><label for="patreon_user"><?php _e("Patreon User"); ?></label></th>
-					<td>
-						<input type="text" name="patreon_user" id="patreon_user" disabled value="<?php echo esc_attr(get_the_author_meta('patreon_user', $user->ID)); ?>" class="regular-text" /><br />
-					</td>
-				</tr>
-				<tr>
-					<th><label for="patreon_created"><?php _e("Patreon Created"); ?></label></th>
-					<td>
-						<input type="text" name="patreon_created" id="patreon_created" disabled value="<?php echo esc_attr(get_the_author_meta('patreon_created', $user->ID)); ?>" class="regular-text" /><br />
-					</td>
-				</tr>
-				<tr>
-					<th><label for="user_firstname"><?php _e("Patreon First name"); ?></label></th>
-					<td>
-						<input type="text" name="user_firstname" id="user_firstname" disabled value="<?php echo esc_attr(get_the_author_meta('user_firstname', $user->ID)); ?>" class="regular-text" /><br />
-					</td>
-				</tr>
-				<tr>
-					<th><label for="user_lastname"><?php _e("Patreon Last name"); ?></label></th>
-					<td>
-						<input type="text" name="user_lastname" id="user_lastname" disabled value="<?php echo esc_attr(get_the_author_meta('user_lastname', $user->ID)); ?>" class="regular-text" /><br />
-					</td>
-				</tr>
-			</table>
+            <table class="form-table">
+                <tr>
+                    <th><label for="patreon_user"><?php _e("Patreon User"); ?></label></th>
+                    <td>
+                        <input type="text" name="patreon_user" id="patreon_user" disabled value="<?php echo esc_attr(get_the_author_meta('patreon_user', $user->ID)); ?>" class="regular-text" /><br />
+                    </td>
+                </tr>
+                <tr>
+                    <th><label for="patreon_created"><?php _e("Patreon Created"); ?></label></th>
+                    <td>
+                        <input type="text" name="patreon_created" id="patreon_created" disabled value="<?php echo esc_attr(get_the_author_meta('patreon_created', $user->ID)); ?>" class="regular-text" /><br />
+                    </td>
+                </tr>
+                <tr>
+                    <th><label for="user_firstname"><?php _e("Patreon First name"); ?></label></th>
+                    <td>
+                        <input type="text" name="user_firstname" id="user_firstname" disabled value="<?php echo esc_attr(get_the_author_meta('user_firstname', $user->ID)); ?>" class="regular-text" /><br />
+                    </td>
+                </tr>
+                <tr>
+                    <th><label for="user_lastname"><?php _e("Patreon Last name"); ?></label></th>
+                    <td>
+                        <input type="text" name="user_lastname" id="user_lastname" disabled value="<?php echo esc_attr(get_the_author_meta('user_lastname', $user->ID)); ?>" class="regular-text" /><br />
+                    </td>
+                </tr>
+            </table>
 
-			<?php
+            <?php
 
         }
 
@@ -69,11 +69,11 @@ class Patreon_User_Profiles
 
             ?>
 
-			<br />
+            <br />
 
-			<h3><?php _e("Patreon account", "blank"); ?></h3>
-		
-			<?php
+            <h3><?php _e("Patreon account", "blank"); ?></h3>
+
+            <?php
 
                 // Check if this is a connected account.
 
@@ -88,17 +88,17 @@ class Patreon_User_Profiles
 
 
                 ?>
-						<div id="patreon_wordpress_user_profile_account_connection_wrapper">
-							<table class="form-table">
-								<tr>
-									<th><label for="patreon_user">Connect your site account to your Patreon account</label></th>
-									<td>
-										<button id="patreon_wordpress_connect_patreon_account" class="button button-primary button-large" patreon_login_url="<?php echo $login_flow_url; ?>" target="">Connect to Patreon</button><br />
-									</td>
-								</tr>
-							</table>
-						</div>
-					<?php
+                        <div id="patreon_wordpress_user_profile_account_connection_wrapper">
+                            <table class="form-table">
+                                <tr>
+                                    <th><label for="patreon_user">Connect your site account to your Patreon account</label></th>
+                                    <td>
+                                        <button id="patreon_wordpress_connect_patreon_account" class="button button-primary button-large" patreon_login_url="<?php echo $login_flow_url; ?>" target="">Connect to Patreon</button><br />
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    <?php
             }
 
             if ($linked_patreon_account != '') {
@@ -121,17 +121,17 @@ class Patreon_User_Profiles
                 }
 
                 ?>
-						<div id="patreon_wordpress_user_profile_account_connection_wrapper">
-							<table class="form-table">
-								<tr>
-									<th><label id="patreon_wordpress_disconnect_patreon_account_label" for="patreon_user"><?php echo $disconnect_label; ?></label></th>
-									<td id="patreon_wordpress_disconnect_patreon_account_content">
-										<button id="patreon_wordpress_disconnect_patreon_account" patreon_disconnect_user_id="<?php echo $user_id; ?>" class="button button-primary button-large" target="" patreon_wordpress_nonce_disconnect_user_account_from_patreon="<?php echo wp_create_nonce('patreon_wordpress_nonce_disconnect_user_account_from_patreon'); ?>">Disconnect from Patreon</button><br /><br /><?php echo $disconnect_warning; ?>
-									</td>
-								</tr>
-							</table>
-						</div>
-					<?php
+                        <div id="patreon_wordpress_user_profile_account_connection_wrapper">
+                            <table class="form-table">
+                                <tr>
+                                    <th><label id="patreon_wordpress_disconnect_patreon_account_label" for="patreon_user"><?php echo $disconnect_label; ?></label></th>
+                                    <td id="patreon_wordpress_disconnect_patreon_account_content">
+                                        <button id="patreon_wordpress_disconnect_patreon_account" patreon_disconnect_user_id="<?php echo $user_id; ?>" class="button button-primary button-large" target="" patreon_wordpress_nonce_disconnect_user_account_from_patreon="<?php echo wp_create_nonce('patreon_wordpress_nonce_disconnect_user_account_from_patreon'); ?>">Disconnect from Patreon</button><br /><br /><?php echo $disconnect_warning; ?>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    <?php
             }
 
         }

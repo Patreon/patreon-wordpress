@@ -263,14 +263,14 @@ class Patreon_Login
 
 
         $username = 'patreon_' . $patreon_user_id;
-        $user 	  = get_user_by('login', $username);
+        $user       = get_user_by('login', $username);
 
         if ($user == false) {
 
             /* create wordpress user with provided username */
 
             $random_password = wp_generate_password(64, false);
-            $user_email 	 = '';
+            $user_email      = '';
 
             // Import user email only if the email was verified
 
@@ -544,10 +544,10 @@ class Patreon_Login
                 // Problem! No valid user id to disconnect or no valid user
 
                 ?>
-				
-					Ooops! Disconnect failed - could not find matching user account!
-				
-				<?php
+
+                    Ooops! Disconnect failed - could not find matching user account!
+
+                <?php
                 exit;
             }
 
@@ -556,26 +556,26 @@ class Patreon_Login
             if (!current_user_can('manage_options')) {
 
                 ?>
-					Disconnected! Now you can connect your site account to another Patreon account.
-					<table class="form-table">
-						<tr>
-							<th><label for="patreon_user">Connect your site account to your Patreon account</label></th>
-							<td>
-								<button id="patreon_wordpress_connect_patreon_account" class="button button-primary button-large" patreon_login_url="<?php echo $login_flow_url; ?>" target="">Connect to Patreon</button><br />
-							</td>
-						</tr>
-					</table>
-				
-				<?php
+                    Disconnected! Now you can connect your site account to another Patreon account.
+                    <table class="form-table">
+                        <tr>
+                            <th><label for="patreon_user">Connect your site account to your Patreon account</label></th>
+                            <td>
+                                <button id="patreon_wordpress_connect_patreon_account" class="button button-primary button-large" patreon_login_url="<?php echo $login_flow_url; ?>" target="">Connect to Patreon</button><br />
+                            </td>
+                        </tr>
+                    </table>
+
+                <?php
 
             }
 
             if (current_user_can('manage_options')) {
 
                 ?>
-					Disconnected! Only the owner of this user account can reconnect it to his/her Patreon account.
-		
-				<?php
+                    Disconnected! Only the owner of this user account can reconnect it to his/her Patreon account.
+
+                <?php
 
             }
 

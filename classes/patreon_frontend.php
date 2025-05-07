@@ -8,8 +8,8 @@ if (!defined('WPINC')) {
 
 class Patreon_Frontend
 {
-    public static $messages_map 					= array();
-    public static $allowed_toggles 					= array();
+    public static $messages_map                     = array();
+    public static $allowed_toggles                     = array();
     public static $current_user_logged_into_patreon = -1;
 
     public function __construct()
@@ -96,11 +96,11 @@ class Patreon_Frontend
         // Why we print out css direclty in header is that we want to account for any potential WP content directory location than default
         echo '<style>';
         echo "@font-face {
-			font-family: 'Libre Franklin Extra Bold';
-			src: url('" . PATREON_PLUGIN_ASSETS . "/fonts/librefranklin-extrabold-webfont.woff2') format('woff2'),
-				 url('" . PATREON_PLUGIN_ASSETS . "/fonts/librefranklin-extrabold-webfont.woff') format('woff');
-			font-weight: bold;
-			}";
+            font-family: 'Libre Franklin Extra Bold';
+            src: url('" . PATREON_PLUGIN_ASSETS . "/fonts/librefranklin-extrabold-webfont.woff2') format('woff2'),
+                 url('" . PATREON_PLUGIN_ASSETS . "/fonts/librefranklin-extrabold-webfont.woff') format('woff');
+            font-weight: bold;
+            }";
         echo '</style>';
 
     }
@@ -131,7 +131,7 @@ class Patreon_Frontend
         }
 
         $login_with_patreon = get_option('patreon-enable-login-with-patreon', false);
-        $client_id 			= get_option('patreon-client-id', false);
+        $client_id             = get_option('patreon-client-id', false);
 
         // Check existence of a custom patreon banners as saved in plugin options
         $custom_universal_banner = get_option('patreon-custom-universal-banner', false);
@@ -181,8 +181,8 @@ class Patreon_Frontend
                 $button_args['is_feed'] = true;
             }
 
-            $universal_button	   = self::patreonMakeUniversalButton($patreon_level, false, false, false, $button_args);
-            $universal_button 	   = apply_filters('ptrn/final_state_universal_button', '<div class="patreon-universal-button">' . $universal_button . '</div>', $patreon_level, $post);
+            $universal_button       = self::patreonMakeUniversalButton($patreon_level, false, false, false, $button_args);
+            $universal_button        = apply_filters('ptrn/final_state_universal_button', '<div class="patreon-universal-button">' . $universal_button . '</div>', $patreon_level, $post);
 
             $text_over_universal_button  = apply_filters('ptrn/final_state_label_over_universal_button', self::getLabelOverUniversalButton($patreon_level, $args), $patreon_level, $post);
 
@@ -1403,11 +1403,11 @@ class Patreon_Frontend
         $button = '';
         /* inline styles - prevent themes from overriding */
         $button .= '
-		<style type="text/css">
-			.ptrn-button{display:block !important;;margin-top:20px !important;margin-bottom:20px !important;}
-			.ptrn-button img {width: 272px; height:42px;}
-			.patreon-msg {-webkit-border-radius: 6px;-moz-border-radius: 6px;-ms-border-radius: 6px;-o-border-radius: 6px;border-radius: 6px;padding:8px;margin-bottom:20px!important;display:block;border:1px solid #E6461A;background-color:#484848;color:#ffffff;}
-		</style>';
+        <style type="text/css">
+            .ptrn-button{display:block !important;;margin-top:20px !important;margin-bottom:20px !important;}
+            .ptrn-button img {width: 272px; height:42px;}
+            .patreon-msg {-webkit-border-radius: 6px;-moz-border-radius: 6px;-ms-border-radius: 6px;-o-border-radius: 6px;border-radius: 6px;padding:8px;margin-bottom:20px!important;display:block;border:1px solid #E6461A;background-color:#484848;color:#ffffff;}
+        </style>';
 
         if (isset($_REQUEST['patreon-msg']) && $_REQUEST['patreon-msg'] == 'login_with_patreon') {
             $button .= '<p class="patreon-msg">You can now login with your WordPress username/password.</p>';
