@@ -3,8 +3,8 @@ Contributors: patreon, codebard
 Tags: patreon, membership, members
 Requires at least: 4.0
 Requires PHP: 7.4
-Tested up to: 6.7.1
-Stable tag: 1.9.6
+Tested up to: 6.8.1
+Stable tag: 1.9.7
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -16,7 +16,7 @@ Bring Patreon features to your WordPress website and make them work together. Yo
 
 You can lock any single post or all of your posts! You can also lock any custom post type. Your visitors can log into your site via Patreon, making it easier for them to use your site in addition to accessing your locked content.
 
-This plugin is developed and maintained by Patreon. 
+This plugin is developed and maintained by Patreon.
 
 = FEATURES FOR CREATORS =
 
@@ -78,6 +78,11 @@ To make a locked post public again, just choose "Everyone" from the select box a
 It is  difficult to protect videos due the intensive bandwidth requirements of hosting video  and having to rely on third parties such as Youtube or Vimeo. Youtube allows you to set videos to ‘private’ but Vimeo offers extra controls by only allowing videos to be played on specific domains. Visit this guide to [protecting your video content with Vimeo](https://help.vimeo.com/hc/en-us/articles/224817847-Privacy-settings-overview).
 
 == Upgrade Notice ==
+
+= 1.9.7 =
+
+* Extracted Patreon hostname in a constant
+* Reformatted code
 
 = 1.9.6 =
 
@@ -192,7 +197,7 @@ It is  difficult to protect videos due the intensive bandwidth requirements of h
 
 * Important bugfix for author select dropdown for post sync in Patreon settings admin page
 * Added args to get_user when constructing post author dropdown. Now only gets users down to contributor level and excludes subscribers - this will prevent problems with sites with large number of users
-* Added count limit to dropdown to limit the size of the select in the case of roles from super admin to contributor having too many users. 
+* Added count limit to dropdown to limit the size of the select in the case of roles from super admin to contributor having too many users.
 * Args now sorts the users based on their nicename, ASC.
 * Dropdown now shows user display name and nice name together.
 
@@ -221,10 +226,10 @@ It is  difficult to protect videos due the intensive bandwidth requirements of h
 = 1.7.0 =
 
 * Fixed a bug with post author for synced posts not being possible to set
-* Added allowed toggle keys to frontend class. 
+* Added allowed toggle keys to frontend class.
 * Added allowed key check to advanced options toggle function that receives ajax call.
-* Added nonce to advanced options toggle form. 
-* Added code to transmit nonce to ajax backend function. 
+* Added nonce to advanced options toggle form.
+* Added code to transmit nonce to ajax backend function.
 * Added nonce check to toggle_option receiver function.
 * Fixed a bug that prevented reconnect site option from being used in Patreon Options
 * Added nonce check to reconnect site option for security
@@ -477,11 +482,11 @@ Added filter for raw text of label over interface button
 
 PW now prevents caching of gated content to make sure unlocked content unlocks
 
-= 1.3.8 = 
+= 1.3.8 =
 
 Added a health check page that allows you to see the health of your Patreon integration
 
-= 1.3.7 = 
+= 1.3.7 =
 
 Minor internal feature update
 
@@ -515,7 +520,7 @@ Yes, you can use Patreon WordPress side by side with any other membership plugin
 
 You can easily install and use Patreon WordPress alongside WooCommerce at the same time.
 
-= Do my patrons get charged again if they unlock a post on my site? = 
+= Do my patrons get charged again if they unlock a post on my site? =
 
 Your patrons do not get charged again if they unlock any post on your site via the 'Unlock with Patreon' button. The plugin just checks if they are qualifying patrons, and if so, it lets them access your content.
 
@@ -532,6 +537,11 @@ Nothing will be changed at your site - the plugin will just connect your site to
 You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team help validate, triage and handle any security vulnerabilities. [Report a security vulnerability.](https://patchstack.com/database/vdp/patreon-connect)
 
 == Changelog ==
+
+= 1.9.7 =
+
+* Extracted Patreon hostname in a constant
+* Reformatted code
 
 = 1.9.6 =
 
@@ -644,7 +654,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 * Important bugfix for author select dropdown for post sync in Patreon settings admin page
 * Added args to get_user when constructing post author dropdown. Now only gets users down to contributor level and excludes subscribers - this will prevent problems with sites with large number of users
-* Added count limit to dropdown to limit the size of the select in the case of roles from super admin to contributor having too many users. 
+* Added count limit to dropdown to limit the size of the select in the case of roles from super admin to contributor having too many users.
 * Args now sorts the users based on their nicename, ASC.
 * Dropdown now shows user display name and nice name together.
 
@@ -673,10 +683,10 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 = 1.7.0 =
 
 * Fixed a bug with post author for synced posts not being possible to set
-* Added allowed toggle keys to frontend class. 
+* Added allowed toggle keys to frontend class.
 * Added allowed key check to advanced options toggle function that receives ajax call.
-* Added nonce to advanced options toggle form. 
-* Added code to transmit nonce to ajax backend function. 
+* Added nonce to advanced options toggle form.
+* Added code to transmit nonce to ajax backend function.
 * Added nonce check to toggle_option receiver function.
 * Fixed a bug that prevented reconnect site option from being used in Patreon Options
 * Added nonce check to reconnect site option for security
@@ -957,7 +967,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 = 1.3.4 =
 
 * Gated post interface now shows refresh link to non logged in visitors. This allows existing patrons to easily refresh the content or login as opposed to being sent to plegdge flow
-* Updated interface message that is shown to non-qualifying patrons. These patrons will now be shown a message asking them to ugprade their tier as opposed to just showing them the default message. 
+* Updated interface message that is shown to non-qualifying patrons. These patrons will now be shown a message asking them to ugprade their tier as opposed to just showing them the default message.
 * Added 2 links to setup wizard to allow creators to easily log in or register at Patreon as a creator before starting setup
 * Added utm params to existing links
 
@@ -1028,7 +1038,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 = 1.2.3 =
 
-* Hotfix - addressed a potential issue which could occur during Patreon maintenance, causing some sites to show Patreon maintenance page in admin or to logged in users. This would happen when the plugin attempted to refresh expired creator tokens or update a user's Patreon details or update any info via Patreon_OAuth class. 
+* Hotfix - addressed a potential issue which could occur during Patreon maintenance, causing some sites to show Patreon maintenance page in admin or to logged in users. This would happen when the plugin attempted to refresh expired creator tokens or update a user's Patreon details or update any info via Patreon_OAuth class.
 
 = 1.2.2 =
 
@@ -1043,7 +1053,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 = 1.2.0 =
 
 * Now compatible with Patreon API v2
-* Patron info related calls to API made to work using v2 - they currently work without needing to upgrade tokens to v2 
+* Patron info related calls to API made to work using v2 - they currently work without needing to upgrade tokens to v2
 * New advanced locking option based on total historical pledge of patrons added
 * New advanced locking option based on membership start date of patrons added
 * New advanced locking options made work in conjunction with each other to provide a total of 4 locking options
@@ -1053,7 +1063,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 * "Show/Hide Advanced" toggle now remembers user preference
 * Existing locking option and new locking options linked to help document from post metabox
 * New method for directly locking any part of content or site added - now anything can be locked, not only posts or custom post types. A part of the theme or content can be locked for any given pledge level by using some code (content in sidebars, widgets, header, footer, inside posts etc)
-* 
+*
 * Compatibility class to hold compatibility related code added
 * Do not cache variable added to compatibility class to tell caching plugins to not cache critical Patreon related routing pages (flow, auth)
 * Cache control / no cache headers added to headers for Patreon routing pages (flow, auth)
