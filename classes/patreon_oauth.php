@@ -43,7 +43,7 @@ class Patreon_OAuth
 
     private function __update_token($params)
     {
-        $api_endpoint = 'https://api.patreon.com/oauth2/token';
+        $api_endpoint = 'https://'.PATREON_HOST.'/api/oauth2/token';
 
         $headers = [
             'User-Agent' => 'Patreon-Wordpress, version '.PATREON_WORDPRESS_VERSION.PATREON_WORDPRESS_BETA_STRING.', platform '.php_uname('s').'-'.php_uname('r'),
