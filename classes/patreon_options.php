@@ -146,7 +146,7 @@ class Patreon_Options
 
                                     <div id="patreon_options_app_details_connect">
 
-                                        We will now connect your site to Patreon by running connection wizard. Before starting, please make sure you deleted any existing app for this site in <a href="https://www.patreon.com/portal/registration/register-clients" target="_blank">this page at Patreon</a><br /><br />
+                                        We will now connect your site to Patreon by running connection wizard. Before starting, please make sure you deleted any existing app for this site in <a href="https://'.PATREON_HOST.'/portal/registration/register-clients" target="_blank">this page at Patreon</a><br /><br />
                                         <button id="patreon_wordpress_reconnect_to_patreon" class="button button-primary button-large" target="<?php echo admin_url('admin.php?page=patreon_wordpress_setup_wizard&setup_stage=0'); ?>"  aria-label="Start connection wizard">Start connection wizard</button> <button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon_options_app_details_connect patreon_options_app_details_main">Cancel</button>
 
                                     </div>
@@ -168,7 +168,7 @@ class Patreon_Options
 
                                         <tr valign="top">
                                             <th scope="row"><strong></strong></th>
-                                            <td>You can find the app settings at Patreon <a href="https://www.patreon.com/platform/documentation/clients?utm_source=<?php urlencode(site_url()); ?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=settings_screen_app_settings_link&utm_term=" target="_blank" aria-label="Visit app settings at Patreon. Not necessary if you already set up your connection">here</a></td>
+                                            <td>You can find the app settings at Patreon <a href="https://'.PATREON_HOST.'/platform/documentation/clients?utm_source=<?php urlencode(site_url()); ?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=settings_screen_app_settings_link&utm_term=" target="_blank" aria-label="Visit app settings at Patreon. Not necessary if you already set up your connection">here</a></td>
                                         </tr>
                                         <tr valign="top">
                                             <th scope="row"><strong>Redirect URI</strong></th>

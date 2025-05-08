@@ -716,7 +716,7 @@ class Patreon_Frontend
 
         $pledge_level = apply_filters('ptrn/patron_link_pledge_level', $pledge_level, $send_post_id, $args);
 
-        $href = 'https://www.patreon.com/oauth2/become-patron?response_type=code&min_cents='.$pledge_level.'&client_id='.$client_id.$v2_params.'&redirect_uri='.$redirect_uri.'&state='.urlencode(base64_encode(json_encode($state)));
+        $href = 'https://'.PATREON_HOST.'/oauth2/become-patron?response_type=code&min_cents='.$pledge_level.'&client_id='.$client_id.$v2_params.'&redirect_uri='.$redirect_uri.'&state='.urlencode(base64_encode(json_encode($state)));
 
         // 3rd party dev goodie! Apply custom filters so they can manipulate the url:
 
@@ -824,7 +824,7 @@ class Patreon_Frontend
         $redirect_uri = site_url().'/patreon-authorization/';
         $v2_params = '&scope=identity+'.urlencode('identity[email]');
 
-        $href = 'https://www.patreon.com/oauth2/authorize?response_type=code&client_id='
+        $href = 'https://'.PATREON_HOST.'/oauth2/authorize?response_type=code&client_id='
         .$client_id.$v2_params
         .'&redirect_uri='.urlencode($redirect_uri)
         .'&state='.urlencode(base64_encode(json_encode($state)));
