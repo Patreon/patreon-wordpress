@@ -2,54 +2,50 @@
 
 // If this file is called directly, abort.
 if (!defined('WPINC')) {
-    die;
+    exit;
 }
 
 class Patreon_User_Profiles
 {
     public function __construct()
     {
-
-        add_action('show_user_profile', array( $this, 'patreon_user_profile_fields' ));
-        add_action('edit_user_profile', array( $this, 'patreon_user_profile_fields' ));
-        add_action('personal_options_update', array( $this, 'save_patreon_user_profile_fields' ));
-        add_action('edit_user_profile_update', array( $this, 'save_patreon_user_profile_fields' ));
-        add_action('user_profile_update_errors', array( $this, 'prevent_email_change'), 10, 3);
-
+        add_action('show_user_profile', [$this, 'patreon_user_profile_fields']);
+        add_action('edit_user_profile', [$this, 'patreon_user_profile_fields']);
+        add_action('personal_options_update', [$this, 'save_patreon_user_profile_fields']);
+        add_action('edit_user_profile_update', [$this, 'save_patreon_user_profile_fields']);
+        add_action('user_profile_update_errors', [$this, 'prevent_email_change'], 10, 3);
     }
 
     public function patreon_user_profile_fields($user)
     {
-
         if (current_user_can('manage_options')) {
-
             ?>
 
             <br />
 
-            <h3><?php _e("Patreon Profile", "blank"); ?></h3>
+            <h3><?php _e('Patreon Profile', 'blank'); ?></h3>
 
             <table class="form-table">
                 <tr>
-                    <th><label for="patreon_user"><?php _e("Patreon User"); ?></label></th>
+                    <th><label for="patreon_user"><?php _e('Patreon User'); ?></label></th>
                     <td>
                         <input type="text" name="patreon_user" id="patreon_user" disabled value="<?php echo esc_attr(get_the_author_meta('patreon_user', $user->ID)); ?>" class="regular-text" /><br />
                     </td>
                 </tr>
                 <tr>
-                    <th><label for="patreon_created"><?php _e("Patreon Created"); ?></label></th>
+                    <th><label for="patreon_created"><?php _e('Patreon Created'); ?></label></th>
                     <td>
                         <input type="text" name="patreon_created" id="patreon_created" disabled value="<?php echo esc_attr(get_the_author_meta('patreon_created', $user->ID)); ?>" class="regular-text" /><br />
                     </td>
                 </tr>
                 <tr>
-                    <th><label for="user_firstname"><?php _e("Patreon First name"); ?></label></th>
+                    <th><label for="user_firstname"><?php _e('Patreon First name'); ?></label></th>
                     <td>
                         <input type="text" name="user_firstname" id="user_firstname" disabled value="<?php echo esc_attr(get_the_author_meta('user_firstname', $user->ID)); ?>" class="regular-text" /><br />
                     </td>
                 </tr>
                 <tr>
-                    <th><label for="user_lastname"><?php _e("Patreon Last name"); ?></label></th>
+                    <th><label for="user_lastname"><?php _e('Patreon Last name'); ?></label></th>
                     <td>
                         <input type="text" name="user_lastname" id="user_lastname" disabled value="<?php echo esc_attr(get_the_author_meta('user_lastname', $user->ID)); ?>" class="regular-text" /><br />
                     </td>
@@ -64,14 +60,13 @@ class Patreon_User_Profiles
         global $user_id;
 
         if (current_user_can('manage_options') or (isset($user_id) and (get_current_user_id() == $user_id))) {
-
             // This is either an admin in profile page or a user who is viewing his/her own profile page. Go ahead.
 
             ?>
 
             <br />
 
-            <h3><?php _e("Patreon account", "blank"); ?></h3>
+            <h3><?php _e('Patreon account', 'blank'); ?></h3>
 
             <?php
 
@@ -79,13 +74,12 @@ class Patreon_User_Profiles
 
                 $linked_patreon_account = get_user_meta($user_id, 'patreon_user_id', true);
 
-            if ($linked_patreon_account == '' and (isset($user_id) and (get_current_user_id() == $user_id))) {
+            if ('' == $linked_patreon_account and (isset($user_id) and (get_current_user_id() == $user_id))) {
                 // Only show this if the current user is the owner of the profile - an admin cant link a user's Patreon account for that user
 
                 $user = wp_get_current_user();
 
-                $login_flow_url = Patreon_Frontend::patreonMakeLoginLink(false, array( 'final_redirect_uri' => get_edit_profile_url($user->ID) ));
-
+                $login_flow_url = Patreon_Frontend::patreonMakeLoginLink(false, ['final_redirect_uri' => get_edit_profile_url($user->ID)]);
 
                 ?>
                         <div id="patreon_wordpress_user_profile_account_connection_wrapper">
@@ -101,7 +95,7 @@ class Patreon_User_Profiles
                     <?php
             }
 
-            if ($linked_patreon_account != '') {
+            if ('' != $linked_patreon_account) {
                 // Admins can disconnect someone's account as well as the user himself/herself
 
                 // Set the warning note:
@@ -113,11 +107,9 @@ class Patreon_User_Profiles
                 // If user is an admin and not the owner of this account, set the admin version of the warning
 
                 if (current_user_can('manage_options') and !(isset($user_id) and (get_current_user_id() == $user_id))) {
-
                     $disconnect_warning = 'Note: If the user logs out of the website after you disconnect the linked Patreon account, the user will have to use his/her site username/password in order to login. Only after that the account can be reconnected to a Patreon account.';
 
                     $disconnect_label = 'Disconnect this site account from linked Patreon account';
-
                 }
 
                 ?>
@@ -133,21 +125,18 @@ class Patreon_User_Profiles
                         </div>
                     <?php
             }
-
         }
-
     }
 
     public function save_patreon_user_profile_fields($user_id)
     {
-
         if (!current_user_can('edit_user', $user_id)) {
             return false;
         }
 
         // if ( is_email( $_POST['patreon_email'] ) ) {
 
-        //update_user_meta( $user_id, 'patreon_email', $_POST['patreon_email'] );
+        // update_user_meta( $user_id, 'patreon_email', $_POST['patreon_email'] );
 
         // }
 
@@ -155,23 +144,16 @@ class Patreon_User_Profiles
         // update_user_meta( $user_id, 'patreon_created', $_POST['patreon_created'] );
         // update_user_meta( $user_id, 'user_firstname', $_POST['province'] );
         // update_user_meta( $user_id, 'user_lastname', $_POST['postalcode'] );
-
-
     }
 
     public function prevent_email_change($errors, $update, $user)
     {
-
         if ($user and isset($user->ID)) {
-
             $old = get_user_by('id', $user->ID);
 
-            if ($user->user_email != $old->user_email   && (!current_user_can('create_users'))) {
+            if ($user->user_email != $old->user_email && (!current_user_can('create_users'))) {
                 $user->user_email = $old->user_email;
             }
-
         }
-
     }
-
 }

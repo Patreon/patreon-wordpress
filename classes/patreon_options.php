@@ -2,41 +2,34 @@
 
 // If this file is called directly, abort.
 if (!defined('WPINC')) {
-    die;
+    exit;
 }
 
 class Patreon_Options
 {
     public function __construct()
     {
-
         if (is_admin()) {
-
-            add_action('admin_menu', array( $this, 'patreon_plugin_setup' ));
-            add_action('admin_init', array( $this, 'patreon_plugin_register_settings' ));
-
+            add_action('admin_menu', [$this, 'patreon_plugin_setup']);
+            add_action('admin_init', [$this, 'patreon_plugin_register_settings']);
         }
-
     }
 
     public function patreon_plugin_setup()
     {
+        add_menu_page('Patreon Settings', 'Patreon Settings', 'manage_options', 'patreon-plugin', [$this, 'patreon_plugin_setup_page'], PATREON_PLUGIN_ASSETS.'/img/Patreon WordPress.png');
 
-        add_menu_page('Patreon Settings', 'Patreon Settings', 'manage_options', 'patreon-plugin', array( $this, 'patreon_plugin_setup_page' ), PATREON_PLUGIN_ASSETS . '/img/Patreon WordPress.png');
+        add_submenu_page('', 'Patreon Settings', 'Patreon Settings', 'administrator', 'patreon_wordpress_setup_wizard', ['Patreon_Wordpress', 'setup_wizard']);
 
-        add_submenu_page('', 'Patreon Settings', 'Patreon Settings', 'administrator', 'patreon_wordpress_setup_wizard', array('Patreon_Wordpress', 'setup_wizard'));
+        add_submenu_page('', 'Patreon WordPress Admin Message', 'Admin message', 'manage_options', 'patreon-plugin-admin-message', [$this, 'patreon_plugin_admin_message_page']);
 
-        add_submenu_page('', 'Patreon WordPress Admin Message', 'Admin message', 'manage_options', 'patreon-plugin-admin-message', array( $this, 'patreon_plugin_admin_message_page' ));
+        add_submenu_page('patreon-plugin', 'Patreon WordPress Post Sync', 'Post Sync', 'manage_options', 'patreon_wordpress_setup_wizard&setup_stage=post_sync_1', [$this, 'patreon_plugin_post_sync_page']);
 
-        add_submenu_page('patreon-plugin', 'Patreon WordPress Post Sync', 'Post Sync', 'manage_options', 'patreon_wordpress_setup_wizard&setup_stage=post_sync_1', array( $this, 'patreon_plugin_post_sync_page' ));
-
-        add_submenu_page('patreon-plugin', 'Patreon WordPress Health Check', 'Health check', 'manage_options', 'patreon-plugin-health', array( $this, 'patreon_plugin_health_check_page' ));
-
+        add_submenu_page('patreon-plugin', 'Patreon WordPress Health Check', 'Health check', 'manage_options', 'patreon-plugin-health', [$this, 'patreon_plugin_health_check_page']);
     }
 
     public function patreon_plugin_register_settings()
     {
-
         // whitelist options
         register_setting('patreon-options', 'patreon-client-id');
         register_setting('patreon-options', 'patreon-client-secret');
@@ -55,9 +48,9 @@ class Patreon_Options
         register_setting('patreon-options', 'patreon-protect-default-image-patreon-level');
         register_setting('patreon-options', 'patreon-enable-file-locking');
         register_setting('patreon-options', 'patreon-enable-strict-oauth');
-        register_setting('patreon-options', 'patreon-lock-entire-site', array(&$this, 'site_locking_value'));
+        register_setting('patreon-options', 'patreon-lock-entire-site', [&$this, 'site_locking_value']);
         register_setting('patreon-options', 'patreon-custom-universal-banner');
-        register_setting('patreon-options', 'patreon-custom-page-name', array(&$this, 'sanitize_page_name'));
+        register_setting('patreon-options', 'patreon-custom-page-name', [&$this, 'sanitize_page_name']);
         register_setting('patreon-options', 'patreon-prevent-caching-gated-content');
         register_setting('patreon-options', 'patreon-currency-sign');
         register_setting('patreon-options', 'patreon-currency-sign-behind');
@@ -70,19 +63,17 @@ class Patreon_Options
         register_setting('patreon-options', 'patreon-auto-publish-public-posts');
         register_setting('patreon-options', 'patreon-auto-publish-patron-only-posts');
         register_setting('patreon-options', 'patreon-override-synced-post-publish-date');
-
     }
 
     public function patreon_plugin_setup_page()
     {
-
-        $args = array(
-                'post_type'      => 'page',
-                'post_status'    => 'publish',
-                'posts_per_page' => -1,
-                'sort_order'     => 'asc',
-                'orderby'        => 'title'
-        );
+        $args = [
+            'post_type' => 'page',
+            'post_status' => 'publish',
+            'posts_per_page' => -1,
+            'sort_order' => 'asc',
+            'orderby' => 'title',
+        ];
         $all_pages = get_pages($args);
 
         $danger_user_list = Patreon_Login::getDangerUserList();
@@ -126,25 +117,24 @@ class Patreon_Options
                                         <button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon-connection-details" aria-label="Patreon connection details">Connection details</button><?php // Immediately inserted here to not cause any funny html rendering
 
         if (
-            (!get_option('patreon-client-id', false) or get_option('patreon-client-id', false) == '') and
-            (!get_option('patreon-client-secret', false) or get_option('patreon-client-secret', false) == '') and
-            (!get_option('patreon-creators-access-token', false) or get_option('patreon-creators-access-token', false) == '') and
-            (!get_option('patreon-creators-refresh-token', false) or get_option('patreon-creators-refresh-token', false) == '')
+            (!get_option('patreon-client-id', false) or '' == get_option('patreon-client-id', false))
+            and (!get_option('patreon-client-secret', false) or '' == get_option('patreon-client-secret', false))
+            and (!get_option('patreon-creators-access-token', false) or '' == get_option('patreon-creators-access-token', false))
+            and (!get_option('patreon-creators-refresh-token', false) or '' == get_option('patreon-creators-refresh-token', false))
         ) {
             ?> <button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon_options_app_details_connect patreon_options_app_details_main"  aria-label="Connect your site to Patreon">Connect site</button>
                                             <?php
 
         }
 
-
         if (get_option('patreon-client-id', false)
             && get_option('patreon-client-secret', false)
             && get_option('patreon-creators-access-token', false)
             && get_option('patreon-creators-refresh-token', false)
-            && get_option('patreon-client-id', false) != ''
-            && get_option('patreon-client-secret', false) != ''
-            && get_option('patreon-creators-access-token', false) != ''
-            && get_option('patreon-creators-refresh-token', false) != ''
+            && '' != get_option('patreon-client-id', false)
+            && '' != get_option('patreon-client-secret', false)
+            && '' != get_option('patreon-creators-access-token', false)
+            && '' != get_option('patreon-creators-refresh-token', false)
         ) {
             ?> <button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon_options_app_details_reconnect patreon_options_app_details_main" aria-label="Connect or Reconnect your site to Patreon">(re)Connect site</button> <button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon_options_app_details_disconnect patreon_options_app_details_main" aria-label="Disconnect your site from Patreon">Disconnect site</button> <?php
 
@@ -163,14 +153,14 @@ class Patreon_Options
                                     <div id="patreon_options_app_details_reconnect">
 
                                         We will now reconnect your site to Patreon. This will refresh your site's connection to Patreon. Your settings and content gating values will remain unchanged. Patron only content will become accessible to everyone until you finish reconnecting your site to Patreon.<br /><br />
-                                        <button id="patreon_wordpress_disconnect_reconnect_to_patreon" class="button button-primary button-large" target="<?php echo admin_url('admin.php?page=patreon_wordpress_setup_wizard&setup_stage=reconnect_0&patreon_wordpress_reconnect_to_patreon_nonce=' . wp_create_nonce()); ?>"  aria-label="Confirm connection">Confirm</button> <button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon_options_app_details_reconnect patreon_options_app_details_main" aria-label="Cancel">Cancel</button>
+                                        <button id="patreon_wordpress_disconnect_reconnect_to_patreon" class="button button-primary button-large" target="<?php echo admin_url('admin.php?page=patreon_wordpress_setup_wizard&setup_stage=reconnect_0&patreon_wordpress_reconnect_to_patreon_nonce='.wp_create_nonce()); ?>"  aria-label="Confirm connection">Confirm</button> <button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon_options_app_details_reconnect patreon_options_app_details_main" aria-label="Cancel">Cancel</button>
 
                                     </div>
 
                                     <div id="patreon_options_app_details_disconnect">
 
                                         We will now remove all info related to currently linked creator account from your site. Post gating values in your posts will be left untouched. After this, you will be able to connect this site to another creator account you have. Gated posts should keep stay gated from the nearest tier you have in the creator account you connect to this site. Patron only content will become accessible to everyone until you reconnect your site to Patreon. <br /><br />
-                                        <button id="patreon_wordpress_disconnect_from_patreon" class="button button-primary button-large"  aria-label="Confirm disconnection" target="<?php echo admin_url('admin.php?page=patreon-plugin&patreon_wordpress_action=disconnect_site_from_patreon&patreon_wordpress_disconnect_from_patreon_nonce=' . wp_create_nonce()); ?>">Confirm disconnection</button> <button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon_options_app_details_disconnect patreon_options_app_details_main" aria-label="Cancel">Cancel</button>
+                                        <button id="patreon_wordpress_disconnect_from_patreon" class="button button-primary button-large"  aria-label="Confirm disconnection" target="<?php echo admin_url('admin.php?page=patreon-plugin&patreon_wordpress_action=disconnect_site_from_patreon&patreon_wordpress_disconnect_from_patreon_nonce='.wp_create_nonce()); ?>">Confirm disconnection</button> <button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon_options_app_details_disconnect patreon_options_app_details_main" aria-label="Cancel">Cancel</button>
 
                                     </div>
 
@@ -178,11 +168,11 @@ class Patreon_Options
 
                                         <tr valign="top">
                                             <th scope="row"><strong></strong></th>
-                                            <td>You can find the app settings at Patreon <a href="https://www.patreon.com/platform/documentation/clients?utm_source=<?php urlencode(site_url()) ?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=settings_screen_app_settings_link&utm_term=" target="_blank" aria-label="Visit app settings at Patreon. Not necessary if you already set up your connection">here</a></td>
+                                            <td>You can find the app settings at Patreon <a href="https://www.patreon.com/platform/documentation/clients?utm_source=<?php urlencode(site_url()); ?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=settings_screen_app_settings_link&utm_term=" target="_blank" aria-label="Visit app settings at Patreon. Not necessary if you already set up your connection">here</a></td>
                                         </tr>
                                         <tr valign="top">
                                             <th scope="row"><strong>Redirect URI</strong></th>
-                                            <td><input type="text" value="<?php echo site_url() . '/patreon-authorization/'; ?>" disabled class="large-text"  aria-label="Redirect uri" /></td>
+                                            <td><input type="text" value="<?php echo site_url().'/patreon-authorization/'; ?>" disabled class="large-text"  aria-label="Redirect uri" /></td>
                                         </tr>
 
                                         <tr valign="top">
@@ -232,7 +222,7 @@ class Patreon_Options
                                     Get support at <a href="https://www.patreondevelopers.com/c/patreon-wordpress-plugin-support/11" target="_blank"  aria-label="Visit the official forum to get support">the official forum</a> by copying your plugin info below and adding to your support thread by pasting to share with support team.<br /><div id="patreon_copied"></div>
                                     <button class="button button-primary button-large" id="patreon_copy_health_check_output">Copy</button>
                                     <div id="patreon_health_check_output_for_support">WP <?php echo get_bloginfo('version'); ?> with PHP <?php echo phpversion();
-        echo "\r\n"; ?>Patreon WordPress <?php echo PATREON_WORDPRESS_VERSION ?> with API v<?php echo get_option('patreon-installation-api-version', false);
+        echo "\r\n"; ?>Patreon WordPress <?php echo PATREON_WORDPRESS_VERSION; ?> with API v<?php echo get_option('patreon-installation-api-version', false);
         echo "\r\n";
 
         // Conditionals for any addons / other relevant Patreon plugins
@@ -311,26 +301,26 @@ class Patreon_Options
                                         <?php
 
             $site_locking_info = '(Only Patrons at and over this pledge level will be able to see Posts)';
-        $readonly            = '';
+        $readonly = '';
         if (!get_option('patreon-creator-id', false)) {
-            $site_locking_info = 'Post locking won\'t work without Creator ID. Please confirm you have it <a href="'.admin_url("?page=patreon-plugin").'">here</a>';
-            $readonly = " readonly";
+            $site_locking_info = 'Post locking won\'t work without Creator ID. Please confirm you have it <a href="'.admin_url('?page=patreon-plugin').'">here</a>';
+            $readonly = ' readonly';
         }
         ?>
                                         <tr valign="top">
                                             <th scope="row">
                                                 <strong>Make entire site Patron-only with Pledge Level</strong>
                                                 <br>
-                                                <?php echo $site_locking_info ?>
+                                                <?php echo $site_locking_info; ?>
                                             </th>
                                             <td>
-                                                $<input type="text" name="patreon-lock-entire-site" value="<?php echo get_option('patreon-lock-entire-site'); ?>" <?php echo $readonly ?>/>
+                                                $<input type="text" name="patreon-lock-entire-site" value="<?php echo get_option('patreon-lock-entire-site'); ?>" <?php echo $readonly; ?>/>
                                             </td>
                                         </tr>
                                         <tr valign="top">
                                             <th scope="row" colspan="2">
                                                 <strong>Custom Call to Action Banner</strong> <br>You can show a custom Call to Action Notification and Banner (ie, "Be our Patron to see this content!") to your visitors. You can use HTML too. Leave empty to disable.<br /><br />
-                                                <?php wp_editor(get_option('patreon-custom-universal-banner'), 'patreon_custom_universal_banner', array( 'textarea_name' => 'patreon-custom-universal-banner', 'textarea_rows' => 5 )); ?>
+                                                <?php wp_editor(get_option('patreon-custom-universal-banner'), 'patreon_custom_universal_banner', ['textarea_name' => 'patreon-custom-universal-banner', 'textarea_rows' => 5]); ?>
                                             </th>
                                         </tr>
 
@@ -389,10 +379,10 @@ class Patreon_Options
                 $prevent_caching_selected = '';
         $do_not_prevent_caching_selected = '';
 
-        if (get_option('patreon-prevent-caching-gated-content', 'yes') == 'yes') {
-            $prevent_caching_selected = " selected";
+        if ('yes' == get_option('patreon-prevent-caching-gated-content', 'yes')) {
+            $prevent_caching_selected = ' selected';
         } else {
-            $do_not_prevent_caching_selected = " selected";
+            $do_not_prevent_caching_selected = ' selected';
         }
 
         ?>
@@ -428,8 +418,8 @@ class Patreon_Options
 
                                             $api_version_warning = '';
 
-        if (get_option('patreon-installation-api-version', 2) == '1') {
-            $api_version_warning = '<div id="patreon_api_version_warning" class="patreon_api_version_warning_inside_options"><div class="patreon_api_version_warning_important">' . PATREON_WARNING_IMPORTANT . '</div>' . PATREON_API_VERSION_WARNING . '</div>';
+        if ('1' == get_option('patreon-installation-api-version', 2)) {
+            $api_version_warning = '<div id="patreon_api_version_warning" class="patreon_api_version_warning_inside_options"><div class="patreon_api_version_warning_important">'.PATREON_WARNING_IMPORTANT.'</div>'.PATREON_API_VERSION_WARNING.'</div>';
         }
         ?>
 
@@ -445,10 +435,10 @@ class Patreon_Options
                     $sync_posts_selected = '';
         $sync_posts_unselected = '';
 
-        if (get_option('patreon-sync-posts', 'no') == 'yes') {
-            $sync_posts_selected = " selected";
+        if ('yes' == get_option('patreon-sync-posts', 'no')) {
+            $sync_posts_selected = ' selected';
         } else {
-            $sync_posts_unselected = " selected";
+            $sync_posts_unselected = ' selected';
         }
 
         ?>
@@ -466,27 +456,26 @@ class Patreon_Options
                                                     <?php
                 global $Patreon_Wordpress;
 
-        $sync_post_type     = get_option('patreon-sync-post-type', 'post');
+        $sync_post_type = get_option('patreon-sync-post-type', 'post');
         $sync_post_category = get_option('patreon-sync-post-category', 'category');
-        $sync_post_term     = get_option('patreon-sync-post-term', '1');
+        $sync_post_term = get_option('patreon-sync-post-term', '1');
 
         $post_type_select = $Patreon_Wordpress->make_post_type_select($sync_post_type);
-        $taxonomy_select  = $Patreon_Wordpress->make_taxonomy_select($sync_post_type, $sync_post_category);
-        $term_select      = $Patreon_Wordpress->make_term_select($sync_post_type, $sync_post_category, $sync_post_term);
-        $post_sync_category_status_color = "9d9d9d";
-
+        $taxonomy_select = $Patreon_Wordpress->make_taxonomy_select($sync_post_type, $sync_post_category);
+        $term_select = $Patreon_Wordpress->make_term_select($sync_post_type, $sync_post_category, $sync_post_term);
+        $post_sync_category_status_color = '9d9d9d';
 
         ?>
                                                     <select name="patreon_sync_post_type" id="patreon_sync_post_type" style="display: inline-block; margin-right: 5px;">
-                                                        <?php echo $post_type_select ?>
+                                                        <?php echo $post_type_select; ?>
                                                     </select>
                                                     <select  name="patreon_sync_post_category" id="patreon_sync_post_category" style="display: inline-block; margin-right: 5px;">
-                                                        <?php echo $taxonomy_select ?>
+                                                        <?php echo $taxonomy_select; ?>
                                                     </select>
                                                     <select  name="patreon_sync_post_term" id="patreon_sync_post_term" style="display: inline-block; margin-right: 5px;">
-                                                        <?php echo $term_select ?>
+                                                        <?php echo $term_select; ?>
                                                     </select>
-                                                    <button id="patreon_wordpress_save_post_sync_category" patreon_wordpress_nonce_save_post_sync_options="<?php echo wp_create_nonce() ?>" class="button button-primary button-large" pw_input_target="#patreon_wordpress_post_import_category_status" target="">Save</button><div id="patreon_wordpress_post_import_category_status" style="color: #<?php echo $post_sync_category_status_color ?>;"></div>
+                                                    <button id="patreon_wordpress_save_post_sync_category" patreon_wordpress_nonce_save_post_sync_options="<?php echo wp_create_nonce(); ?>" class="button button-primary button-large" pw_input_target="#patreon_wordpress_post_import_category_status" target="">Save</button><div id="patreon_wordpress_post_import_category_status" style="color: #<?php echo $post_sync_category_status_color; ?>;"></div>
                                                 </div>
 
                                                 </div>
@@ -506,10 +495,10 @@ class Patreon_Options
         $auto_publish_public_posts_selected = '';
         $auto_publish_public_posts_unselected = '';
 
-        if (get_option('patreon-auto-publish-public-posts', 'yes') == 'yes') {
-            $auto_publish_public_posts_selected = " selected";
+        if ('yes' == get_option('patreon-auto-publish-public-posts', 'yes')) {
+            $auto_publish_public_posts_selected = ' selected';
         } else {
-            $auto_publish_public_posts_unselected = " selected";
+            $auto_publish_public_posts_unselected = ' selected';
         }
 
         ?>
@@ -530,10 +519,10 @@ class Patreon_Options
             $auto_publish_patron_only_posts_selected = '';
         $auto_publish_patron_only_posts_unselected = '';
 
-        if (get_option('patreon-auto-publish-patron-only-posts', 'yes') == 'yes') {
-            $auto_publish_patron_only_posts_selected = " selected";
+        if ('yes' == get_option('patreon-auto-publish-patron-only-posts', 'yes')) {
+            $auto_publish_patron_only_posts_selected = ' selected';
         } else {
-            $auto_publish_patron_only_posts_unselected = " selected";
+            $auto_publish_patron_only_posts_unselected = ' selected';
         }
 
         ?>
@@ -555,8 +544,8 @@ class Patreon_Options
         $user_select = $Patreon_Wordpress->make_user_select($post_author_for_synced_posts);
 
         ?>
-                                                <select id="patreon_post_author_for_synced_posts" name="patreon-post-author-for-synced-posts" pw_input_target="#patreon_wordpress_post_author_status" patreon_wordpress_set_post_author_for_post_sync_nonce="<?php echo wp_create_nonce() ?>">
-                                                    <?php echo $user_select ?>
+                                                <select id="patreon_post_author_for_synced_posts" name="patreon-post-author-for-synced-posts" pw_input_target="#patreon_wordpress_post_author_status" patreon_wordpress_set_post_author_for_post_sync_nonce="<?php echo wp_create_nonce(); ?>">
+                                                    <?php echo $user_select; ?>
                                                 </select><div id="patreon_wordpress_post_author_status"></div>
                                             </td>
                                         </tr>
@@ -571,10 +560,10 @@ class Patreon_Options
             $override_post_publish_dates_from_patreon_selected = '';
         $override_post_publish_dates_from_patreon_unselected = '';
 
-        if (get_option('patreon-override-synced-post-publish-date', 'no') == 'yes') {
-            $override_post_publish_dates_from_patreon_selected = " selected";
+        if ('yes' == get_option('patreon-override-synced-post-publish-date', 'no')) {
+            $override_post_publish_dates_from_patreon_selected = ' selected';
         } else {
-            $override_post_publish_dates_from_patreon_unselected = " selected";
+            $override_post_publish_dates_from_patreon_unselected = ' selected';
         }
 
         ?>
@@ -595,10 +584,10 @@ class Patreon_Options
             $update_posts_selected = '';
         $update_posts_unselected = '';
 
-        if (get_option('patreon-update-posts', 'no') == 'yes') {
-            $update_posts_selected = " selected";
+        if ('yes' == get_option('patreon-update-posts', 'no')) {
+            $update_posts_selected = ' selected';
         } else {
-            $update_posts_unselected = " selected";
+            $update_posts_unselected = ' selected';
         }
 
         ?>
@@ -619,10 +608,10 @@ class Patreon_Options
             $delete_posts_selected = '';
         $delete_posts_unselected = '';
 
-        if (get_option('patreon-remove-deleted-posts', 'no') == 'yes') {
-            $delete_posts_selected = " selected";
+        if ('yes' == get_option('patreon-remove-deleted-posts', 'no')) {
+            $delete_posts_selected = ' selected';
         } else {
-            $delete_posts_unselected = " selected";
+            $delete_posts_unselected = ' selected';
         }
 
         ?>
@@ -643,10 +632,10 @@ class Patreon_Options
             $set_post_featured_image_selected = '';
         $set_post_featured_image_unselected = '';
 
-        if (get_option('patreon-set-featured-image', 'no') == 'yes') {
-            $set_post_featured_image_selected = " selected";
+        if ('yes' == get_option('patreon-set-featured-image', 'no')) {
+            $set_post_featured_image_selected = ' selected';
         } else {
-            $set_post_featured_image_unselected = " selected";
+            $set_post_featured_image_unselected = ' selected';
         }
 
         ?>
@@ -661,32 +650,32 @@ class Patreon_Options
                                                 <?php
 
             $post_import_status = 'No post import ongoing';
-        $post_import_status_color = "9d9d9d";
+        $post_import_status_color = '9d9d9d';
         $post_import_cancel = '';
-        $post_import_button = '<button id="patreon_wordpress_start_post_import" class="button button-primary button-large" pw_input_target="#patreon_wp_post_import_status" target="" patreon_wordpress_nonce_post_sync="' . wp_create_nonce('patreon_wordpress_nonce_post_sync') .'">Start an import</button>';
+        $post_import_button = '<button id="patreon_wordpress_start_post_import" class="button button-primary button-large" pw_input_target="#patreon_wp_post_import_status" target="" patreon_wordpress_nonce_post_sync="'.wp_create_nonce('patreon_wordpress_nonce_post_sync').'">Start an import</button>';
         $import_post_info_text = "Start an import of your posts from Patreon if you haven't done it before. After import of existing posts is complete, new posts will automatically be imported and existing posts automatically updated so you don't need to do this again.";
-        $import_post_info_header = "Start a post import";
+        $import_post_info_header = 'Start a post import';
 
         if (get_option('patreon-post-import-in-progress', false)) {
-            $post_import_status = "There is an ongoing post import";
-            $post_import_status_color = "129500";
+            $post_import_status = 'There is an ongoing post import';
+            $post_import_status_color = '129500';
             $post_import_button = '<button id="patreon_wordpress_import_next_batch_of_posts" class="button button-primary button-large" pw_input_target="#patreon_wp_post_import_status" target="" style="margin-right: 10px;">Import next batch</button>';
             $post_import_cancel = '<button id="patreon_wordpress_cancel_manual_post_import" class="button button-primary button-large" pw_input_target="#patreon_wp_post_import_status" target="">Cancel</button>';
-            $import_post_info_text = "Posts will be imported automatically every 5 minutes. If they are not, or you want to do it faster, click to import next batch of posts. This will import the next batch of posts in the queue. You can do this every 10 seconds.";
-            $import_post_info_header = "Ongoing post import";
+            $import_post_info_text = 'Posts will be imported automatically every 5 minutes. If they are not, or you want to do it faster, click to import next batch of posts. This will import the next batch of posts in the queue. You can do this every 10 seconds.';
+            $import_post_info_header = 'Ongoing post import';
         }
 
-        $api_version    = get_option('patreon-installation-api-version', '1');
-        $sync_posts     = get_option('patreon-sync-posts', 'no');
+        $api_version = get_option('patreon-installation-api-version', '1');
+        $sync_posts = get_option('patreon-sync-posts', 'no');
 
-        if ($api_version != '2' and $sync_posts == 'yes') {
+        if ('2' != $api_version and 'yes' == $sync_posts) {
             $post_import_status = 'Cant import posts - Wrong api version! Please upgrade to v2 using the tutorial <a href="https://www.patreondevelopers.com/t/how-to-upgrade-your-patreon-wordpress-to-use-api-v2/3249" target="_blank">here</a>';
-            $post_import_status_color = "f31d00";
+            $post_import_status_color = 'f31d00';
         }
 
         ?>
                                                 <strong id="post_import_status_heading"><?php echo $import_post_info_header; ?></strong>
-                                                <div class="patreon-options-info"><div id="post_import_info_text"><?php echo $import_post_info_text; ?></div><div id="patreon_wp_post_import_status" style="color: #<?php echo $post_import_status_color ?>;"><?php echo $post_import_status; ?></div></div>
+                                                <div class="patreon-options-info"><div id="post_import_info_text"><?php echo $import_post_info_text; ?></div><div id="patreon_wp_post_import_status" style="color: #<?php echo $post_import_status_color; ?>;"><?php echo $post_import_status; ?></div></div>
                                             </th>
                                             <td>
 
@@ -725,8 +714,8 @@ class Patreon_Options
                                     <p>Patreon Wordpress developed by Patreon</p>
 
                                     <p><strong>SUPPORT &amp; TECHNICAL HELP</strong> <br>
-                                    We actively support this plugin on our <a href="https://www.patreondevelopers.com/c/patreon-wordpress-plugin-support?utm_source=<?php urlencode(site_url()) ?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=settings_screen_support_link&utm_term=" target="_blank">Patreon Wordpress Support Forum</a>.</p>
-                                    <p><strong>DOCUMENTATION</strong> <br>Technical documentation and code examples available @ <a href="https://patreon.com/apps/wordpress?utm_source=<?php urlencode(site_url()) ?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=settings_screen_about_patreon_wordpress_link&utm_term=" target="_blank">https://patreon.com/apps/wordpress</a></p>
+                                    We actively support this plugin on our <a href="https://www.patreondevelopers.com/c/patreon-wordpress-plugin-support?utm_source=<?php urlencode(site_url()); ?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=settings_screen_support_link&utm_term=" target="_blank">Patreon Wordpress Support Forum</a>.</p>
+                                    <p><strong>DOCUMENTATION</strong> <br>Technical documentation and code examples available @ <a href="https://patreon.com/apps/wordpress?utm_source=<?php urlencode(site_url()); ?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=settings_screen_about_patreon_wordpress_link&utm_term=" target="_blank">https://patreon.com/apps/wordpress</a></p>
                                 </div>
                                 <!-- .inside -->
 
@@ -740,7 +729,7 @@ class Patreon_Options
                                 <h2 class="handle patreon_wordpress_option_heading">GDPR compliance</h2>
 
                                <div class="inside">
-                                    <p>Please visit <a href="<?php echo admin_url('tools.php?wp-privacy-policy-guide=1#wp-privacy-policy-guide-patreon-wordpress'); ?>">the new WordPress privacy policy recommendation page</a> and copy & paste the section related to Patreon WordPress to your privacy policy page.<br><br>You can read our easy tutorial for GDPR compliance with Patreon WordPress <a href="https://patreon.zendesk.com/hc/en-us/articles/360004198011?utm_source=<?php urlencode(site_url()) ?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=settings_screen_gdpr_info_link&utm_term=" target="_blank">by visiting our GDPR help page</a></p>
+                                    <p>Please visit <a href="<?php echo admin_url('tools.php?wp-privacy-policy-guide=1#wp-privacy-policy-guide-patreon-wordpress'); ?>">the new WordPress privacy policy recommendation page</a> and copy & paste the section related to Patreon WordPress to your privacy policy page.<br><br>You can read our easy tutorial for GDPR compliance with Patreon WordPress <a href="https://patreon.zendesk.com/hc/en-us/articles/360004198011?utm_source=<?php urlencode(site_url()); ?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=settings_screen_gdpr_info_link&utm_term=" target="_blank">by visiting our GDPR help page</a></p>
                                 </div>
                                 <!-- .inside -->
 
@@ -773,10 +762,9 @@ class Patreon_Options
 
     public function patreon_plugin_admin_message_page()
     {
-
         echo '<div id="patreon_setup_screen">';
 
-        echo '<div id="patreon_setup_logo"><img src="' . PATREON_PLUGIN_ASSETS . '/img/Patreon_Logo_100.png" /></div>';
+        echo '<div id="patreon_setup_logo"><img src="'.PATREON_PLUGIN_ASSETS.'/img/Patreon_Logo_100.png" /></div>';
 
         // Put some defaults so sites with warnings on will be fine
         $heading = 'patreon_admin_message_default_title';
@@ -789,13 +777,12 @@ class Patreon_Options
             $content = $_REQUEST['patreon_admin_message_content'];
         }
 
-        $heading = Patreon_Frontend::$messages_map[ $heading ];
-        $content = Patreon_Frontend::$messages_map[ $content ];
+        $heading = Patreon_Frontend::$messages_map[$heading];
+        $content = Patreon_Frontend::$messages_map[$content];
 
-        echo '<div id="patreon_setup_content"><h1 style="margin-top: 0px;">' . $heading . '</h1><div id="patreon_setup_message">' . $content . '</div></div>';
+        echo '<div id="patreon_setup_content"><h1 style="margin-top: 0px;">'.$heading.'</h1><div id="patreon_setup_message">'.$content.'</div></div>';
 
         echo '</div>';
-
     }
 
     public function patreon_plugin_post_sync_page()
@@ -803,16 +790,16 @@ class Patreon_Options
         // For now, dud to prevent any PHP notices when going to post sync wizard from admi menu. Can be expanded later.
         return;
     }
+
     public function patreon_plugin_health_check_page()
     {
-
         ?>
         <div class="patreon_admin_health_content_section">
             <h1>Health check of your Patreon integration</h1>
             Below are settings or issues which may affect your Patreon integration. Please check the recommendations and implement them to have your integration function better. You can get help for any of these items <a href="https://www.patreondevelopers.com/c/patreon-wordpress-plugin-support" target="_blank">by visiting our support forum</a> and posting a thread.
             <br><br>
             Your site is using:<br /><br /> WP <?php echo get_bloginfo('version'); ?> with PHP <?php echo phpversion(); ?><br />
-            Patreon WordPress <?php echo PATREON_WORDPRESS_VERSION ?> with API v<?php echo get_option('patreon-installation-api-version', false) ?><br />
+            Patreon WordPress <?php echo PATREON_WORDPRESS_VERSION; ?> with API v<?php echo get_option('patreon-installation-api-version', false); ?><br />
 
             <?php
 
@@ -823,8 +810,7 @@ class Patreon_Options
                 }
 
         if (isset($cb_p6_a1)) {
-
-            ?>Patron Plugin Pro <?php echo $cb_p6_a1->internal['version'] ?><br /><?php
+            ?>Patron Plugin Pro <?php echo $cb_p6_a1->internal['version']; ?><br /><?php
 
         }
 
@@ -833,8 +819,7 @@ class Patreon_Options
         }
 
         if (isset($cb_p6)) {
-
-            ?>Patreon Button, Widgets and Plugin <?php echo $cb_p6->internal['version'] ?><br /><?php
+            ?>Patreon Button, Widgets and Plugin <?php echo $cb_p6->internal['version']; ?><br /><?php
 
         }
 
@@ -846,7 +831,7 @@ class Patreon_Options
         </div>
         <?php
 
-        if (count(Patreon_Compatibility::$site_health_info) == 0) {
+        if (0 == count(Patreon_Compatibility::$site_health_info)) {
             ?>
 
         <div class="patreon_admin_health_content_box">
@@ -858,7 +843,6 @@ class Patreon_Options
         }
 
         if (count(Patreon_Compatibility::$site_health_info) > 0) {
-
             $health_info = Patreon_Compatibility::$site_health_info;
 
             // Sort according to priority
@@ -869,42 +853,35 @@ class Patreon_Options
 
             // Add last 50 connection errors at the end.
 
-
             foreach ($health_info as $key => $value) {
                 ?>
 
                 <div class="patreon_admin_health_content_box">
-                    <div class="patreon_toggle_admin_sections" target=".patreon_admin_health_content_box_hidden"><h3><?php echo $health_info[$key]['heading'] ?><span class="dashicons dashicons-arrow-down-alt2 patreon_setting_section_toggle_icon"></span></h3></div>
-                    <div class="patreon_admin_health_content_box_hidden"><?php echo $health_info[$key]['notice'] ?></div>
+                    <div class="patreon_toggle_admin_sections" target=".patreon_admin_health_content_box_hidden"><h3><?php echo $health_info[$key]['heading']; ?><span class="dashicons dashicons-arrow-down-alt2 patreon_setting_section_toggle_icon"></span></h3></div>
+                    <div class="patreon_admin_health_content_box_hidden"><?php echo $health_info[$key]['notice']; ?></div>
                 </div>
 
             <?php
 
             }
-
         }
 
         // Print out the last 50 connection errors if they exist
         ?>
 
         <div class="patreon_admin_health_content_box">
-            <div class="patreon_toggle_admin_sections" target=".patreon_admin_health_content_box_hidden"><h3><?php echo PATREON_LAST_50_CONNECTION_ERRORS_HEADING ?><span class="dashicons dashicons-arrow-down-alt2 patreon_setting_section_toggle_icon"></span></h3></div>
-            <div class="patreon_admin_health_content_box_hidden"><?php echo PATREON_LAST_50_CONNECTION_ERRORS ?>
+            <div class="patreon_toggle_admin_sections" target=".patreon_admin_health_content_box_hidden"><h3><?php echo PATREON_LAST_50_CONNECTION_ERRORS_HEADING; ?><span class="dashicons dashicons-arrow-down-alt2 patreon_setting_section_toggle_icon"></span></h3></div>
+            <div class="patreon_admin_health_content_box_hidden"><?php echo PATREON_LAST_50_CONNECTION_ERRORS; ?>
                 <?php
-                    $last_50_conn_errors = get_option('patreon-last-50-conn-errors', array());
+                    $last_50_conn_errors = get_option('patreon-last-50-conn-errors', []);
 
         if (count($last_50_conn_errors) > 0) {
-
             foreach ($last_50_conn_errors as $key => $value) {
+                $days = abs(time() - $last_50_conn_errors[$key]['date']) / 86400;
 
-
-                $days = abs(time() - $last_50_conn_errors[$key]['date']) / 86400 ;
-
-                echo '<br /><br /><b>' . round($days, 2) . ' days ago</b><br /><br />';
+                echo '<br /><br /><b>'.round($days, 2).' days ago</b><br /><br />';
                 echo $last_50_conn_errors[$key]['error'];
-
             }
-
         } else {
             echo '<br /><br />No recent connection errors<br />';
         }
@@ -914,12 +891,11 @@ class Patreon_Options
 
         <?php
 
-
         // Output a hidden, non formatted version of the health info to be used by the users to c/p to support
         ?>
 
         <div id="patreon_health_check_output_for_support">WP <?php echo get_bloginfo('version'); ?> with PHP <?php echo phpversion();
-        echo "\r\n"; ?>Patreon WordPress <?php echo PATREON_WORDPRESS_VERSION ?> with API v<?php echo get_option('patreon-installation-api-version', false);
+        echo "\r\n"; ?>Patreon WordPress <?php echo PATREON_WORDPRESS_VERSION; ?> with API v<?php echo get_option('patreon-installation-api-version', false);
         echo "\r\n";
 
         // Conditionals for any addons / other relevant Patreon plugins
@@ -958,15 +934,16 @@ class Patreon_Options
     {
         // Allow only permitted chars - Escape any potential special char among the allowed just in case
         $input = preg_replace("/[^A-Za-z0-9_\-\ \!\?\$\,\.\#\(\)\^\&\=\[\]\%\@\+]/", '', $input);
+
         // Further sanitization here if needed in future
         return $input;
     }
 
     public function site_locking_value($input)
     {
-        $input = preg_replace("/[^0-9,.]/", '', $input);
+        $input = preg_replace('/[^0-9,.]/', '', $input);
+
         // Further sanitization here if needed in future
         return $input;
     }
-
 }
