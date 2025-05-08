@@ -357,7 +357,7 @@ class Patreon_API
 
         $method = 'GET';
         $params = false;
-        $api_endpoint = 'https://www.patreon.com/api/oauth2/v2/'.$suffix;
+        $api_endpoint = 'https://'.PATREON_HOST.'/api/oauth2/v2/'.$suffix;
         $return_result_format = 'body';
 
         // Overrides
