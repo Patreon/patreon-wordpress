@@ -1,9 +1,16 @@
 repos:
--   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v2.3.0
-    hooks:
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v4.3.0
+  hooks:
     - id: check-json
     - id: end-of-file-fixer
     - id: pretty-format-json
       args: ["--autofix"]
     - id: trailing-whitespace
+- repo: local
+  hooks:
+    - id: php-cs-fixer
+      name: Run php-cs-fixer
+      entry: ./vendor/bin/php-cs-fixer fix .
+      language: system
+      pass_filenames: false
