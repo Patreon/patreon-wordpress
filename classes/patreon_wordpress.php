@@ -84,7 +84,7 @@ class Patreon_Wordpress
         add_action('init', [$this, 'check_creator_token_expiration']);
         add_action('init', [$this, 'checkPatreonCampaignID']);
         add_action('init', [$this, 'checkPatreonCreatorURL']);
-        add_action('init', [$this, 'checkPatreonCreatorName']);
+        add_action('init', [$this, 'checkPatreonCampaignName']);
         add_action('init', 'Patreon_Login::checkTokenExpiration');
         add_action('admin_enqueue_scripts', [$this, 'enqueueAdminScripts']);
         add_action('upgrader_process_complete', 'Patreon_Wordpress::AfterUpdateActions', 10, 2);
@@ -422,28 +422,29 @@ class Patreon_Wordpress
         }
     }
 
-    public static function checkPatreonCreatorName()
+    public static function checkPatreonCampaignName()
     {
-        // This function checks and saves creator's full name, name and surname. These are used in post locking interface
+        // This function checks and saves campaign name and creator's name details. These are used in post locking interface
 
-        if (!get_option('patreon-creator-full-name', false) or '' == get_option('patreon-creator-full-name', false)) {
+        if (!get_option('patreon-campaign-name', false) or '' == get_option('patreon-campaign-name', false)) {
             // Making sure access credentials are there to avoid fruitlessly contacting the api:
 
             if (get_option('patreon-client-id', false) && get_option('patreon-client-secret', false) && get_option('patreon-creators-access-token', false)) {
                 // Credentials are in. Go.
                 $creator_info = self::getPatreonCreatorInfo();
-            }
-            if (isset($creator_info['included'][0]['attributes']['full_name'])) {
-                // Creator id acquired. Update.
-                update_option('patreon-creator-full-name', $creator_info['included'][0]['attributes']['full_name']);
-            }
-            if (isset($creator_info['included'][0]['attributes']['first_name'])) {
-                // Creator id acquired. Update.
-                update_option('patreon-creator-first-name', $creator_info['included'][0]['attributes']['first_name']);
-            }
-            if (isset($creator_info['included'][0]['attributes']['last_name'])) {
-                // Creator id acquired. Update.
-                update_option('patreon-creator-last-name', $creator_info['included'][0]['attributes']['last_name']);
+
+                if (isset($creator_info['data'][0]['attributes']['name'])) {
+                    update_option('patreon-campaign-name', $creator_info['data'][0]['attributes']['name']);
+                }
+                if (isset($creator_info['included'][0]['attributes']['full_name'])) {
+                    update_option('patreon-creator-full-name', $creator_info['included'][0]['attributes']['full_name']);
+                }
+                if (isset($creator_info['included'][0]['attributes']['first_name'])) {
+                    update_option('patreon-creator-first-name', $creator_info['included'][0]['attributes']['first_name']);
+                }
+                if (isset($creator_info['included'][0]['attributes']['last_name'])) {
+                    update_option('patreon-creator-last-name', $creator_info['included'][0]['attributes']['last_name']);
+                }
             }
         }
     }
@@ -1859,6 +1860,7 @@ class Patreon_Wordpress
                 $options_to_delete = [
                     'patreon-custom-page-name',
                     'patreon-fetch-creator-id',
+                    'patreon-campaign-name',
                     'patreon-creator-tiers',
                     'patreon-creator-last-name',
                     'patreon-creator-first-name',
@@ -2465,6 +2467,7 @@ class Patreon_Wordpress
             $options_to_delete = [
                 'patreon-custom-page-name',
                 'patreon-fetch-creator-id',
+                'patreon-campaign-name',
                 'patreon-creator-tiers',
                 'patreon-creator-last-name',
                 'patreon-creator-first-name',
@@ -2562,6 +2565,7 @@ class Patreon_Wordpress
             $options_to_delete = [
                 'patreon-custom-page-name',
                 'patreon-fetch-creator-id',
+                'patreon-campaign-name',
                 'patreon-creator-tiers',
                 'patreon-creator-last-name',
                 'patreon-creator-first-name',
