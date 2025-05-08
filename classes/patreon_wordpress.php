@@ -390,9 +390,8 @@ class Patreon_Wordpress
 
     public static function checkPatreonCreatorName()
     {
-        // This function checks and saves creator's full name, name and surname. These are used in post locking interface
-
-        if (!get_option('patreon-creator-name', false) or !get_option('patreon-creator-full-name', false) or '' == get_option('patreon-creator-full-name', false)) {
+        // This function checks and saves creator's full name, name, surname and campaign name. These are used in post locking interface
+        if (!get_option('patreon-campaign-name', false) or '' == get_option('patreon-campaign-name', false)) {
             // Making sure access credentials are there to avoid fruitlessly contacting the api:
 
             if (get_option('patreon-client-id', false) && get_option('patreon-client-secret', false) && get_option('patreon-creators-access-token', false)) {
