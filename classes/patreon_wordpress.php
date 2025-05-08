@@ -392,12 +392,15 @@ class Patreon_Wordpress
     {
         // This function checks and saves creator's full name, name and surname. These are used in post locking interface
 
-        if (!get_option('patreon-creator-full-name', false) or '' == get_option('patreon-creator-full-name', false)) {
+        if (!get_option('patreon-creator-name', false) or !get_option('patreon-creator-full-name', false) or '' == get_option('patreon-creator-full-name', false)) {
             // Making sure access credentials are there to avoid fruitlessly contacting the api:
 
             if (get_option('patreon-client-id', false) && get_option('patreon-client-secret', false) && get_option('patreon-creators-access-token', false)) {
                 // Credentials are in. Go.
                 $creator_info = self::getPatreonCreatorInfo();
+            }
+            if (isset($creator_info['data'][0]['attributes']['name'])) {
+                update_option('patreon-campaign-name', $creator_info['data'][0]['attributes']['name']);
             }
             if (isset($creator_info['included'][0]['attributes']['full_name'])) {
                 // Creator id acquired. Update.
@@ -1737,6 +1740,7 @@ class Patreon_Wordpress
                 $options_to_delete = [
                     'patreon-custom-page-name',
                     'patreon-fetch-creator-id',
+                    'patreon-campaign-name',
                     'patreon-creator-tiers',
                     'patreon-creator-last-name',
                     'patreon-creator-first-name',
@@ -2334,6 +2338,7 @@ class Patreon_Wordpress
             $options_to_delete = [
                 'patreon-custom-page-name',
                 'patreon-fetch-creator-id',
+                'patreon-campaign-name',
                 'patreon-creator-tiers',
                 'patreon-creator-last-name',
                 'patreon-creator-first-name',
@@ -2431,6 +2436,7 @@ class Patreon_Wordpress
             $options_to_delete = [
                 'patreon-custom-page-name',
                 'patreon-fetch-creator-id',
+                'patreon-campaign-name',
                 'patreon-creator-tiers',
                 'patreon-creator-last-name',
                 'patreon-creator-first-name',

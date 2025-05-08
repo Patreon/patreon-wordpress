@@ -1387,7 +1387,7 @@ class Patreon_Frontend
         $creator_interface_name = Patreon_Wordpress::get_page_name();
 
         if (!$creator_interface_name or '' == $creator_interface_name) {
-            $creator_interface_name = get_option('patreon-creator-first-name', false);
+            $creator_interface_name = get_option('patreon-campaign-name', false);
         }
 
         if (!$creator_interface_name or '' == $creator_interface_name) {
