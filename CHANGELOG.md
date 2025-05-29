@@ -1,3 +1,7 @@
+= 1.9.8 =
+
+* Fixed two broken links to Patreon WP client page
+
 = 1.9.7 =
 
 * Extracted Patreon hostname in a constant
