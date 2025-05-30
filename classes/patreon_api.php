@@ -143,10 +143,6 @@ if ($load_api_version and '2' == $load_api_version) {
                 $api_endpoint = 'https://'.PATREON_HOST.'/api/oauth2/v2/'.$suffix;
             }
 
-            $headers = [
-                'Authorization' => 'Bearer '.$this->access_token,
-                'User-Agent' => get_patreon_ua(),
-            ];
             $default_headers = PatreonApiUtil::get_default_headers();
             $headers = [
                 'Authorization' => 'Bearer '.$this->access_token,
