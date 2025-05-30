@@ -382,10 +382,7 @@ class Patreon_Login
             return false;
         }
 
-        $headers = [
-            'User-Agent' => PATREON_USER_AGENT,
-        ];
-
+        $headers = PatreonApiUtil::get_default_headers();
         $api_request = [
             'headers' => $headers,
         ];

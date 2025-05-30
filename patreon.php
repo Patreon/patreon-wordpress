@@ -144,7 +144,6 @@ define('PATREON_ALL_POST_CATEGORY_FIELDS_MUST_BE_SELECTED', 'Please select all p
 define('PATREON_API_VERSION_WARNING', 'Your plugin is still using API v1! This will cause errors when you use post sync feature! Please read <a href="https://www.patreondevelopers.com/t/how-to-upgrade-your-patreon-wordpress-to-use-api-v2/3249" target="_blank">this guide</a> to upgrade your plugin to API v2 before activating post sync.');
 define('PATREON_WARNING_IMPORTANT', 'Important: ');
 define('PATREON_WARNING_POST_SYNC_SET_WITHOUT_API_V2', 'Important: Post syncing from Patreon is set to on, but your site is using API v1. Post sync wont work without API v2. Follow <a href="https://www.patreondevelopers.com/t/how-to-upgrade-your-patreon-wordpress-to-use-api-v2/3249" target="_blank">this guide</a> to upgrade your site to API v2 or disable post sync <a href="'.admin_url('admin.php?page=patreon-plugin').'">here in settings</a>');
-define('PATREON_USER_AGENT', 'Patreon-Wordpress, version '.PATREON_WORDPRESS_VERSION.PATREON_WORDPRESS_BETA_STRING.', platform '.php_uname('s').'-'.php_uname('r').' PW-Site: '.get_site_url().' PW-Campaign-Id: '.get_option('patreon-campaign-id', '').' PW-WP-Version: '.get_bloginfo('version').' PW-PHP-Version: '.phpversion());
 
 require 'classes/patreon_wordpress.php';
 
@@ -153,3 +152,4 @@ register_activation_hook(__FILE__, ['Patreon_Wordpress', 'activate']);
 $Patreon_Wordpress = new Patreon_Wordpress();
 
 require 'includes/patreon_widgets.php';
+require 'includes/patreon_api_util.php';

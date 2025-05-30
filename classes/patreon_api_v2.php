@@ -156,10 +156,7 @@ class Patreon_API
 
         // Check if this url is legitimate with https:
 
-        $headers = [
-            'User-Agent' => PATREON_USER_AGENT,
-        ];
-
+        $headers = PatreonApiUtil::get_default_headers();
         $api_request = [
             'headers' => $headers,
         ];
@@ -382,11 +379,11 @@ class Patreon_API
             $params = $args['params'];
         }
 
+        $default_headers = PatreonApiUtil::get_default_headers();
         $headers = [
             'Authorization' => 'Bearer '.$this->access_token,
-            'User-Agent' => PATREON_USER_AGENT,
         ];
-
+        $headers = array_merge($default_headers, $headers);
         $api_request = [
             'headers' => $headers,
             'method' => $method,

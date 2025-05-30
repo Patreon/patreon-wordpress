@@ -145,9 +145,13 @@ if ($load_api_version and '2' == $load_api_version) {
 
             $headers = [
                 'Authorization' => 'Bearer '.$this->access_token,
-                'User-Agent' => PATREON_USER_AGENT,
+                'User-Agent' => get_patreon_ua(),
             ];
-
+            $default_headers = PatreonApiUtil::get_default_headers();
+            $headers = [
+                'Authorization' => 'Bearer '.$this->access_token,
+            ];
+            $headers = array_merge($default_headers, $headers);
             $api_request = [
                 'headers' => $headers,
                 'method' => 'GET',

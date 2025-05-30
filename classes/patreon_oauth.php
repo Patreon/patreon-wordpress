@@ -45,10 +45,7 @@ class Patreon_OAuth
     {
         $api_endpoint = 'https://'.PATREON_HOST.'/api/oauth2/token';
 
-        $headers = [
-            'User-Agent' => PATREON_USER_AGENT,
-        ];
-
+        $headers = PatreonApiUtil::get_default_headers();
         $api_request = [
             'method' => 'POST',
             'body' => $params,

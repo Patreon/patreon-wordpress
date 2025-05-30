@@ -2792,10 +2792,7 @@ class Patreon_Wordpress
     {
         global $wpdb;
 
-        $headers = [
-            'User-Agent' => PATREON_USER_AGENT,
-        ];
-
+        $headers = PatreonApiUtil::get_default_headers();
         $api_request = [
             'headers' => $headers,
             'timeout' => 3,
