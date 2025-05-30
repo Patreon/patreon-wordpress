@@ -156,7 +156,15 @@ class Patreon_API
 
         // Check if this url is legitimate with https:
 
-        $check_url = wp_remote_get($webhook_response_uri);
+        $headers = [
+            'User-Agent' => PATREON_USER_AGENT,
+        ];
+
+        $api_request = [
+            'headers' => $headers,
+        ];
+
+        $check_url = wp_remote_get($webhook_response_uri, $api_request);
 
         if (is_wp_error($check_url)) {
             return;
@@ -376,7 +384,7 @@ class Patreon_API
 
         $headers = [
             'Authorization' => 'Bearer '.$this->access_token,
-            'User-Agent' => 'Patreon-Wordpress, version '.PATREON_WORDPRESS_VERSION.PATREON_WORDPRESS_BETA_STRING.', platform '.php_uname('s').'-'.php_uname('r').' PW-Site: '.get_site_url().' PW-Campaign-Id: '.get_option('patreon-campaign-id', '').' PW-WP-Version: '.get_bloginfo('version').' PW-PHP-Version: '.phpversion(),
+            'User-Agent' => PATREON_USER_AGENT,
         ];
 
         $api_request = [

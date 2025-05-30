@@ -2792,8 +2792,17 @@ class Patreon_Wordpress
     {
         global $wpdb;
 
+        $headers = [
+            'User-Agent' => PATREON_USER_AGENT,
+        ];
+
+        $api_request = [
+            'headers' => $headers,
+            'timeout' => 3,
+        ];
+
         $image_hash = false;
-        $image_response = wp_remote_get($image_url, ['timeout' => 3]);
+        $image_response = wp_remote_get($image_url, $api_request);
         $image_content = wp_remote_retrieve_body($image_response);
 
         if ('' != $image_content) {

@@ -145,7 +145,7 @@ if ($load_api_version and '2' == $load_api_version) {
 
             $headers = [
                 'Authorization' => 'Bearer '.$this->access_token,
-                'User-Agent' => 'Patreon-Wordpress, version '.PATREON_WORDPRESS_VERSION.PATREON_WORDPRESS_BETA_STRING.', platform '.php_uname('s').'-'.php_uname('r'),
+                'User-Agent' => PATREON_USER_AGENT,
             ];
 
             $api_request = [

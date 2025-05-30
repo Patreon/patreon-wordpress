@@ -46,7 +46,7 @@ class Patreon_OAuth
         $api_endpoint = 'https://'.PATREON_HOST.'/api/oauth2/token';
 
         $headers = [
-            'User-Agent' => 'Patreon-Wordpress, version '.PATREON_WORDPRESS_VERSION.PATREON_WORDPRESS_BETA_STRING.', platform '.php_uname('s').'-'.php_uname('r'),
+            'User-Agent' => PATREON_USER_AGENT,
         ];
 
         $api_request = [

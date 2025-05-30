@@ -382,21 +382,29 @@ class Patreon_Login
             return false;
         }
 
-        $patreon_image_data = wp_remote_get($patreon_image_url);
+        $headers = [
+            'User-Agent' => PATREON_USER_AGENT,
+        ];
+
+        $api_request = [
+            'headers' => $headers,
+        ];
+
+        $patreon_image_data = wp_remote_get($patreon_image_url, $api_request);
 
         if (is_wp_error($patreon_image_data)) {
             return false;
         }
 
-        $headers = $patreon_image_data['headers'];
+        $resp_headers = $patreon_image_data['headers'];
 
         // If mime type is not set, abort
 
-        if (!isset($headers) or !isset($headers['content-type'])) {
+        if (!isset($resp_headers) or !isset($resp_headers['content-type'])) {
             return false;
         }
 
-        $mime_type = $headers['content-type'];
+        $mime_type = $resp_headers['content-type'];
 
         $patreon_image = $patreon_image_data['body'];
 
