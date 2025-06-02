@@ -7,6 +7,11 @@ class PatreonApiUtil
         return ['User-Agent' => self::get_patreon_ua()];
     }
 
+    public static function is_credentials_broken()
+    {
+        return get_option('patreon-wordpress-app-credentials-failure', false);
+    }
+
     private static function get_patreon_ua()
     {
         $campaign_id = get_option('patreon-campaign-id', '?');

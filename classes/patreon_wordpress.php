@@ -235,7 +235,7 @@ class Patreon_Wordpress
         $refresh_token = get_user_meta($user->ID, 'patreon_refresh_token', true);
 
         $oauth_client = new Patreon_Oauth();
-        $tokens = $oauth_client->refresh_token($refresh_token, site_url().'/patreon-authorization/');
+        $tokens = $oauth_client->refresh_token($refresh_token, site_url().'/patreon-authorization/', false);
 
         if (isset($tokens['access_token'])) {
             update_user_meta($user->ID, 'patreon_refresh_token', $tokens['refresh_token']);
@@ -446,7 +446,7 @@ class Patreon_Wordpress
         }
 
         $oauth_client = new Patreon_Oauth();
-        $tokens = $oauth_client->refresh_token($refresh_token, site_url().'/patreon-authorization/');
+        $tokens = $oauth_client->refresh_token($refresh_token, site_url().'/patreon-authorization/', true);
 
         if (isset($tokens['refresh_token']) && isset($tokens['access_token'])) {
             update_option('patreon-creators-refresh-token', $tokens['refresh_token']);
@@ -948,7 +948,6 @@ class Patreon_Wordpress
                 </div>
             <?php
 
-            delete_option('patreon-wordpress-app-credentials-failure');
         }
     }
 
@@ -1349,6 +1348,7 @@ class Patreon_Wordpress
 
         if ($creator_access) {
             update_option('patreon-wordpress-app-credentials-success', 1);
+            delete_option('patreon-wordpress-app-credentials-failure');
 
             return;
         }
