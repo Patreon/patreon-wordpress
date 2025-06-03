@@ -146,7 +146,7 @@ class Patreon_Options
 
                                     <div id="patreon_options_app_details_connect">
 
-                                    We will now connect your site to Patreon by running connection wizard. Before starting, please make sure you deleted any existing app for this site in <a href="https://<?php echo PATREON_HOST;?>/portal/registration/register-clients" target="_blank">this page at Patreon</a><br /><br />
+                                    We will now connect your site to Patreon by running connection wizard. Before starting, please make sure you deleted any existing app for this site in <a href="https://<?php echo PATREON_HOST; ?>/portal/registration/register-clients" target="_blank">this page at Patreon</a><br /><br />
                                         <button id="patreon_wordpress_reconnect_to_patreon" class="button button-primary button-large" target="<?php echo admin_url('admin.php?page=patreon_wordpress_setup_wizard&setup_stage=0'); ?>"  aria-label="Start connection wizard">Start connection wizard</button> <button class="button button-primary button-large patreon_wordpress_interface_toggle" toggle="patreon_options_app_details_connect patreon_options_app_details_main">Cancel</button>
 
                                     </div>
