@@ -1,7 +1,7 @@
 = 1.9.9 =
 
 * Ensure that Patreon-Wordpress UA is consistently set across requests
-* Fixed reconnect flow not working if the client had been deleted form patreon.com
+* Fixed reconnect flow not working if the client had been deleted from patreon.com
 
 = 1.9.8 =
 
