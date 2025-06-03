@@ -241,204 +241,7 @@ class Patreon_Routing
         }
 
         if (false !== strpos($_SERVER['REQUEST_URI'], '/patreon-authorization/')) {
-            // First slap the noindex header so search engines wont index this page:
-            header('X-Robots-Tag: noindex, nofollow');
-
-            // Make sure browsers dont cache this
-            header('cache-control: no-cache, must-revalidate, max-age=0');
-
-            if (array_key_exists('code', $wp->query_vars)) {
-                // Get state vars if they exist
-
-                if ('' != $wp->query_vars['state']) {
-                    $state = json_decode(base64_decode(urldecode($wp->query_vars['state'])), true);
-                }
-
-                $redirect = false;
-
-                // Check if final_redirect exists in state vars - if so, override redirect:
-
-                if (isset($state['final_redirect_uri']) and '' != $state['final_redirect_uri']) {
-                    $redirect = $state['final_redirect_uri'];
-                }
-
-                if (isset($state['patreon_action'])) {
-                    $stage_prefix = ''
-
-                    if (isset($state['patreon_action']) and 'reconnect_site' == $state['patreon_action']) {
-                        $stage_prefix =  'reconnect_';
-                    }
-
-                    if (!current_user_can('manage_options')) {
-                        // If user is not an admin, abort
-                        echo 'Sorry - to connect your site to Patreon you need to be an admin user.';
-                        exit;
-                    }
-
-                    $oauth_client = new Patreon_Oauth();
-
-                    // Set the client id to plugin wide client id one for setup process
-
-                    $oauth_client->client_id = PATREON_PLUGIN_CLIENT_ID;
-
-                    $tokens = $oauth_client->get_tokens($wp->query_vars['code'], site_url().'/patreon-authorization/', ['scopes' => 'w:identity.clients']);
-
-                    if (isset($tokens['access_token'])) {
-                        // Exception - If we are here with a legit access token, re-mark this installation as v2 - can be removed when all installations are using v2
-
-                        update_option('patreon-installation-api-version', '2');
-                        update_option('patreon-can-use-api-v2', true);
-
-                        // We got auth. Proceed with creating the client
-
-                        // Create new api object
-
-                        $api_client = new Patreon_API($tokens['access_token']);
-
-                        $params = [
-                            'data' => [
-                                'type' => 'oauth-client',
-                                'attributes' => Patreon_Wordpress::collect_app_info(),
-                            ],
-                        ];
-
-                        $client_result = $api_client->create_refresh_client(json_encode($params));
-
-                        if (isset($client_result['data']['type']) and 'oauth-client' == $client_result['data']['type']) {
-                            $client_id = $client_result['data']['id'];
-                            $client_secret = $client_result['data']['attributes']['client_secret'];
-                            $creator_access_token = $client_result['included'][0]['attributes']['access_token'];
-                            $creator_refresh_token = $client_result['included'][0]['attributes']['refresh_token'];
-
-                            // Some error handling here - later to be updated
-
-                            if (!isset($client_id) or '' == $client_id
-                                or !isset($client_secret) or '' == $client_secret
-                                or !isset($creator_access_token) or '' == $creator_access_token
-                                or !isset($creator_refresh_token) or '' == $creator_refresh_token
-                            ) {
-                                // One or more of the app details is kaput. Redirect with an error message.
-
-                                wp_redirect(admin_url('admin.php?page=patreon_wordpress_setup_wizard&setup_stage='.$stage_prefix.'0&patreon_message=error_missing_credentials'));
-                                exit;
-                            }
-
-                            // All good. Update the client details locally
-
-                            $existing_client_id = get_option('patreon-client-id', false);
-
-                            if ($existing_client_id != $client_id) {
-                                $client_id_updated = update_option('patreon-client-id', sanitize_text_field($client_id));
-                            } else {
-                                $client_id_updated = true;
-                            }
-
-                            if ($client_id_updated
-                                and update_option('patreon-client-secret', sanitize_text_field($client_secret))
-                                and update_option('patreon-creators-access-token', sanitize_text_field($creator_access_token))
-                                and update_option('patreon-creators-refresh-token', sanitize_text_field($creator_refresh_token))
-                            ) {
-                                // All succeeded.
-
-                                // Save entire return to options
-
-                                update_option('patreon-installation-api-version', '2');
-                                update_option('patreon-setup-done', true);
-                                update_option('patreon-redirect_to_setup_wizard', false);
-                                update_option('patreon-setup-wizard-last-call-result', $client_result);
-
-                                delete_option('patreon-creator-access-token-401');
-
-                                // Redirect to success screen
-
-                                // First apply a filter so that 3rd party addons can redirect to a custom final screen
-
-                                // Check if post syncing is set up, if not, redirect to post sync page.
-
-                                $setup_final_redirect = apply_filters('ptrn/setup_wizard_final_redirect', admin_url('admin.php?page=patreon_wordpress_setup_wizard&setup_stage='.$stage_prefix.'final'));
-
-                                if (!get_option('patreon-post-sync-set-up', false)) {
-                                    // Post sync not set up. Redirect it to relevant page
-
-                                    $setup_final_redirect = apply_filters('ptrn/setup_wizard_post_sync_redirect', admin_url('admin.php?page=patreon_wordpress_setup_wizard&setup_stage=post_sync_0'));
-                                }
-
-                                wp_redirect($setup_final_redirect);
-                                exit;
-                            }
-                        }
-
-                        // If we are here, something else is wrong. Come out with an error
-
-                        wp_redirect(admin_url('admin.php?page=patreon_wordpress_setup_wizard&setup_stage='.$stage_prefix.'0&patreon_message=failure_obtaining_credentials'));
-                        exit;
-                    } else {
-                        // No auth. Error handling here.
-
-                        wp_redirect(admin_url('admin.php?page=patreon_wordpress_setup_wizard&setup_stage='.$stage_prefix.'0&patreon_message=no_auth_for_client_creation'));
-                        exit;
-                    }
-                }
-
-
-                $redirect = apply_filters('ptrn/redirect', $redirect);
-
-                if (false == get_option('patreon-client-id', false) || false == get_option('patreon-client-secret', false)) {
-                    /* redirect to homepage because of oauth client_id or secure_key error */
-                    $redirect = add_query_arg('patreon_message', 'patreon_api_credentials_missing', $redirect);
-                    wp_redirect($redirect);
-                    exit;
-                } else {
-                    $oauth_client = new Patreon_Oauth();
-                }
-
-                $tokens = $oauth_client->get_tokens($wp->query_vars['code'], site_url().'/patreon-authorization/');
-
-                if (array_key_exists('error', $tokens)) {
-                    if ('invalid_client' == $tokens['error']) {
-                        // Credentials are wrong. Redirect with an informative message
-                        $redirect = add_query_arg('patreon_message', 'patreon_cant_login_api_error_credentials', $redirect);
-                    } else {
-                        // Some other error from api. Append the message from Patreon too.
-                        $redirect = add_query_arg('patreon_message', 'patreon_cant_login_api_error', $redirect);
-                        $redirect = add_query_arg('patreon_error', $tokens['error'], $redirect);
-                    }
-
-                    wp_redirect($redirect);
-                    exit;
-                } else {
-                    $api_client = new Patreon_API($tokens['access_token']);
-
-                    $user_response = $api_client->fetch_user();
-
-                    // Check out if there is a proper user return.
-
-                    if (!is_array($user_response) or !isset($user_response['data']['id'])) {
-                        // We didnt get user info back from the API. Cancel with a message
-
-                        $redirect = add_query_arg('patreon_message', 'patreon_couldnt_acquire_user_details', $redirect);
-
-                        wp_redirect($redirect);
-                        exit;
-                    }
-
-                    if (apply_filters('ptrn/force_strict_oauth', get_option('patreon-enable-strict-oauth', false))) {
-                        $user = Patreon_Login::updateLoggedInUserForStrictoAuth($user_response, $tokens, $redirect);
-                    } else {
-                        $user = Patreon_Login::createOrLogInUserFromPatreon($user_response, $tokens, $redirect);
-                    }
-
-                    // shouldn't get here
-                    $redirect = add_query_arg('patreon_message', 'patreon_weird_redirection_at_login', $redirect);
-
-                    wp_redirect($redirect);
-                    exit;
-                }
-            } else {
-                $redirect = add_query_arg('patreon_message', 'no_code_receved_from_patreon', wp_login_url());
-                wp_redirect($redirect);
-                exit;
-            }
+            self::handle_authorization_flow($wp);
         }
 
         if (false !== strpos($_SERVER['REQUEST_URI'], '/patreon-webhooks/')) {
@@ -597,6 +400,207 @@ class Patreon_Routing
                 nocache_headers();
                 exit;
             }
+        }
+    }
+
+    private function handle_authorization_flow($wp)
+    {
+        // First slap the noindex header so search engines wont index this page:
+        header('X-Robots-Tag: noindex, nofollow');
+
+        // Make sure browsers dont cache this
+        header('cache-control: no-cache, must-revalidate, max-age=0');
+
+        if (array_key_exists('code', $wp->query_vars)) {
+            // Get state vars if they exist
+
+            if ('' != $wp->query_vars['state']) {
+                $state = json_decode(base64_decode(urldecode($wp->query_vars['state'])), true);
+            }
+
+            $redirect = false;
+
+            // Check if final_redirect exists in state vars - if so, override redirect:
+
+            if (isset($state['final_redirect_uri']) and '' != $state['final_redirect_uri']) {
+                $redirect = $state['final_redirect_uri'];
+            }
+
+            if (isset($state['patreon_action'])) {
+                $stage_prefix = '';
+
+                if (isset($state['patreon_action']) and 'reconnect_site' == $state['patreon_action']) {
+                    $stage_prefix = 'reconnect_';
+                }
+
+                if (!current_user_can('manage_options')) {
+                    // If user is not an admin, abort
+                    echo 'Sorry - to connect your site to Patreon you need to be an admin user.';
+                    exit;
+                }
+
+                $oauth_client = new Patreon_Oauth();
+
+                // Set the client id to plugin wide client id one for setup process
+
+                $oauth_client->client_id = PATREON_PLUGIN_CLIENT_ID;
+
+                $tokens = $oauth_client->get_tokens($wp->query_vars['code'], site_url().'/patreon-authorization/', ['scopes' => 'w:identity.clients']);
+
+                if (isset($tokens['access_token'])) {
+                    // Exception - If we are here with a legit access token, re-mark this installation as v2 - can be removed when all installations are using v2
+
+                    update_option('patreon-installation-api-version', '2');
+                    update_option('patreon-can-use-api-v2', true);
+
+                    // We got auth. Proceed with creating the client
+
+                    // Create new api object
+
+                    $api_client = new Patreon_API($tokens['access_token']);
+
+                    $params = [
+                        'data' => [
+                            'type' => 'oauth-client',
+                            'attributes' => Patreon_Wordpress::collect_app_info(),
+                        ],
+                    ];
+
+                    $client_result = $api_client->create_refresh_client(json_encode($params));
+
+                    if (isset($client_result['data']['type']) and 'oauth-client' == $client_result['data']['type']) {
+                        $client_id = $client_result['data']['id'];
+                        $client_secret = $client_result['data']['attributes']['client_secret'];
+                        $creator_access_token = $client_result['included'][0]['attributes']['access_token'];
+                        $creator_refresh_token = $client_result['included'][0]['attributes']['refresh_token'];
+
+                        // Some error handling here - later to be updated
+
+                        if (!isset($client_id) or '' == $client_id
+                            or !isset($client_secret) or '' == $client_secret
+                            or !isset($creator_access_token) or '' == $creator_access_token
+                            or !isset($creator_refresh_token) or '' == $creator_refresh_token
+                        ) {
+                            // One or more of the app details is kaput. Redirect with an error message.
+
+                            wp_redirect(admin_url('admin.php?page=patreon_wordpress_setup_wizard&setup_stage='.$stage_prefix.'0&patreon_message=error_missing_credentials'));
+                            exit;
+                        }
+
+                        // All good. Update the client details locally
+
+                        $existing_client_id = get_option('patreon-client-id', false);
+
+                        if ($existing_client_id != $client_id) {
+                            $client_id_updated = update_option('patreon-client-id', sanitize_text_field($client_id));
+                        } else {
+                            $client_id_updated = true;
+                        }
+
+                        if ($client_id_updated
+                            and update_option('patreon-client-secret', sanitize_text_field($client_secret))
+                            and update_option('patreon-creators-access-token', sanitize_text_field($creator_access_token))
+                            and update_option('patreon-creators-refresh-token', sanitize_text_field($creator_refresh_token))
+                        ) {
+                            // All succeeded.
+
+                            // Save entire return to options
+
+                            update_option('patreon-installation-api-version', '2');
+                            update_option('patreon-setup-done', true);
+                            update_option('patreon-redirect_to_setup_wizard', false);
+                            update_option('patreon-setup-wizard-last-call-result', $client_result);
+
+                            delete_option('patreon-creator-access-token-401');
+
+                            // Redirect to success screen
+
+                            // First apply a filter so that 3rd party addons can redirect to a custom final screen
+
+                            // Check if post syncing is set up, if not, redirect to post sync page.
+
+                            $setup_final_redirect = apply_filters('ptrn/setup_wizard_final_redirect', admin_url('admin.php?page=patreon_wordpress_setup_wizard&setup_stage='.$stage_prefix.'final'));
+
+                            if (!get_option('patreon-post-sync-set-up', false)) {
+                                // Post sync not set up. Redirect it to relevant page
+
+                                $setup_final_redirect = apply_filters('ptrn/setup_wizard_post_sync_redirect', admin_url('admin.php?page=patreon_wordpress_setup_wizard&setup_stage=post_sync_0'));
+                            }
+
+                            wp_redirect($setup_final_redirect);
+                            exit;
+                        }
+                    }
+
+                    // If we are here, something else is wrong. Come out with an error
+
+                    wp_redirect(admin_url('admin.php?page=patreon_wordpress_setup_wizard&setup_stage='.$stage_prefix.'0&patreon_message=failure_obtaining_credentials'));
+                    exit;
+                } else {
+                    // No auth. Error handling here.
+
+                    wp_redirect(admin_url('admin.php?page=patreon_wordpress_setup_wizard&setup_stage='.$stage_prefix.'0&patreon_message=no_auth_for_client_creation'));
+                    exit;
+                }
+            }
+
+            $redirect = apply_filters('ptrn/redirect', $redirect);
+
+            if (false == get_option('patreon-client-id', false) || false == get_option('patreon-client-secret', false)) {
+                /* redirect to homepage because of oauth client_id or secure_key error */
+                $redirect = add_query_arg('patreon_message', 'patreon_api_credentials_missing', $redirect);
+                wp_redirect($redirect);
+                exit;
+            } else {
+                $oauth_client = new Patreon_Oauth();
+            }
+
+            $tokens = $oauth_client->get_tokens($wp->query_vars['code'], site_url().'/patreon-authorization/');
+
+            if (array_key_exists('error', $tokens)) {
+                if ('invalid_client' == $tokens['error']) {
+                    // Credentials are wrong. Redirect with an informative message
+                    $redirect = add_query_arg('patreon_message', 'patreon_cant_login_api_error_credentials', $redirect);
+                } else {
+                    // Some other error from api. Append the message from Patreon too.
+                    $redirect = add_query_arg('patreon_message', 'patreon_cant_login_api_error', $redirect);
+                    $redirect = add_query_arg('patreon_error', $tokens['error'], $redirect);
+                }
+
+                wp_redirect($redirect);
+                exit;
+            } else {
+                $api_client = new Patreon_API($tokens['access_token']);
+
+                $user_response = $api_client->fetch_user();
+
+                // Check out if there is a proper user return.
+
+                if (!is_array($user_response) or !isset($user_response['data']['id'])) {
+                    // We didnt get user info back from the API. Cancel with a message
+
+                    $redirect = add_query_arg('patreon_message', 'patreon_couldnt_acquire_user_details', $redirect);
+
+                    wp_redirect($redirect);
+                    exit;
+                }
+
+                if (apply_filters('ptrn/force_strict_oauth', get_option('patreon-enable-strict-oauth', false))) {
+                    $user = Patreon_Login::updateLoggedInUserForStrictoAuth($user_response, $tokens, $redirect);
+                } else {
+                    $user = Patreon_Login::createOrLogInUserFromPatreon($user_response, $tokens, $redirect);
+                }
+
+                // shouldn't get here
+                $redirect = add_query_arg('patreon_message', 'patreon_weird_redirection_at_login', $redirect);
+
+                wp_redirect($redirect);
+                exit;
+            }
+        } else {
+            $redirect = add_query_arg('patreon_message', 'no_code_receved_from_patreon', wp_login_url());
+            wp_redirect($redirect);
+            exit;
         }
     }
 }
