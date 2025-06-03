@@ -152,3 +152,4 @@ register_activation_hook(__FILE__, ['Patreon_Wordpress', 'activate']);
 $Patreon_Wordpress = new Patreon_Wordpress();
 
 require 'includes/patreon_widgets.php';
+require 'includes/patreon_api_util.php';
