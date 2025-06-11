@@ -530,6 +530,8 @@ class Patreon_Routing
                             wp_redirect($setup_final_redirect);
                             exit;
                         }
+                    } elseif (isset($client_result['errors'])) {
+                        Patreon_Wordpress::log_connection_error('Failed to create connection. Response: '.json_encode($client_result['errors']));
                     }
 
                     // If we are here, something else is wrong. Come out with an error
