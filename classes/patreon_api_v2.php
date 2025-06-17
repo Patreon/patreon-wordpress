@@ -219,9 +219,8 @@ class Patreon_API
 
     public function create_refresh_client($params)
     {
-        // Contacts api to create or refresh client
-        // Only uses v2
-
+        // Create an oauth client on the behalf of the creator. The new client
+        // is a child of the Patreon WP client.
         $args = [
             'method' => 'POST',
             'params' => $params,

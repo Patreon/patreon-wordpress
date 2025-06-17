@@ -17,7 +17,7 @@ class Patreon_OAuth
 
     public function get_tokens($code, $redirect_uri, $params = [])
     {
-        // TODO: Can this be used for non-creator token? Should false/treu
+        // TODO: Can this be used for non-creator token? Should false/true
         return $this->__update_token(
             array_merge(
                 [
@@ -35,6 +35,8 @@ class Patreon_OAuth
     public function refresh_token($refresh_token, $redirect_uri, $is_creator_token)
     {
         if (PatreonApiUtil::is_credentials_broken()) {
+            // Don't allow token refresh if the credentials have been marked as
+            // broken.
             return;
         }
 
@@ -73,6 +75,7 @@ class Patreon_OAuth
         $status_code = wp_remote_retrieve_response_code($response);
 
         if ($is_creator_token && 401 == $status_code) {
+            // Mark credentials as invalid
             update_option('patreon-wordpress-app-credentials-failure', true);
         }
 

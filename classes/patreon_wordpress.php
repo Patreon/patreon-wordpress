@@ -1354,7 +1354,7 @@ class Patreon_Wordpress
         }
 
         // All flopped. Set failure flag
-        update_option('patreon-wordpress-app-credentials-failure', 1);
+        update_option('patreon-wordpress-app-credentials-failure', true);
     }
 
     public function toggle_option()
