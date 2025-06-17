@@ -438,6 +438,12 @@ class Patreon_Wordpress
 
     public static function refresh_creator_access_token()
     {
+        if (PatreonApiUtil::is_app_creds_invalid()) {
+            // Don't attempt creator token refresh if the plugin client
+            // credentials have been marked as broken
+            return false;
+        }
+
         /* refresh creators token if error 1 */
         $refresh_token = get_option('patreon-creators-refresh-token', false);
 
@@ -927,7 +933,7 @@ class Patreon_Wordpress
 
         // This is a plugin system info notice.
         if (get_option('patreon-wordpress-app-credentials-success', false)) {
-            // Non-important non-permanent info notice - doesnt need nonce verification
+            // Non-important non-permanent info notice - doesn't need nonce verification
             ?>
                  <div class="notice notice-success is-dismissible patreon-wordpress" id="patreon-wordpress-credentials-success">
                  <h3>Your Patreon client details were successfully saved!</h3>
@@ -939,8 +945,8 @@ class Patreon_Wordpress
         }
 
         // This is a plugin system info notice.
-        if (get_option('patreon-wordpress-app-credentials-failure', false)) {
-            // Non-important non-permanent info notice - doesnt need nonce verification
+        if (PatreonApiUtil::is_app_creds_invalid()) {
+            // Non-important non-permanent info notice - doesn't need nonce verification
             ?>
                  <div class="notice notice-error is-dismissible patreon-wordpress" id="patreon-wordpress-credentials-failure">
                  <h3>Sorry - couldn't connect your site to Patreon</h3>

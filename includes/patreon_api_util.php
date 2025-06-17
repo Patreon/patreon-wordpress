@@ -7,7 +7,7 @@ class PatreonApiUtil
         return ['User-Agent' => self::get_patreon_ua()];
     }
 
-    public static function is_credentials_broken()
+    public static function is_app_creds_invalid()
     {
         return get_option('patreon-wordpress-app-credentials-failure', false);
     }
