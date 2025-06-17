@@ -73,9 +73,9 @@ class Patreon_OAuth
             // Patreon's API with token refresh requests with invalid or expired
             // credentials.
             update_option('patreon-wordpress-app-credentials-failure', true);
-            Patreon_Wordpress::log_connection_error('Failed creator token get/update. Response:'.$response);
+            Patreon_Wordpress::log_connection_error('Failed get/update creator token. HTTP '.$status_code.', Response: '.$response['body']);
         } elseif (200 != $status_code) {
-            Patreon_Wordpress::log_connection_error('Failed token get/update. Response:'.$response);
+            Patreon_Wordpress::log_connection_error('Failed get/update token. HTTP '.$status_code.', Response: '.$response['body']);
         }
 
         $response_decoded = json_decode($response['body'], true);
