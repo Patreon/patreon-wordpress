@@ -235,7 +235,7 @@ class Patreon_Wordpress
         $refresh_token = get_user_meta($user->ID, 'patreon_refresh_token', true);
 
         $oauth_client = new Patreon_Oauth();
-        $tokens = $oauth_client->refresh_token($refresh_token, site_url().'/patreon-authorization/');
+        $tokens = $oauth_client->refresh_token($refresh_token, site_url().'/patreon-authorization/', false);
 
         if (isset($tokens['access_token'])) {
             update_user_meta($user->ID, 'patreon_refresh_token', $tokens['refresh_token']);
@@ -438,24 +438,42 @@ class Patreon_Wordpress
 
     public static function refresh_creator_access_token()
     {
-        /* refresh creators token if error 1 */
-        $refresh_token = get_option('patreon-creators-refresh-token', false);
+        $lock_key = 'patreon-wordpress-app-creator-token-refresh-lock';
 
-        if (false == $refresh_token) {
+        if (get_transient($lock_key)) {
             return false;
         }
 
-        $oauth_client = new Patreon_Oauth();
-        $tokens = $oauth_client->refresh_token($refresh_token, site_url().'/patreon-authorization/');
+        // Ensure that only one request at a time refreshes the token
+        set_transient($lock_key, true, 120);
 
-        if (isset($tokens['refresh_token']) && isset($tokens['access_token'])) {
-            update_option('patreon-creators-refresh-token', $tokens['refresh_token']);
-            update_option('patreon-creators-access-token', $tokens['access_token']);
+        try {
+            if (PatreonApiUtil::is_creator_token_refresh_cooldown()) {
+                // Don't attempt creator token refresh if the plugin client
+                // credentials have been marked as broken
+                return false;
+            }
 
-            return $tokens;
+            /* refresh creators token if error 1 */
+            $refresh_token = get_option('patreon-creators-refresh-token', false);
+
+            if (!$refresh_token) {
+                return false;
+            }
+
+            $oauth_client = new Patreon_Oauth();
+            $tokens = $oauth_client->refresh_token($refresh_token, site_url().'/patreon-authorization/', true);
+
+            if (isset($tokens['refresh_token']) && isset($tokens['access_token'])) {
+                update_option('patreon-creators-refresh-token', $tokens['refresh_token']);
+                update_option('patreon-creators-access-token', $tokens['access_token']);
+                delete_option('patreon-wordpress-app-credentials-failure');
+            }
+
+            return $tokens ?: false;
+        } finally {
+            delete_transient($lock_key);
         }
-
-        return false;
     }
 
     public static function check_creator_token_expiration()
@@ -927,7 +945,7 @@ class Patreon_Wordpress
 
         // This is a plugin system info notice.
         if (get_option('patreon-wordpress-app-credentials-success', false)) {
-            // Non-important non-permanent info notice - doesnt need nonce verification
+            // Non-important non-permanent info notice - doesn't need nonce verification
             ?>
                  <div class="notice notice-success is-dismissible patreon-wordpress" id="patreon-wordpress-credentials-success">
                  <h3>Your Patreon client details were successfully saved!</h3>
@@ -939,8 +957,8 @@ class Patreon_Wordpress
         }
 
         // This is a plugin system info notice.
-        if (get_option('patreon-wordpress-app-credentials-failure', false)) {
-            // Non-important non-permanent info notice - doesnt need nonce verification
+        if (PatreonApiUtil::is_app_creds_invalid()) {
+            // Non-important non-permanent info notice - doesn't need nonce verification
             ?>
                  <div class="notice notice-error is-dismissible patreon-wordpress" id="patreon-wordpress-credentials-failure">
                  <h3>Sorry - couldn't connect your site to Patreon</h3>
@@ -948,7 +966,6 @@ class Patreon_Wordpress
                 </div>
             <?php
 
-            delete_option('patreon-wordpress-app-credentials-failure');
         }
     }
 
@@ -1348,13 +1365,16 @@ class Patreon_Wordpress
         // Here some check for client id and secret may be entered in future - currently only checks creator access token
 
         if ($creator_access) {
+            // Successfully used creator token, mark the integration credentials
+            // valid.
             update_option('patreon-wordpress-app-credentials-success', 1);
+            delete_option('patreon-wordpress-app-credentials-failure');
 
             return;
         }
 
         // All flopped. Set failure flag
-        update_option('patreon-wordpress-app-credentials-failure', 1);
+        update_option('patreon-wordpress-app-credentials-failure', true);
     }
 
     public function toggle_option()

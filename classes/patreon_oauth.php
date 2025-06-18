@@ -17,7 +17,7 @@ class Patreon_OAuth
 
     public function get_tokens($code, $redirect_uri, $params = [])
     {
-        return $this->__update_token(
+        return $this->__get_or_update_token(
             array_merge(
                 [
                     'grant_type' => 'authorization_code',
@@ -27,21 +27,23 @@ class Patreon_OAuth
                     'redirect_uri' => $redirect_uri,
                 ],
                 $params
-            )
+            ), false
         );
     }
 
-    public function refresh_token($refresh_token, $redirect_uri)
+    public function refresh_token($refresh_token, $redirect_uri, $disable_app_on_auth_err)
     {
-        return $this->__update_token([
+        $result = $this->__get_or_update_token([
             'grant_type' => 'refresh_token',
             'refresh_token' => $refresh_token,
             'client_id' => $this->client_id,
             'client_secret' => $this->client_secret,
-        ]);
+        ], $disable_app_on_auth_err);
+
+        return $result;
     }
 
-    private function __update_token($params)
+    private function __get_or_update_token($params, $disable_app_on_auth_err)
     {
         $api_endpoint = 'https://'.PATREON_HOST.'/api/oauth2/token';
 
@@ -63,20 +65,27 @@ class Patreon_OAuth
             return $result;
         }
 
+        $status_code = wp_remote_retrieve_response_code($response);
+
+        if ($disable_app_on_auth_err && 401 == $status_code) {
+            // Token refresh failed. Mark the app integration credentials as
+            // bad. This is done for creator access token to prevent spamming
+            // Patreon's API with token refresh requests using invalid or
+            // expired credentials. Add a cooldown period when the token refresh
+            // could be retried.
+            update_option('patreon-wordpress-app-credentials-failure', true);
+            set_transient('patreon-wordpress-app-creator-token-refresh-cooldown', true, PATREON_CREATOR_TOKEN_REFRESH_ATTEMPT_COOLDOWN_S);
+
+            Patreon_Wordpress::log_connection_error('Failed get/update creator token. HTTP '.$status_code.', Response: '.$response['body']);
+        } elseif (200 != $status_code) {
+            Patreon_Wordpress::log_connection_error('Failed get/update token. HTTP '.$status_code.', Response: '.$response['body']);
+        }
+
         $response_decoded = json_decode($response['body'], true);
-
-        // Log the connection as having error if the return is not 200
-
-        if (isset($response['response']['code']) and '200' != $response['response']['code']) {
-            Patreon_Wordpress::log_connection_error('Response code: '.$response['response']['code'].' Response :'.$response['body']);
+        if (!is_array($response_decoded) || !isset($response_decoded['access_token'], $response_decoded['refresh_token'])) {
+            Patreon_Wordpress::log_connection_error('Invalid token refresh response '.$response['body']);
         }
 
-        if (is_array($response_decoded)) {
-            return $response_decoded;
-        }
-
-        // Commented out to address issues caused by Patreon's maintenance in between 01 - 02 Feb 2019 - the plugin was showing Patreon's maintenance page at WP sites yin certain cases
-        // echo $response['body'];
-        // wp_die();
+        return $response_decoded;
     }
 }

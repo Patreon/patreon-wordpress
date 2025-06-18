@@ -7,6 +7,16 @@ class PatreonApiUtil
         return ['User-Agent' => self::get_patreon_ua()];
     }
 
+    public static function is_app_creds_invalid()
+    {
+        return get_option('patreon-wordpress-app-credentials-failure', false);
+    }
+
+    public static function is_creator_token_refresh_cooldown()
+    {
+        return get_transient('patreon-wordpress-app-creator-token-refresh-cooldown');
+    }
+
     private static function get_patreon_ua()
     {
         $campaign_id = get_option('patreon-campaign-id', '?');

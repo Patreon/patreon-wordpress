@@ -144,6 +144,7 @@ define('PATREON_ALL_POST_CATEGORY_FIELDS_MUST_BE_SELECTED', 'Please select all p
 define('PATREON_API_VERSION_WARNING', 'Your plugin is still using API v1! This will cause errors when you use post sync feature! Please read <a href="https://www.patreondevelopers.com/t/how-to-upgrade-your-patreon-wordpress-to-use-api-v2/3249" target="_blank">this guide</a> to upgrade your plugin to API v2 before activating post sync.');
 define('PATREON_WARNING_IMPORTANT', 'Important: ');
 define('PATREON_WARNING_POST_SYNC_SET_WITHOUT_API_V2', 'Important: Post syncing from Patreon is set to on, but your site is using API v1. Post sync wont work without API v2. Follow <a href="https://www.patreondevelopers.com/t/how-to-upgrade-your-patreon-wordpress-to-use-api-v2/3249" target="_blank">this guide</a> to upgrade your site to API v2 or disable post sync <a href="'.admin_url('admin.php?page=patreon-plugin').'">here in settings</a>');
+define('PATREON_CREATOR_TOKEN_REFRESH_ATTEMPT_COOLDOWN_S', 5 * 10);
 
 require 'classes/patreon_wordpress.php';
 
