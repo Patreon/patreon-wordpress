@@ -439,7 +439,6 @@ class Patreon_Wordpress
     public static function refresh_creator_access_token()
     {
         $lock_key = 'patreon-wordpress-app-creator-token-refresh-lock';
-        $tokens = null;
 
         if (get_transient($lock_key)) {
             return false;
