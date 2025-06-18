@@ -70,9 +70,12 @@ class Patreon_OAuth
         if ($disable_app_on_auth_err && 401 == $status_code) {
             // Token refresh failed. Mark the app integration credentials as
             // bad. This is done for creator access token to prevent spamming
-            // Patreon's API with token refresh requests with invalid or expired
-            // credentials.
+            // Patreon's API with token refresh requests using invalid or
+            // expired credentials. Add a cooldown period when the token refresh
+            // could be retried.
             update_option('patreon-wordpress-app-credentials-failure', true);
+            set_transient('patreon-wordpress-app-creator-token-refresh-cooldown', true, PATREON_CREATOR_TOKEN_REFRESH_ATTEMPT_COOLDOWN_S);
+
             Patreon_Wordpress::log_connection_error('Failed get/update creator token. HTTP '.$status_code.', Response: '.$response['body']);
         } elseif (200 != $status_code) {
             Patreon_Wordpress::log_connection_error('Failed get/update token. HTTP '.$status_code.', Response: '.$response['body']);
