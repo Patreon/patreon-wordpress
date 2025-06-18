@@ -1,3 +1,9 @@
+= 1.9.10 =
+
+* Prevent repeated creator token refresh attempts after a 401 error. This helps
+  reduce the risk of your WordPress site being rate-limited or blocked by the
+  Patreon API due to excessive failed requests.
+
 = 1.9.9 =
 
 * Ensure that Patreon-Wordpress UA is consistently set across requests
