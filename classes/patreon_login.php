@@ -68,6 +68,10 @@ class Patreon_Login
             $expiration = get_user_meta($user->ID, 'patreon_token_expires_in', true);
             $minted = get_user_meta($user->ID, 'patreon_token_minted', true);
 
+            if (!$expiration) {
+                return null;
+            }
+
             if ('' != $minted) {
                 // We have value. get secs to use them in comparison.
 
