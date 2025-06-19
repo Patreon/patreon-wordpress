@@ -877,7 +877,7 @@ class Patreon_Options
 
         if (count($last_50_conn_errors) > 0) {
             foreach ($last_50_conn_errors as $key => $value) {
-                $days = abs(time() - $last_50_conn_errors[$key]['date']) / 86400;
+                $days = abs(time() - $last_50_conn_errors[$key]['date']) / PatreonTimeConstants::DAY_S;
 
                 echo '<br /><br /><b>'.round($days, 2).' days ago</b><br /><br />';
                 echo $last_50_conn_errors[$key]['error'];

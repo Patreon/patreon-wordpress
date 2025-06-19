@@ -86,6 +86,22 @@ class Patreon_OAuth
             Patreon_Wordpress::log_connection_error('Invalid token refresh response '.$response['body']);
         }
 
-        return $response_decoded;
+        $result = [];
+
+        if (isset($response_decoded['access_token'])) {
+            $result['access_token'] = $response_decoded['access_token'];
+        }
+
+        if (isset($response_decoded['refresh_token'])) {
+            $result['refresh_token'] = $response_decoded['refresh_token'];
+        }
+
+        if (isset($response_decoded['expires_in'])) {
+            $result['expires_in'] = $response_decoded['expires_in'];
+        }
+
+        $result['http_status_code'] = $status_code;
+
+        return $result;
     }
 }
