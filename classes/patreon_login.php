@@ -7,11 +7,18 @@ if (!defined('WPINC')) {
 
 class Patreon_Login
 {
+    public static function set_user_token_data($user_id, $access_token, $refresh_token, $expires_in)
+    {
+        update_user_meta($user_id, 'patreon_access_token', $access_token);
+        update_user_meta($user_id, 'patreon_refresh_token', $refresh_token);
+        update_user_meta($user_id, 'patreon_token_expires_in', $expires_in);
+        update_user_meta($user_id, 'patreon_token_minted', microtime());
+    }
+
     public static function updateExistingUser($user_id, $user_response, $tokens)
     {
         /* update user meta data with patreon data */
-        update_user_meta($user_id, 'patreon_refresh_token', $tokens['refresh_token']);
-        update_user_meta($user_id, 'patreon_access_token', $tokens['access_token']);
+        self::set_user_token_data($user_id, $tokens['access_token'], $tokens['refresh_token'], $tokens['expires_in']);
         update_user_meta($user_id, 'patreon_user', $user_response['data']['attributes']['vanity']);
         update_user_meta($user_id, 'patreon_user_id', $user_response['data']['id']);
         update_user_meta($user_id, 'patreon_last_logged_in', time());
@@ -22,8 +29,6 @@ class Patreon_Login
         }
 
         update_user_meta($user_id, 'patreon_created', $patreon_created);
-        update_user_meta($user_id, 'patreon_token_minted', microtime());
-        update_user_meta($user_id, 'patreon_token_expires_in', $tokens['expires_in']);
 
         $user = get_user_by('ID', $user_id);
 
@@ -97,6 +102,7 @@ class Patreon_Login
         delete_user_meta($user_id, 'patreon_access_token');
         delete_user_meta($user_id, 'patreon_refresh_token');
         delete_user_meta($user_id, 'patreon_token_expires_in');
+        delete_user_meta($user_id, 'patreon_token_minted');
     }
 
     public static function createOrLogInUserFromPatreon($user_response, $tokens, $redirect = false)

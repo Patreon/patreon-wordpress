@@ -168,7 +168,6 @@ class Patreon_Wordpress
         $patreon_access_token = get_user_meta($user->ID, 'patreon_access_token', true);
 
         if ('' != $patreon_access_token) {
-            // TODO add wrong
             $api_client = new Patreon_API($patreon_access_token);
 
             // Get the user from the API
@@ -224,8 +223,6 @@ class Patreon_Wordpress
             if (isset($user_response['included'][0]) and is_array($user_response['included'][0]) and $user_response_timestamp >= (time() - (3600 * 24 * 3))) {
                 return Patreon_Wordpress::add_to_patreon_user_info_cache($user->ID, $user_response);
             }
-        } else {
-            echo 'Testing - no token';
         }
 
         // All failed - return false
@@ -255,11 +252,7 @@ class Patreon_Wordpress
             $refresh_data = $oauth_client->refresh_token($refresh_token, site_url().'/patreon-authorization/', false);
 
             if (isset($refresh_data['access_token'])) {
-                update_user_meta($user->ID, 'patreon_access_token', $refresh_data['access_token']);
-                update_user_meta($user->ID, 'patreon_refresh_token', $refresh_data['refresh_token']);
-                update_user_meta($user->ID, 'patreon_refresh_token', $refresh_data['refresh_token']);
-                update_user_meta($user->ID, 'patreon_token_expires_in', $refresh_data['expires_in']);
-                update_user_meta($user->ID, 'patreon_token_minted', microtime(true));
+                Patreon_Login::set_user_token_data($user->ID, $refresh_data['access_token'], $refresh_data['refresh_token'], $refresh_data['expires_in']);
 
                 return true;
             }
@@ -294,7 +287,6 @@ class Patreon_Wordpress
         $last_update = get_user_meta($user->ID, 'patreon_user_details_last_updated', true);
 
         // If last update time is not empty and it is closer to time() than one day, dont update
-        // TODO: comment out for testing
         $one_day_s = 86400;
         if (!('' == $last_update or ((time() - $last_update) > $one_day_s))) {
             return false;
