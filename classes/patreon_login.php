@@ -65,14 +65,16 @@ class Patreon_Login
         if ($user and 0 != $user->ID) {
             // Valid user is logged in. Check the token:
 
-            $expiration = get_user_meta($user->ID, 'patreon_token_expires_in', true);
-            $minted = get_user_meta($user->ID, 'patreon_token_minted', true);
+            $access_token = get_user_meta($user->ID, 'patreon_access_token', true);
 
-            if (!$expiration) {
+            if (!$access_token) {
                 return null;
             }
 
-            if ('' != $minted) {
+            $expiration = get_user_meta($user->ID, 'patreon_token_expires_in', true);
+            $minted = get_user_meta($user->ID, 'patreon_token_minted', true);
+
+            if ($minted && '' !== $expiration) {
                 // We have value. get secs to use them in comparison.
 
                 $minted = explode(' ', $minted);
@@ -81,13 +83,20 @@ class Patreon_Login
 
                 if ((int) microtime(true) >= ($minted + $expiration)) {
                     // This token is expired. Nuke it.
-                    delete_user_meta($user->ID, 'patreon_access_token');
+                    self::clear_user_token_data($user->ID);
                 }
             } else {
-                // No minted value. Even if there may be no access token created and saved, still nuke it.
-                delete_user_meta($user->ID, 'patreon_access_token');
+                // Missing expiration time or minted time, clear token data.
+                self::clear_user_token_data($user->ID);
             }
         }
+    }
+
+    public static function clear_user_token_data($user_id)
+    {
+        delete_user_meta($user_id, 'patreon_access_token');
+        delete_user_meta($user_id, 'patreon_refresh_token');
+        delete_user_meta($user_id, 'patreon_token_expires_in');
     }
 
     public static function createOrLogInUserFromPatreon($user_response, $tokens, $redirect = false)

@@ -237,7 +237,7 @@ class Patreon_Wordpress
     {
         $refresh_token = get_user_meta($user->ID, 'patreon_refresh_token', true);
 
-        if (!refresh_token || !$user->ID) {
+        if (!$refresh_token || !$user->ID) {
             return false;
         }
 
@@ -255,17 +255,18 @@ class Patreon_Wordpress
             $refresh_data = $oauth_client->refresh_token($refresh_token, site_url().'/patreon-authorization/', false);
 
             if (isset($refresh_data['access_token'])) {
-                update_user_meta($user->ID, 'patreon_refresh_token', $refresh_data['refresh_token']);
                 update_user_meta($user->ID, 'patreon_access_token', $refresh_data['access_token']);
+                update_user_meta($user->ID, 'patreon_refresh_token', $refresh_data['refresh_token']);
+                update_user_meta($user->ID, 'patreon_refresh_token', $refresh_data['refresh_token']);
+                update_user_meta($user->ID, 'patreon_token_expires_in', $refresh_data['expires_in']);
+                update_user_meta($user->ID, 'patreon_token_minted', microtime(true));
 
-                return $refresh_data['access_token'];
+                return true;
             }
 
             if (isset($refresh_data['http_status_code']) && 401 == $refresh_data['http_status_code']) {
                 // Token refresh failed, most likely invalid token data
-                delete_user_meta($user->ID, 'patreon_access_token');
-                delete_user_meta($user->ID, 'patreon_refresh_token');
-                delete_user_meta($user->ID, 'patreon_token_expires_in');
+                Patreon_Login::clear_user_token_data($user->ID);
                 // TODO: Might need to consider asking the user to re-auth with
                 // Patreon.
             }
