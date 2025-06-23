@@ -43,6 +43,7 @@ class Patreon_Wordpress
         include_once 'patreon_compatibility.php';
         include_once 'patreon_admin_pointers.php';
         include_once 'patreon_content_sync.php';
+        include_once 'patreon_constants.php';
 
         self::$patreon_routing = new Patreon_Routing();
         self::$patreon_frontend = new Patreon_Frontend();
@@ -220,7 +221,7 @@ class Patreon_Wordpress
             $user_response_timestamp = get_user_meta($user->ID, 'patreon_latest_patron_info_timestamp', true);
 
             // Check if there is a valid saved user return and whether it has a timestamp within desired range
-            if (isset($user_response['included'][0]) and is_array($user_response['included'][0]) and $user_response_timestamp >= (time() - (3600 * 24 * 3))) {
+            if (isset($user_response['included'][0]) and is_array($user_response['included'][0]) and $user_response_timestamp >= (time() - 3 * PatreonTimeConstants::DAY_S)) {
                 return Patreon_Wordpress::add_to_patreon_user_info_cache($user->ID, $user_response);
             }
         }
@@ -234,17 +235,41 @@ class Patreon_Wordpress
     {
         $refresh_token = get_user_meta($user->ID, 'patreon_refresh_token', true);
 
-        $oauth_client = new Patreon_Oauth();
-        $tokens = $oauth_client->refresh_token($refresh_token, site_url().'/patreon-authorization/', false);
-
-        if (isset($tokens['access_token'])) {
-            update_user_meta($user->ID, 'patreon_refresh_token', $tokens['refresh_token']);
-            update_user_meta($user->ID, 'patreon_access_token', $tokens['access_token']);
-
-            return $tokens['access_token'];
+        if (!$refresh_token || !$user->ID) {
+            return false;
         }
 
-        return false;
+        $lock_key = 'patreon-wordpress-app-user-token-refresh-lock-'.$user->ID;
+
+        if (get_transient($lock_key)) {
+            return false;
+        }
+
+        // Ensure that only one request at a time refreshes tokens for this user
+        set_transient($lock_key, true, 120);
+
+        try {
+            $oauth_client = new Patreon_Oauth();
+            $refresh_data = $oauth_client->refresh_token($refresh_token, site_url().'/patreon-authorization/', false);
+
+            if (!is_array($refresh_data)) {
+                return false;
+            }
+            if (isset($refresh_data['http_status_code']) && 401 == $refresh_data['http_status_code']) {
+                // Token refresh failed, most likely invalid token data
+                // TODO: Might need to consider asking the user to re-auth with
+                // Patreon.
+                Patreon_Login::clear_user_token_data($user->ID);
+            } elseif (isset($refresh_data['access_token'])) {
+                Patreon_Login::set_user_token_data($user->ID, $refresh_data['access_token'], $refresh_data['refresh_token'], $refresh_data['expires_in']);
+
+                return true;
+            }
+
+            return false;
+        } finally {
+            delete_transient($lock_key);
+        }
     }
 
     public static function updatePatreonUser()
@@ -264,7 +289,7 @@ class Patreon_Wordpress
         $last_update = get_user_meta($user->ID, 'patreon_user_details_last_updated', true);
 
         // If last update time is not empty and it is closer to time() than one day, dont update
-        if (!('' == $last_update or ((time() - $last_update) > 86400))) {
+        if (!('' == $last_update or ((time() - $last_update) > PatreonTimeConstants::DAY_S))) {
             return false;
         }
 
