@@ -15,6 +15,14 @@ class Patreon_Login
         update_user_meta($user_id, 'patreon_token_minted', microtime());
     }
 
+    public static function clear_user_token_data($user_id)
+    {
+        delete_user_meta($user_id, 'patreon_access_token');
+        delete_user_meta($user_id, 'patreon_refresh_token');
+        delete_user_meta($user_id, 'patreon_token_expires_in');
+        delete_user_meta($user_id, 'patreon_token_minted');
+    }
+
     public static function updateExistingUser($user_id, $user_response, $tokens)
     {
         /* update user meta data with patreon data */
@@ -95,14 +103,6 @@ class Patreon_Login
                 self::clear_user_token_data($user->ID);
             }
         }
-    }
-
-    public static function clear_user_token_data($user_id)
-    {
-        delete_user_meta($user_id, 'patreon_access_token');
-        delete_user_meta($user_id, 'patreon_refresh_token');
-        delete_user_meta($user_id, 'patreon_token_expires_in');
-        delete_user_meta($user_id, 'patreon_token_minted');
     }
 
     public static function createOrLogInUserFromPatreon($user_response, $tokens, $redirect = false)

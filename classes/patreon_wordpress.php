@@ -252,17 +252,18 @@ class Patreon_Wordpress
             $oauth_client = new Patreon_Oauth();
             $refresh_data = $oauth_client->refresh_token($refresh_token, site_url().'/patreon-authorization/', false);
 
-            if (isset($refresh_data['access_token'])) {
+            if (!is_array($refresh_data)) {
+                return false;
+            }
+            if (isset($refresh_data['http_status_code']) && 401 == $refresh_data['http_status_code']) {
+                // Token refresh failed, most likely invalid token data
+                // TODO: Might need to consider asking the user to re-auth with
+                // Patreon.
+                Patreon_Login::clear_user_token_data($user->ID);
+            } elseif (isset($refresh_data['access_token'])) {
                 Patreon_Login::set_user_token_data($user->ID, $refresh_data['access_token'], $refresh_data['refresh_token'], $refresh_data['expires_in']);
 
                 return true;
-            }
-
-            if (isset($refresh_data['http_status_code']) && 401 == $refresh_data['http_status_code']) {
-                // Token refresh failed, most likely invalid token data
-                Patreon_Login::clear_user_token_data($user->ID);
-                // TODO: Might need to consider asking the user to re-auth with
-                // Patreon.
             }
 
             return false;
