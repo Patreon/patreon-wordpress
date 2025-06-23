@@ -1,3 +1,10 @@
+= 1.9.11 =
+
+* Fixed: Resolved an issue where the plugin would repeatedly attempt to refresh
+  expired or invalid OAuth tokens, resulting in continuous 401 responses. This
+  update prevents unnecessary token refresh attempts and reduces the risk of
+  rate limiting by the Patreon API.
+
 = 1.9.10 =
 
 * Prevent repeated creator token refresh attempts after a 401 error. This helps
