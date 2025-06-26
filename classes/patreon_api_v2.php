@@ -58,6 +58,8 @@ class Patreon_API
 
     public function fetch_creator_info()
     {
+        $trace = (new Exception())->getTraceAsString();
+        Patreon_Wordpress::log_connection_error('Creator info trace - '.$trace);
         $api_return = $this->__get_json('campaigns?include=creator&fields[campaign]=created_at,creation_name,discord_server_id,image_small_url,image_url,is_charged_immediately,is_monthly,is_nsfw,main_video_embed,main_video_url,one_liner,one_liner,patron_count,pay_per_name,pledge_url,published_at,summary,thanks_embed,thanks_msg,thanks_video_url,has_rss,has_sent_rss_notify,rss_feed_title,rss_artwork_url,patron_count,discord_server_id,google_analytics_id&fields[user]=about,created,email,first_name,full_name,image_url,last_name,social_connections,thumb_url,url,vanity,is_email_verified');
 
         return $api_return;
