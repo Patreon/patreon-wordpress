@@ -493,9 +493,11 @@ class Patreon_Wordpress
                 update_option('patreon-creators-refresh-token', $tokens['refresh_token']);
                 update_option('patreon-creators-access-token', $tokens['access_token']);
                 delete_option('patreon-wordpress-app-credentials-failure');
+
+                return $tokens;
             }
 
-            return $tokens ?: false;
+            return false;
         } finally {
             delete_transient($lock_key);
         }
