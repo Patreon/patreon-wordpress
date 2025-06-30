@@ -100,6 +100,10 @@ class Patreon_OAuth
             $result['expires_in'] = $response_decoded['expires_in'];
         }
 
+        if (isset($response_decoded['scope'])) {
+            $result['scope'] = $response_decoded['scope'];
+        }
+
         $result['http_status_code'] = $status_code;
 
         return $result;
