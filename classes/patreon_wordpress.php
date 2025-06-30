@@ -448,14 +448,20 @@ class Patreon_Wordpress
             return false;
         }
 
+        $should_refresh_tokens = false;
+
         if (isset($user_response['errors']) && is_array($user_response['errors'])) {
             foreach ($user_response['errors'] as $error) {
                 if (1 == $error['code']) {
-                    if (self::refresh_creator_access_token()) {
-                        return $api_client->fetch_creator_info();
-                    }
+                    $should_refresh_tokens = true;
                 }
             }
+        }
+
+        if ($should_refresh_tokens and $token_data = self::refresh_creator_access_token()) {
+            $api_client = new Patreon_API($token_data['access_token']);
+
+            return $api_client->fetch_creator_info();
         }
 
         return $user_response;
@@ -489,9 +495,22 @@ class Patreon_Wordpress
             $oauth_client = new Patreon_Oauth();
             $tokens = $oauth_client->refresh_token($refresh_token, site_url().'/patreon-authorization/', true);
 
+            if (isset($tokens['scope'])) {
+                update_option('patreon-creators-access-token-scope', $tokens['scope']);
+            }
+
+            $expires_in = PatreonTimeConstants::DAY_S * 7;
+
+            if (isset($tokens['expires_in'])) {
+                $expires_in = $tokens['expires_in'];
+            }
+
+            $new_expiration = time() + $expires_in;
+            update_option('patreon-creators-access-token-scope', $new_expiration);
+
             if (isset($tokens['refresh_token']) && isset($tokens['access_token'])) {
-                update_option('patreon-creators-refresh-token', $tokens['refresh_token']);
                 update_option('patreon-creators-access-token', $tokens['access_token']);
+                update_option('patreon-creators-refresh-token', $tokens['refresh_token']);
                 delete_option('patreon-wordpress-app-credentials-failure');
 
                 return $tokens;
@@ -516,10 +535,7 @@ class Patreon_Wordpress
         $expiration = get_option('patreon-creators-refresh-token-expiration', false);
 
         if (!$expiration or $expiration <= (time() + (60 * 60 * 24 * 7))) {
-            if ($tokens = self::refresh_creator_access_token()) {
-                update_option('patreon-creators-refresh-token-expiration', time() + $tokens['expires_in']);
-                update_option('patreon-creators-access-token-scope', $tokens['scope']);
-
+            if (self::refresh_creator_access_token()) {
                 return true;
             }
         }
@@ -1352,52 +1368,42 @@ class Patreon_Wordpress
     public static function check_api_connection()
     {
         // Just attempts to connect to API with given credentials, and returns result
+        $creator_access_token = get_option('patreon-creator-access-token', false);
 
-        // Currently can verify only if creator's access token and refresh token are false. If the access token is false and refresh token is not, the system already refreshes the access token automatically. If only refresh token is false, then the existing correct access token will check true. In future a better check should be implemented
-
-        $api_client = new Patreon_API(get_option('patreon-creators-access-token', false));
-        $creator_response = $api_client->fetch_creator_info();
-
-        $creator_access = false;
-        $client_access = false;
-
-        if (isset($creator_response['included'][0]['id']) and '' != $creator_response['included'][0]['id']) {
-            // Got creator id. Credentials must be valid
-
-            // Success - set flag
-            // update_option( 'patreon-wordpress-app-credentials-success', 1 );
-
-            $creator_access = true;
-        }
-
-        // Try to do a creator's token refresh
-
-        if (!$creator_access and $tokens = self::refresh_creator_access_token()) {
-            update_option('patreon-creators-refresh-token-expiration', time() + $tokens['expires_in']);
-            update_option('patreon-creators-access-token-scope', $tokens['scope']);
-
-            // Try again:
-
-            $api_client = new Patreon_API(get_option('patreon-creators-access-token', false));
+        if ($creator_access_token) {
+            $api_client = new Patreon_API($creator_access_token);
             $creator_response = $api_client->fetch_creator_info();
+
+            $creator_access = false;
 
             if (isset($creator_response['included'][0]['id']) and '' != $creator_response['included'][0]['id']) {
                 // Got creator id. Credentials must be valid
-                // Success - set flag
-
                 $creator_access = true;
             }
-        }
 
-        // Here some check for client id and secret may be entered in future - currently only checks creator access token
+            // Try to do a creator's token refresh
+            if (!$creator_access and $tokens = self::refresh_creator_access_token()) {
+                // Try again:
+                $api_client = new Patreon_API($tokens['access_token']);
+                $creator_response = $api_client->fetch_creator_info();
 
-        if ($creator_access) {
-            // Successfully used creator token, mark the integration credentials
-            // valid.
-            update_option('patreon-wordpress-app-credentials-success', 1);
-            delete_option('patreon-wordpress-app-credentials-failure');
+                if (isset($creator_response['included'][0]['id']) and '' != $creator_response['included'][0]['id']) {
+                    // Got creator id. Credentials must be valid
+                    // Success - set flag
+                    $creator_access = true;
+                }
+            }
 
-            return;
+            // Here some check for client id and secret may be entered in future - currently only checks creator access token
+
+            if ($creator_access) {
+                // Successfully used creator token, mark the integration credentials
+                // valid.
+                update_option('patreon-wordpress-app-credentials-success', 1);
+                delete_option('patreon-wordpress-app-credentials-failure');
+
+                return;
+            }
         }
 
         // All flopped. Set failure flag
