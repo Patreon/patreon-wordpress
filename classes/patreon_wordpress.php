@@ -458,13 +458,17 @@ class Patreon_Wordpress
             }
         }
 
-        if ($should_refresh_tokens and $token_data = self::refresh_creator_access_token()) {
-            $api_client = new Patreon_API($token_data['access_token']);
+        if ($should_refresh_tokens) {
+            if ($token_data = self::refresh_creator_access_token()) {
+                $api_client = new Patreon_API($token_data['access_token']);
 
-            return $api_client->fetch_creator_info();
+                return $api_client->fetch_creator_info();
+            }
+        } else {
+            return $user_response;
         }
 
-        return $user_response;
+        return false;
     }
 
     public static function refresh_creator_access_token()
