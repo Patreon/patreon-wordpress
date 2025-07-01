@@ -1,3 +1,7 @@
+= 1.9.12 =
+
+* Fixed: Fixed several bugs with creator token refresh.
+
 = 1.9.11 =
 
 * Fixed: Resolved an issue where the plugin would repeatedly attempt to refresh
