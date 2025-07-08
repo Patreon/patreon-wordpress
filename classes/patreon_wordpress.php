@@ -1372,7 +1372,7 @@ class Patreon_Wordpress
     public static function check_api_connection()
     {
         // Just attempts to connect to API with given credentials, and returns result
-        $creator_access_token = get_option('patreon-creator-access-token', false);
+        $creator_access_token = get_option('patreon-creators-access-token', false);
 
         if ($creator_access_token) {
             $api_client = new Patreon_API($creator_access_token);
