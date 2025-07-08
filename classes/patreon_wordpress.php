@@ -70,12 +70,17 @@ class Patreon_Wordpress
         add_action('init', [$this, 'check_post_sync_webhook']);
         add_action('init', [&$this, 'order_independent_actions_to_run_on_init_start'], 0);
         add_action('init', [$this, 'check_plugin_activation_date_for_existing_installs']);
-        add_action('admin_init', [$this, 'post_credential_update_api_connectivity_check']);
         add_action('admin_init', [$this, 'check_api_connection_if_allowed']);
-        add_action('update_option_patreon-client-id', [$this, 'toggle_check_api_credentials_on_setting_save'], 10, 2);
-        add_action('update_option_patreon-client-secret', [$this, 'toggle_check_api_credentials_on_setting_save'], 10, 2);
-        add_action('update_option_patreon-creators-access-token', [$this, 'toggle_check_api_credentials_on_setting_save'], 10, 2);
-        add_action('update_option_patreon-creators-refresh-token', [$this, 'toggle_check_api_credentials_on_setting_save'], 10, 2);
+
+        // Toggling api credential check should happen before the connectivity
+        // check (post_credential_update_api_connectivity_check) runs to ensure
+        // that the toggle is in its final state before performing the check.
+        add_action('admin_init', [$this, 'post_credential_update_api_connectivity_check'], 10);
+        add_action('update_option_patreon-client-id', [$this, 'toggle_check_api_credentials_on_setting_save'], 9, 2);
+        add_action('update_option_patreon-client-secret', [$this, 'toggle_check_api_credentials_on_setting_save'], 9, 2);
+        add_action('update_option_patreon-creators-access-token', [$this, 'toggle_check_api_credentials_on_setting_save'], 9, 2);
+        add_action('update_option_patreon-creators-refresh-token', [$this, 'toggle_check_api_credentials_on_setting_save'], 9, 2);
+
         add_action('init', [$this, 'check_creator_token_expiration']);
         add_action('init', [$this, 'checkPatreonCampaignID']);
         add_action('init', [$this, 'checkPatreonCreatorURL']);
@@ -500,23 +505,23 @@ class Patreon_Wordpress
             $oauth_client = new Patreon_Oauth();
             $tokens = $oauth_client->refresh_token($refresh_token, site_url().'/patreon-authorization/', true);
 
-            if (isset($tokens['scope'])) {
-                update_option('patreon-creators-access-token-scope', $tokens['scope']);
-            }
-
-            $expires_in = PatreonTimeConstants::DAY_S * 7;
-
-            if (isset($tokens['expires_in'])) {
-                $expires_in = $tokens['expires_in'];
-            }
-
-            $new_expiration = time() + $expires_in;
-            update_option('patreon-creators-access-token-scope', $new_expiration);
-
             if (isset($tokens['refresh_token']) && isset($tokens['access_token'])) {
                 update_option('patreon-creators-access-token', $tokens['access_token']);
                 update_option('patreon-creators-refresh-token', $tokens['refresh_token']);
                 delete_option('patreon-wordpress-app-credentials-failure');
+
+                if (isset($tokens['scope'])) {
+                    update_option('patreon-creators-access-token-scope', $tokens['scope']);
+                }
+
+                $expires_in = PatreonTimeConstants::DAY_S * 7;
+
+                if (isset($tokens['expires_in'])) {
+                    $expires_in = $tokens['expires_in'];
+                }
+
+                $new_expiration = time() + $expires_in;
+                update_option('patreon-creators-refresh-token-expiration', $new_expiration);
 
                 return $tokens;
             }
@@ -992,7 +997,7 @@ class Patreon_Wordpress
         }
 
         // This is a plugin system info notice.
-        if (get_option('patreon-wordpress-app-credentials-success', false)) {
+        if (get_option('patreon-wordpress-app-credentials-success', false) && !PatreonApiUtil::is_app_creds_invalid()) {
             // Non-important non-permanent info notice - doesn't need nonce verification
             ?>
                  <div class="notice notice-success is-dismissible patreon-wordpress" id="patreon-wordpress-credentials-success">
@@ -1376,11 +1381,19 @@ class Patreon_Wordpress
     }
 
     /**
-     * Determine if creator's API credentials are valid. Add a cooldown period
-     * to prevent frequent checks.
+     * Due to a race condition, credentials can sometimes be incorrectly marked
+     * as invalid. Use this method to check if the credentials are correct.
+     *
+     * Use a cooldown period to prevent frequent checks.
      * */
     public static function check_api_connection_if_allowed()
     {
+        if (!PatreonApiUtil::is_app_creds_invalid()) {
+            // For now, don't check when credentials have not been marked as
+            // invalid. This check reduces calls to Patreon's API.
+            return null;
+        }
+
         if (PatreonApiUtil::get_check_api_connection_cooldown()) {
             return null;
         }
