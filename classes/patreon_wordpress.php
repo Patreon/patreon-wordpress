@@ -510,7 +510,7 @@ class Patreon_Wordpress
             }
 
             $new_expiration = time() + $expires_in;
-            update_option('patreon-creators-access-token-scope', $new_expiration);
+            update_option('patreon-creators-refresh-token-expiration', $new_expiration);
 
             if (isset($tokens['refresh_token']) && isset($tokens['access_token'])) {
                 update_option('patreon-creators-access-token', $tokens['access_token']);
