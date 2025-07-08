@@ -1388,19 +1388,25 @@ class Patreon_Wordpress
      * */
     public static function check_api_connection_if_allowed()
     {
-        if (!PatreonApiUtil::is_app_creds_invalid()) {
-            // For now, don't check when credentials have not been marked as
-            // invalid. This check reduces calls to Patreon's API.
+        try {
+            if (!PatreonApiUtil::is_app_creds_invalid()) {
+                // For now, don't check when credentials have not been marked as
+                // invalid. This check reduces calls to Patreon's API.
+                return null;
+            }
+
+            if (PatreonApiUtil::get_check_api_connection_cooldown()) {
+                return null;
+            }
+
+            PatreonApiUtil::set_check_api_connection_cooldown();
+
+            return self::check_api_connection();
+        } catch (Throwable $e) {
+            Patreon_Wordpress::log_connection_error('Critical error during api connection check: '.$e->getMessage());
+
             return null;
         }
-
-        if (PatreonApiUtil::get_check_api_connection_cooldown()) {
-            return null;
-        }
-
-        PatreonApiUtil::set_check_api_connection_cooldown();
-
-        return self::check_api_connection();
     }
 
     /**
