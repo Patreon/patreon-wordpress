@@ -2,6 +2,8 @@
 
 class PatreonApiUtil
 {
+    public const CHECK_API_CONNECTION_COOLDOWN_KEY = 'patreon-check-api-connection-cooldown';
+
     public static function get_default_headers()
     {
         return ['User-Agent' => self::get_patreon_ua()];
@@ -15,6 +17,16 @@ class PatreonApiUtil
     public static function is_creator_token_refresh_cooldown()
     {
         return get_transient('patreon-wordpress-app-creator-token-refresh-cooldown');
+    }
+
+    public static function get_check_api_connection_cooldown()
+    {
+        return get_transient(self::CHECK_API_CONNECTION_COOLDOWN_KEY);
+    }
+
+    public static function set_check_api_connection_cooldown()
+    {
+        set_transient(self::CHECK_API_CONNECTION_COOLDOWN_KEY, true, PATREON_CHECK_API_CONNECTION_COOLDOWN_S);
     }
 
     private static function get_patreon_ua()

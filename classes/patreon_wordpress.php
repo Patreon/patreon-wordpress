@@ -71,6 +71,7 @@ class Patreon_Wordpress
         add_action('init', [&$this, 'order_independent_actions_to_run_on_init_start'], 0);
         add_action('init', [$this, 'check_plugin_activation_date_for_existing_installs']);
         add_action('admin_init', [$this, 'post_credential_update_api_connectivity_check']);
+        add_action('admin_init', [$this, 'check_api_connection_if_allowed']);
         add_action('update_option_patreon-client-id', [$this, 'toggle_check_api_credentials_on_setting_save'], 10, 2);
         add_action('update_option_patreon-client-secret', [$this, 'toggle_check_api_credentials_on_setting_save'], 10, 2);
         add_action('update_option_patreon-creators-access-token', [$this, 'toggle_check_api_credentials_on_setting_save'], 10, 2);
@@ -1364,14 +1365,37 @@ class Patreon_Wordpress
         // Doesnt need capability checks - should be allowed to be used programmatically
 
         if (get_option('patreon-wordpress-do-api-connectivity-check', false)) {
-            $result = self::check_api_connection();
+            $has_valid_creator_access = self::check_api_connection();
+
+            if ($has_valid_creator_access) {
+                update_option('patreon-wordpress-app-credentials-success', true);
+            }
+
             delete_option('patreon-wordpress-do-api-connectivity-check');
         }
     }
 
+    /**
+     * Determine if creator's API credentials are valid. Add a cooldown period
+     * to prevent frequent checks.
+     * */
+    public static function check_api_connection_if_allowed()
+    {
+        if (PatreonApiUtil::get_check_api_connection_cooldown()) {
+            return null;
+        }
+
+        PatreonApiUtil::set_check_api_connection_cooldown();
+
+        return self::check_api_connection();
+    }
+
+    /**
+     * Determine if creator's API credentials are valid. If access failed,
+     * attempt to refresh the token.
+     * */
     public static function check_api_connection()
     {
-        // Just attempts to connect to API with given credentials, and returns result
         $creator_access_token = get_option('patreon-creators-access-token', false);
 
         if ($creator_access_token) {
@@ -1403,15 +1427,16 @@ class Patreon_Wordpress
             if ($creator_access) {
                 // Successfully used creator token, mark the integration credentials
                 // valid.
-                update_option('patreon-wordpress-app-credentials-success', 1);
                 delete_option('patreon-wordpress-app-credentials-failure');
 
-                return;
+                return true;
             }
         }
 
         // All flopped. Set failure flag
         update_option('patreon-wordpress-app-credentials-failure', true);
+
+        return false;
     }
 
     public function toggle_option()
