@@ -1010,7 +1010,7 @@ class Patreon_Wordpress
             ?>
                  <div class="notice notice-error is-dismissible patreon-wordpress" id="patreon-wordpress-credentials-failure">
                  <h3>Sorry - couldn't connect your site to Patreon</h3>
-                    <p>Patreon WordPress wasn't able to contact Patreon with the app details you provided. This may be because there is an error in the app details, or because there is something preventing proper connectivity in between your site/server and Patreon API. You can get help by visiting our support forum <a href="https://www.patreondevelopers.com/c/patreon-wordpress-plugin-support?utm_source=<?php urlencode(site_url()); ?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=connection_details_not_correct_admin_notice_link&utm_term=" target="_blank">here</a></p>
+                    <p>Patreon WordPress wasn't able to contact Patreon with the app details you provided. This may be because there is an error in the app details, or because there is something preventing proper connectivity in between your site/server and Patreon API. Try using the re-connect flow. You can seek help in our support forum <a href="https://www.patreondevelopers.com/c/patreon-wordpress-plugin-support?utm_source=<?php urlencode(site_url()); ?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=connection_details_not_correct_admin_notice_link&utm_term=" target="_blank">here</a></p>
                 </div>
             <?php
 
