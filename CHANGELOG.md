@@ -1,3 +1,10 @@
+= 1.9.13 =
+
+* Fixed: Success message no longer shows when the connection fails
+* Fixed: Stopped unnecessary creator token refreshes
+* Added: Automatic check to re-verify broken connections
+* Improved: Connection error message is now more informative
+
 = 1.9.12 =
 
 * Fixed: Fixed several bugs with creator token refresh.
