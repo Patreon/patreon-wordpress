@@ -3026,7 +3026,7 @@ class Patreon_Wordpress
                 $webhook_delete = $api_client->delete_post_webhook($existing_hook['data']['id']);
 
                 // If delete is successful remove the local info about webhook
-                if (is_array($webhook_delete) and isset($webhook_delete['response']['code']) and '204' == $webhook_delete['response']['code']) {
+                if (is_array($webhook_delete) and isset($webhook_delete['response']['code']) and in_array($webhook_delete['response']['code'], ['204', '404'])) {
                     update_option('patreon-post-sync-webhook-saved', false);
                     delete_option('patreon-post-sync-webhook');
                 }
