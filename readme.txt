@@ -4,7 +4,7 @@ Tags: patreon, membership, members
 Requires at least: 4.0
 Requires PHP: 7.4
 Tested up to: 6.8.1
-Stable tag: 1.9.13
+Stable tag: 1.9.14
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -78,6 +78,13 @@ To make a locked post public again, just choose "Everyone" from the select box a
 It is  difficult to protect videos due the intensive bandwidth requirements of hosting video  and having to rely on third parties such as Youtube or Vimeo. Youtube allows you to set videos to ‘private’ but Vimeo offers extra controls by only allowing videos to be played on specific domains. Visit this guide to [protecting your video content with Vimeo](https://help.vimeo.com/hc/en-us/articles/224817847-Privacy-settings-overview).
 
 == Upgrade Notice ==
+
+= 1.9.14 =
+
+* Fixed: Webhook deletion logic no longer gets stuck in a loop when the API
+  returns a 404 - such responses are now treated as successful deletions
+* Added: Query parameter to POST api/oauth2/token requests to indicate if the
+  refresh is for a creator access token, for improved API-side debugging
 
 = 1.9.13 =
 
@@ -571,9 +578,9 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
-= 1.9.13 =
+= 1.9.14 =
 
-* Fixed: Success message no longer shows when the connection fails
-* Fixed: Stopped unnecessary creator token refreshes
-* Added: Automatic check to re-verify broken connections
-* Improved: Connection error message is now more informative
+* Fixed: Webhook deletion logic no longer gets stuck in a loop when the API
+  returns a 404 - such responses are now treated as successful deletions
+* Added: Query parameter to POST api/oauth2/token requests to indicate if the
+  refresh is for a creator access token, for improved API-side debugging
