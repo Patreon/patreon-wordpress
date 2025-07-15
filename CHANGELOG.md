@@ -1,3 +1,10 @@
+= 1.9.14 =
+
+* Fixed: Webhook deletion logic no longer gets stuck in a loop when the API
+  returns a 404 - such responses are now treated as successful deletions
+* Added: Query parameter to POST api/oauth2/token requests to indicate if the
+  refresh is for a creator access token, for improved API-side debugging
+
 = 1.9.13 =
 
 * Fixed: Success message no longer shows when the connection fails
