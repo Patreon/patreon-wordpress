@@ -485,17 +485,23 @@ class Patreon_Wordpress
             return false;
         }
 
-        // Ensure that only one request at a time refreshes the token
+        if (PatreonApiUtil::is_app_creds_invalid()) {
+            // Don't attempt creator token refresh if the plugin client
+            // credentials have been marked as broken
+            return false;
+        }
+
+        // Ensure that only one request at a time refreshes the token.
+        // If returning early, make sure that finally block releases the lock.
         set_transient($lock_key, true, 120);
 
         try {
-            if (PatreonApiUtil::is_creator_token_refresh_cooldown()) {
-                // Don't attempt creator token refresh if the plugin client
-                // credentials have been marked as broken
+            // Limit frequency of creator token refreshes
+            if (PatreonApiUtil::get_creator_token_refresh_cooldown()) {
                 return false;
             }
+            PatreonApiUtil::set_creator_token_refresh_cooldown();
 
-            /* refresh creators token if error 1 */
             $refresh_token = get_option('patreon-creators-refresh-token', false);
 
             if (!$refresh_token) {
