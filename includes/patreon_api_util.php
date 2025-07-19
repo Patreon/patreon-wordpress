@@ -3,6 +3,7 @@
 class PatreonApiUtil
 {
     public const CHECK_API_CONNECTION_COOLDOWN_KEY = 'patreon-check-api-connection-cooldown';
+    public const REFRESH_CREATOR_TOKEN_COOLDOWN_KEY = 'patreon-wordpress-app-creator-token-refresh-cooldown';
 
     public static function get_default_headers()
     {
@@ -14,9 +15,14 @@ class PatreonApiUtil
         return get_option('patreon-wordpress-app-credentials-failure', false);
     }
 
-    public static function is_creator_token_refresh_cooldown()
+    public static function get_creator_token_refresh_cooldown()
     {
-        return get_transient('patreon-wordpress-app-creator-token-refresh-cooldown');
+        return get_transient(self::REFRESH_CREATOR_TOKEN_COOLDOWN_KEY);
+    }
+
+    public static function set_creator_token_refresh_cooldown()
+    {
+        set_transient(self::REFRESH_CREATOR_TOKEN_COOLDOWN_KEY, true, PATREON_CREATOR_TOKEN_REFRESH_ATTEMPT_COOLDOWN_S);
     }
 
     public static function get_check_api_connection_cooldown()
