@@ -1,3 +1,9 @@
+= 1.9.15 =
+
+* Fixed: Clients with invalid credentials no longer attempt creator token
+  refresh, reducing unnecessary `POST /api/oauth2/token` calls that result in
+  401 errors
+
 = 1.9.14 =
 
 * Fixed: Webhook deletion logic no longer gets stuck in a loop when the API
