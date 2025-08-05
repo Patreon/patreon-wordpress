@@ -174,7 +174,7 @@ class Patreon_Wordpress
         /* get user meta data and query patreon api */
         $patreon_access_token = get_user_meta($user->ID, 'patreon_access_token', true);
 
-        if ('' != $patreon_access_token) {
+        if (!empty($patreon_access_token)) {
             $api_client = new Patreon_API($patreon_access_token);
 
             // Get the user from the API
@@ -196,8 +196,9 @@ class Patreon_Wordpress
 
             if (isset($user_response['errors']) && is_array($user_response['errors'])) {
                 foreach ($user_response['errors'] as $error) {
-                    if (1 == $error['code']) {
+                    if (isset($error['status']) && '401' == $error['status']) {
                         $token_refreshed = self::refresh_user_access_token($user);
+                        break;
                     }
                 }
             }
@@ -205,7 +206,7 @@ class Patreon_Wordpress
             // Reload token
             $patreon_access_token = get_user_meta($user->ID, 'patreon_access_token', true);
 
-            if ($token_refreshed and '' != $patreon_access_token) {
+            if ($token_refreshed and !empty($patreon_access_token)) {
                 $api_client = new Patreon_API($patreon_access_token);
 
                 $user_response = $api_client->fetch_user();
