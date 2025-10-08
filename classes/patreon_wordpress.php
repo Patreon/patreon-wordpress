@@ -2358,17 +2358,21 @@ class Patreon_Wordpress
 
     public static function update_creator_tiers_from_api()
     {
-        // Does an update of creator tiers from the api
-
-        if (get_option('patreon-client-id', false)
-                && get_option('patreon-client-secret', false)
-                && get_option('patreon-creators-access-token', false)
-        ) {
-            // Credentials are in. Go.
-
-            $api_client = new Patreon_API(get_option('patreon-creators-access-token', false));
-            $creator_info = $api_client->fetch_tiers();
+        if (PatreonApiUtil::is_app_creds_invalid()) {
+            // Don't attempt tier information refresh if the plugin client
+            // credentials have been marked as broken
+            return false;
         }
+
+        $creator_access_token = PatreonApiUtil::get_creator_access_token();
+
+        if (!$creator_access_token) {
+            // Creator access token not available, don't proceed
+            return false;
+        }
+
+        $api_client = new Patreon_API($creator_access_token);
+        $creator_info = $api_client->fetch_tiers();
 
         if (isset($creator_info) and 'throttled_locally' == $creator_info) {
             // Return by doing nothing until the api can be contacted again
