@@ -15,9 +15,13 @@ class Patreon_Content_Sync
     public function import_posts_from_patreon($args = [])
     {
         // This function performs a full import of posts from Patreon using cron
+        if (PatreonApiUtil::is_app_creds_invalid()) {
+            // Don't attempt to import posts if the plugin client credentials
+            // have been marked as broken
+            return 'app_credential_error';
+        }
 
         // Check if the site uses api v2. If not, abort.
-
         $api_version = get_option('patreon-installation-api-version', '1');
 
         if ('2' != $api_version) {
@@ -50,7 +54,7 @@ class Patreon_Content_Sync
             return 'no_ongoing_post_import';
         }
 
-        $creator_access_token = get_option('patreon-creators-access-token', false);
+        $creator_access_token = PatreonApiUtil::get_creator_access_token();
         $client_id = get_option('patreon-client-id', false);
 
         if ($creator_access_token and $client_id) {

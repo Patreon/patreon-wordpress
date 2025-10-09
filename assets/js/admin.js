@@ -212,6 +212,13 @@
 						jQuery( '#patreon_wp_post_import_status' ).css( 'color', '#f31d00' );
 						return;
 					}
+
+					if ( response == 'app_credential_error') {
+						jQuery( '#patreon_wp_post_import_status' ).html( 'Invalid Patreon API credentials. Please follow the re-connect flow.' );
+						jQuery( '#patreon_wp_post_import_status' ).css( 'color', '#f31d00' );
+						return;
+					}
+
 					if ( response == 'couldnt_get_posts') {
 						jQuery( '#patreon_wp_post_import_status' ).html( 'Failed to get posts from Patreon...' );
 						jQuery( '#patreon_wp_post_import_status' ).css( 'color', '#f31d00' );

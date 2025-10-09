@@ -1184,6 +1184,11 @@ class Patreon_Wordpress
             exit;
         }
 
+        if ('app_credential_error' == $import_return) {
+            echo $import_return;
+            exit;
+        }
+
         // If did not import any posts
 
         if ('did_not_import_any_post' == $import_return) {
