@@ -354,7 +354,7 @@ class Patreon_Wordpress
 
         $creator_tiers = get_option('patreon-creator-tiers', false);
 
-        if (!$creator_tiers or '' == $creator_tiers or !is_array($creator_tiers['included'][1])) {
+        if (!$creator_tiers or '' == $creator_tiers or !is_array($creator_tiers['included'][2])) {
             // Refresh tiers if this is not a lite plan. We dont want this on every page load.
 
             if (get_option('patreon-creator-has-tiers', 'yes')) {
@@ -1459,7 +1459,7 @@ class Patreon_Wordpress
         }
 
         // All flopped. Set failure flag
-        update_option('patreon-wordpress-app-credentials-failure', true);
+        PatreonApiUtil::set_app_creds_invalid();
 
         return false;
     }
@@ -2997,8 +2997,16 @@ class Patreon_Wordpress
             return;
         }
 
-        if (get_option('patreon-creator-access-token-401', false)) {
-            return;
+        if (PatreonApiUtil::is_app_creds_invalid()) {
+            // Don't attempt to manage post sync webhooks if the plugin client
+            // credentials have been marked as broken
+            return false;
+        }
+
+        $creator_access_token = PatreonApiUtil::get_creator_access_token();
+        if (!$creator_access_token) {
+            // Creator access token not available, don't proceed
+            return false;
         }
 
         $api_version = get_option('patreon-installation-api-version', '1');
@@ -3025,8 +3033,8 @@ class Patreon_Wordpress
                     return;
                 }
 
-                $creator_access_token = get_option('patreon-creators-access-token', false);
-
+                // Refetch client token
+                $creator_access_token = PatreonApiUtil::get_creator_access_token();
                 $api_client = new Patreon_API($creator_access_token);
 
                 $webhook_delete = $api_client->delete_post_webhook($existing_hook['data']['id']);
@@ -3047,8 +3055,8 @@ class Patreon_Wordpress
             return;
         }
 
-        $creator_access_token = get_option('patreon-creators-access-token', false);
-
+        // Refetch client token
+        $creator_access_token = PatreonApiUtil::get_creator_access_token();
         $api_client = new Patreon_API($creator_access_token);
 
         $webhook_added = $api_client->add_post_webhook();

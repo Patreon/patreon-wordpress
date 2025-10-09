@@ -199,7 +199,7 @@ class Patreon_API
         $response = $this->__get_json('webhooks', $args);
 
         if (isset($response['errors']) and isset($response['errors'][0]) and isset($response['errors'][0]['status']) and '401' == $response['errors'][0]['status']) {
-            update_option('patreon-creator-access-token-401', true);
+            PatreonApiUtil::set_app_creds_invalid();
         }
 
         return $response;
@@ -214,7 +214,13 @@ class Patreon_API
             'return_result_format' => 'full',
         ];
 
-        return $this->__get_json('webhooks/'.$webhook_id, $args);
+        $response = $this->__get_json('webhooks/'.$webhook_id, $args);
+
+        if (isset($response['errors']) and isset($response['errors'][0]) and isset($response['errors'][0]['status']) and '401' == $response['errors'][0]['status']) {
+            PatreonApiUtil::set_app_creds_invalid();
+        }
+
+        return $response;
     }
 
     public function create_refresh_client($params)

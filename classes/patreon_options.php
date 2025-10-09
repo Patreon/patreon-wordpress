@@ -108,7 +108,7 @@ class Patreon_Options
 
                                         <?php
 
-                                            if (get_option('patreon-creator-access-token-401', false)) {
+                                            if (PatreonApiUtil::is_app_creds_invalid()) {
                                                 echo '<div style="color: #ffa00f;">Sorry, it looks like your site\'s connection to Patreon is broken. Please reconnect by using the "(re)Connect site" button.</div><br>';
                                             }
         ?>
