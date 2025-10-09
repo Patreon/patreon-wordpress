@@ -3099,17 +3099,4 @@ class Patreon_Wordpress
             self::$patreon_content_sync->import_posts_from_patreon();
         }
     }
-
-    public function creator_has_tiers()
-    {
-        // Checks if creator has tiers locally. This is a way to identify lite plans and avoid hammering the api with tier requests
-
-        $creator_tiers = get_option('patreon-creator-tiers', false);
-
-        if (!$creator_tiers or '' == $creator_tiers or !is_array($creator_tiers['included'][1])) {
-            return false;
-        } else {
-            return true;
-        }
-    }
 }
