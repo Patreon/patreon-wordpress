@@ -66,7 +66,7 @@ class Patreon_Wordpress
 
         add_action('wp_head', [$this, 'updatePatreonUser'], 10);
         add_action('init', [$this, 'checkPatreonCreatorID']);
-        add_action('init', [$this, 'check_creator_tiers']);
+        add_action('admin_init', [$this, 'check_creator_tiers']);
         add_action('init', [$this, 'check_post_sync_webhook']);
         add_action('init', [&$this, 'order_independent_actions_to_run_on_init_start'], 0);
         add_action('init', [$this, 'check_plugin_activation_date_for_existing_installs']);
