@@ -354,7 +354,7 @@ class Patreon_Wordpress
 
         $creator_tiers = get_option('patreon-creator-tiers', false);
 
-        if (!$creator_tiers or '' == $creator_tiers or !is_array($creator_tiers['included'][2])) {
+        if (!$creator_tiers or '' == $creator_tiers or !is_array($creator_tiers['included'][1])) {
             // Refresh tiers if this is not a lite plan. We dont want this on every page load.
 
             if (get_option('patreon-creator-has-tiers', 'yes')) {
