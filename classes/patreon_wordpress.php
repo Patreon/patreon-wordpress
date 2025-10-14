@@ -66,7 +66,7 @@ class Patreon_Wordpress
 
         add_action('wp_head', [$this, 'updatePatreonUser'], 10);
         add_action('init', [$this, 'checkPatreonCreatorID']);
-        add_action('init', [$this, 'check_creator_tiers']);
+        add_action('admin_init', [$this, 'check_creator_tiers']);
         add_action('init', [$this, 'check_post_sync_webhook']);
         add_action('init', [&$this, 'order_independent_actions_to_run_on_init_start'], 0);
         add_action('init', [$this, 'check_plugin_activation_date_for_existing_installs']);
@@ -2358,17 +2358,21 @@ class Patreon_Wordpress
 
     public static function update_creator_tiers_from_api()
     {
-        // Does an update of creator tiers from the api
-
-        if (get_option('patreon-client-id', false)
-                && get_option('patreon-client-secret', false)
-                && get_option('patreon-creators-access-token', false)
-        ) {
-            // Credentials are in. Go.
-
-            $api_client = new Patreon_API(get_option('patreon-creators-access-token', false));
-            $creator_info = $api_client->fetch_tiers();
+        if (PatreonApiUtil::is_app_creds_invalid()) {
+            // Don't attempt tier information refresh if the plugin client
+            // credentials have been marked as broken
+            return false;
         }
+
+        $creator_access_token = PatreonApiUtil::get_creator_access_token();
+
+        if (!$creator_access_token) {
+            // Creator access token not available, don't proceed
+            return false;
+        }
+
+        $api_client = new Patreon_API($creator_access_token);
+        $creator_info = $api_client->fetch_tiers();
 
         if (isset($creator_info) and 'throttled_locally' == $creator_info) {
             // Return by doing nothing until the api can be contacted again
@@ -3093,19 +3097,6 @@ class Patreon_Wordpress
 
         if (get_option('patreon-post-import-in-progress', false)) {
             self::$patreon_content_sync->import_posts_from_patreon();
-        }
-    }
-
-    public function creator_has_tiers()
-    {
-        // Checks if creator has tiers locally. This is a way to identify lite plans and avoid hammering the api with tier requests
-
-        $creator_tiers = get_option('patreon-creator-tiers', false);
-
-        if (!$creator_tiers or '' == $creator_tiers or !is_array($creator_tiers['included'][1])) {
-            return false;
-        } else {
-            return true;
         }
     }
 }
