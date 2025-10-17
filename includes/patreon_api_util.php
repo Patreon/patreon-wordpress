@@ -20,6 +20,11 @@ class PatreonApiUtil
         return get_option('patreon-wordpress-app-credentials-failure', false);
     }
 
+    public static function set_app_creds_invalid()
+    {
+        update_option('patreon-wordpress-app-credentials-failure', true);
+    }
+
     public static function get_creator_token_refresh_cooldown()
     {
         return get_transient(self::REFRESH_CREATOR_TOKEN_COOLDOWN_KEY);
