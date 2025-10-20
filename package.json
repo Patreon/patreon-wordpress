@@ -1,0 +1,14 @@
+{
+  "description": "Official Patreon WordPress plugin",
+  "devDependencies": {
+    "prettier": "^3.6.2"
+  },
+  "license": "Apache-2.0",
+  "name": "patreon-wordpress",
+  "private": true,
+  "scripts": {
+    "format": "prettier --write '**/*.{js,jsx,ts,tsx,json,css}'",
+    "format:check": "prettier --check '**/*.{js,jsx,ts,tsx,json,css}'"
+  },
+  "version": "1.0.0"
+}
