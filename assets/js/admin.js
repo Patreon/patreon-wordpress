@@ -28,53 +28,53 @@
 					patreon_wordpress_nonce_patreon_api_version_update: patreon_wordpress_nonce_patreon_api_version_update,
 				}
 			});
-		});	
-		
+		});
+
 		// Doing the below via jQuery because we have to submit some POST info inside another form. Avoided using a link inside button to account for older devices
-		
+
 		jQuery(document).on( 'click', '#patreon_wordpress_disconnect_from_patreon', function(e) {
 			e.preventDefault();
 			var target = jQuery(this).attr( 'target' );
 			window.location.replace( target );
 		});
-		
+
 		// Doing the below via jQuery because we have to submit some POST info inside another form. Avoided using a link inside button to account for older devices
-		
+
 		jQuery(document).on( 'click', '#patreon_wordpress_reconnect_to_patreon', function(e) {
 			e.preventDefault();
 			var target = jQuery(this).attr( 'target' );
 			window.location.replace( target );
 		});
-		
+
 		jQuery(document).on( 'click', '#patreon_wordpress_disconnect_reconnect_to_patreon', function(e) {
 			e.preventDefault();
 			var target = jQuery(this).attr( 'target' );
 			window.location.replace( target );
 		});
-		
+
 		jQuery(document).on( 'click', '.patreon-wordpress-admin-toggle', function(e) {
-			
+
 			e.preventDefault();
-			
+
 			var toggle_id = jQuery( this ).attr( 'toggle' );
 			var toggle_target = document.getElementById( toggle_id );
 			var patreon_wordpress_advanced_options_toggle_nonce = jQuery( this ).attr( 'patreon_wordpress_advanced_options_toggle_nonce' );
 
 			jQuery( toggle_target ).slideToggle();
-			
+
 			if( jQuery( this ).attr( 'togglestatus' ) == 'off' ) {
-				
+
 				jQuery( this ).html( jQuery( this ).attr( 'ontext' ) );
 				jQuery( this ).attr( 'togglestatus', 'on' );
-				
+
 			}
 			else if( jQuery( this ).attr( 'togglestatus' ) == 'on' ) {
-				
+
 				jQuery( this ).html( jQuery( this ).attr( 'offtext' ) );
 				jQuery( this ).attr( 'togglestatus', 'off' );
-				
+
 			}
-					
+
 			jQuery.ajax({
 				url: ajaxurl,
 				type:"POST",
@@ -84,15 +84,15 @@
 					toggle_id: toggle_id,
 					patreon_wordpress_advanced_options_toggle_nonce: patreon_wordpress_advanced_options_toggle_nonce,
 				}
-			});		
-			
+			});
+
 		});
-		
+
 		jQuery(document).on( 'click', '#patreon_wordpress_start_post_import', function(e) {
-			
+
 			e.preventDefault();
 			var pw_input_target = jQuery( this ).attr( 'pw_input_target' );
-			
+
 			jQuery.ajax({
 				url: ajaxurl,
 				type:"POST",
@@ -102,46 +102,46 @@
 					patreon_wordpress_nonce_post_sync: pw_admin_js.patreon_wordpress_nonce_post_sync,
 				},
 				success: function( response ) {
-					
+
 					jQuery( '#patreon_wp_post_import_status' ).empty();
-					
+
 					if ( response == 'apiv2fail') {
 						jQuery( '#patreon_wp_post_import_status' ).html( 'Wrong api version! Please upgrade to v2 using the tutorial <a href="https://www.patreondevelopers.com/t/how-to-upgrade-your-patreon-wordpress-to-use-api-v2/3249" target="_blank">here</a>' );
 						jQuery( '#patreon_wp_post_import_status' ).css( 'color', '#f31d00' );
 						return;
 					}
-					
+
 					if ( response == 'need_admin_privileges') {
 						jQuery( '#patreon_wp_post_import_status' ).html( 'You need admin privileges to be able to do this' );
 						jQuery( '#patreon_wp_post_import_status' ).css( 'color', '#f31d00' );
 						return;
 					}
-					
+
 					if ( response == 'nonce_fail') {
 						jQuery( '#patreon_wp_post_import_status' ).html( 'Form expired - please reload the page and try again' );
 						jQuery( '#patreon_wp_post_import_status' ).css( 'color', '#f31d00' );
 						return;
 					}
-					
+
 					jQuery( '#patreon_wp_post_import_status' ).html( 'Started a post import' );
 					jQuery( '#patreon_wp_post_import_status' ).css( 'color', '#129500' );
-					
+
 					// Replace the button with post batch import button
-					
+
 					jQuery( '#patreon_post_import_button_container' ).html( '<button id="patreon_wordpress_import_next_batch_of_posts" class="button button-primary button-large" pw_input_target="#patreon_wp_post_import_status" target="" style="margin-right: 10px;">Import next batch</button><button id="patreon_wordpress_cancel_manual_post_import" class="button button-primary button-large" pw_input_target="#patreon_wp_post_import_status" target="">Cancel</button>' );
 					jQuery( '#post_import_status_heading' ).html( 'Ongoing post import' );
 					jQuery( '#post_import_info_text' ).html( "Posts will be imported automatically every 5 minutes. If they are not, or you want to do it faster, click to import next batch of posts. This will import the next batch of posts in the queue. You can do this every 10 seconds." );
-					
+
 				},
-			});		
-			
+			});
+
 		});
-		
+
 		jQuery(document).on( 'click', '#patreon_wordpress_import_next_batch_of_posts', function(e) {
-			
+
 			e.preventDefault();
 			var pw_input_target = jQuery( this ).attr( 'pw_input_target' );
-			
+
 			jQuery.ajax({
 				url: ajaxurl,
 				type:"POST",
@@ -155,47 +155,47 @@
 					jQuery( '#patreon_wp_post_import_status' ).css( 'color', '#129500' );
 				},
 				success: function( response ) {
-					
+
 					jQuery( '#patreon_wp_post_import_status' ).empty();
-					
+
 					if ( response == 'apiv2fail') {
 						jQuery( '#patreon_wp_post_import_status' ).html( 'Wrong api version! Please upgrade to v2 using the tutorial <a href="https://www.patreondevelopers.com/t/how-to-upgrade-your-patreon-wordpress-to-use-api-v2/3249" target="_blank">here</a>' );
 						jQuery( '#patreon_wp_post_import_status' ).css( 'color', '#f31d00' );
 						return;
 					}
-					
-					
+
+
 					if ( response == 'need_admin_privileges') {
 						jQuery( '#patreon_wp_post_import_status' ).html( 'You need admin privileges to be able to do this' );
 						jQuery( '#patreon_wp_post_import_status' ).css( 'color', '#f31d00' );
 						return;
 					}
-					
+
 					if ( response == 'nonce_fail') {
 						jQuery( '#patreon_wp_post_import_status' ).html( 'Form expired - please reload the page and try again' );
 						jQuery( '#patreon_wp_post_import_status' ).css( 'color', '#f31d00' );
 						return;
 					}
-					
-					
+
+
 					if ( response == 'time_limit_error') {
 						jQuery( '#patreon_wp_post_import_status' ).html( 'You can trigger next batch every 10 seconds. Please wait a few seconds more.' );
 						jQuery( '#patreon_wp_post_import_status' ).css( 'color', '#f31d00' );
 						return;
 					}
-					
+
 					if ( response == 'no_ongoing_post_import') {
 						jQuery( '#patreon_wp_post_import_status' ).html( 'There is no ongoing post import' );
 						jQuery( '#patreon_wp_post_import_status' ).css( 'color', '#f31d00' );
-						
+
 						// Replace the post import setting info with original
 						jQuery( '#patreon_post_import_button_container' ).html( '<button id="patreon_wordpress_start_post_import" class="button button-primary button-large" pw_input_target="#patreon_wp_post_import_status" target="">Start an import</button>' );
 						jQuery( '#post_import_status_heading' ).html( 'Start a post import' );
 						jQuery( '#post_import_info_text' ).html( "Start an import of your posts from Patreon if you haven't done it before. After import of existing posts is complete, new posts will automatically be imported and existing posts automatically updated so you don't need to do this again." );
-						
+
 						return;
 					}
-					
+
 					if ( response == 'did_not_import_any_post') {
 						jQuery( '#patreon_wp_post_import_status' ).html( 'Failed to import any post...' );
 						jQuery( '#patreon_wp_post_import_status' ).css( 'color', '#f31d00' );
@@ -206,7 +206,7 @@
 						jQuery( '#patreon_wp_post_import_status' ).html( 'Expired or lost page cursor deleted. Post import will restart from scratch...' );
 						return;
 					}
-					
+
 					if ( response == 'throttled_internally') {
 						jQuery( '#patreon_wp_post_import_status' ).html( 'Patreon api was contacted too frequently. Please wait a few minutes and try again...' );
 						jQuery( '#patreon_wp_post_import_status' ).css( 'color', '#f31d00' );
@@ -217,38 +217,38 @@
 						jQuery( '#patreon_wp_post_import_status' ).css( 'color', '#f31d00' );
 						return;
 					}
-					
+
 					if ( response == 'post_import_ended') {
-						
+
 						jQuery( '#patreon_wp_post_import_status' ).html( 'Post import ended' );
 						jQuery( '#patreon_wp_post_import_status' ).css( 'color', '#129500' );
-						
+
 						// Replace the post import setting info with original
 						jQuery( '#patreon_post_import_button_container' ).html( '<button id="patreon_wordpress_start_post_import" class="button button-primary button-large" pw_input_target="#patreon_wp_post_import_status" target="">Start an import</button>' );
 						jQuery( '#post_import_status_heading' ).html( 'Start a post import' );
 						jQuery( '#post_import_info_text' ).html( "Start an import of your posts from Patreon if you haven't done it before. After import of existing posts is complete, new posts will automatically be imported and existing posts automatically updated so you don't need to do this again." );
-						
+
 						return;
 					}
-					
+
 					if ( response == 'imported_posts') {
 						jQuery( '#patreon_wp_post_import_status' ).html( 'Imported next batch' );
 						jQuery( '#patreon_wp_post_import_status' ).css( 'color', '#129500' );
 						return;
 					}
-					
+
 					jQuery( '#patreon_wp_post_import_status' ).html( 'An unexpected issue occurred' );
 					jQuery( '#patreon_wp_post_import_status' ).css( 'color', '#f31d00' );
-					
+
 				},
-			});		
-			
+			});
+
 		});
 		jQuery(document).on( 'click', '#patreon_wordpress_cancel_manual_post_import', function(e) {
-			
+
 			e.preventDefault();
 			var pw_input_target = jQuery( this ).attr( 'pw_input_target' );
-			
+
 			jQuery.ajax({
 				url: ajaxurl,
 				type:"POST",
@@ -260,46 +260,46 @@
 				beforeSend: function(e) {
 				},
 				success: function( response ) {
-					
+
 					jQuery( '#patreon_wp_post_import_status' ).empty();
-					
+
 					if ( response == 'apiv2fail') {
 						jQuery( '#patreon_wp_post_import_status' ).html( 'Wrong api version! Please upgrade to v2 using the tutorial <a href="https://www.patreondevelopers.com/t/how-to-upgrade-your-patreon-wordpress-to-use-api-v2/3249" target="_blank">here</a>' );
 						jQuery( '#patreon_wp_post_import_status' ).css( 'color', '#f31d00' );
 						return;
 					}
-					
+
 					if ( response == 'time_limit_error') {
 						jQuery( '#patreon_wp_post_import_status' ).html( 'You can trigger next batch every 10 seconds. Please wait a few seconds more.' );
 						jQuery( '#patreon_wp_post_import_status' ).css( 'color', '#f31d00' );
 						return;
 					}
-					
-					
+
+
 					if ( response == 'need_admin_privileges') {
 						jQuery( '#patreon_wp_post_import_status' ).html( 'You need admin privileges to be able to do this' );
 						jQuery( '#patreon_wp_post_import_status' ).css( 'color', '#f31d00' );
 						return;
 					}
-					
+
 					if ( response == 'nonce_fail') {
 						jQuery( '#patreon_wp_post_import_status' ).html( 'Form expired - please reload the page and try again' );
 						jQuery( '#patreon_wp_post_import_status' ).css( 'color', '#f31d00' );
 						return;
 					}
-					
+
 					if ( response == 'no_ongoing_post_import') {
 						jQuery( '#patreon_wp_post_import_status' ).html( 'There is no ongoing post import' );
 						jQuery( '#patreon_wp_post_import_status' ).css( 'color', '#f31d00' );
-						
+
 						// Replace the post import setting info with original
 						jQuery( '#patreon_post_import_button_container' ).html( '<button id="patreon_wordpress_start_post_import" class="button button-primary button-large" pw_input_target="#patreon_wp_post_import_status" target="">Start an import</button>' );
 						jQuery( '#post_import_status_heading' ).html( 'Start a post import' );
 						jQuery( '#post_import_info_text' ).html( "Start an import of your posts from Patreon if you haven't done it before. After import of existing posts is complete, new posts will automatically be imported and existing posts automatically updated so you don't need to do this again." );
-						
+
 						return;
 					}
-					
+
 					if ( response == 'did_not_import_any_post') {
 						jQuery( '#patreon_wp_post_import_status' ).html( 'Failed to import any post...' );
 						jQuery( '#patreon_wp_post_import_status' ).css( 'color', '#f31d00' );
@@ -310,7 +310,7 @@
 						jQuery( '#patreon_wp_post_import_status' ).html( 'Expired or lost page cursor deleted. Post import will restart from scratch...' );
 						return;
 					}
-					
+
 					if ( response == 'throttled_internally') {
 						jQuery( '#patreon_wp_post_import_status' ).html( 'Patreon api was contacted too frequently. Please wait a few minutes and try again...' );
 						jQuery( '#patreon_wp_post_import_status' ).css( 'color', '#f31d00' );
@@ -321,26 +321,26 @@
 						jQuery( '#patreon_wp_post_import_status' ).css( 'color', '#f31d00' );
 						return;
 					}
-					
+
 					if ( response == 'post_import_ended') {
-						
+
 						jQuery( '#patreon_wp_post_import_status' ).html( 'Post import ended' );
 						jQuery( '#patreon_wp_post_import_status' ).css( 'color', '#129500' );
-						
+
 						// Replace the post import setting info with original
 						jQuery( '#patreon_post_import_button_container' ).html( '<button id="patreon_wordpress_start_post_import" class="button button-primary button-large" pw_input_target="#patreon_wp_post_import_status" target="">Start an import</button>' );
 						jQuery( '#post_import_status_heading' ).html( 'Start a post import' );
 						jQuery( '#post_import_info_text' ).html( "Start an import of your posts from Patreon if you haven't done it before. After import of existing posts is complete, new posts will automatically be imported and existing posts automatically updated so you don't need to do this again." );
-						
+
 						return;
 					}
-					
+
 					if ( response == 'imported_posts') {
 						jQuery( '#patreon_wp_post_import_status' ).html( 'Imported next batch' );
 						jQuery( '#patreon_wp_post_import_status' ).css( 'color', '#129500' );
 						return;
 					}
-					
+
 					if ( response == 'manual_post_import_canceled') {
 						jQuery( '#patreon_wp_post_import_status' ).html( 'Canceled' );
 						jQuery( '#patreon_post_import_button_container' ).html( '<button id="patreon_wordpress_start_post_import" class="button button-primary button-large" pw_input_target="#patreon_wp_post_import_status" target="">Start an import</button>' );
@@ -348,26 +348,26 @@
 						jQuery( '#patreon_wp_post_import_status' ).css( 'color', '#129500' );
 						return;
 					}
-					
+
 					if ( response == 'couldnt_cancel_manual_post_import') {
 						jQuery( '#patreon_wp_post_import_status' ).html( 'Could not cancel import' );
 						jQuery( '#patreon_wp_post_import_status' ).css( 'color', '#f31d00' );
 						return;
 					}
-					
+
 					jQuery( '#patreon_wp_post_import_status' ).html( 'An unexpected issue occurred' );
 					jQuery( '#patreon_wp_post_import_status' ).css( 'color', '#f31d00' );
-					
+
 				},
-			});		
-			
+			});
+
 		});
-		
+
 		jQuery(document).on( 'click', '#patreon_wordpress_disconnect_patreon_account', function(e) {
-			
+
 			e.preventDefault();
 			var pw_input_target = jQuery( this ).attr( 'pw_input_target' );
-			
+
 			jQuery.ajax({
 				url: ajaxurl,
 				type:"POST",
@@ -387,25 +387,25 @@
 					}
 					jQuery('#patreon_wordpress_user_profile_account_connection_wrapper').html(message );
 				},
-			});		
-			
+			});
+
 		});
-		
+
 		jQuery(document).on( 'click', '#patreon_wordpress_connect_patreon_account', function(e) {
-			
+
 			e.preventDefault();
 
 			var patreon_login_url = jQuery( this ).attr( 'patreon_login_url' );
 			window.location.replace( patreon_login_url );
-			
+
 		});
-		
+
 		jQuery(document).on( 'click', '#patreon_wordpress_connect_patreon_account', function(e) {
-			
+
 			// Disconnects a connected Patreon account from local WP account. Does not contact the api
-			
+
 			e.preventDefault();
-			
+
 			jQuery.ajax({
 				url: ajaxurl,
 				type:"POST",
@@ -418,22 +418,22 @@
 					jQuery( '#patreon_wp_post_import_status' ).empty();
 					jQuery( '#patreon_wp_post_import_status' ).html( 'Started a post import' );
 					jQuery( '#patreon_wp_post_import_status' ).css( 'color', '#129500' );
-					
+
 				},
-			});		
-			
+			});
+
 		});
-		
+
 
 		jQuery(document).on( 'click', '#patreon_wordpress_save_post_sync_category', function(e) {
-			
+
 			e.preventDefault();
 			var pw_input_target = jQuery( this ).attr( 'pw_input_target' );
 			var patreon_wordpress_nonce_save_post_sync_options = jQuery( this ).attr( 'patreon_wordpress_nonce_save_post_sync_options' );
 			var patreon_sync_post_type = jQuery('#patreon_sync_post_type').val();
 			var patreon_sync_post_category = jQuery('#patreon_sync_post_category').val();
 			var patreon_sync_post_term = jQuery('#patreon_sync_post_term').val();
-			
+
 			jQuery.ajax({
 				url: ajaxurl,
 				type:"POST",
@@ -446,57 +446,57 @@
 					patreon_wordpress_nonce_save_post_sync_options: patreon_wordpress_nonce_save_post_sync_options,
 				},
 				beforeSend: function( xhr ) {
-					jQuery( '#patreon_wordpress_post_import_category_status' ).empty();					
+					jQuery( '#patreon_wordpress_post_import_category_status' ).empty();
 				},
 				success: function( response ) {
 					jQuery( '#patreon_wordpress_post_import_category_status' ).empty();
 					jQuery( '#patreon_wordpress_post_import_category_status' ).html( response );
 					jQuery( '#patreon_wordpress_post_import_category_status' ).css( 'color', '#129500' );
-					
+
 				},
 				error: function( response ) {
 					jQuery( '#patreon_wordpress_post_import_category_status' ).empty();
 					jQuery( '#patreon_wordpress_post_import_category_status' ).html( 'Sorry, encountered an issue' );
-					
+
 				},
-			});		
-			
-		});		
-		
+			});
+
+		});
+
 		jQuery(document).on( 'click', '.patreon_wordpress_interface_toggle', function(e) {
-			
+
 			e.preventDefault();
-			
+
 			var toggles = jQuery( this ).attr( 'toggle' );
 			var toggle_array = toggles.split(" ");
 			toggle_array.forEach( function( toggle_id, index, toggle_array ) {
 				var toggle_target = document.getElementById( toggle_id );
 
 				jQuery( toggle_target ).slideToggle();
-								
+
 			}, jQuery( this ) );
-			
-		});	
-		
+
+		});
+
 		// Sync the exact amount value to select value if select is changed
 		jQuery( "#patreon_level_select" ).on( 'change', function() {
 			jQuery( "#patreon-level-exact" ).val( this.value );
 		});
-		
+
 		// Save patreon-update-posts option upon change during post sync wizard screens
 		jQuery( "#patreon-update-posts" ).on( 'change', function(e) {
-			
+
 			// Just in case
 			e.preventDefault();
 			var pw_input_target = jQuery( this ).attr( 'pw_input_target' );
-			var option_value = jQuery(this).val();		
+			var option_value = jQuery(this).val();
 			var patreon_wordpress_nonce_save_post_sync_options = jQuery( this ).attr( 'patreon_wordpress_nonce_save_post_sync_options' );
 			if (  option_value == '' ) {
 				// Do nothing if value is empty
 				jQuery( pw_input_target ).html('');
 				return;
 			}
-			
+
 			jQuery.ajax({
 				url: ajaxurl,
 				async: true, // Just to make sure
@@ -507,12 +507,12 @@
 					update_posts_option_value: option_value,
 					patreon_wordpress_nonce_save_post_sync_options: patreon_wordpress_nonce_save_post_sync_options,
 				},
-				beforeSend: function( e ) {			
+				beforeSend: function( e ) {
 				},
 				success: function( response ) {
 					jQuery( pw_input_target ).empty();
 					jQuery( pw_input_target ).html( response );
-					
+
 				},
 				error: function( response ) {
 					jQuery( pw_input_target ).empty();
@@ -524,26 +524,26 @@
 						jQuery( pw_input_target ).html( 'Sorry - error (500)' );
 					}
 				}
-			});	
-			
+			});
+
 		});
-		
+
 		// Save patreon post author option upon change in post sync wizard screens
 		jQuery( "#patreon-post-author-for-synced-posts" ).on( 'change', function(e) {
-			
+
 			// Just in case
 			e.preventDefault();
 			var pw_input_target = jQuery( this ).attr( 'pw_input_target' );
 			var patreon_wordpress_nonce_save_post_sync_options = jQuery( this ).attr( 'patreon_wordpress_nonce_save_post_sync_options' );
 			var option_value = jQuery(this).val();
-			
+
 			if (  option_value == '' ) {
 				// Do nothing if value is empty
 				jQuery( pw_input_target ).html('');
 				console.log('empty');
 				return;
 			}
-			
+
 			jQuery.ajax({
 				url: ajaxurl,
 				async: true, // Just to make sure
@@ -554,12 +554,12 @@
 					patreon_post_author_for_post_sync: option_value,
 					patreon_wordpress_nonce_save_post_sync_options: patreon_wordpress_nonce_save_post_sync_options,
 				},
-				beforeSend: function( e ) {			
+				beforeSend: function( e ) {
 				},
 				success: function( response ) {
 					jQuery( pw_input_target ).empty();
 					jQuery( pw_input_target ).html( response );
-					
+
 				},
 				error: function( response ) {
 					jQuery( pw_input_target ).empty();
@@ -571,25 +571,25 @@
 						jQuery( pw_input_target ).html( 'Sorry - error (500)' );
 					}
 				}
-			});	
-			
+			});
+
 		});
-		
+
 		// Save patreon-remove-deleted-posts option upon change during post sync wizard screens
 		jQuery( "#patreon-remove-deleted-posts" ).on( 'change', function(e) {
-			
+
 			// Just in case
 			e.preventDefault();
 			var pw_input_target = jQuery( this ).attr( 'pw_input_target' );
 			var option_value = jQuery(this).val();
 			var patreon_wordpress_nonce_save_post_sync_options = jQuery( this ).attr( 'patreon_wordpress_nonce_save_post_sync_options' );
-			
+
 			if (  option_value == '' ) {
 				// Do nothing if value is empty
 				jQuery( pw_input_target ).html('');
 				return;
 			}
-			
+
 			jQuery.ajax({
 				url: ajaxurl,
 				async: true, // Just to make sure
@@ -600,12 +600,12 @@
 					delete_posts_option_value: option_value,
 					patreon_wordpress_nonce_save_post_sync_options: patreon_wordpress_nonce_save_post_sync_options,
 				},
-				beforeSend: function( e ) {			
+				beforeSend: function( e ) {
 				},
 				success: function( response ) {
 					jQuery( pw_input_target ).empty();
 					jQuery( pw_input_target ).html( response );
-					
+
 				},
 				error: function( response ) {
 					jQuery( pw_input_target ).empty();
@@ -617,19 +617,19 @@
 						jQuery( pw_input_target ).html( 'Sorry - error (500)' );
 					}
 				}
-			});	
-			
+			});
+
 		});
-		
+
 		// Post sync post type selection dropdown action
 		jQuery( "#patreon_sync_post_type" ).on( 'change', function(e) {
-			
+
 			var patreon_wordpress_post_type = jQuery(this).val();
 			var patreon_wordpress_input_target = jQuery('#patreon_sync_post_category');
 			var patreon_wordpress_general_error = 'Sorry - could not get the category list for this post type';
-			
+
 			e.preventDefault();
-					
+
 			jQuery('#patreon_sync_post_category').hide('slow');
 			jQuery('#patreon_sync_post_term').hide('slow');
 
@@ -664,18 +664,18 @@
 						jQuery(patreon_wordpress_input_target).html(response);
 					}
 				}
-			});		
+			});
 		});
-		
+
 		// Post sync post - category selection dropdown action
 		jQuery( "#patreon_sync_post_category" ).on( 'change', function(e) {
-			
+
 			var patreon_sync_post_category = jQuery(this).val();
 			var patreon_wordpress_input_target = jQuery('#patreon_sync_post_term');
 			var patreon_wordpress_general_error = 'Sorry - could not get the category list for this post type';
-			
+
 			e.preventDefault();
-					
+
 			jQuery('#patreon_sync_post_term').hide('slow');
 
 			jQuery.ajax({
@@ -709,15 +709,15 @@
 						jQuery(patreon_wordpress_input_target).html(response);
 					}
 				}
-			});		
+			});
 		});
-		
+
 		jQuery( ".patreon_toggle_admin_sections" ).on( 'click', function (e) {
-			
-			if ( jQuery( e.target ).hasClass( 'patreon_setting_section_help_icon' ) ) { 
-				return 
+
+			if ( jQuery( e.target ).hasClass( 'patreon_setting_section_help_icon' ) ) {
+				return
 			};
-			
+
 			jQuery( '#footer-thankyou' ).remove();
 			var patreon_target = jQuery( this ).parent('.patreon_admin_health_content_box').find( jQuery( this ).attr( 'target' ) );
 			e.preventDefault();
@@ -731,7 +731,7 @@
 			}
 			jQuery( patreon_target ).toggle( 'slow' );
 		});
-		
+
 		jQuery( '#patreon_copy_health_check_output' ).on( 'click', function (e) {
 			e.preventDefault();
 			// Some of below is from stack https://stackoverflow.com/questions/23048550/how-to-copy-a-divs-content-to-clipboard-without-flash
@@ -756,15 +756,15 @@
 			e.preventDefault();
 			target_url = jQuery(this).attr('go_to_url')
 			window.location.replace(target_url)
-			
+
 		});
 
 		// Only trigger if the select dropdown is actually present
-		
+
 		jQuery(document).on( 'click', '#patreon_level_refresh', function(e) {
-			
+
 			var pw_input_target = jQuery( "#patreon_level_select" );
-			var pw_post_id = pw_input_target.attr( 'pw_post_id' );		
+			var pw_post_id = pw_input_target.attr( 'pw_post_id' );
 			var patreon_wordpress_nonce_populate_tier_dropdown = jQuery( this ).attr( 'patreon_wordpress_nonce_populate_tier_dropdown' );
 
 			jQuery.ajax({
@@ -778,12 +778,12 @@
 					patreon_wordpress_nonce_populate_tier_dropdown: patreon_wordpress_nonce_populate_tier_dropdown,
 				},
 				beforeSend: function( e ) {
-					jQuery( pw_input_target ).html( '<option value="">Loading...</option>' );				
+					jQuery( pw_input_target ).html( '<option value="">Loading...</option>' );
 				},
 				success: function( response ) {
 					jQuery( pw_input_target ).empty();
 					jQuery( pw_input_target ).html( response );
-					
+
 				},
 				error: function( response ) {
 					jQuery( pw_input_target ).empty();
@@ -795,17 +795,17 @@
 						jQuery( pw_input_target ).html( 'Sorry - error (500)' );
 					}
 				}
-			});	
-			
+			});
+
 		});
-		
+
 		jQuery.fn.pw_screen_center = function () {
 			this.css( "position", "absolute" );
 			this.css( "top", Math.max(0, ((jQuery(window).height() - $(this).outerHeight()) / 2) + jQuery(window).scrollTop()) + "px");
 			this.css( "left", Math.max(0, ((jQuery(window).width() - $(this).outerWidth()) / 2) + jQuery(window).scrollLeft()) + "px");
 			return this;
-		}	
-		
+		}
+
 	});
-	
+
 })()
