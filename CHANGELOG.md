@@ -1,3 +1,10 @@
+= 1.9.16 =
+
+* Fixed: Plugin no longer attempts to fetch tier details when the connection with Patreon's API is broken, preventing unnecessary `HTTP 401` responses
+* Fixed: Webhook management now stops early if client credentials are invalid, reducing failed API calls
+* Fixed: Post sync process no longer retries when app credentials have been marked as invalid, eliminating repeated `401` errors
+* Improved: JavaScript assets now use consistent Unix-style line endings instead of Windows-style carriage returns
+
 = 1.9.15 =
 
 * Fixed: Clients with invalid credentials no longer attempt creator token
