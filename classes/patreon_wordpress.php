@@ -66,7 +66,7 @@ class Patreon_Wordpress
 
         add_action('wp_head', [$this, 'updatePatreonUser'], 10);
         add_action('init', [$this, 'checkPatreonCreatorID']);
-        add_action('admin_init', [$this, 'check_creator_tiers']);
+        add_action('admin_init', [$this, 'check_creator_tiers_admin_init']);
         add_action('init', [$this, 'check_post_sync_webhook']);
         add_action('init', [&$this, 'order_independent_actions_to_run_on_init_start'], 0);
         add_action('init', [$this, 'check_plugin_activation_date_for_existing_installs']);
@@ -346,19 +346,22 @@ class Patreon_Wordpress
         }
     }
 
-    public static function check_creator_tiers()
+    public static function check_creator_tiers_admin_init()
     {
-        // Check if creator tier info doesnt exist. This will make sure the new version is compatible with existing installs and will show the tiers in locked interface text from the get go
+        // Refreshes creator tier info if it is missing or invalid. A cooldown
+        // prevents hitting the API on every admin page load. Tiers may be
+        // missing if they were never fetched, or if a previous fetch failed
+        // (e.g. due to a 429) and saved an empty result — in that case we retry
+        // after the cooldown to recover correctly.
 
-        // When we move to webhooks, this code can be changed to read from the already present creator details
+        // When we move to webhooks, this code can be changed to read from the
+        // already present creator details
 
         $creator_tiers = get_option('patreon-creator-tiers', false);
 
         if (!$creator_tiers or '' == $creator_tiers or !is_array($creator_tiers['included'][1])) {
-            // Refresh tiers if this is not a lite plan. We dont want this on every page load.
-
-            if (get_option('patreon-creator-has-tiers', 'yes')) {
-                // Trigger an update of creator tiers
+            if (!PatreonApiUtil::get_check_creator_tiers_cooldown()) {
+                PatreonApiUtil::set_check_creator_tiers_cooldown();
                 self::update_creator_tiers_from_api();
             }
         }
@@ -766,7 +769,7 @@ class Patreon_Wordpress
     {
         // Exception - for lite tier creators, use currently_entitled_amount_cents until there is a better way to match custom $ without tiers to local info:
 
-        if ('no' == get_option('patreon-creator-has-tiers', 'yes')) {
+        if (!PatreonCreatorUtil::creator_has_tiers()) {
             if (isset($pledge['attributes']['amount_cents'])) {
                 return $pledge['attributes']['amount_cents'];
             }
@@ -2407,11 +2410,11 @@ class Patreon_Wordpress
             array_walk_recursive($creator_info, 'self::format_creator_info_array');
 
             update_option('patreon-creator-tiers', $creator_info);
-            update_option('patreon-creator-has-tiers', 'yes');
+            update_option('patreon-creator-has-tiers', true);
         } else {
             // Creator doesnt have tiers. Save empty array so local checker functions can know there are no tiers
             update_option('patreon-creator-tiers', []);
-            update_option('patreon-creator-has-tiers', 'no');
+            update_option('patreon-creator-has-tiers', false);
         }
     }
 

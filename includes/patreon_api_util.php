@@ -45,6 +45,16 @@ class PatreonApiUtil
         set_transient(self::CHECK_API_CONNECTION_COOLDOWN_KEY, true, PATREON_CHECK_API_CONNECTION_COOLDOWN_S);
     }
 
+    public static function get_check_creator_tiers_cooldown()
+    {
+        return get_transient('patreon-check-creator-tiers-cooldown');
+    }
+
+    public static function set_check_creator_tiers_cooldown()
+    {
+        set_transient('patreon-check-creator-tiers-cooldown', true, PATREON_CHECK_CREATOR_TIERS_COOLDOWN_S);
+    }
+
     private static function get_patreon_ua()
     {
         $campaign_id = get_option('patreon-campaign-id', '?');
