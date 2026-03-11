@@ -354,7 +354,7 @@ class Patreon_Frontend
 
         $creator_url .= $append_with.$utm_params;
 
-        if ('yes' == get_option('patreon-creator-has-tiers', 'yes')) {
+        if (PatreonCreatorUtil::creator_has_tiers()) {
             // Get Patreon creator tiers
 
             $tiers = get_option('patreon-creator-tiers', false);
@@ -1158,7 +1158,7 @@ class Patreon_Frontend
             }
         }
 
-        if ('yes' == get_option('patreon-creator-has-tiers', 'yes')) {
+        if (PatreonCreatorUtil::creator_has_tiers()) {
             // Get Patreon creator tiers
 
             $tiers = get_option('patreon-creator-tiers', false);

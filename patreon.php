@@ -146,6 +146,7 @@ define('PATREON_WARNING_IMPORTANT', 'Important: ');
 define('PATREON_WARNING_POST_SYNC_SET_WITHOUT_API_V2', 'Important: Post syncing from Patreon is set to on, but your site is using API v1. Post sync wont work without API v2. Follow <a href="https://www.patreondevelopers.com/t/how-to-upgrade-your-patreon-wordpress-to-use-api-v2/3249" target="_blank">this guide</a> to upgrade your site to API v2 or disable post sync <a href="'.admin_url('admin.php?page=patreon-plugin').'">here in settings</a>');
 define('PATREON_CHECK_API_CONNECTION_COOLDOWN_S', 10 * 60);
 define('PATREON_CREATOR_TOKEN_REFRESH_ATTEMPT_COOLDOWN_S', 60);
+define('PATREON_CHECK_CREATOR_TIERS_COOLDOWN_S', 5 * 60);
 
 require 'classes/patreon_wordpress.php';
 
@@ -155,3 +156,4 @@ $Patreon_Wordpress = new Patreon_Wordpress();
 
 require 'includes/patreon_widgets.php';
 require 'includes/patreon_api_util.php';
+require 'includes/patreon_creator_util.php';
