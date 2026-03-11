@@ -1432,6 +1432,9 @@ class Patreon_Wordpress
             $api_client = new Patreon_API($creator_access_token);
             $creator_response = $api_client->fetch_creator_info();
 
+            $http_status = $creator_response['http_status_code'] ?? null;
+            $is_auth_failure = 401 == $http_status;
+
             $creator_access = false;
 
             if (isset($creator_response['included'][0]['id']) and '' != $creator_response['included'][0]['id']) {
@@ -1439,8 +1442,9 @@ class Patreon_Wordpress
                 $creator_access = true;
             }
 
-            // Try to do a creator's token refresh
-            if (!$creator_access and $tokens = self::refresh_creator_access_token()) {
+            // Only attempt a token refresh for auth failures, not for temporary
+            // issues like rate limiting or server errors
+            if (!$creator_access and $is_auth_failure and $tokens = self::refresh_creator_access_token()) {
                 // Try again:
                 $api_client = new Patreon_API($tokens['access_token']);
                 $creator_response = $api_client->fetch_creator_info();
@@ -1461,10 +1465,13 @@ class Patreon_Wordpress
 
                 return true;
             }
-        }
 
-        // All flopped. Set failure flag
-        PatreonApiUtil::set_app_creds_invalid();
+            // Only mark credentials invalid for auth failures, not temporary
+            // issues like rate limiting or server errors
+            if ($is_auth_failure) {
+                PatreonApiUtil::set_app_creds_invalid();
+            }
+        }
 
         return false;
     }
