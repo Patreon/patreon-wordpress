@@ -779,7 +779,8 @@ class Patreon_Wordpress
         }
 
         // Get currently entitled tiers:
-
+		if(!is_array($pledge)) return 0;
+		if(empty($pledge['relationships']['currently_entitled_tiers']['data'])) return 0;
         $currently_entitled_tiers = $pledge['relationships']['currently_entitled_tiers']['data'];
 
         if (!is_array($currently_entitled_tiers)) {
