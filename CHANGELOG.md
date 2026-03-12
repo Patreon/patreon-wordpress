@@ -1,3 +1,9 @@
+= 1.9.17 =
+
+* Fixed: HTTP 429 responses no longer incorrectly mark credentials as invalid — only HTTP 401 triggers this
+* Fixed: Token refresh is no longer attempted when API calls fail due to rate limiting or server errors
+* Fixed: Added a 5-minute cooldown to `check_creator_tiers` to prevent repeated `/oauth2/v2/campaigns` calls on every admin page load
+
 = 1.9.16 =
 
 * Fixed: Plugin no longer attempts to fetch tier details when the connection with Patreon's API is broken, preventing unnecessary `HTTP 401` responses
