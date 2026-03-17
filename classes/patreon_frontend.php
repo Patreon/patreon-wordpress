@@ -74,14 +74,12 @@ class Patreon_Frontend
 
     public function patreonEnqueueAdminCss()
     {
-        wp_register_style('patreon-wordpress-admin-css', PATREON_PLUGIN_ASSETS.'/css/admin.css', false);
-        wp_enqueue_style('patreon-wordpress-admin-css', PATREON_PLUGIN_ASSETS.'/css/admin.css', PATREON_WORDPRESS_VERSION);
+        wp_enqueue_style('patreon-wordpress-admin-css', PATREON_PLUGIN_ASSETS.'/css/admin.css', [], PATREON_WORDPRESS_VERSION);
     }
 
     public function patreonEnqueueCss()
     {
-        wp_register_style('patreon-wordpress-css', PATREON_PLUGIN_ASSETS.'/css/app.css', false);
-        wp_enqueue_style('patreon-wordpress-css', PATREON_PLUGIN_ASSETS.'/css/app.css');
+        wp_enqueue_style('patreon-wordpress-css', PATREON_PLUGIN_ASSETS.'/css/app.css', [], PATREON_WORDPRESS_VERSION);
     }
 
     public function patreonPrintCss()
