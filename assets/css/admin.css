@@ -15,9 +15,9 @@
 	width: 100%;
 	height: 100%;
 	overflow: auto;
-	-webkit-box-sizing: border-box; 
+	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
-	box-sizing: border-box;	
+	box-sizing: border-box;
 }
 
 .patreon_image_lock_modal_content {
@@ -25,7 +25,7 @@
 	border: 1px solid #888;
 	width: 100%;
 	height: 100%;
-	-webkit-box-sizing: border-box; 
+	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	color : #737276;
@@ -98,9 +98,9 @@
 	padding: 15px;
 	padding-top: 0px;
 	vertical-align: top;
-	-webkit-box-sizing: border-box; 
+	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
-	box-sizing: border-box;	
+	box-sizing: border-box;
 }
 
 .patreon_image_locking_interface_info {
@@ -111,9 +111,9 @@
 	padding: 15px;
 	padding-top: 0px;
 	vertical-align: top;
-	-webkit-box-sizing: border-box; 
+	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
-	box-sizing: border-box;	
+	box-sizing: border-box;
 }
 
 .patreon_image_locking_interface_content_message{
@@ -127,9 +127,9 @@
 	box-sizing: border-box;
 	color: #737276;
 	font-weight: bold;
-	-webkit-box-sizing: border-box; 
+	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
-	box-sizing: border-box;	
+	box-sizing: border-box;
 }
 
 /* Image gating modal css eof */
@@ -139,7 +139,7 @@
 	color: #0F0;
 	font-weight: bold;
 	width: 49px;
-	height: 57px;	
+	height: 57px;
 	z-index: 100100;
 }
 
@@ -188,7 +188,7 @@
 
 
 @media only screen and (max-width: 325px) {
-	
+
 	#patreon_setup_logo {
 		display: block;
 		float:none;
@@ -196,10 +196,10 @@
 }
 
 #patreon_setup_content form .button {
-	
+
 	/* Have to override WP button styles */
 	font-size: 150% !important;
-	
+
 }
 
 #patreon_setup_content {
@@ -210,7 +210,7 @@
 	max-width: 800px;
 	font-size: 125%;
 	padding-top: 0px;
-	
+
 }
 
 #patreon_setup_message {
@@ -241,7 +241,7 @@
 	background-color : #ffffff;
 	border: 1px solid #c0c0c0;
 	width : 100%;
-	max-width : 250px;	
+	max-width : 250px;
 	height: 330px;
 }
 
@@ -262,7 +262,7 @@
 	vertical-align: top;
 	margin: 5px;
 	margin-top: 0px;
-} 
+}
 
 .patreon_success_insert_logo {
 	display:block;
@@ -302,7 +302,7 @@
 }
 
 .patreon_admin_health_content_box {
-	
+
 	display: block;
 	margin: 20px;
 	margin-left: 0px;
@@ -311,15 +311,15 @@
 	max-width: 800px;
 	width: 100%;
 	font-size: 115%;
-	
+
 }
 
 .patreon_toggle_admin_sections {
-	
+
 	display: block;
 	width: 100%;
 	cursor: pointer;
-	
+
 }
 
 .patreon_admin_health_content_box > h3:first-of-type {
@@ -327,7 +327,7 @@
 }
 
 .patreon_admin_health_content_section {
-	
+
 	display: block;
 	margin: 20px;
 	margin-left: 0px;
@@ -359,34 +359,43 @@
 	margin-top: 10px;
 }
 
-#patreon_level_select_wrapper{
-	width: 100%;
-	white-space: nowrap;
-	-webkit-transform-style: preserve-3d;
-	-moz-transform-style: preserve-3d;
-	transform-style: preserve-3d;	
+#patreon_level_select_wrapper.selector-row {
+	display: flex;
 }
 
-#patreon_level_select_wrapper img {
-	position: relative;
-	top: 50%;
-	transform: translateY(-50%);
+#patreon_level_select_wrapper .selector-col {
+	flex: 1;
+	min-width: 0;
+}
+
+#patreon_level_select_wrapper .selector-col select {
+	width: 100%;
+	box-sizing: border-box;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
+}
+
+#patreon_level_select_wrapper .refresh-col {
+	padding-left: 5px;
+	width: 18px;
+	flex-shrink: 0;
+	display: flex;
+	align-items: center;
+}
+
+#patreon_level_refresh {
+	cursor: pointer;
 	filter:progid:DXImageTransform.Microsoft.Alpha(opacity=70);
 	-moz-opacity: 0.7;
-	opacity: 0.7;	
+	opacity: 0.7;
 }
 
-#patreon_level_select_wrapper img:hover {
+#patreon_level_refresh:hover {
 	cursor: pointer;
 	filter:progid:DXImageTransform.Microsoft.Alpha(opacity=100);
 	-moz-opacity: 1;
 	opacity: 1;
-}
-
-#patreon_level_select_wrapper select {
-	position: relative;
-	top: 50%;
-	transform: translateY(-50%);
 }
 
 .patreon_post_sync_choice {
@@ -406,14 +415,14 @@
 	padding: 2px;
 	padding-left: 10px;
 	width: 80px;
-	display:inline-block;	
+	display:inline-block;
 }
 
 #patreon_select_post_sync_category {
-	
+
 	display: block;
 	margin-top: 10px;
-	
+
 }
 
 #patreon_wordpress_post_import_category_status{
