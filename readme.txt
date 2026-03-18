@@ -84,6 +84,7 @@ It is  difficult to protect videos due the intensive bandwidth requirements of h
 * Fixed: HTTP 429 responses no longer incorrectly mark credentials as invalid — only HTTP 401 triggers this
 * Fixed: Token refresh is no longer attempted when API calls fail due to rate limiting or server errors
 * Fixed: Added a 5-minute cooldown to `check_creator_tiers` to prevent repeated `/oauth2/v2/campaigns` calls on every admin page load
+* Fixed: Tier dropdown refresh icon in post editor metabox was hidden when tier names were long
 
 = 1.9.16 =
 
@@ -602,3 +603,4 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 * Fixed: HTTP 429 responses no longer incorrectly mark credentials as invalid — only HTTP 401 triggers this
 * Fixed: Token refresh is no longer attempted when API calls fail due to rate limiting or server errors
 * Fixed: Added a 5-minute cooldown to `check_creator_tiers` to prevent repeated `/oauth2/v2/campaigns` calls on every admin page load
+* Fixed: Tier dropdown refresh icon in post editor metabox was hidden when tier names were long
