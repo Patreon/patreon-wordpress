@@ -595,7 +595,8 @@ class Patreon_Routing
                 if (apply_filters('ptrn/force_strict_oauth', get_option('patreon-enable-strict-oauth', false))) {
                     $user = Patreon_Login::updateLoggedInUserForStrictoAuth($user_response, $tokens, $redirect);
                 } else {
-                    $user = Patreon_Login::createOrLogInUserFromPatreon($user_response, $tokens, $redirect);
+                    $state_for_login = isset($state) ? $state : [];
+                    $user = Patreon_Login::createOrLogInUserFromPatreon($user_response, $tokens, $redirect, $state_for_login);
                 }
 
                 // shouldn't get here

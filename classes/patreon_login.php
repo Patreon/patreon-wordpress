@@ -166,7 +166,7 @@ class Patreon_Login
         }
     }
 
-    public static function createOrLogInUserFromPatreon($user_response, $tokens, $redirect = false)
+    public static function createOrLogInUserFromPatreon($user_response, $tokens, $redirect = false, $state = [])
     {
         global $wpdb;
 
@@ -176,8 +176,9 @@ class Patreon_Login
 
         // Check if user is logged in to wp:
 
-        // Logged in user. We just link the user up and be done.
-        if (is_user_logged_in()) {
+        // Logged in user. Only link if the OAuth flow nonce confirms this user initiated the flow.
+        // If verification fails, fall through to the not-logged-in path (lookup/create).
+        if (is_user_logged_in() && self::verify_oauth_flow_nonce($state)) {
             $user = wp_get_current_user();
 
             self::updateExistingUser($user->ID, $user_response, $tokens);
