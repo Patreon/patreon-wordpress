@@ -39,15 +39,15 @@ class Patreon_User_Profiles
                     </td>
                 </tr>
                 <tr>
-                    <th><label for="user_firstname"><?php _e('Patreon First name'); ?></label></th>
+                    <th><label for="patreon_user_firstname"><?php _e('Patreon First name'); ?></label></th>
                     <td>
-                        <input type="text" name="user_firstname" id="user_firstname" disabled value="<?php echo esc_attr(get_the_author_meta('user_firstname', $user->ID)); ?>" class="regular-text" /><br />
+                        <input type="text" name="patreon_user_firstname" id="patreon_user_firstname" disabled value="<?php echo esc_attr(get_user_meta($user->ID, 'patreon_user_firstname', true)); ?>" class="regular-text" /><br />
                     </td>
                 </tr>
                 <tr>
-                    <th><label for="user_lastname"><?php _e('Patreon Last name'); ?></label></th>
+                    <th><label for="patreon_user_lastname"><?php _e('Patreon Last name'); ?></label></th>
                     <td>
-                        <input type="text" name="user_lastname" id="user_lastname" disabled value="<?php echo esc_attr(get_the_author_meta('user_lastname', $user->ID)); ?>" class="regular-text" /><br />
+                        <input type="text" name="patreon_user_lastname" id="patreon_user_lastname" disabled value="<?php echo esc_attr(get_user_meta($user->ID, 'patreon_user_lastname', true)); ?>" class="regular-text" /><br />
                     </td>
                 </tr>
             </table>
