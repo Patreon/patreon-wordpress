@@ -52,8 +52,8 @@ define('PATREON_TEXT_OVER_BUTTON_2', 'Edit your pledge to %%creator%% to %%curre
 define('PATREON_TEXT_OVER_BUTTON_3', 'Please <a href="https://'.PATREON_HOST.'/settings/payment?utm_source='.urlencode(site_url()).'&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=declined_payment_info_link&utm_term=" target="_blank" ref="nofollow">update</a> your Patreon payment method to access this content.');
 define('PATREON_VALID_PATRON_POST_FOOTER_TEXT', 'This content is available exclusively to members of <b><a href="%%creator_link%%" target="_blank">%%creator%% Patreon</a> at %%currency_sign_front%%%%pledgelevel%%%%currency_sign_behind%%</b> or more.');
 define('PATREON_TEXT_UNDER_BUTTON_1', '');
-define('PATREON_TEXT_UNDER_BUTTON_2', 'Already a qualifying Patreon member? <a href="%%flow_link%%" rel="nofollow">Refresh</a> to access this content.');
-define('PATREON_TEXT_UNDER_BUTTON_3', 'Already updated? <a href="%%flow_link%%" rel="nofollow">Refresh</a> to access this content.');
+define('PATREON_TEXT_UNDER_BUTTON_2', 'Already a qualifying Patreon member? <a href="%%flow_link%%" rel="nofollow">Authenticate with Patreon</a> to access this content.');
+define('PATREON_TEXT_UNDER_BUTTON_3', 'Already updated? <a href="%%flow_link%%" rel="nofollow">Authenticate with Patreon</a> to access this content.');
 define('PATREON_CANT_LOGIN_STRICT_OAUTH', 'Sorry, couldn\'t log you in with Patreon because you have to be logged in to '.get_bloginfo('NAME').' first');
 define('PATREON_LOGIN_WITH_WORDPRESS_NOW', 'You can now login with your WordPress username/password.');
 define('PATREON_CANT_LOGIN_NONCES_DONT_MATCH', 'Sorry. Aborted Patreon login for security because security cookies dont match.');
