@@ -319,8 +319,8 @@ class Patreon_Wordpress
             }
 
             update_user_meta($user->ID, 'patreon_created', $patreon_created);
-            update_user_meta($user->ID, 'user_firstname', $user_response['data']['attributes']['first_name']);
-            update_user_meta($user->ID, 'user_lastname', $user_response['data']['attributes']['last_name']);
+            update_user_meta($user->ID, 'patreon_user_firstname', $user_response['data']['attributes']['first_name']);
+            update_user_meta($user->ID, 'patreon_user_lastname', $user_response['data']['attributes']['last_name']);
         }
     }
 

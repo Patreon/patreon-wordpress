@@ -80,6 +80,9 @@ class Patreon_Routing
                     'final_redirect_uri' => $final_redirect,
                 ];
 
+                // Embed OAuth flow nonce so the callback can verify which user initiated this flow
+                $state = array_merge($state, Patreon_Login::generate_oauth_flow_nonce());
+
                 // Below filter vars and the following filter allows plugin devs to acquire/filter info about Patron/user + content before going to Patreon flow
 
                 $filter_args = [
@@ -127,6 +130,9 @@ class Patreon_Routing
                     $link_interface_item = 'direct_unlock_button';
                     $state['final_redirect_uri'] = $redirect;
                     $send_pledge_level = $patreon_level * 100;
+
+                    // Embed OAuth flow nonce so the callback can verify which user initiated this flow
+                    $state = array_merge($state, Patreon_Login::generate_oauth_flow_nonce());
 
                     $flow_link = Patreon_Frontend::MakeUniversalFlowLink($send_pledge_level, $state, $client_id, $post, ['link_interface_item' => $link_interface_item]);
 
@@ -211,6 +217,9 @@ class Patreon_Routing
                     }
 
                     $state['final_redirect_uri'] = $final_redirect;
+
+                    // Embed OAuth flow nonce so the callback can verify which user initiated this flow
+                    $state = array_merge($state, Patreon_Login::generate_oauth_flow_nonce());
 
                     $send_pledge_level = $patreon_level * 100;
 
@@ -586,7 +595,8 @@ class Patreon_Routing
                 if (apply_filters('ptrn/force_strict_oauth', get_option('patreon-enable-strict-oauth', false))) {
                     $user = Patreon_Login::updateLoggedInUserForStrictoAuth($user_response, $tokens, $redirect);
                 } else {
-                    $user = Patreon_Login::createOrLogInUserFromPatreon($user_response, $tokens, $redirect);
+                    $state_for_login = isset($state) ? $state : [];
+                    $user = Patreon_Login::createOrLogInUserFromPatreon($user_response, $tokens, $redirect, $state_for_login);
                 }
 
                 // shouldn't get here

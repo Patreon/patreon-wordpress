@@ -23,6 +23,67 @@ class Patreon_Login
         delete_user_meta($user_id, 'patreon_token_minted');
     }
 
+    /**
+     * Generate an OAuth flow nonce for the current user and store it as a transient.
+     * Returns an array with 'nonce' and 'user_id' to embed in the OAuth state parameter.
+     * If no user is logged in, returns an empty array.
+     */
+    public static function generate_oauth_flow_nonce()
+    {
+        if (!is_user_logged_in()) {
+            return [];
+        }
+
+        $user_id = get_current_user_id();
+        $nonce = wp_generate_password(32, false);
+        $transient_key = 'patreon_oauth_nonce_' . $user_id;
+
+        // Store nonce with 10-minute TTL
+        set_transient($transient_key, $nonce, 10 * MINUTE_IN_SECONDS);
+
+        return [
+            'oauth_nonce' => $nonce,
+            'oauth_user_id' => $user_id,
+        ];
+    }
+
+    /**
+     * Verify that the OAuth flow nonce in the state parameter matches the logged-in user.
+     * Returns true if the nonce is valid and belongs to the current user, false otherwise.
+     */
+    public static function verify_oauth_flow_nonce($state)
+    {
+        if (!is_user_logged_in()) {
+            return false;
+        }
+
+        if (!isset($state['oauth_nonce']) || !isset($state['oauth_user_id'])) {
+            return false;
+        }
+
+        $user_id = get_current_user_id();
+
+        // The state must claim to belong to the currently logged-in user
+        if ((int) $state['oauth_user_id'] !== $user_id) {
+            return false;
+        }
+
+        $transient_key = 'patreon_oauth_nonce_' . $user_id;
+        $stored_nonce = get_transient($transient_key);
+
+        if (false === $stored_nonce) {
+            return false;
+        }
+
+        // Constant-time comparison
+        $valid = hash_equals($stored_nonce, $state['oauth_nonce']);
+
+        // Delete the transient after use (one-time use nonce)
+        delete_transient($transient_key);
+
+        return $valid;
+    }
+
     public static function updateExistingUser($user_id, $user_response, $tokens)
     {
         /* update user meta data with patreon data */
@@ -105,7 +166,7 @@ class Patreon_Login
         }
     }
 
-    public static function createOrLogInUserFromPatreon($user_response, $tokens, $redirect = false)
+    public static function createOrLogInUserFromPatreon($user_response, $tokens, $redirect = false, $state = [])
     {
         global $wpdb;
 
@@ -115,8 +176,9 @@ class Patreon_Login
 
         // Check if user is logged in to wp:
 
-        // Logged in user. We just link the user up and be done.
-        if (is_user_logged_in()) {
+        // Logged in user. Only link if the OAuth flow nonce confirms this user initiated the flow.
+        // If verification fails, fall through to the not-logged-in path (lookup/create).
+        if (is_user_logged_in() && self::verify_oauth_flow_nonce($state)) {
             $user = wp_get_current_user();
 
             self::updateExistingUser($user->ID, $user_response, $tokens);
