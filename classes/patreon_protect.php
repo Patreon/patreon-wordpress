@@ -307,7 +307,7 @@ class Patreon_Protect
 
         // first, check if cached image exists:
 
-        if (file_exists(PATREON_PLUGIN_LOCKED_IMAGE_CACHE_DIR.'/'.$cached_filename) and isset($go)) {
+        if (file_exists(PATREON_PLUGIN_LOCKED_IMAGE_CACHE_DIR.'/'.$cached_filename)) {
             // Exists - serve the cached image:
 
             header('Content-Type: '.$mime_type);
