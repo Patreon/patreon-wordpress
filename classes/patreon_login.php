@@ -111,6 +111,7 @@ class Patreon_Login
 
         $login_with_patreon = get_option('patreon-enable-login-with-patreon', true);
         $admins_editors_login_with_patreon = get_option('patreon-enable-allow-admins-login-with-patreon', false);
+        $extend_patreon_cookie_login = get_option('patreon-extend-cookie-login', false);
         $danger_user_list = Patreon_Login::getDangerUserList();
 
         // Check if user is logged in to wp:
@@ -190,7 +191,12 @@ class Patreon_Login
                 } else {
                     /* log user into existing wordpress account with matching username */
                     wp_set_current_user($user->ID, $user->user_login);
-                    wp_set_auth_cookie($user->ID);
+                    /* check if the extended cookie expiration time option is selected */
+					if (false == $extend_patreon_cookie_login) {
+						wp_set_auth_cookie( $user->ID );
+					} else {
+						wp_set_auth_cookie( $user->ID, true ); /* second parameter set to true means "Remember Me", which sets the auth cookie expiration to 2 weeks */
+					}
                     do_action('wp_login', $user->user_login, $user);
 
                     // Import Patreon avatar for this user since it is a new user

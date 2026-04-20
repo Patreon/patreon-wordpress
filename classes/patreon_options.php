@@ -42,7 +42,8 @@ class Patreon_Options
         register_setting('patreon-options', 'patreon-can-use-api-v2');
         register_setting('patreon-options', 'patreon-enable-register-with-patreon');
         register_setting('patreon-options', 'patreon-enable-login-with-patreon');
-        register_setting('patreon-options', 'patreon-enable-allow-admins-login-with-patreon');
+        register_setting('patreon-options', 'patreon-extend-cookie-login');
+        register_setting('patreon-options', 'patreon-cookie-login-remember' );
         register_setting('patreon-options', 'patreon-enable-redirect-to-page-after-login');
         register_setting('patreon-options', 'patreon-enable-redirect-to-page-id');
         register_setting('patreon-options', 'patreon-protect-default-image-patreon-level');
@@ -346,6 +347,17 @@ class Patreon_Options
                                         </tr>
                                         <?php } ?>
 
+                                        <?php if (get_option('patreon-enable-login-with-patreon', true)) { ?>
+                                        <tr valign="top">
+                                            <th scope="row">
+                                                <strong>Extend Patreon Login cookie expiration</strong>
+                                                <div class="patreon-options-info">If on, Patreons will only have to re-sign in once your AUTH_COOKIE_EXPIRATION expires instead of every time they visit your website. Recommended: on</div>
+                                            </th>
+                                            <td>
+                                                <input type="checkbox" name="patreon-extend-cookie-login" value="1"<?php checked(get_option('patreon-enable-allow-admins-login-with-patreon', false)); ?> />
+                                            </td>
+                                        </tr>
+                                        <?php } ?>
 
                                         <tr valign="top">
                                             <th scope="row">
