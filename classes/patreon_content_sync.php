@@ -137,11 +137,20 @@ class Patreon_Content_Sync
 
         if (0 == count($matching_posts)) {
             // no matching posts. Try checking from the title.
-            $matching_post = get_page_by_title($patreon_post['data']['attributes']['title'], OBJECT, 'post');
+            $matching_posts_by_title = get_posts([
+                'post_type' => 'post',
+                'title' => $patreon_post['data']['attributes']['title'],
+                'post_status' => 'all',
+                'numberposts' => 1,
+                'orderby' => 'post_date ID',
+                'order' => 'ASC',
+                'update_post_term_cache' => false,
+                'update_post_meta_cache' => false,
+            ]);
 
-            if (isset($matching_post)) {
+            if (!empty($matching_posts_by_title)) {
                 // A post matching from title was found.
-                $matching_post_id = $matching_post->ID;
+                $matching_post_id = $matching_posts_by_title[0]->ID;
             }
         }
 
