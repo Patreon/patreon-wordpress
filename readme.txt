@@ -4,7 +4,7 @@ Tags: patreon, membership, members
 Requires at least: 4.0
 Requires PHP: 7.4
 Tested up to: 6.8.1
-Stable tag: 1.9.17
+Stable tag: 1.10.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -78,6 +78,10 @@ To make a locked post public again, just choose "Everyone" from the select box a
 It is  difficult to protect videos due the intensive bandwidth requirements of hosting video  and having to rely on third parties such as Youtube or Vimeo. Youtube allows you to set videos to ‘private’ but Vimeo offers extra controls by only allowing videos to be played on specific domains. Visit this guide to [protecting your video content with Vimeo](https://help.vimeo.com/hc/en-us/articles/224817847-Privacy-settings-overview).
 
 == Upgrade Notice ==
+
+= 1.10.0 =
+
+* Security fixes for Patreon connections and admin settings. Updating is recommended.
 
 = 1.9.17 =
 
@@ -598,9 +602,6 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
-= 1.9.17 =
+= 1.10.0 =
 
-* Fixed: HTTP 429 responses no longer incorrectly mark credentials as invalid — only HTTP 401 triggers this
-* Fixed: Token refresh is no longer attempted when API calls fail due to rate limiting or server errors
-* Fixed: Added a 5-minute cooldown to `check_creator_tiers` to prevent repeated `/oauth2/v2/campaigns` calls on every admin page load
-* Fixed: Tier dropdown refresh icon in post editor metabox was hidden when tier names were long
+* Security fixes for Patreon connections and admin settings. Updating is recommended.

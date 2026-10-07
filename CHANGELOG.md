@@ -1,3 +1,7 @@
+= 1.10.0 =
+
+* Security fixes for Patreon connections and admin settings.
+
 = 1.9.17 =
 
 * Fixed: HTTP 429 responses no longer incorrectly mark credentials as invalid — only HTTP 401 triggers this
