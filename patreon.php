@@ -57,6 +57,7 @@ define('PATREON_TEXT_UNDER_BUTTON_3', 'Already updated? <a href="%%flow_link%%" 
 define('PATREON_CANT_LOGIN_STRICT_OAUTH', 'Sorry, couldn\'t log you in with Patreon because you have to be logged in to '.get_bloginfo('NAME').' first');
 define('PATREON_LOGIN_WITH_WORDPRESS_NOW', 'You can now login with your WordPress username/password.');
 define('PATREON_CANT_LOGIN_NONCES_DONT_MATCH', 'Sorry. Aborted Patreon login for security because security cookies dont match.');
+define('PATREON_INVALID_OAUTH_STATE', 'Sorry. Aborted Patreon connection for security because it was not started from this browser session. Please try again.');
 define('PATREON_CANT_LOGIN_DUE_TO_API_ERROR', 'Sorry. Login aborted due to an API error.');
 define('PATREON_CANT_LOGIN_DUE_TO_API_ERROR_CHECK_CREDENTIALS', 'Sorry. Login aborted due to an API error. Please check API credentials.');
 define('PATREON_WEIRD_REDIRECTION_AT_LOGIN', 'This redirect should not have happened. Please contact site administration.');
@@ -157,3 +158,4 @@ $Patreon_Wordpress = new Patreon_Wordpress();
 require 'includes/patreon_widgets.php';
 require 'includes/patreon_api_util.php';
 require 'includes/patreon_creator_util.php';
+require 'includes/patreon_oauth_state_util.php';

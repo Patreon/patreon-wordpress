@@ -32,6 +32,7 @@ class Patreon_Frontend
         self::$messages_map = [
             'patreon_cant_login_strict_oauth' => PATREON_CANT_LOGIN_STRICT_OAUTH,
             'login_with_wordpress' => PATREON_LOGIN_WITH_WORDPRESS_NOW,
+            'patreon_invalid_oauth_state' => PATREON_INVALID_OAUTH_STATE,
             'patreon_cant_login_api_error' => PATREON_CANT_LOGIN_DUE_TO_API_ERROR,
             'patreon_cant_login_api_error_credentials' => PATREON_CANT_LOGIN_DUE_TO_API_ERROR_CHECK_CREDENTIALS,
             'patreon_no_locking_level_set_for_this_post' => PATREON_NO_LOCKING_LEVEL_SET_FOR_THIS_POST,
@@ -714,7 +715,7 @@ class Patreon_Frontend
 
         $pledge_level = apply_filters('ptrn/patron_link_pledge_level', $pledge_level, $send_post_id, $args);
 
-        $href = 'https://'.PATREON_HOST.'/oauth2/become-patron?response_type=code&min_cents='.$pledge_level.'&client_id='.$client_id.$v2_params.'&redirect_uri='.$redirect_uri.'&state='.urlencode(base64_encode(json_encode($state)));
+        $href = 'https://'.PATREON_HOST.'/oauth2/become-patron?response_type=code&min_cents='.$pledge_level.'&client_id='.$client_id.$v2_params.'&redirect_uri='.$redirect_uri.'&state='.PatreonOauthStateUtil::encode_state($state);
 
         // 3rd party dev goodie! Apply custom filters so they can manipulate the url:
 
@@ -825,7 +826,7 @@ class Patreon_Frontend
         $href = 'https://'.PATREON_HOST.'/oauth2/authorize?response_type=code&client_id='
         .$client_id.$v2_params
         .'&redirect_uri='.urlencode($redirect_uri)
-        .'&state='.urlencode(base64_encode(json_encode($state)));
+        .'&state='.PatreonOauthStateUtil::encode_state($state);
 
         $href = apply_filters('ptrn/login_link', $href);
         $filterable_utm_params = 'utm_term=&utm_content=login_button';
