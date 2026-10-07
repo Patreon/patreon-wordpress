@@ -922,7 +922,7 @@ class Patreon_Wordpress
             // Info notice - not permanent - doesnt require nonce verification
             ?>
                  <div class="notice notice-success is-dismissible  patreon-wordpress" id="patreon_site_disconnect_success_notice">
-                    <p><?php echo PATREON_SITE_DISCONNECTED_FROM_PATREON_TEXT; ?></p>
+                    <p><?php echo esc_html(PATREON_SITE_DISCONNECTED_FROM_PATREON_TEXT); ?></p>
                 </div>
             <?php
 
@@ -940,8 +940,8 @@ class Patreon_Wordpress
         if (!$setup_done and !$setup_wizard_notice_dismissed and current_user_can('manage_options')) {
             // This notice needs a nonce but the link to start setup doesnt need a nonce - any admin level user with manage options should be able to go to the setup wizard from anywhere
             ?>
-                 <div class="notice notice-success is-dismissible patreon-wordpress" id="patreon_setup_needed_notice" patreon_wordpress_nonce_setup_needed="<?php echo wp_create_nonce('patreon_wordpress_nonce_setup_needed'); ?>">
-                    <p>We must connect your site to Patreon to enable Patreon features. Please click <a href="<?php echo admin_url('admin.php?page=patreon_wordpress_setup_wizard&setup_stage=0'); ?>" target="_self">here</a> to start the setup wizard</p>
+                 <div class="notice notice-success is-dismissible patreon-wordpress" id="patreon_setup_needed_notice" patreon_wordpress_nonce_setup_needed="<?php echo esc_attr(wp_create_nonce('patreon_wordpress_nonce_setup_needed')); ?>">
+                    <p>We must connect your site to Patreon to enable Patreon features. Please click <a href="<?php echo esc_url(admin_url('admin.php?page=patreon_wordpress_setup_wizard&setup_stage=0')); ?>" target="_self">here</a> to start the setup wizard</p>
                 </div>
             <?php
 
@@ -957,8 +957,8 @@ class Patreon_Wordpress
         if ($setup_done and (!$api_version or '' == $api_version or '1' == $api_version) and current_user_can('manage_options') and (!$api_version_notice_dismissed or (!$api_version_notice_dismissed_time or $api_version_notice_dismissed_time < (time() - (24 * 3600 * 7))))) {
             // This notice needs a nonce but the link to start setup doesnt need a nonce - any admin level user with manage options should be able to go to the setup wizard from anywhere
             ?>
-                <div class="notice notice-warning is-dismissible patreon-wordpress" id="patreon_wordpress_patreon_api_version_update_notice" patreon_wordpress_nonce_patreon_api_version_update="<?php echo wp_create_nonce('patreon_wordpress_nonce_patreon_api_version_update'); ?>">
-                    <p>Your site's connection to Patreon must be upgraded to ensure that Patreon features will work! Please click <a href="<?php echo admin_url('admin.php?page=patreon_wordpress_setup_wizard&setup_stage=0'); ?>" target="_self">here</a> to start the setup wizard to reconnect your site again</p>
+                <div class="notice notice-warning is-dismissible patreon-wordpress" id="patreon_wordpress_patreon_api_version_update_notice" patreon_wordpress_nonce_patreon_api_version_update="<?php echo esc_attr(wp_create_nonce('patreon_wordpress_nonce_patreon_api_version_update')); ?>">
+                    <p>Your site's connection to Patreon must be upgraded to ensure that Patreon features will work! Please click <a href="<?php echo esc_url(admin_url('admin.php?page=patreon_wordpress_setup_wizard&setup_stage=0')); ?>" target="_self">here</a> to start the setup wizard to reconnect your site again</p>
                 </div>
             <?php
 
@@ -975,7 +975,7 @@ class Patreon_Wordpress
 
         if (!$rate_plugin_notice_shown and self::check_days_after_last_non_system_notice(7) and self::calculate_days_after_first_activation(37) and !$already_showed_non_system_notice) {
             ?>
-                 <div class="notice notice-info is-dismissible patreon-wordpress" id="patreon-rate-plugin-notice-shown" patreon_wordpress_nonce_rate_plugin_notice="<?php echo wp_create_nonce('patreon_wordpress_nonce_rate_plugin_notice'); ?>">
+                 <div class="notice notice-info is-dismissible patreon-wordpress" id="patreon-rate-plugin-notice-shown" patreon_wordpress_nonce_rate_plugin_notice="<?php echo esc_attr(wp_create_nonce('patreon_wordpress_nonce_rate_plugin_notice')); ?>">
                     <p>Did Patreon WordPress help your site? Help creators like yourself find out about it <a href="https://wordpress.org/support/plugin/patreon-connect/reviews/#new-post?utm_source=<?php urlencode(site_url()); ?>&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=patreon_wordpress_review_infobox_link&utm_term=" target="_blank">by giving us a good rating!</a></p>
                 </div>
             <?php
@@ -987,8 +987,8 @@ class Patreon_Wordpress
 
         if (Patreon_Compatibility::$toggle_warning and self::check_days_after_last_system_notice(7) and (!isset($_REQUEST['page']) or 'patreon-plugin-health' != $_REQUEST['page'])) {
             ?>
-                 <div class="notice notice-error patreon-wordpress is-dismissible" id="patreon-critical-issues" patreon_wordpress_nonce_plugin_critical_issues="<?php echo wp_create_nonce('patreon_wordpress_nonce_plugin_critical_issues'); ?>">
-                    <p>There are important issues affecting your Patreon integration. Please visit <a href="<?php echo admin_url('admin.php?page=patreon-plugin-health'); ?>">health check page</a> to see the issues and solutions.</p>
+                 <div class="notice notice-error patreon-wordpress is-dismissible" id="patreon-critical-issues" patreon_wordpress_nonce_plugin_critical_issues="<?php echo esc_attr(wp_create_nonce('patreon_wordpress_nonce_plugin_critical_issues')); ?>">
+                    <p>There are important issues affecting your Patreon integration. Please visit <a href="<?php echo esc_url(admin_url('admin.php?page=patreon-plugin-health')); ?>">health check page</a> to see the issues and solutions.</p>
                 </div>
             <?php
 
@@ -1045,11 +1045,13 @@ class Patreon_Wordpress
 
         // Mapping what comes from REQUEST to a given value avoids potential security problems and allows custom actions depending on notice
 
-        if ('patreon-wordpress-update-available' == $_REQUEST['notice_id']) {
+        $notice_id = isset($_REQUEST['notice_id']) ? sanitize_key(wp_unslash($_REQUEST['notice_id'])) : '';
+
+        if ('patreon-wordpress-update-available' == $notice_id) {
             delete_option('patreon-wordpress-update-available');
         }
 
-        if ('patreon-addon-upsell-shown' == $_REQUEST['notice_id']) {
+        if ('patreon-addon-upsell-shown' == $notice_id) {
             if (!isset($_REQUEST['patreon_wordpress_nonce_patron_pro_addon_notice_shown']) or !wp_verify_nonce(sanitize_key($_REQUEST['patreon_wordpress_nonce_patron_pro_addon_notice_shown']), 'patreon_wordpress_nonce_patron_pro_addon_notice_shown')) {
                 return;
             }
@@ -1059,7 +1061,7 @@ class Patreon_Wordpress
             // Set the last notice shown date
             self::set_last_non_system_notice_shown_date();
         }
-        if ('patron_content_manager_pitch_shown' == $_REQUEST['notice_id']) {
+        if ('patron_content_manager_pitch_shown' == $notice_id) {
             if (!isset($_REQUEST['patreon_wordpress_nonce_patron_content_manager_addon_notice_shown']) or !wp_verify_nonce(sanitize_key($_REQUEST['patreon_wordpress_nonce_patron_content_manager_addon_notice_shown']), 'patreon_wordpress_nonce_patron_content_manager_addon_notice_shown')) {
                 return;
             }
@@ -1070,7 +1072,7 @@ class Patreon_Wordpress
         }
 
         // Mapping what comes from REQUEST to a given value avoids potential security problems
-        if ('patreon_setup_needed_notice' == $_REQUEST['notice_id']) {
+        if ('patreon_setup_needed_notice' == $notice_id) {
             if (!isset($_REQUEST['patreon_wordpress_nonce_setup_needed']) or !wp_verify_nonce(sanitize_key($_REQUEST['patreon_wordpress_nonce_setup_needed']), 'patreon_wordpress_nonce_setup_needed')) {
                 return;
             }
@@ -1080,7 +1082,7 @@ class Patreon_Wordpress
         }
 
         // Mapping what comes from REQUEST to a given value avoids potential security problems
-        if ('patreon_wordpress_patreon_api_version_update_notice' == $_REQUEST['notice_id']) {
+        if ('patreon_wordpress_patreon_api_version_update_notice' == $notice_id) {
             if (!isset($_REQUEST['patreon_wordpress_nonce_patreon_api_version_update']) or !wp_verify_nonce(sanitize_key($_REQUEST['patreon_wordpress_nonce_patreon_api_version_update']), 'patreon_wordpress_nonce_patreon_api_version_update')) {
                 return;
             }
@@ -1090,7 +1092,7 @@ class Patreon_Wordpress
         }
 
         // Mapping what comes from REQUEST to a given value avoids potential security problems
-        if ('patreon-rate-plugin-notice-shown' == $_REQUEST['notice_id']) {
+        if ('patreon-rate-plugin-notice-shown' == $notice_id) {
             if (!isset($_REQUEST['patreon_wordpress_nonce_rate_plugin_notice']) or !wp_verify_nonce(sanitize_key($_REQUEST['patreon_wordpress_nonce_rate_plugin_notice']), 'patreon_wordpress_nonce_rate_plugin_notice')) {
                 return;
             }
@@ -1101,7 +1103,7 @@ class Patreon_Wordpress
         }
 
         // Mapping what comes from REQUEST to a given value avoids potential security problems
-        if ('patreon-critical-issues' == $_REQUEST['notice_id']) {
+        if ('patreon-critical-issues' == $notice_id) {
             if (!isset($_REQUEST['patreon_wordpress_nonce_plugin_critical_issues']) or !wp_verify_nonce(sanitize_key($_REQUEST['patreon_wordpress_nonce_plugin_critical_issues']), 'patreon_wordpress_nonce_plugin_critical_issues')) {
                 return;
             }
