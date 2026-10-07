@@ -1830,6 +1830,8 @@ class Patreon_Wordpress
     {
         // Handles setup wizard and reconnect wizard screens
 
+        $patreon_message = isset($_REQUEST['patreon_message']) ? sanitize_text_field(wp_unslash($_REQUEST['patreon_message'])) : '';
+
         $setup_message = PATREON_SETUP_INITIAL_MESSAGE;
 
         if (!isset($_REQUEST['setup_stage']) or '0' == $_REQUEST['setup_stage']) {
@@ -1887,11 +1889,11 @@ class Patreon_Wordpress
             $config_input = '';
 
             foreach ($config_info as $key => $value) {
-                $config_input .= '<input type="hidden" name="'.$key.'" value="'.$config_info[$key].'" />';
+                $config_input .= '<input type="hidden" name="'.esc_attr($key).'" value="'.esc_attr($config_info[$key]).'" />';
             }
 
-            if (isset($_REQUEST['patreon_message']) and '' != $_REQUEST['patreon_message']) {
-                $setup_message = Patreon_Frontend::$messages_map[$_REQUEST['patreon_message']];
+            if ('' != $patreon_message) {
+                $setup_message = Patreon_Frontend::$messages_map[$patreon_message] ?? '';
             }
 
             // Create state var needed for identifying connection attempt
@@ -1902,11 +1904,11 @@ class Patreon_Wordpress
 
             echo '<div id="patreon_setup_screen">';
 
-            echo '<div id="patreon_setup_logo"><img src="'.PATREON_PLUGIN_ASSETS.'/img/Patreon_Logo_100.png" /></div>';
+            echo '<div id="patreon_setup_logo"><img src="'.esc_url(PATREON_PLUGIN_ASSETS.'/img/Patreon_Logo_100.png').'" /></div>';
 
             $api_endpoint = 'https://'.PATREON_HOST.'/oauth2/';
 
-            echo '<div id="patreon_setup_content"><h1 style="margin-top: 0px;">Let\'s connect your site to Patreon!</h1><div id="patreon_setup_message">'.$setup_message.'</div>'.$requirement_notices.'<form style="display:block;" method="get" action="'.$api_endpoint.'register-client-creation"><p class="submit" style="margin-top: 10px;"><input type="submit" name="submit" id="submit" class="button button-large button-primary" value="Let\'s start!"></p>'.$config_input.'<input type="hidden" name="client_id" value="'.PATREON_PLUGIN_CLIENT_ID.'" /><input type="hidden" name="redirect_uri" value="'.site_url().'/patreon-authorization/" /><input type="hidden" name="state" value="'.PatreonOauthStateUtil::encode_state($state).'" /><input type="hidden" name="scopes" value="w:identity.clients" /><input type="hidden" name="response_type" value="code" /></form></div>';
+            echo '<div id="patreon_setup_content"><h1 style="margin-top: 0px;">Let\'s connect your site to Patreon!</h1><div id="patreon_setup_message">'.wp_kses_post($setup_message).'</div>'.wp_kses_post($requirement_notices).'<form style="display:block;" method="get" action="'.esc_url($api_endpoint.'register-client-creation').'"><p class="submit" style="margin-top: 10px;"><input type="submit" name="submit" id="submit" class="button button-large button-primary" value="Let\'s start!"></p>'.$config_input.'<input type="hidden" name="client_id" value="'.esc_attr(PATREON_PLUGIN_CLIENT_ID).'" /><input type="hidden" name="redirect_uri" value="'.esc_url(site_url().'/patreon-authorization/').'" /><input type="hidden" name="state" value="'.esc_attr(PatreonOauthStateUtil::encode_state($state)).'" /><input type="hidden" name="scopes" value="w:identity.clients" /><input type="hidden" name="response_type" value="code" /></form></div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Form markup, dynamic values escaped inline
 
             echo '</div>';
         }
@@ -1914,20 +1916,20 @@ class Patreon_Wordpress
         if (isset($_REQUEST['setup_stage']) and 'final' == $_REQUEST['setup_stage']) {
             $setup_message = PATREON_SETUP_SUCCESS_MESSAGE;
 
-            if (isset($_REQUEST['patreon_message']) and '' != $_REQUEST['patreon_message']) {
-                $setup_message = Patreon_Frontend::$messages_map[$_REQUEST['patreon_message']];
+            if ('' != $patreon_message) {
+                $setup_message = Patreon_Frontend::$messages_map[$patreon_message] ?? '';
             }
 
             echo '<div id="patreon_setup_screen">';
-            echo '<div id="patreon_setup_logo"><img src="'.PATREON_PLUGIN_ASSETS.'/img/Patreon_Logo_100.png" /></div>';
+            echo '<div id="patreon_setup_logo"><img src="'.esc_url(PATREON_PLUGIN_ASSETS.'/img/Patreon_Logo_100.png').'" /></div>';
 
-            echo '<div id="patreon_setup_content"><h1 style="margin-top: 5px;">Patreon WordPress is set up and ready to go!</h1><div id="patreon_setup_message">'.$setup_message.'</div>';
+            echo '<div id="patreon_setup_content"><h1 style="margin-top: 5px;">Patreon WordPress is set up and ready to go!</h1><div id="patreon_setup_message">'.wp_kses_post($setup_message).'</div>';
 
             echo '</div>';
 
             echo '<div id="patreon_success_inserts">';
 
-            echo '<a href="https://support.patreon.com/hc/en-us/articles/360032409172-Patreon-WordPress-Quickstart?utm_source='.urlencode(site_url()).'&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=setup_wizard_screen_3_quickstart_article_link&utm_term=" target="_blank"><div class="patreon_success_insert"><div class="patreon_success_insert_logo"><img src="'.PATREON_PLUGIN_ASSETS.'/img/Learn-how-to-use-Patreon-WordPress.jpg" /></div><div class="patreon_success_insert_heading"><h3>Quickstart guide</h3></div><div class="patreon_success_insert_content"><br clear="both">Click here to read our quickstart guide and learn how to lock your content</div></div></a>';
+            echo '<a href="https://support.patreon.com/hc/en-us/articles/360032409172-Patreon-WordPress-Quickstart?utm_source='.urlencode(site_url()).'&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=setup_wizard_screen_3_quickstart_article_link&utm_term=" target="_blank"><div class="patreon_success_insert"><div class="patreon_success_insert_logo"><img src="'.esc_url(PATREON_PLUGIN_ASSETS.'/img/Learn-how-to-use-Patreon-WordPress.jpg').'" /></div><div class="patreon_success_insert_heading"><h3>Quickstart guide</h3></div><div class="patreon_success_insert_content"><br clear="both">Click here to read our quickstart guide and learn how to lock your content</div></div></a>';
 
             echo '</div>';
         }
@@ -1935,17 +1937,17 @@ class Patreon_Wordpress
         if (isset($_REQUEST['setup_stage']) and 'post_sync_0' == $_REQUEST['setup_stage']) {
             $setup_message = PATREON_POST_SYNC_0;
 
-            if (isset($_REQUEST['patreon_message']) and '' != $_REQUEST['patreon_message']) {
-                $setup_message = Patreon_Frontend::$messages_map[$_REQUEST['patreon_message']];
+            if ('' != $patreon_message) {
+                $setup_message = Patreon_Frontend::$messages_map[$patreon_message] ?? '';
             }
 
             // Create state var needed for identifying connection attempt
 
             echo '<div id="patreon_setup_screen">';
 
-            echo '<div id="patreon_setup_logo"><img src="'.PATREON_PLUGIN_ASSETS.'/img/Patreon_Logo_100.png" /></div>';
+            echo '<div id="patreon_setup_logo"><img src="'.esc_url(PATREON_PLUGIN_ASSETS.'/img/Patreon_Logo_100.png').'" /></div>';
 
-            echo '<div id="patreon_setup_content"><h1 style="margin-top: 0px;">Do you want to sync your posts?</h1><div id="patreon_setup_message">'.$setup_message.'</div><form style="display:inline-block;margin-right: 10px;" method="post" action="'.admin_url('admin.php?page=patreon_wordpress_setup_wizard&setup_stage=post_sync_1').'"><p class="submit" style="margin-top: 10px;"><input type="submit" class="button button-large button-primary" value="Yes, lets go!" /></p></form><form style="display:inline-block;" method="post" action="'.admin_url('admin.php?page=patreon_wordpress_setup_wizard&setup_stage=final').'"><p class="submit" style="margin-top: 10px;"><input type="submit" class="button button-large button-primary" value="Maybe later" /></p></form></div>';
+            echo '<div id="patreon_setup_content"><h1 style="margin-top: 0px;">Do you want to sync your posts?</h1><div id="patreon_setup_message">'.wp_kses_post($setup_message).'</div><form style="display:inline-block;margin-right: 10px;" method="post" action="'.esc_url(admin_url('admin.php?page=patreon_wordpress_setup_wizard&setup_stage=post_sync_1')).'"><p class="submit" style="margin-top: 10px;"><input type="submit" class="button button-large button-primary" value="Yes, lets go!" /></p></form><form style="display:inline-block;" method="post" action="'.esc_url(admin_url('admin.php?page=patreon_wordpress_setup_wizard&setup_stage=final')).'"><p class="submit" style="margin-top: 10px;"><input type="submit" class="button button-large button-primary" value="Maybe later" /></p></form></div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Form markup, dynamic values escaped inline
 
             echo '</div>';
         }
@@ -1953,8 +1955,8 @@ class Patreon_Wordpress
         if (isset($_REQUEST['setup_stage']) and 'post_sync_1' == $_REQUEST['setup_stage']) {
             $setup_message = '';
 
-            if (isset($_REQUEST['patreon_message']) and '' != $_REQUEST['patreon_message']) {
-                $setup_message = Patreon_Frontend::$messages_map[$_REQUEST['patreon_message']];
+            if ('' != $patreon_message) {
+                $setup_message = Patreon_Frontend::$messages_map[$patreon_message] ?? '';
             }
 
             $update_posts_selected = '';
@@ -2005,9 +2007,9 @@ class Patreon_Wordpress
 
             echo '<div id="patreon_setup_screen">';
 
-            echo '<div id="patreon_setup_logo"><img src="'.PATREON_PLUGIN_ASSETS.'/img/Patreon_Logo_100.png" /></div>';
+            echo '<div id="patreon_setup_logo"><img src="'.esc_url(PATREON_PLUGIN_ASSETS.'/img/Patreon_Logo_100.png').'" /></div>';
             $patreon_wordpress_nonce_save_post_sync_options = wp_create_nonce();
-            echo '<div id="patreon_setup_content"><h1 style="margin-top: 0px;">How should posts be synced?</h1><div id="patreon_setup_message">'.$api_version_warning.$invalid_client_credential_error.$setup_message.'<div class="patreon_post_sync_choice"><div class="patreon_post_sync_choice_title">Sync posts to this category</div>'.PATREON_POST_SYNC_5.'<div style="display:block;margin-top:10px;width: 200px;"><select name="patreon_sync_post_type" id="patreon_sync_post_type" style="display: inline-block; margin-right: 5px; margin-bottom: 10px; font-size: 20px; width: 250px;">'.$post_type_select.'</select><select  name="patreon_sync_post_category" id="patreon_sync_post_category" style="display: inline-block; margin-right: 5px; margin-bottom: 10px; font-size: 20px; width: 250px;">'.$taxonomy_select.'</select><select name="patreon_sync_post_term" id="patreon_sync_post_term" style="display: inline-block; margin-right: 5px; margin-bottom: 10px; font-size: 20px; width: 250px;">'.$term_select.'</select><button id="patreon_wordpress_save_post_sync_category"  patreon_wordpress_nonce_save_post_sync_options="'.$patreon_wordpress_nonce_save_post_sync_options.'" class="button button-primary button-large" style="display: inline-block; margin-right: 5px; margin-bottom: 10px; font-size: 20px; width: 250px;" pw_input_target="#patreon_wordpress_post_import_category_status" target="">Save</button><div id="patreon_wordpress_post_import_category_status" style="color: #<?php echo $post_sync_category_status_color ?>;"></div></div><div class="patreon_post_sync_choice"><div class="patreon_post_sync_choice_title">Author for imported posts</div>'.PATREON_POST_SYNC_6.'<div style="display:block;margin-top:10px;"><select id="patreon-post-author-for-synced-posts" patreon_wordpress_nonce_save_post_sync_options="'.$patreon_wordpress_nonce_save_post_sync_options.'" name="patreon-post-author-for-synced-posts" pw_input_target="#patreon-post-author-for-synced-posts-info" style="font-size:20px; display:inline-block;">'.$user_select.'</select><div id="patreon-post-author-for-synced-posts-info" style="clear:both;display:block;width:auto;"></div></div></div><div class="patreon_post_sync_choice"><div class="patreon_post_sync_choice_title">Update local posts from the ones at Patreon</div>'.PATREON_POST_SYNC_2.'<div style="display:block;margin-top:10px;width: 200px;"><select id="patreon-update-posts" patreon_wordpress_nonce_save_post_sync_options="'.$patreon_wordpress_nonce_save_post_sync_options.'" name="patreon-update-posts" pw_input_target="#patreon-update-posts-info" style="font-size:20px; display:inline-block;"><option value="">Select</option><option value="yes" '.$update_posts_selected.'>Yes</option><option value="no"'.$update_posts_unselected.'>No</option></select><div id="patreon-update-posts-info" style=:clear:both;display:block;width:auto;""></div></div></div><div class="patreon_post_sync_choice"><div class="patreon_post_sync_choice_title">Delete local post when Patreon post is deleted</div>'.PATREON_POST_SYNC_3.'<div style="display:block;margin-top:10px;width: 200px;"><select name="patreon-remove-deleted-posts" id="patreon-remove-deleted-posts" patreon_wordpress_nonce_save_post_sync_options="'.$patreon_wordpress_nonce_save_post_sync_options.'" pw_input_target="#patreon-remove-deleted-posts-info" style="font-size:20px;"><option value="">Select</option><option value="yes" '.$delete_posts_selected.'>Yes</option><option value="no" '.$delete_posts_unselected.'>No</option></select><div id="patreon-remove-deleted-posts-info" style="clear:both;display:block;width:auto;"></div></div></div></div><form style="display:inline-block;margin-right:10px;" method="post" action="'.admin_url('admin.php?page=patreon_wordpress_setup_wizard&setup_stage=post_sync_2').'"><p class="submit" style="margin-top: 10px;"><input type="submit" name="submit" id="submit" class="button button-large button-primary" value="Done!"></p><input type="hidden" name="patreon_wordpress_nonce_save_post_sync_options" value="'.$patreon_wordpress_nonce_save_post_sync_options.'" /></form></div>';
+            echo '<div id="patreon_setup_content"><h1 style="margin-top: 0px;">How should posts be synced?</h1><div id="patreon_setup_message">'.$api_version_warning.$invalid_client_credential_error.wp_kses_post($setup_message).'<div class="patreon_post_sync_choice"><div class="patreon_post_sync_choice_title">Sync posts to this category</div>'.PATREON_POST_SYNC_5.'<div style="display:block;margin-top:10px;width: 200px;"><select name="patreon_sync_post_type" id="patreon_sync_post_type" style="display: inline-block; margin-right: 5px; margin-bottom: 10px; font-size: 20px; width: 250px;">'.$post_type_select.'</select><select  name="patreon_sync_post_category" id="patreon_sync_post_category" style="display: inline-block; margin-right: 5px; margin-bottom: 10px; font-size: 20px; width: 250px;">'.$taxonomy_select.'</select><select name="patreon_sync_post_term" id="patreon_sync_post_term" style="display: inline-block; margin-right: 5px; margin-bottom: 10px; font-size: 20px; width: 250px;">'.$term_select.'</select><button id="patreon_wordpress_save_post_sync_category"  patreon_wordpress_nonce_save_post_sync_options="'.esc_attr($patreon_wordpress_nonce_save_post_sync_options).'" class="button button-primary button-large" style="display: inline-block; margin-right: 5px; margin-bottom: 10px; font-size: 20px; width: 250px;" pw_input_target="#patreon_wordpress_post_import_category_status" target="">Save</button><div id="patreon_wordpress_post_import_category_status" style="color: #<?php echo $post_sync_category_status_color ?>;"></div></div><div class="patreon_post_sync_choice"><div class="patreon_post_sync_choice_title">Author for imported posts</div>'.PATREON_POST_SYNC_6.'<div style="display:block;margin-top:10px;"><select id="patreon-post-author-for-synced-posts" patreon_wordpress_nonce_save_post_sync_options="'.esc_attr($patreon_wordpress_nonce_save_post_sync_options).'" name="patreon-post-author-for-synced-posts" pw_input_target="#patreon-post-author-for-synced-posts-info" style="font-size:20px; display:inline-block;">'.$user_select.'</select><div id="patreon-post-author-for-synced-posts-info" style="clear:both;display:block;width:auto;"></div></div></div><div class="patreon_post_sync_choice"><div class="patreon_post_sync_choice_title">Update local posts from the ones at Patreon</div>'.PATREON_POST_SYNC_2.'<div style="display:block;margin-top:10px;width: 200px;"><select id="patreon-update-posts" patreon_wordpress_nonce_save_post_sync_options="'.esc_attr($patreon_wordpress_nonce_save_post_sync_options).'" name="patreon-update-posts" pw_input_target="#patreon-update-posts-info" style="font-size:20px; display:inline-block;"><option value="">Select</option><option value="yes" '.$update_posts_selected.'>Yes</option><option value="no"'.$update_posts_unselected.'>No</option></select><div id="patreon-update-posts-info" style=:clear:both;display:block;width:auto;""></div></div></div><div class="patreon_post_sync_choice"><div class="patreon_post_sync_choice_title">Delete local post when Patreon post is deleted</div>'.PATREON_POST_SYNC_3.'<div style="display:block;margin-top:10px;width: 200px;"><select name="patreon-remove-deleted-posts" id="patreon-remove-deleted-posts" patreon_wordpress_nonce_save_post_sync_options="'.esc_attr($patreon_wordpress_nonce_save_post_sync_options).'" pw_input_target="#patreon-remove-deleted-posts-info" style="font-size:20px;"><option value="">Select</option><option value="yes" '.$delete_posts_selected.'>Yes</option><option value="no" '.$delete_posts_unselected.'>No</option></select><div id="patreon-remove-deleted-posts-info" style="clear:both;display:block;width:auto;"></div></div></div></div><form style="display:inline-block;margin-right:10px;" method="post" action="'.esc_url(admin_url('admin.php?page=patreon_wordpress_setup_wizard&setup_stage=post_sync_2')).'"><p class="submit" style="margin-top: 10px;"><input type="submit" name="submit" id="submit" class="button button-large button-primary" value="Done!"></p><input type="hidden" name="patreon_wordpress_nonce_save_post_sync_options" value="'.esc_attr($patreon_wordpress_nonce_save_post_sync_options).'" /></form></div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Form markup, dynamic values escaped inline
 
             echo '</div>';
         }
@@ -2016,13 +2018,13 @@ class Patreon_Wordpress
 
             // Check if any post sync field
 
-            if (!isset($_POST['patreon_wordpress_nonce_save_post_sync_options']) or !wp_verify_nonce($_POST['patreon_wordpress_nonce_save_post_sync_options'])) {
+            if (!isset($_POST['patreon_wordpress_nonce_save_post_sync_options']) or !wp_verify_nonce(sanitize_key($_POST['patreon_wordpress_nonce_save_post_sync_options']))) {
                 echo '<div class="notice notice-info">Form security field expired - please refresh the page and try again</div>';
                 exit;
             }
 
-            if (isset($_REQUEST['patreon_message']) and '' != $_REQUEST['patreon_message']) {
-                $setup_message = Patreon_Frontend::$messages_map[$_REQUEST['patreon_message']];
+            if ('' != $patreon_message) {
+                $setup_message = Patreon_Frontend::$messages_map[$patreon_message] ?? '';
             }
 
             update_option('patreon-post-sync-set-up', true);
@@ -2037,9 +2039,9 @@ class Patreon_Wordpress
 
             echo '<div id="patreon_setup_screen">';
 
-            echo '<div id="patreon_setup_logo"><img src="'.PATREON_PLUGIN_ASSETS.'/img/Patreon_Logo_100.png" /></div>';
+            echo '<div id="patreon_setup_logo"><img src="'.esc_url(PATREON_PLUGIN_ASSETS.'/img/Patreon_Logo_100.png').'" /></div>';
 
-            echo '<div id="patreon_setup_content"><h1 style="margin-top: 0px;">Post sync set up!</h1><div id="patreon_setup_message">'.$setup_message.'</div><form style="display:inline-block;margin-right:10px;" method="post" action="'.admin_url('admin.php?page=patreon_wordpress_setup_wizard&setup_stage=final').'"><p class="submit" style="margin-top: 10px;"><input type="submit" name="submit" id="submit" class="button button-large button-primary" value="Got it!"></p></form></div>';
+            echo '<div id="patreon_setup_content"><h1 style="margin-top: 0px;">Post sync set up!</h1><div id="patreon_setup_message">'.wp_kses_post($setup_message).'</div><form style="display:inline-block;margin-right:10px;" method="post" action="'.esc_url(admin_url('admin.php?page=patreon_wordpress_setup_wizard&setup_stage=final')).'"><p class="submit" style="margin-top: 10px;"><input type="submit" name="submit" id="submit" class="button button-large button-primary" value="Got it!"></p></form></div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Form markup, dynamic values escaped inline
 
             echo '</div>';
         }
@@ -2059,13 +2061,13 @@ class Patreon_Wordpress
             $config_input = '';
 
             foreach ($config_info as $key => $value) {
-                $config_input .= '<input type="hidden" name="'.$key.'" value="'.$config_info[$key].'" />';
+                $config_input .= '<input type="hidden" name="'.esc_attr($key).'" value="'.esc_attr($config_info[$key]).'" />';
             }
 
             $setup_message = PATREON_RECONNECT_INITIAL_MESSAGE;
 
-            if (isset($_REQUEST['patreon_message']) and '' != $_REQUEST['patreon_message']) {
-                $setup_message = Patreon_Frontend::$messages_map[$_REQUEST['patreon_message']];
+            if ('' != $patreon_message) {
+                $setup_message = Patreon_Frontend::$messages_map[$patreon_message] ?? '';
             }
 
             // Create state var needed for identifying connection attempt
@@ -2076,11 +2078,11 @@ class Patreon_Wordpress
 
             echo '<div id="patreon_setup_screen">';
 
-            echo '<div id="patreon_setup_logo"><img src="'.PATREON_PLUGIN_ASSETS.'/img/Patreon_Logo_100.png" /></div>';
+            echo '<div id="patreon_setup_logo"><img src="'.esc_url(PATREON_PLUGIN_ASSETS.'/img/Patreon_Logo_100.png').'" /></div>';
 
             $api_endpoint = 'https://'.PATREON_HOST.'/oauth2/';
 
-            echo '<div id="patreon_setup_content"><h1 style="margin-top: 0px;">Reconnecting your site to Patreon</h1><div id="patreon_setup_message">'.$setup_message.'</div>'.$requirement_notices.'<form style="display:block;" method="get" action="'.$api_endpoint.'register-client-creation"><p class="submit" style="margin-top: 10px;"><input type="submit" name="submit" id="submit" class="button button-large button-primary" value="Let\'s start!"></p>'.$config_input.'<input type="hidden" name="client_id" value="'.PATREON_PLUGIN_CLIENT_ID.'" /><input type="hidden" name="redirect_uri" value="'.site_url().'/patreon-authorization/" /><input type="hidden" name="state" value="'.PatreonOauthStateUtil::encode_state($state).'" /><input type="hidden" name="scopes" value="w:identity.clients" /><input type="hidden" name="response_type" value="code" /></form></div>';
+            echo '<div id="patreon_setup_content"><h1 style="margin-top: 0px;">Reconnecting your site to Patreon</h1><div id="patreon_setup_message">'.wp_kses_post($setup_message).'</div>'.wp_kses_post($requirement_notices).'<form style="display:block;" method="get" action="'.esc_url($api_endpoint.'register-client-creation').'"><p class="submit" style="margin-top: 10px;"><input type="submit" name="submit" id="submit" class="button button-large button-primary" value="Let\'s start!"></p>'.$config_input.'<input type="hidden" name="client_id" value="'.esc_attr(PATREON_PLUGIN_CLIENT_ID).'" /><input type="hidden" name="redirect_uri" value="'.esc_url(site_url().'/patreon-authorization/').'" /><input type="hidden" name="state" value="'.esc_attr(PatreonOauthStateUtil::encode_state($state)).'" /><input type="hidden" name="scopes" value="w:identity.clients" /><input type="hidden" name="response_type" value="code" /></form></div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Form markup, dynamic values escaped inline
 
             echo '</div>';
         }
@@ -2088,20 +2090,20 @@ class Patreon_Wordpress
         if (isset($_REQUEST['setup_stage']) and 'reconnect_final' == $_REQUEST['setup_stage']) {
             $setup_message = PATREON_RECONNECT_SUCCESS_MESSAGE;
 
-            if (isset($_REQUEST['patreon_message']) and '' != $_REQUEST['patreon_message']) {
-                $setup_message = Patreon_Frontend::$messages_map[$_REQUEST['patreon_message']];
+            if ('' != $patreon_message) {
+                $setup_message = Patreon_Frontend::$messages_map[$patreon_message] ?? '';
             }
 
             echo '<div id="patreon_setup_screen">';
-            echo '<div id="patreon_setup_logo"><img src="'.PATREON_PLUGIN_ASSETS.'/img/Patreon_Logo_100.png" /></div>';
+            echo '<div id="patreon_setup_logo"><img src="'.esc_url(PATREON_PLUGIN_ASSETS.'/img/Patreon_Logo_100.png').'" /></div>';
 
-            echo '<div id="patreon_setup_content"><h1 style="margin-top: 5px;">Your site is now reconnected!</h1><div id="patreon_setup_message">'.$setup_message.'</div>';
+            echo '<div id="patreon_setup_content"><h1 style="margin-top: 5px;">Your site is now reconnected!</h1><div id="patreon_setup_message">'.wp_kses_post($setup_message).'</div>';
 
             echo '</div>';
 
             echo '<div id="patreon_success_inserts">';
 
-            echo '<a href="https://support.patreon.com/hc/en-us/articles/360032409172-Patreon-WordPress-Quickstart?utm_source='.urlencode(site_url()).'&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=setup_wizard_screen_3_quickstart_insert&utm_term=" target="_blank"><div class="patreon_success_insert"><div class="patreon_success_insert_logo"><img src="'.PATREON_PLUGIN_ASSETS.'/img/Learn-how-to-use-Patreon-WordPress.jpg" /></div><div class="patreon_success_insert_heading"><h3>Quickstart guide</h3></div><div class="patreon_success_insert_content"><br clear="both">Click here to read our quickstart guide and learn how to lock your content</div></div></a>';
+            echo '<a href="https://support.patreon.com/hc/en-us/articles/360032409172-Patreon-WordPress-Quickstart?utm_source='.urlencode(site_url()).'&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=setup_wizard_screen_3_quickstart_insert&utm_term=" target="_blank"><div class="patreon_success_insert"><div class="patreon_success_insert_logo"><img src="'.esc_url(PATREON_PLUGIN_ASSETS.'/img/Learn-how-to-use-Patreon-WordPress.jpg').'" /></div><div class="patreon_success_insert_heading"><h3>Quickstart guide</h3></div><div class="patreon_success_insert_content"><br clear="both">Click here to read our quickstart guide and learn how to lock your content</div></div></a>';
 
             echo '</div>';
         }
