@@ -24,18 +24,18 @@ class patreon_wordpress_login_widget extends WP_Widget
         $title = apply_filters('widget_title', $instance['title']);
         $message = $instance['message'];
 
-        echo $before_widget;
+        echo $before_widget; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Markup provided by the theme
 
         if ($title) {
-            echo $before_title.$title.$after_title;
+            echo $before_title.wp_kses_post($title).$after_title; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Markup provided by the theme
         }
         if (isset($message) and '' != $message) {
-            echo '<p>'.$message.'</p>';
+            echo '<p>'.esc_html($message).'</p>';
         }
 
-        echo Patreon_Frontend::login_widget();
+        echo Patreon_Frontend::login_widget(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML built and escaped by Patreon_Frontend
 
-        echo $after_widget;
+        echo $after_widget; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Markup provided by the theme
     }
 
     /** @see WP_Widget::update -- do not rename this */
@@ -52,20 +52,20 @@ class patreon_wordpress_login_widget extends WP_Widget
     public function form($instance)
     {
         $instance = wp_parse_args((array) $instance, ['title' => PATREON_LOGIN_WIDGET_NAME, 'message' => '']);
-        $title = esc_attr($instance['title']);
-        $message = esc_attr($instance['message']);
+        $title = $instance['title'];
+        $message = $instance['message'];
 
         ?>
         <p>
-          <label for="<?php echo $this->get_field_id('title'); ?>">Title:</label>
-          <input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo $title; ?>" />
+          <label for="<?php echo esc_attr($this->get_field_id('title')); ?>">Title:</label>
+          <input class="widefat" id="<?php echo esc_attr($this->get_field_id('title')); ?>" name="<?php echo esc_attr($this->get_field_name('title')); ?>" type="text" value="<?php echo esc_attr($title); ?>" />
         </p>
         <p>
-          <label for="<?php echo $this->get_field_id('message'); ?>"><?php echo 'Message over login button - optional'; ?></label>
-          <input class="widefat" id="<?php echo $this->get_field_id('message'); ?>" name="<?php echo $this->get_field_name('message'); ?>" type="text" value="<?php echo $message; ?>" />
+          <label for="<?php echo esc_attr($this->get_field_id('message')); ?>">Message over login button - optional</label>
+          <input class="widefat" id="<?php echo esc_attr($this->get_field_id('message')); ?>" name="<?php echo esc_attr($this->get_field_name('message')); ?>" type="text" value="<?php echo esc_attr($message); ?>" />
         </p>
         <p>
-          <?php echo Patreon_Frontend::login_widget(); ?>
+          <?php echo Patreon_Frontend::login_widget(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML built and escaped by Patreon_Frontend?>
         </p>
 
         <?php
