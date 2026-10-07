@@ -2335,8 +2335,8 @@ class Patreon_Wordpress
                         $tier_title = $reward['attributes']['title'];
 
                         // If the title is too long, snip it
-                        if (strlen($tier_title) > 23) {
-                            $tier_title = substr($tier_title, 0, 23).'...';
+                        if (mb_strlen($tier_title) > 23) {
+                            $tier_title = mb_substr($tier_title, 0, 23).'...';
                         }
                     }
 
@@ -2359,7 +2359,7 @@ class Patreon_Wordpress
                     }
                 }
 
-                $select_options .= '<option value="'.($reward['attributes']['amount_cents'] / 100).'"'.$selected.'>'.$label.'</option>';
+                $select_options .= '<option value="'.esc_attr($reward['attributes']['amount_cents'] / 100).'"'.$selected.'>'.esc_html($label).'</option>';
             }
         }
 

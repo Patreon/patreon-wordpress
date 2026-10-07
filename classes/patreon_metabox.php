@@ -77,21 +77,21 @@ class Patron_Metabox
 
         ?>
         <p>
-            <label for="patreon-level"><?php echo $label; ?></label>
+            <label for="patreon-level"><?php echo wp_kses_post($label); ?></label>
             <br><br>
-            <div id="patreon_level_select_wrapper" class="selector-row"><div class="selector-col"><select id="patreon_level_select" name="patreon-level"<?php echo $disabled; ?> pw_post_id="<?php echo $object->ID; ?>"><option value="<?php echo get_post_meta($object->ID, 'patreon-level', true); ?>"><?php echo Patreon_Wordpress::make_tiers_select($post); ?></option></select></div><div class="refresh-col"><img id="patreon_level_refresh" src="<?php echo PATREON_PLUGIN_ASSETS; ?>/img/refresh_tiers_18.png" style="width: 18px; height: 18px;" patreon_wordpress_nonce_populate_tier_dropdown="<?php echo wp_create_nonce('patreon_wordpress_nonce_populate_tier_dropdown'); ?>" /></div></div>
+            <div id="patreon_level_select_wrapper" class="selector-row"><div class="selector-col"><select id="patreon_level_select" name="patreon-level"<?php echo esc_attr($disabled); ?> pw_post_id="<?php echo esc_attr($object->ID); ?>"><option value="<?php echo esc_attr(get_post_meta($object->ID, 'patreon-level', true)); ?>"><?php echo Patreon_Wordpress::make_tiers_select($post); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML built and escaped by make_tiers_select()?></option></select></div><div class="refresh-col"><img id="patreon_level_refresh" src="<?php echo esc_url(PATREON_PLUGIN_ASSETS.'/img/refresh_tiers_18.png'); ?>" style="width: 18px; height: 18px;" patreon_wordpress_nonce_populate_tier_dropdown="<?php echo esc_attr(wp_create_nonce('patreon_wordpress_nonce_populate_tier_dropdown')); ?>" /></div></div>
         </p>
 
         <?php
 
-            $advanced_post_options_toggle_status_display = 'style=" display: block;" ';
+            $advanced_post_options_toggle_status_display = 'block';
 
         if ('' == $advanced_post_options_toggle_status or 'off' == $advanced_post_options_toggle_status) {
-            $advanced_post_options_toggle_status_display = 'style=" display: none;" ';
+            $advanced_post_options_toggle_status_display = 'none';
         }
         ?>
 
-        <div <?php echo $advanced_post_options_toggle_status_display; ?>id="patreon-wordpress-advanced-options-toggle">
+        <div style=" display: <?php echo esc_attr($advanced_post_options_toggle_status_display); ?>;" id="patreon-wordpress-advanced-options-toggle">
         <?php
 
             $label = '(If you set a precise amount in advanced settings below, or had one set before, that will be used instead.) <br><br>Require the below precise $ monthly membership or over to view this post. (optional - overrides the above select box when used)  <a href="https://www.patreondevelopers.com/t/patreon-wordpress-locking-options-guide/1135#heading--section-11?utm_source='.urlencode(site_url()).'&utm_medium=patreon_wordpress_plugin&utm_campaign=&utm_content=post_locking_metabox_link_2&utm_term=" target="_blank">(?)</a>';
@@ -109,9 +109,9 @@ class Patron_Metabox
         ?>
 
             <p>
-                <label for="patreon-level-exact"><?php echo $label; ?></label>
+                <label for="patreon-level-exact"><?php echo wp_kses_post($label); ?></label>
                 <br><br>
-                <strong>&#36; </strong><input type="text" id="patreon-level-exact" name="patreon-level-exact" value="<?php echo get_post_meta($object->ID, 'patreon-level', true); ?>" <?php echo $readonly; ?>>
+                <strong>&#36; </strong><input type="text" id="patreon-level-exact" name="patreon-level-exact" value="<?php echo esc_attr(get_post_meta($object->ID, 'patreon-level', true)); ?>" <?php echo esc_attr($readonly); ?>>
             </p>
 
             <?php
@@ -126,9 +126,9 @@ class Patron_Metabox
 
         ?>
             <p>
-                <label for="patreon-active-patrons-only"><?php echo $label; ?></label>
+                <label for="patreon-active-patrons-only"><?php echo wp_kses_post($label); ?></label>
                 <br><br>
-                <input type="checkbox" name="patreon-active-patrons-only" value="1" <?php checked(get_post_meta($object->ID, 'patreon-active-patrons-only', true), true, true); ?> <?php echo $readonly; ?> /> Yes
+                <input type="checkbox" name="patreon-active-patrons-only" value="1" <?php checked(get_post_meta($object->ID, 'patreon-active-patrons-only', true), true, true); ?> <?php echo esc_attr($readonly); ?> /> Yes
             </p>
 
             <?php
@@ -143,9 +143,9 @@ class Patron_Metabox
 
         ?>
             <p>
-                <label for="patreon-total-patronage-level"><?php echo $label; ?></label>
+                <label for="patreon-total-patronage-level"><?php echo wp_kses_post($label); ?></label>
                 <br><br>
-                <strong>&#36; </strong><input type="text" id="patreon-total-patronage-level" name="patreon-total-patronage-level" value="<?php echo get_post_meta($object->ID, 'patreon-total-patronage-level', true); ?>" <?php echo $readonly; ?>>
+                <strong>&#36; </strong><input type="text" id="patreon-total-patronage-level" name="patreon-total-patronage-level" value="<?php echo esc_attr(get_post_meta($object->ID, 'patreon-total-patronage-level', true)); ?>" <?php echo esc_attr($readonly); ?>>
             </p>
 
         </div>
@@ -161,7 +161,7 @@ class Patron_Metabox
         }
         ?>
 
-        <a href="" toggle="patreon-wordpress-advanced-options-toggle" patreon_wordpress_advanced_options_toggle_nonce="<?php echo wp_create_nonce(); ?>" togglestatus="<?php echo $advanced_post_options_toggle_status; ?>" ontext="Hide advanced" offtext="Show advanced" class="patreon-wordpress-admin-toggle"><?php echo $advanced_post_options_toggle_text; ?></a>
+        <a href="" toggle="patreon-wordpress-advanced-options-toggle" patreon_wordpress_advanced_options_toggle_nonce="<?php echo esc_attr(wp_create_nonce()); ?>" togglestatus="<?php echo esc_attr($advanced_post_options_toggle_status); ?>" ontext="Hide advanced" offtext="Show advanced" class="patreon-wordpress-admin-toggle"><?php echo esc_html($advanced_post_options_toggle_text); ?></a>
 
         <?php
 
@@ -169,7 +169,7 @@ class Patron_Metabox
 
     public function patreon_plugin_save_post_class_meta($post_id, $post)
     {
-        if (!isset($_POST['patreon_metabox_nonce']) || !wp_verify_nonce($_POST['patreon_metabox_nonce'], basename(__FILE__))) {
+        if (!isset($_POST['patreon_metabox_nonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['patreon_metabox_nonce'])), basename(__FILE__))) {
             return $post_id;
         }
 
@@ -180,7 +180,7 @@ class Patron_Metabox
         }
 
         if (isset($_POST['patreon-level']) && is_numeric($_POST['patreon-level'])) {
-            $new_patreon_level = $_POST['patreon-level'];
+            $new_patreon_level = sanitize_text_field(wp_unslash($_POST['patreon-level']));
         } else {
             $new_patreon_level = 0;
         }
@@ -191,7 +191,7 @@ class Patron_Metabox
 
         if (isset($_POST['patreon-level-exact']) && is_numeric($_POST['patreon-level-exact'])) {
             if ($_POST['patreon-level-exact'] != $patreon_level) {
-                $new_patreon_level = $_POST['patreon-level-exact'];
+                $new_patreon_level = sanitize_text_field(wp_unslash($_POST['patreon-level-exact']));
             }
         }
 
@@ -206,7 +206,7 @@ class Patron_Metabox
 
         // Handles lifetime patronage value
         if (isset($_POST['patreon-total-patronage-level']) && is_numeric($_POST['patreon-total-patronage-level'])) {
-            $new_patreon_lifetime_patronage_level = $_POST['patreon-total-patronage-level'];
+            $new_patreon_lifetime_patronage_level = sanitize_text_field(wp_unslash($_POST['patreon-total-patronage-level']));
         } else {
             $new_patreon_lifetime_patronage_level = 0;
         }
