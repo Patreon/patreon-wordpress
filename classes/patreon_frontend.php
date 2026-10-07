@@ -421,12 +421,12 @@ class Patreon_Frontend
             $label = PATREON_TEXT_OVER_BUTTON_15;
         }
 
-        $label = apply_filters('ptrn/label_text_over_universal_button_raw', $label, $args['reason'], $user_logged_into_patreon, $is_patron, $args, $post, $creator_full_name, $patreon_level, $post_total_patronage_level, $creator_url, strip_tags($tier_title), self::patreonMakeCacheableFlowLink($post));
+        $label = apply_filters('ptrn/label_text_over_universal_button_raw', $label, $args['reason'], $user_logged_into_patreon, $is_patron, $args, $post, $creator_full_name, $patreon_level, $post_total_patronage_level, $creator_url, wp_strip_all_tags($tier_title), self::patreonMakeCacheableFlowLink($post));
 
         $label = str_replace('%%creator_link%%', $creator_url, $label);
         $label = str_replace('%%creator%%', $creator_full_name, $label);
         $label = str_replace('%%pledgelevel%%', $patreon_level, $label);
-        $label = str_replace('%%tier_level%%', strip_tags($tier_title), $label);
+        $label = str_replace('%%tier_level%%', wp_strip_all_tags($tier_title), $label);
         $label = str_replace('%%flow_link%%', self::patreonMakeCacheableFlowLink($post), $label);
         $label = str_replace('%%total_pledge%%', $post_total_patronage_level, $label);
 
@@ -1252,7 +1252,7 @@ class Patreon_Frontend
         $creator_url .= $append_with.$utm_params;
 
         $label = str_replace('%%creator_link%%', $creator_url, $label);
-        $label = str_replace('%%tier_level%%', strip_tags($tier_title), $label);
+        $label = str_replace('%%tier_level%%', wp_strip_all_tags($tier_title), $label);
         $label = str_replace('%%creator%%', $creator_full_name, $label);
         $label = str_replace('%%pledgelevel%%', $patreon_level, $label);
         $label = str_replace('%%flow_link%%', self::patreonMakeCacheableFlowLink(), $label);

@@ -1520,7 +1520,7 @@ class Patreon_Wordpress
         // Adds action links to plugin listing in WP plugin admin
 
         $links = array_merge([
-            '<a href="'.esc_url(admin_url('admin.php?page=patreon-plugin')).'">'.__('Settings', 'textdomain').'</a>'], $links);
+            '<a href="'.esc_url(admin_url('admin.php?page=patreon-plugin')).'">Settings</a>'], $links);
 
         return $links;
     }
@@ -1777,7 +1777,7 @@ class Patreon_Wordpress
     {
         // Collects app information from WP site to be used in client settins at Patreon
 
-        $parsed_home_url = parse_url(get_bloginfo('url'));
+        $parsed_home_url = wp_parse_url(get_bloginfo('url'));
 
         $company_domain = $parsed_home_url['host'];
 
@@ -2827,8 +2827,8 @@ class Patreon_Wordpress
         }
 
         $terms = get_terms(
-            $selected_taxonomy,
             [
+                'taxonomy' => $selected_taxonomy,
                 'hide_empty' => false,
                 'parent' => 0,
                 'orderby' => 'description',
@@ -2970,7 +2970,7 @@ class Patreon_Wordpress
         foreach ($images as $image) {
             $url = $image->getAttribute('src');
 
-            $details = parse_url($url);
+            $details = wp_parse_url($url);
 
             $exploded_path = array_reverse(explode('/', $details['path']));
 
@@ -3124,7 +3124,7 @@ class Patreon_Wordpress
     {
         $schedules['patreon_five_minute_cron_schedule'] = [
             'interval' => 300, // 5 min
-            'display' => __('Patreon cron - every five minutes'),
+            'display' => 'Patreon cron - every five minutes',
         ];
 
         return $schedules;

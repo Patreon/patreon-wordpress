@@ -42,8 +42,8 @@ class patreon_wordpress_login_widget extends WP_Widget
     public function update($new_instance, $old_instance)
     {
         $instance = $old_instance;
-        $instance['title'] = strip_tags($new_instance['title']);
-        $instance['message'] = strip_tags($new_instance['message']);
+        $instance['title'] = wp_strip_all_tags($new_instance['title']);
+        $instance['message'] = wp_strip_all_tags($new_instance['message']);
 
         return $instance;
     }
@@ -57,7 +57,7 @@ class patreon_wordpress_login_widget extends WP_Widget
 
         ?>
         <p>
-          <label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:'); ?></label>
+          <label for="<?php echo $this->get_field_id('title'); ?>">Title:</label>
           <input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo $title; ?>" />
         </p>
         <p>
