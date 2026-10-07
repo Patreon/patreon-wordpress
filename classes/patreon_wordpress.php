@@ -1179,7 +1179,7 @@ class Patreon_Wordpress
         }
 
         if ('app_credential_error' == $import_return) {
-            echo $import_return;
+            echo 'app_credential_error';
             exit;
         }
 
@@ -1275,9 +1275,9 @@ class Patreon_Wordpress
             exit;
         }
 
-        update_option('patreon-sync-post-type', $_REQUEST['patreon_sync_post_type']);
-        update_option('patreon-sync-post-category', $_REQUEST['patreon_sync_post_category']);
-        update_option('patreon-sync-post-term', $_REQUEST['patreon_sync_post_term']);
+        update_option('patreon-sync-post-type', sanitize_key(wp_unslash($_REQUEST['patreon_sync_post_type'])));
+        update_option('patreon-sync-post-category', sanitize_key(wp_unslash($_REQUEST['patreon_sync_post_category'])));
+        update_option('patreon-sync-post-term', absint(wp_unslash($_REQUEST['patreon_sync_post_term'])));
 
         echo 'Saved!';
         exit;
@@ -1304,7 +1304,7 @@ class Patreon_Wordpress
             exit;
         }
 
-        update_option('patreon-post-author-for-synced-posts', $_REQUEST['patreon_post_author_for_post_sync']);
+        update_option('patreon-post-author-for-synced-posts', absint(wp_unslash($_REQUEST['patreon_post_author_for_post_sync'])));
 
         echo 'Saved!';
         exit;
@@ -1321,11 +1321,11 @@ class Patreon_Wordpress
             exit;
         }
 
-        if ('yes' == $_REQUEST['update_posts_option_value']) {
+        if (isset($_REQUEST['update_posts_option_value']) and 'yes' == $_REQUEST['update_posts_option_value']) {
             update_option('patreon-update-posts', 'yes');
         }
 
-        if ('no' == $_REQUEST['update_posts_option_value']) {
+        if (isset($_REQUEST['update_posts_option_value']) and 'no' == $_REQUEST['update_posts_option_value']) {
             update_option('patreon-update-posts', 'no');
         }
 
@@ -1344,11 +1344,11 @@ class Patreon_Wordpress
             exit;
         }
 
-        if ('yes' == $_REQUEST['delete_posts_option_value']) {
+        if (isset($_REQUEST['delete_posts_option_value']) and 'yes' == $_REQUEST['delete_posts_option_value']) {
             update_option('patreon-remove-deleted-posts', 'yes');
         }
 
-        if ('no' == $_REQUEST['delete_posts_option_value']) {
+        if (isset($_REQUEST['delete_posts_option_value']) and 'no' == $_REQUEST['delete_posts_option_value']) {
             update_option('patreon-remove-deleted-posts', 'no');
         }
 
@@ -1478,7 +1478,7 @@ class Patreon_Wordpress
 
         $current_user = wp_get_current_user();
 
-        $option_to_toggle = sanitize_key($_REQUEST['toggle_id']);
+        $option_to_toggle = isset($_REQUEST['toggle_id']) ? sanitize_key($_REQUEST['toggle_id']) : '';
 
         // Bail out if the option to be toggled is not in the allowed options
         if (!array_key_exists($option_to_toggle, Patreon_Frontend::$allowed_toggles)) {
@@ -1486,7 +1486,7 @@ class Patreon_Wordpress
         }
 
         // Bail out if the option to be toggled is not in the allowed options
-        if (!wp_verify_nonce(sanitize_key($_REQUEST['patreon_wordpress_advanced_options_toggle_nonce']))) {
+        if (!isset($_REQUEST['patreon_wordpress_advanced_options_toggle_nonce']) or !wp_verify_nonce(sanitize_key($_REQUEST['patreon_wordpress_advanced_options_toggle_nonce']))) {
             return;
         }
 
@@ -2256,7 +2256,7 @@ class Patreon_Wordpress
             exit;
         }
 
-        if (!isset($_POST['patreon_wordpress_nonce_populate_tier_dropdown']) or !wp_verify_nonce($_POST['patreon_wordpress_nonce_populate_tier_dropdown'], 'patreon_wordpress_nonce_populate_tier_dropdown')) {
+        if (!isset($_POST['patreon_wordpress_nonce_populate_tier_dropdown']) or !wp_verify_nonce(sanitize_key($_POST['patreon_wordpress_nonce_populate_tier_dropdown']), 'patreon_wordpress_nonce_populate_tier_dropdown')) {
             echo 'Form security field expired - please refresh the page and try again';
             exit;
         }
@@ -2274,9 +2274,9 @@ class Patreon_Wordpress
 
         Patreon_Wordpress::update_creator_tiers_from_api();
 
-        $post = get_post($_REQUEST['pw_post_id']);
+        $post = get_post(absint(wp_unslash($_REQUEST['pw_post_id'])));
 
-        echo Patreon_Wordpress::make_tiers_select($post);
+        echo Patreon_Wordpress::make_tiers_select($post); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML built and escaped by make_tiers_select()
         exit;
     }
 
@@ -2808,7 +2808,7 @@ class Patreon_Wordpress
             return $select;
         }
 
-        echo $select;
+        echo $select; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Options escaped as they are built above
         exit;
     }
 
@@ -2854,7 +2854,7 @@ class Patreon_Wordpress
             return $select;
         }
 
-        echo $select;
+        echo $select; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Options escaped as they are built above
         exit;
     }
 
@@ -2864,7 +2864,7 @@ class Patreon_Wordpress
         $select = '';
 
         if (isset($_REQUEST['patreon-post-author-for-synced-posts'])) {
-            $selected_user = $_REQUEST['patreon-post-author-for-synced-posts'];
+            $selected_user = absint(wp_unslash($_REQUEST['patreon-post-author-for-synced-posts']));
             $return = false;
         }
 
@@ -2912,7 +2912,7 @@ class Patreon_Wordpress
             return $select;
         }
 
-        echo $select;
+        echo $select; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Options escaped as they are built above
         exit;
     }
 
