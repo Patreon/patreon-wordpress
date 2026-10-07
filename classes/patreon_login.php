@@ -149,14 +149,10 @@ class Patreon_Login
 
         global $wpdb;
 
-        $prepared_sql = $wpdb->prepare(
+        $patreon_linked_accounts = $wpdb->get_results($wpdb->prepare(
             'SELECT * FROM '.$wpdb->usermeta." WHERE meta_key = 'patreon_user_id' AND meta_value = %s",
             [$patreon_user_id]
-        );
-
-        // Now get the result :
-
-        $patreon_linked_accounts = $wpdb->get_results($prepared_sql, ARRAY_A);
+        ), ARRAY_A);
 
         if (count($patreon_linked_accounts) > 0) {
             // //////////////////////////////////////////////

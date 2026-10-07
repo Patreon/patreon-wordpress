@@ -2918,13 +2918,13 @@ class Patreon_Wordpress
     {
         global $wpdb;
 
-        $query = $wpdb->prepare(
+        $attachment_id = $wpdb->get_var($wpdb->prepare(
             "SELECT ID FROM $wpdb->posts WHERE post_type = 'attachment' AND post_name = %s",
             $filename
-        );
+        ));
 
-        if (null !== $wpdb->get_var($query)) {
-            return $wpdb->get_var($query);
+        if (null !== $attachment_id) {
+            return $attachment_id;
         }
 
         return false;

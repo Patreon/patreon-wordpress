@@ -472,22 +472,19 @@ class Patreon_Compatibility
             return false;
         }
 
+        $post_categories = [];
+
         if (isset($post->post_type) && 'post' == $post->post_type) {
             $post_categories = wp_get_post_categories($post->ID);
-
-            if (!$post_categories) {
-                // just check for entries in the memberships_pages table
-                $sqlQuery = "SELECT m.id, m.name FROM $wpdb->pmpro_memberships_pages mp LEFT JOIN $wpdb->pmpro_membership_levels m ON mp.membership_id = m.id WHERE mp.page_id = '".$post->ID."'";
-            } else {
-                // are any of the post categories associated with membership levels? also check the memberships_pages table
-                $sqlQuery = "(SELECT m.id, m.name FROM $wpdb->pmpro_memberships_categories mc LEFT JOIN $wpdb->pmpro_membership_levels m ON mc.membership_id = m.id WHERE mc.category_id IN(".implode(',', $post_categories).") AND m.id IS NOT NULL) UNION (SELECT m.id, m.name FROM $wpdb->pmpro_memberships_pages mp LEFT JOIN $wpdb->pmpro_membership_levels m ON mp.membership_id = m.id WHERE mp.page_id = '".$post->ID."')";
-            }
-        } else {
-            // are any membership levels associated with this page?
-            $sqlQuery = "SELECT m.id, m.name FROM $wpdb->pmpro_memberships_pages mp LEFT JOIN $wpdb->pmpro_membership_levels m ON mp.membership_id = m.id WHERE mp.page_id = '".$post->ID."'";
         }
 
-        $post_membership_levels = $wpdb->get_results($sqlQuery);
+        if ($post_categories) {
+            // are any of the post categories associated with membership levels? also check the memberships_pages table
+            $post_membership_levels = $wpdb->get_results($wpdb->prepare("(SELECT m.id, m.name FROM $wpdb->pmpro_memberships_categories mc LEFT JOIN $wpdb->pmpro_membership_levels m ON mc.membership_id = m.id WHERE mc.category_id IN(".implode(',', array_fill(0, count($post_categories), '%d')).") AND m.id IS NOT NULL) UNION (SELECT m.id, m.name FROM $wpdb->pmpro_memberships_pages mp LEFT JOIN $wpdb->pmpro_membership_levels m ON mp.membership_id = m.id WHERE mp.page_id = %d)", array_merge($post_categories, [$post->ID])));
+        } else {
+            // are any membership levels associated with this page?
+            $post_membership_levels = $wpdb->get_results($wpdb->prepare("SELECT m.id, m.name FROM $wpdb->pmpro_memberships_pages mp LEFT JOIN $wpdb->pmpro_membership_levels m ON mp.membership_id = m.id WHERE mp.page_id = %d", $post->ID));
+        }
 
         $post_membership_level_ids = [];
 
