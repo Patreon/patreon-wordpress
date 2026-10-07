@@ -187,7 +187,7 @@ class Patreon_Content_Sync
             }
         }
 
-        $post_date = date('Y-m-d H:i:s', time());
+        $post_date = gmdate('Y-m-d H:i:s', time());
 
         if ('yes' == get_option('patreon-override-synced-post-publish-date', 'no')) {
             $utc_timezone = new DateTimeZone('UTC');
