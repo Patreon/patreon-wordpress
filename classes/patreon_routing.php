@@ -414,16 +414,22 @@ class Patreon_Routing
         if (array_key_exists('code', $wp->query_vars)) {
             // Get state vars if they exist
 
+            $state = [];
+
             if ('' != $wp->query_vars['state']) {
                 $state = json_decode(base64_decode(urldecode($wp->query_vars['state'])), true);
             }
 
+            if (!is_array($state)) {
+                $state = [];
+            }
+
             $redirect = false;
 
-            // Check if final_redirect exists in state vars - if so, override redirect:
+            // Check if final_redirect exists in state vars - if so, override redirect. State comes from the request, so only allow redirects to this site:
 
-            if (isset($state['final_redirect_uri']) and '' != $state['final_redirect_uri']) {
-                $redirect = $state['final_redirect_uri'];
+            if (isset($state['final_redirect_uri']) and is_string($state['final_redirect_uri']) and '' != $state['final_redirect_uri']) {
+                $redirect = wp_validate_redirect($state['final_redirect_uri'], home_url());
             }
 
             if (isset($state['patreon_action'])) {
