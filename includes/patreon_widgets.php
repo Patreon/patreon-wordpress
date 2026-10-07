@@ -42,8 +42,8 @@ class patreon_wordpress_login_widget extends WP_Widget
     public function update($new_instance, $old_instance)
     {
         $instance = $old_instance;
-        $instance['title'] = strip_tags($new_instance['title']);
-        $instance['message'] = strip_tags($new_instance['message']);
+        $instance['title'] = wp_strip_all_tags($new_instance['title']);
+        $instance['message'] = wp_strip_all_tags($new_instance['message']);
 
         return $instance;
     }
