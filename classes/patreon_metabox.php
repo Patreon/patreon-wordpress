@@ -26,7 +26,7 @@ class Patron_Metabox
         if (false == in_array($post_type, $exclude) && in_array($post_type, $post_types)) {
             add_meta_box(
                 'patreon-level',      // Unique ID
-                esc_html__('Patreon Level', 'Patreon Contribution Requirement'),
+                'Patreon Level',
                 [$this, 'patreon_plugin_meta_box'],
                 $post_type,
                 'side',
@@ -77,7 +77,7 @@ class Patron_Metabox
 
         ?>
         <p>
-            <label for="patreon-level"><?php _e($label, '1'); ?></label>
+            <label for="patreon-level"><?php echo $label; ?></label>
             <br><br>
             <div id="patreon_level_select_wrapper" class="selector-row"><div class="selector-col"><select id="patreon_level_select" name="patreon-level"<?php echo $disabled; ?> pw_post_id="<?php echo $object->ID; ?>"><option value="<?php echo get_post_meta($object->ID, 'patreon-level', true); ?>"><?php echo Patreon_Wordpress::make_tiers_select($post); ?></option></select></div><div class="refresh-col"><img id="patreon_level_refresh" src="<?php echo PATREON_PLUGIN_ASSETS; ?>/img/refresh_tiers_18.png" style="width: 18px; height: 18px;" patreon_wordpress_nonce_populate_tier_dropdown="<?php echo wp_create_nonce('patreon_wordpress_nonce_populate_tier_dropdown'); ?>" /></div></div>
         </p>
@@ -109,7 +109,7 @@ class Patron_Metabox
         ?>
 
             <p>
-                <label for="patreon-level-exact"><?php _e($label, '1'); ?></label>
+                <label for="patreon-level-exact"><?php echo $label; ?></label>
                 <br><br>
                 <strong>&#36; </strong><input type="text" id="patreon-level-exact" name="patreon-level-exact" value="<?php echo get_post_meta($object->ID, 'patreon-level', true); ?>" <?php echo $readonly; ?>>
             </p>
@@ -126,7 +126,7 @@ class Patron_Metabox
 
         ?>
             <p>
-                <label for="patreon-active-patrons-only"><?php _e($label, '1'); ?></label>
+                <label for="patreon-active-patrons-only"><?php echo $label; ?></label>
                 <br><br>
                 <input type="checkbox" name="patreon-active-patrons-only" value="1" <?php checked(get_post_meta($object->ID, 'patreon-active-patrons-only', true), true, true); ?> <?php echo $readonly; ?> /> Yes
             </p>
@@ -143,7 +143,7 @@ class Patron_Metabox
 
         ?>
             <p>
-                <label for="patreon-total-patronage-level"><?php _e($label, '1'); ?></label>
+                <label for="patreon-total-patronage-level"><?php echo $label; ?></label>
                 <br><br>
                 <strong>&#36; </strong><input type="text" id="patreon-total-patronage-level" name="patreon-total-patronage-level" value="<?php echo get_post_meta($object->ID, 'patreon-total-patronage-level', true); ?>" <?php echo $readonly; ?>>
             </p>

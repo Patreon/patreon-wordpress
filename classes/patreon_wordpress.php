@@ -1520,7 +1520,7 @@ class Patreon_Wordpress
         // Adds action links to plugin listing in WP plugin admin
 
         $links = array_merge([
-            '<a href="'.esc_url(admin_url('admin.php?page=patreon-plugin')).'">'.__('Settings', 'textdomain').'</a>'], $links);
+            '<a href="'.esc_url(admin_url('admin.php?page=patreon-plugin')).'">Settings</a>'], $links);
 
         return $links;
     }
@@ -3124,7 +3124,7 @@ class Patreon_Wordpress
     {
         $schedules['patreon_five_minute_cron_schedule'] = [
             'interval' => 300, // 5 min
-            'display' => __('Patreon cron - every five minutes'),
+            'display' => 'Patreon cron - every five minutes',
         ];
 
         return $schedules;
