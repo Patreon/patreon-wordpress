@@ -648,6 +648,7 @@
 				data: {
 					action: 'patreon_wordpress_get_taxonomies_for_post_type',
 					patreon_wordpress_post_type: patreon_wordpress_post_type,
+					patreon_wordpress_nonce_post_sync: pw_admin_js.patreon_wordpress_nonce_post_sync,
 				},
 				success: function( response ) {
 					if( response == '' ) {
@@ -693,6 +694,7 @@
 				data: {
 					action: 'patreon_wordpress_get_terms_for_taxonomy',
 					patreon_sync_post_category: patreon_sync_post_category,
+					patreon_wordpress_nonce_post_sync: pw_admin_js.patreon_wordpress_nonce_post_sync,
 				},
 				success: function( response ) {
 					if( response == '' ) {

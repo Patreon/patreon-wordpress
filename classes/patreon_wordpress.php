@@ -97,30 +97,18 @@ class Patreon_Wordpress
         add_action('wp_ajax_patreon_wordpress_populate_patreon_level_select', [$this, 'populate_patreon_level_select_from_ajax'], 10, 1);
         add_action('plugin_action_links_'.PATREON_WORDPRESS_PLUGIN_SLUG, [$this, 'add_plugin_action_links'], 10, 1);
         add_action('wp_ajax_patreon_make_attachment_pledge_editor', [self::$patreon_protect, 'makeAttachmentPledgeEditor']);
-        add_action('wp_ajax_nopriv_patreon_make_attachment_pledge_editor', [self::$patreon_protect, 'makeAttachmentPledgeEditor']);
         add_action('wp_ajax_patreon_save_attachment_patreon_level', [self::$patreon_protect, 'saveAttachmentLevel']);
-        add_action('wp_ajax_nopriv_patreon_save_attachment_patreon_level', [self::$patreon_protect, 'saveAttachmentLevel']);
         add_action('wp_ajax_patreon_wordpress_start_post_import', [$this, 'start_post_import']);
-        add_action('wp_ajax_nopriv_patreon_wordpress_start_post_import', [$this, 'start_post_import']);
         add_action('wp_ajax_patreon_wordpress_import_next_batch_of_posts', [$this, 'import_next_batch_of_posts']);
-        add_action('wp_ajax_nopriv_patreon_wordpress_import_next_batch_of_posts', [$this, 'import_next_batch_of_posts']);
         add_action('wp_ajax_patreon_wordpress_cancel_manual_post_import', [$this, 'cancel_manual_post_import']);
-        add_action('wp_ajax_nopriv_patreon_wordpress_cancel_manual_post_import', [$this, 'cancel_manual_post_import']);
         add_action('wp_ajax_patreon_wordpress_set_update_posts_option', [$this, 'set_update_posts_option']);
-        add_action('wp_ajax_nopriv_patreon_wordpress_set_update_posts_option', [$this, 'set_update_posts_option']);
         add_action('wp_ajax_patreon_wordpress_set_delete_posts_option', [$this, 'set_delete_posts_option']);
-        add_action('wp_ajax_nopriv_patreon_wordpress_set_delete_posts_option', [$this, 'set_delete_posts_option']);
         add_action('wp_ajax_patreon_wordpress_get_taxonomies_for_post_type', [$this, 'make_taxonomy_select']);
-        add_action('wp_ajax_nopriv_patreon_wordpress_get_taxonomies_for_post_type', [$this, 'make_taxonomy_select']);
         add_action('wp_ajax_patreon_wordpress_get_terms_for_taxonomy', [$this, 'make_term_select']);
-        add_action('wp_ajax_nopriv_patreon_wordpress_get_terms_for_taxonomy', [$this, 'make_term_select']);
         add_action('wp_ajax_patreon_wordpress_save_post_sync_category', [$this, 'save_post_sync_category']);
-        add_action('wp_ajax_nopriv_patreon_wordpress_save_post_sync_category', [$this, 'save_post_sync_category']);
         add_action('wp_ajax_patreon_wordpress_set_post_author_for_post_sync', [$this, 'set_post_author_for_post_sync']);
-        add_action('wp_ajax_nopriv_patreon_wordpress_set_post_author_for_post_sync', [$this, 'set_post_author_for_post_sync']);
         add_filter('cron_schedules', [&$this, 'add_patreon_cron_schedules']);
         add_action('wp_ajax_patreon_wordpress_disconnect_patreon_account', [self::$patreon_login, 'disconnect_account_from_patreon']);
-        add_action('wp_ajax_nopriv_patreon_wordpress_disconnect_patreon_account', [self::$patreon_login, 'disconnect_account_from_patreon']);
 
         // Schedule an action if it's not already scheduled
         if (!wp_next_scheduled('patreon_five_minute_action')) {
@@ -2775,13 +2763,26 @@ class Patreon_Wordpress
         return self::$patreon_pledge_info_cache[$user_id] = $pledge;
     }
 
+    // Gate for the post sync dropdown AJAX handlers, which expose taxonomy and term names
+    private static function check_post_sync_ajax_request()
+    {
+        if (!(is_admin() && current_user_can('manage_options'))) {
+            echo 'need_admin_privileges';
+            exit;
+        }
+
+        check_ajax_referer('patreon_wordpress_nonce_post_sync', 'patreon_wordpress_nonce_post_sync');
+    }
+
     public function make_taxonomy_select($selected_post_type = 'post', $selected_taxonomy = 'category')
     {
         $return = true;
         $select = '';
 
         if (isset($_REQUEST['patreon_wordpress_post_type'])) {
-            $selected_post_type = $_REQUEST['patreon_wordpress_post_type'];
+            self::check_post_sync_ajax_request();
+
+            $selected_post_type = sanitize_key(wp_unslash($_REQUEST['patreon_wordpress_post_type']));
             $return = false;
         }
 
@@ -2797,7 +2798,7 @@ class Patreon_Wordpress
                     $selected = ' selected';
                 }
 
-                $select .= '<option value="'.$taxonomy->name.'" '.$selected.' >'.$taxonomy->labels->singular_name.'</option>';
+                $select .= '<option value="'.esc_attr($taxonomy->name).'" '.$selected.' >'.esc_html($taxonomy->labels->singular_name).'</option>';
             }
         }
 
@@ -2815,8 +2816,14 @@ class Patreon_Wordpress
         $select = '';
 
         if (isset($_REQUEST['patreon_sync_post_category'])) {
-            $selected_taxonomy = $_REQUEST['patreon_sync_post_category'];
+            self::check_post_sync_ajax_request();
+
+            $selected_taxonomy = sanitize_key(wp_unslash($_REQUEST['patreon_sync_post_category']));
             $return = false;
+
+            if (!taxonomy_exists($selected_taxonomy)) {
+                exit;
+            }
         }
 
         $terms = get_terms(
@@ -2837,7 +2844,7 @@ class Patreon_Wordpress
                     $selected = ' selected';
                 }
 
-                $select .= '<option value="'.$terms[$key]->term_id.'" '.$selected.' >'.$terms[$key]->name.'</option>';
+                $select .= '<option value="'.esc_attr($terms[$key]->term_id).'" '.$selected.' >'.esc_html($terms[$key]->name).'</option>';
             }
         }
 
