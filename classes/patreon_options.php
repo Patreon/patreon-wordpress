@@ -31,38 +31,38 @@ class Patreon_Options
     public function patreon_plugin_register_settings()
     {
         // whitelist options
-        register_setting('patreon-options', 'patreon-client-id');
-        register_setting('patreon-options', 'patreon-client-secret');
-        register_setting('patreon-options', 'patreon-creators-access-token');
-        register_setting('patreon-options', 'patreon-creators-refresh-token');
-        register_setting('patreon-options', 'patreon-fetch-creator-id');
-        register_setting('patreon-options', 'patreon-paywall-img-url');
-        register_setting('patreon-options', 'patreon-paywall-blocked-img-url');
-        register_setting('patreon-options', 'patreon-rewrite-rules-flushed');
-        register_setting('patreon-options', 'patreon-can-use-api-v2');
-        register_setting('patreon-options', 'patreon-enable-register-with-patreon');
-        register_setting('patreon-options', 'patreon-enable-login-with-patreon');
-        register_setting('patreon-options', 'patreon-enable-allow-admins-login-with-patreon');
-        register_setting('patreon-options', 'patreon-enable-redirect-to-page-after-login');
-        register_setting('patreon-options', 'patreon-enable-redirect-to-page-id');
-        register_setting('patreon-options', 'patreon-protect-default-image-patreon-level');
-        register_setting('patreon-options', 'patreon-enable-file-locking');
-        register_setting('patreon-options', 'patreon-enable-strict-oauth');
+        register_setting('patreon-options', 'patreon-client-id', 'sanitize_text_field');
+        register_setting('patreon-options', 'patreon-client-secret', 'sanitize_text_field');
+        register_setting('patreon-options', 'patreon-creators-access-token', 'sanitize_text_field');
+        register_setting('patreon-options', 'patreon-creators-refresh-token', 'sanitize_text_field');
+        register_setting('patreon-options', 'patreon-fetch-creator-id', 'sanitize_text_field');
+        register_setting('patreon-options', 'patreon-paywall-img-url', 'esc_url_raw');
+        register_setting('patreon-options', 'patreon-paywall-blocked-img-url', 'esc_url_raw');
+        register_setting('patreon-options', 'patreon-rewrite-rules-flushed', 'sanitize_text_field');
+        register_setting('patreon-options', 'patreon-can-use-api-v2', 'sanitize_text_field');
+        register_setting('patreon-options', 'patreon-enable-register-with-patreon', 'sanitize_text_field');
+        register_setting('patreon-options', 'patreon-enable-login-with-patreon', 'sanitize_text_field');
+        register_setting('patreon-options', 'patreon-enable-allow-admins-login-with-patreon', 'sanitize_text_field');
+        register_setting('patreon-options', 'patreon-enable-redirect-to-page-after-login', 'sanitize_text_field');
+        register_setting('patreon-options', 'patreon-enable-redirect-to-page-id', 'absint');
+        register_setting('patreon-options', 'patreon-protect-default-image-patreon-level', 'sanitize_text_field');
+        register_setting('patreon-options', 'patreon-enable-file-locking', 'sanitize_text_field');
+        register_setting('patreon-options', 'patreon-enable-strict-oauth', 'sanitize_text_field');
         register_setting('patreon-options', 'patreon-lock-entire-site', [&$this, 'site_locking_value']);
-        register_setting('patreon-options', 'patreon-custom-universal-banner');
+        register_setting('patreon-options', 'patreon-custom-universal-banner', [&$this, 'sanitize_custom_universal_banner']);
         register_setting('patreon-options', 'patreon-custom-page-name', [&$this, 'sanitize_page_name']);
-        register_setting('patreon-options', 'patreon-prevent-caching-gated-content');
-        register_setting('patreon-options', 'patreon-currency-sign');
-        register_setting('patreon-options', 'patreon-currency-sign-behind');
-        register_setting('patreon-options', 'patreon-sync-posts');
-        register_setting('patreon-options', 'patreon-remove-deleted-posts');
-        register_setting('patreon-options', 'patreon-update-posts');
-        register_setting('patreon-options', 'patreon-post-author-for-synced-posts');
-        register_setting('patreon-options', 'patreon-hide-login-button');
-        register_setting('patreon-options', 'patreon-set-featured-image');
-        register_setting('patreon-options', 'patreon-auto-publish-public-posts');
-        register_setting('patreon-options', 'patreon-auto-publish-patron-only-posts');
-        register_setting('patreon-options', 'patreon-override-synced-post-publish-date');
+        register_setting('patreon-options', 'patreon-prevent-caching-gated-content', 'sanitize_text_field');
+        register_setting('patreon-options', 'patreon-currency-sign', [&$this, 'sanitize_currency_sign']);
+        register_setting('patreon-options', 'patreon-currency-sign-behind', [&$this, 'sanitize_currency_sign']);
+        register_setting('patreon-options', 'patreon-sync-posts', 'sanitize_text_field');
+        register_setting('patreon-options', 'patreon-remove-deleted-posts', 'sanitize_text_field');
+        register_setting('patreon-options', 'patreon-update-posts', 'sanitize_text_field');
+        register_setting('patreon-options', 'patreon-post-author-for-synced-posts', 'absint');
+        register_setting('patreon-options', 'patreon-hide-login-button', 'sanitize_text_field');
+        register_setting('patreon-options', 'patreon-set-featured-image', 'sanitize_text_field');
+        register_setting('patreon-options', 'patreon-auto-publish-public-posts', 'sanitize_text_field');
+        register_setting('patreon-options', 'patreon-auto-publish-patron-only-posts', 'sanitize_text_field');
+        register_setting('patreon-options', 'patreon-override-synced-post-publish-date', 'sanitize_text_field');
     }
 
     public function patreon_plugin_setup_page()
@@ -928,6 +928,22 @@ class Patreon_Options
         }
         ?></div><?php
 
+    }
+
+    public function sanitize_currency_sign($input)
+    {
+        // Strip any HTML but keep whitespace - currency signs may need spacing around the amount
+        return wp_kses((string) $input, []);
+    }
+
+    public function sanitize_custom_universal_banner($input)
+    {
+        // Banner is entered with wp_editor and may contain HTML - filter it the same way as post content
+        if (current_user_can('unfiltered_html')) {
+            return $input;
+        }
+
+        return wp_kses_post($input);
     }
 
     public function sanitize_page_name($input)
