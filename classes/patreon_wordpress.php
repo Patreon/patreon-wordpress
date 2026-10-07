@@ -2827,8 +2827,8 @@ class Patreon_Wordpress
         }
 
         $terms = get_terms(
-            $selected_taxonomy,
             [
+                'taxonomy' => $selected_taxonomy,
                 'hide_empty' => false,
                 'parent' => 0,
                 'orderby' => 'description',
