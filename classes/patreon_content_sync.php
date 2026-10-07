@@ -508,7 +508,7 @@ class Patreon_Content_Sync
                     if (isset($patreon_post['data']['attributes']['embed_data']['url']) and '' != $patreon_post['data']['attributes']['embed_data']['url']) {
                         // Get the image if not present in local library:
 
-                        $path = parse_url($patreon_post['data']['attributes']['embed_data']['html'], PHP_URL_PATH);
+                        $path = wp_parse_url($patreon_post['data']['attributes']['embed_data']['html'], PHP_URL_PATH);
 
                         $image_hash = $Patreon_Wordpress->get_remote_image_hash($patreon_post['data']['attributes']['embed_data']['html']);
 

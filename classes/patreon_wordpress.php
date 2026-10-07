@@ -1777,7 +1777,7 @@ class Patreon_Wordpress
     {
         // Collects app information from WP site to be used in client settins at Patreon
 
-        $parsed_home_url = parse_url(get_bloginfo('url'));
+        $parsed_home_url = wp_parse_url(get_bloginfo('url'));
 
         $company_domain = $parsed_home_url['host'];
 
@@ -2970,7 +2970,7 @@ class Patreon_Wordpress
         foreach ($images as $image) {
             $url = $image->getAttribute('src');
 
-            $details = parse_url($url);
+            $details = wp_parse_url($url);
 
             $exploded_path = array_reverse(explode('/', $details['path']));
 
