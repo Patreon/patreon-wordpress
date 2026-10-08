@@ -287,15 +287,15 @@ class Patreon_Content_Sync
                 if ($patreon_post['data']['attributes']['is_paid']) {
                     // Pay per post set to patron only
                     // Add only if not exists
-                    add_post_meta($inserted_attachment_id, 'patreon-level', 1, true);
+                    add_post_meta($inserted_attachment_id, 'patreon_level', 1, true);
                 } else {
                     // Not a pay per post - check tier level or patron only status
                     // For now do this in else, when api returns tiers replace with proper logic
 
                     if ($patreon_post['data']['attributes']['is_public']) {
-                        add_post_meta($inserted_attachment_id, 'patreon-level', 0, true);
+                        add_post_meta($inserted_attachment_id, 'patreon_level', 0, true);
                     } else {
-                        add_post_meta($inserted_attachment_id, 'patreon-level', 1, true);
+                        add_post_meta($inserted_attachment_id, 'patreon_level', 1, true);
                     }
                 }
             }
@@ -393,15 +393,15 @@ class Patreon_Content_Sync
 
                 if ($patreon_post['data']['attributes']['is_paid']) {
                     // Pay per post set to patron only
-                    update_post_meta($inserted_attachment_id, 'patreon-level', 1);
+                    update_post_meta($inserted_attachment_id, 'patreon_level', 1);
                 } else {
                     // Not a pay per post - check tier level or patron only status
                     // For now do this in else, when api returns tiers replace with proper logic
 
                     if ($patreon_post['data']['attributes']['is_public']) {
-                        update_post_meta($inserted_attachment_id, 'patreon-level', 0);
+                        update_post_meta($inserted_attachment_id, 'patreon_level', 0);
                     } else {
-                        update_post_meta($inserted_attachment_id, 'patreon-level', 1);
+                        update_post_meta($inserted_attachment_id, 'patreon_level', 1);
                     }
                 }
             }

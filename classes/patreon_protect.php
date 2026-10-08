@@ -19,6 +19,29 @@ class Patreon_Protect
         }
         // Only image-reader is left always on for backward compatibility in case a user already has images linked directly - it can be put into the conditional block above in later versions
         add_action('plugins_loaded', [$this, 'servePatronOnlyImage']);
+        add_action('init', [self::class, 'migrateSyncedAttachmentLevels']);
+    }
+
+    public static function migrateSyncedAttachmentLevels()
+    {
+        if (get_option('patreon-synced-attachment-levels-migrated', false)) {
+            return;
+        }
+
+        $attachment_ids = get_posts([
+            'post_type' => 'attachment',
+            'post_status' => 'any',
+            'posts_per_page' => -1,
+            'fields' => 'ids',
+            'meta_key' => 'patreon-level',
+        ]);
+
+        foreach ($attachment_ids as $attachment_id) {
+            add_post_meta($attachment_id, 'patreon_level', get_post_meta($attachment_id, 'patreon-level', true), true);
+            delete_post_meta($attachment_id, 'patreon-level');
+        }
+
+        update_option('patreon-synced-attachment-levels-migrated', true);
     }
 
     public function GalleryItemSavePatreonEdit($form_fields, $post)
