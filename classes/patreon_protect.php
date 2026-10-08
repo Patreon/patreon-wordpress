@@ -152,7 +152,7 @@ class Patreon_Protect
             header('Pragma: no-cache');
         }
 
-        echo file_get_contents($file);
+        echo file_get_contents($file); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Binary image data
         exit;
     }
 
@@ -270,7 +270,7 @@ class Patreon_Protect
         if (!(extension_loaded('gd') and function_exists('gd_info'))) {
             // Not installed we have to serve a static image:
             header('Content-Type: image/png');
-            echo file_get_contents(PATREON_PLUGIN_ASSETS_DIR.'/img/patreon-300x300-locked-image-placeholder.png');
+            echo file_get_contents(PATREON_PLUGIN_ASSETS_DIR.'/img/patreon-300x300-locked-image-placeholder.png'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Binary image data
             exit;
         }
 
@@ -312,7 +312,7 @@ class Patreon_Protect
 
             header('Content-Type: '.$mime_type);
             // Readfile to avoid higher memory usage. Can be modified to echo file_get_contents for small files in future
-            echo file_get_contents(PATREON_PLUGIN_LOCKED_IMAGE_CACHE_DIR.'/'.$cached_filename);
+            echo file_get_contents(PATREON_PLUGIN_LOCKED_IMAGE_CACHE_DIR.'/'.$cached_filename); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Binary image data
             exit;
         }
 
@@ -569,7 +569,7 @@ class Patreon_Protect
         }
 
         // Readfile below for lower memory usage. Can be changed to echo file_get_contents for small images in future
-        echo file_get_contents(PATREON_PLUGIN_LOCKED_IMAGE_CACHE_DIR.'/'.$cached_filename);
+        echo file_get_contents(PATREON_PLUGIN_LOCKED_IMAGE_CACHE_DIR.'/'.$cached_filename); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Binary image data
 
         imagedestroy($image);
     }
@@ -661,7 +661,7 @@ RewriteRule ^".$upload_dir.'/(.*)$ index.php?patreon_action=serve_patron_only_im
             'message' => $message,
         ];
 
-        echo self::make_image_lock_interface($args);
+        echo self::make_image_lock_interface($args); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML built and escaped by make_image_lock_interface()
 
         // Delete all cached images for this attachment
         self::deleteCachedAttachmentPlaceholders($_REQUEST['patreon_attachment_id']);
@@ -716,7 +716,7 @@ RewriteRule ^".$upload_dir.'/(.*)$ index.php?patreon_action=serve_patron_only_im
             'message' => $message,
         ];
 
-        echo self::make_image_lock_interface($args);
+        echo self::make_image_lock_interface($args); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML built and escaped by make_image_lock_interface()
 
         wp_die();
     }
@@ -731,15 +731,15 @@ RewriteRule ^".$upload_dir.'/(.*)$ index.php?patreon_action=serve_patron_only_im
         $interface .= ' <form id="patreon_attachment_patreon_level_form" action="/wp-admin/admin-ajax.php" method="post">';
         $interface .= '<h1 class="patreon_image_locking_interface_heading">Lock Image</h1>';
         $interface .= '<div class="patreon_image_locking_interface_level">';
-        $interface .= '<span class="patreon_image_locking_interface_input_prefix">$<input id="patreon_attachment_patreon_level" type="text" name="patreon_attachment_patreon_level" value="'.$args['patreon_level'].'" / ></span>';
+        $interface .= '<span class="patreon_image_locking_interface_input_prefix">$<input id="patreon_attachment_patreon_level" type="text" name="patreon_attachment_patreon_level" value="'.esc_attr($args['patreon_level']).'" / ></span>';
         $interface .= '</div>';
         $interface .= '<div class="patreon_image_locking_interface_info">';
         $interface .= 'Minimum Patreon pledge amount required to see this image';
         $interface .= '</div>';
-        $interface .= '<input type="hidden" name="patreon_attachment_id" value="'.$args['attachment_id'].'" />';
+        $interface .= '<input type="hidden" name="patreon_attachment_id" value="'.esc_attr($args['attachment_id']).'" />';
         $interface .= '<div class="patreon-image-locking-update-button"><input type="submit" class="button button-primary button-large" value=" Update " /></div>';
         $interface .= '<div id="patreon_image_locking_interface_message">';
-        $interface .= $args['message'];
+        $interface .= wp_kses_post($args['message']);
         $interface .= '</div>';
         $interface .= '<input type="hidden" name="action" value="patreon_save_attachment_patreon_level" />';
         $interface .= '</form>';
@@ -831,7 +831,7 @@ RewriteRule ^".$upload_dir.'/(.*)$ index.php?patreon_action=serve_patron_only_im
     {
         echo "<style>
                 #patreon-image-toolbar {
-                    background-image: url( '".PATREON_PLUGIN_ASSETS."/img/patreon-image-lock-button-for-toolbar-bg.png' );
+                    background-image: url( '".esc_url(PATREON_PLUGIN_ASSETS.'/img/patreon-image-lock-button-for-toolbar-bg.png')."' );
                     background-repeat: no-repeat;
                 }
               </style>";
@@ -849,7 +849,7 @@ RewriteRule ^".$upload_dir.'/(.*)$ index.php?patreon_action=serve_patron_only_im
         ?>
 
         <div id="patreon-image-toolbar">
-            <div id="patreon-image-lock-icon"><img src="<?php echo PATREON_PLUGIN_ASSETS.'/img/patreon-image-lock-icon.png'; ?>" /></div>
+            <div id="patreon-image-lock-icon"><img src="<?php echo esc_url(PATREON_PLUGIN_ASSETS.'/img/patreon-image-lock-icon.png'); ?>" /></div>
         </div>
 
         <?php
