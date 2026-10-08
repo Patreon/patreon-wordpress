@@ -440,7 +440,7 @@ class Patreon_Login
         // Delete existing Patreon avatar
 
         if (file_exists($user_patreon_avatar_path)) {
-            unlink($user_patreon_avatar_path);
+            wp_delete_file($user_patreon_avatar_path);
         }
 
         // Upload new one
