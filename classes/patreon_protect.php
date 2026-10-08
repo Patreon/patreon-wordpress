@@ -138,7 +138,7 @@ class Patreon_Protect
 
         header('Content-Type: '.$mimetype); // always send this
 
-        if (false === strpos($_SERVER['SERVER_SOFTWARE'], 'Microsoft-IIS')) {
+        if (!isset($_SERVER['SERVER_SOFTWARE']) or false === strpos(sanitize_text_field(wp_unslash($_SERVER['SERVER_SOFTWARE'])), 'Microsoft-IIS')) {
             header('Content-Length: '.filesize($file));
         }
 
@@ -159,7 +159,7 @@ class Patreon_Protect
     public static function servePatronOnlyImage($image = false)
     {
         if ((!isset($image) or !$image) and isset($_REQUEST['patron_only_image'])) {
-            $image = $_REQUEST['patron_only_image'];
+            $image = sanitize_text_field(wp_unslash($_REQUEST['patron_only_image']));
         }
 
         if (!$image or '' == $image) {
@@ -643,9 +643,14 @@ RewriteRule ^".$upload_dir.'/(.*)$ index.php?patreon_action=serve_patron_only_im
             return;
         }
 
-        $_REQUEST['patreon_attachment_patreon_level'] = preg_replace('/[^0-9.]/', '', $_REQUEST['patreon_attachment_patreon_level']);
+        check_ajax_referer('patreon_save_attachment_patreon_level', 'patreon_attachment_patreon_level_nonce');
 
-        if (update_post_meta($_REQUEST['patreon_attachment_id'], 'patreon_level', $_REQUEST['patreon_attachment_patreon_level'])) {
+        $attachment_id = isset($_REQUEST['patreon_attachment_id']) ? absint(wp_unslash($_REQUEST['patreon_attachment_id'])) : 0;
+        $patreon_level = isset($_REQUEST['patreon_attachment_patreon_level']) ? preg_replace('/[^0-9.]/', '', sanitize_text_field(wp_unslash($_REQUEST['patreon_attachment_patreon_level']))) : '';
+
+        $update_status = '';
+
+        if (update_post_meta($attachment_id, 'patreon_level', $patreon_level)) {
             $update_status = 'updated';
         }
 
@@ -657,14 +662,14 @@ RewriteRule ^".$upload_dir.'/(.*)$ index.php?patreon_action=serve_patron_only_im
 
         $args = [
             'attachment_id' => $attachment_id,
-            'patreon_level' => $_REQUEST['patreon_attachment_patreon_level'],
+            'patreon_level' => $patreon_level,
             'message' => $message,
         ];
 
         echo self::make_image_lock_interface($args); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML built and escaped by make_image_lock_interface()
 
         // Delete all cached images for this attachment
-        self::deleteCachedAttachmentPlaceholders($_REQUEST['patreon_attachment_id']);
+        self::deleteCachedAttachmentPlaceholders($attachment_id);
 
         wp_die();
     }
@@ -676,8 +681,10 @@ RewriteRule ^".$upload_dir.'/(.*)$ index.php?patreon_action=serve_patron_only_im
             wp_die();
         }
 
+        $attachment_url = '';
+
         if (isset($_REQUEST['pw_image_source']) and '' != $_REQUEST['pw_image_source']) {
-            $attachment_url = $_REQUEST['pw_image_source'];
+            $attachment_url = esc_url_raw(wp_unslash($_REQUEST['pw_image_source']));
         }
 
         $message = '';
@@ -742,6 +749,7 @@ RewriteRule ^".$upload_dir.'/(.*)$ index.php?patreon_action=serve_patron_only_im
         $interface .= wp_kses_post($args['message']);
         $interface .= '</div>';
         $interface .= '<input type="hidden" name="action" value="patreon_save_attachment_patreon_level" />';
+        $interface .= wp_nonce_field('patreon_save_attachment_patreon_level', 'patreon_attachment_patreon_level_nonce', false, false);
         $interface .= '</form>';
         $interface .= '</div>';
 
