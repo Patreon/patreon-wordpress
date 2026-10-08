@@ -522,7 +522,7 @@ class Patreon_Login
                         <tr>
                             <th><label for="patreon_user">Connect your site account to your Patreon account</label></th>
                             <td>
-                                <button id="patreon_wordpress_connect_patreon_account" class="button button-primary button-large" patreon_login_url="<?php echo $login_flow_url; ?>" target="">Connect to Patreon</button><br />
+                                <button id="patreon_wordpress_connect_patreon_account" class="button button-primary button-large" patreon_login_url="<?php echo esc_url($login_flow_url); ?>" target="">Connect to Patreon</button><br />
                             </td>
                         </tr>
                     </table>
