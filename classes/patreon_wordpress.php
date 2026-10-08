@@ -2335,8 +2335,8 @@ class Patreon_Wordpress
                         $tier_title = $reward['attributes']['title'];
 
                         // If the title is too long, snip it
-                        if (strlen($tier_title) > 23) {
-                            $tier_title = substr($tier_title, 0, 23).'...';
+                        if (mb_strlen($tier_title) > 23) {
+                            $tier_title = mb_substr($tier_title, 0, 23).'...';
                         }
                     }
 
@@ -2359,7 +2359,7 @@ class Patreon_Wordpress
                     }
                 }
 
-                $select_options .= '<option value="'.($reward['attributes']['amount_cents'] / 100).'"'.$selected.'>'.$label.'</option>';
+                $select_options .= '<option value="'.esc_attr($reward['attributes']['amount_cents'] / 100).'"'.$selected.'>'.esc_html($label).'</option>';
             }
         }
 
@@ -2727,7 +2727,7 @@ class Patreon_Wordpress
                 $selected = ' selected';
             }
 
-            $select .= '<option value="'.$key.'" '.$selected.' >'.$obj->labels->singular_name.'</option>';
+            $select .= '<option value="'.esc_attr($key).'" '.$selected.' >'.esc_html($obj->labels->singular_name).'</option>';
         }
 
         return $select;
@@ -2888,7 +2888,7 @@ class Patreon_Wordpress
                     $existing_author_found = true;
                 }
 
-                $select .= '<option value="'.$users[$key]->data->ID.'" '.$selected.' >'.$users[$key]->data->user_nicename.' ('.$users[$key]->data->display_name.')</option>';
+                $select .= '<option value="'.esc_attr($users[$key]->data->ID).'" '.$selected.' >'.esc_html($users[$key]->data->user_nicename.' ('.$users[$key]->data->display_name.')').'</option>';
 
                 if ($user_count > 100) {
                     break;
@@ -2902,7 +2902,7 @@ class Patreon_Wordpress
             $existing_author = get_user_by('ID', $selected_user);
 
             if ($existing_author) {
-                $select .= '<option value="'.$existing_author->data->ID.'" selected>'.$existing_author->data->user_nicename.' ('.$existing_author->data->display_name.')</option>';
+                $select .= '<option value="'.esc_attr($existing_author->data->ID).'" selected>'.esc_html($existing_author->data->user_nicename.' ('.$existing_author->data->display_name.')').'</option>';
             }
         }
 

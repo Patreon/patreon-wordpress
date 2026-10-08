@@ -89,8 +89,8 @@ class Patreon_Frontend
         echo '<style>';
         echo "@font-face {
             font-family: 'Libre Franklin Extra Bold';
-            src: url('".PATREON_PLUGIN_ASSETS."/fonts/librefranklin-extrabold-webfont.woff2') format('woff2'),
-                 url('".PATREON_PLUGIN_ASSETS."/fonts/librefranklin-extrabold-webfont.woff') format('woff');
+            src: url('".esc_url(PATREON_PLUGIN_ASSETS.'/fonts/librefranklin-extrabold-webfont.woff2')."') format('woff2'),
+                 url('".esc_url(PATREON_PLUGIN_ASSETS.'/fonts/librefranklin-extrabold-webfont.woff')."') format('woff');
             font-weight: bold;
             }";
         echo '</style>';
@@ -516,7 +516,7 @@ class Patreon_Frontend
 
     public static function showPatreonMessages()
     {
-        echo self::processPatreonMessages();
+        echo wp_kses_post(self::processPatreonMessages());
     }
 
     public static function processPatreonMessages()
@@ -524,15 +524,17 @@ class Patreon_Frontend
         $patreon_error = '';
         if (isset($_REQUEST['patreon_error'])) {
             // If any specific error message is sent from Patreon, prepare it
-            $patreon_error = ' - Patreon returned: '.preg_replace('/[^A-Za-z0-9 ]/', '', $_REQUEST['patreon_error']);
+            $patreon_error = ' - Patreon returned: '.preg_replace('/[^A-Za-z0-9 ]/', '', sanitize_text_field(wp_unslash($_REQUEST['patreon_error'])));
         }
 
         if (isset($_REQUEST['patreon_message'])) {
-            return '<p class="patreon_message">'.apply_filters('ptrn/error_message', self::$messages_map[$_REQUEST['patreon_message']].$patreon_error).'</p>';
+            $patreon_message = sanitize_text_field(wp_unslash($_REQUEST['patreon_message']));
+
+            return '<p class="patreon_message">'.apply_filters('ptrn/error_message', (self::$messages_map[$patreon_message] ?? '').$patreon_error).'</p>';
         }
 
         if (isset($GLOBALS['patreon_notice'])) {
-            return '<p class="patreon_message">'.apply_filters('ptrn/patreon_notice', $GLOBALS['patreon_notice']).'</p>';
+            return '<p class="patreon_message">'.apply_filters('ptrn/patreon_notice', esc_html($GLOBALS['patreon_notice'])).'</p>';
         }
 
         return '';
@@ -1277,7 +1279,7 @@ class Patreon_Frontend
 
         // Check if the login button hide option is on
         if (!get_option('patreon-hide-login-button', false)) {
-            echo '<div style="display:inline-block;width : 100%; text-align: center;">'.self::showPatreonLoginButton().'</div>';
+            echo '<div style="display:inline-block;width : 100%; text-align: center;">'.self::showPatreonLoginButton().'</div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML built and escaped by showPatreonLoginButton()
         }
     }
 
@@ -1320,7 +1322,7 @@ class Patreon_Frontend
         if (isset($_REQUEST['patreon-msg']) && 'login_with_patreon' == $_REQUEST['patreon-msg']) {
             $button .= '<p class="patreon-msg">You can now login with your WordPress username/password.</p>';
         } else {
-            $button .= apply_filters('ptrn/login_button', '<a href="'.self::patreonMakeCacheableLoginLink().'" class="ptrn-button"><img src="'.$log_in_img.'" width="272" height="42" alt="Login with Patreon" /></a>');
+            $button .= apply_filters('ptrn/login_button', '<a href="'.esc_url(self::patreonMakeCacheableLoginLink()).'" class="ptrn-button"><img src="'.esc_url($log_in_img).'" width="272" height="42" alt="Login with Patreon" /></a>');
         }
 
         return $button;
@@ -1497,7 +1499,7 @@ class Patreon_Frontend
         }
 
         // User logged in and has Patreon connected. Display logout link.
-        return str_replace('%%click_here%%', '<a href="'.wp_logout_url(get_permalink()).'">'.PATREON_CLICK_HERE.'</a>', PATREON_LOGIN_WIDGET_LOGOUT);
+        return str_replace('%%click_here%%', '<a href="'.esc_url(wp_logout_url(get_permalink())).'">'.PATREON_CLICK_HERE.'</a>', PATREON_LOGIN_WIDGET_LOGOUT);
     }
 
     public static function replace_in_currency_sign($label)

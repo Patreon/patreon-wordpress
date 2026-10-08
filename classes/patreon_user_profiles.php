@@ -87,7 +87,7 @@ class Patreon_User_Profiles
                                 <tr>
                                     <th><label for="patreon_user">Connect your site account to your Patreon account</label></th>
                                     <td>
-                                        <button id="patreon_wordpress_connect_patreon_account" class="button button-primary button-large" patreon_login_url="<?php echo $login_flow_url; ?>" target="">Connect to Patreon</button><br />
+                                        <button id="patreon_wordpress_connect_patreon_account" class="button button-primary button-large" patreon_login_url="<?php echo esc_attr($login_flow_url); ?>" target="">Connect to Patreon</button><br />
                                     </td>
                                 </tr>
                             </table>
@@ -116,9 +116,9 @@ class Patreon_User_Profiles
                         <div id="patreon_wordpress_user_profile_account_connection_wrapper">
                             <table class="form-table">
                                 <tr>
-                                    <th><label id="patreon_wordpress_disconnect_patreon_account_label" for="patreon_user"><?php echo $disconnect_label; ?></label></th>
+                                    <th><label id="patreon_wordpress_disconnect_patreon_account_label" for="patreon_user"><?php echo esc_html($disconnect_label); ?></label></th>
                                     <td id="patreon_wordpress_disconnect_patreon_account_content">
-                                        <button id="patreon_wordpress_disconnect_patreon_account" patreon_disconnect_user_id="<?php echo $user_id; ?>" class="button button-primary button-large" target="" patreon_wordpress_nonce_disconnect_user_account_from_patreon="<?php echo wp_create_nonce('patreon_wordpress_nonce_disconnect_user_account_from_patreon'); ?>">Disconnect from Patreon</button><br /><br /><?php echo $disconnect_warning; ?>
+                                        <button id="patreon_wordpress_disconnect_patreon_account" patreon_disconnect_user_id="<?php echo esc_attr($user_id); ?>" class="button button-primary button-large" target="" patreon_wordpress_nonce_disconnect_user_account_from_patreon="<?php echo esc_attr(wp_create_nonce('patreon_wordpress_nonce_disconnect_user_account_from_patreon')); ?>">Disconnect from Patreon</button><br /><br /><?php echo esc_html($disconnect_warning); ?>
                                     </td>
                                 </tr>
                             </table>
