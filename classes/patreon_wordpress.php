@@ -91,7 +91,6 @@ class Patreon_Wordpress
         add_action('admin_notices', [$this, 'AdminMessages']);
         add_action('admin_init', [$this, 'add_privacy_policy_section'], 20);
         add_action('admin_init', [$this, 'check_setup'], 5);
-        add_filter('pre_set_site_transient_update_plugins', [$this, 'check_for_update']);
         add_action('wp_ajax_patreon_wordpress_dismiss_admin_notice', [$this, 'dismiss_admin_notice'], 10, 1);
         add_action('wp_ajax_patreon_wordpress_toggle_option', [$this, 'toggle_option'], 10, 1);
         add_action('wp_ajax_patreon_wordpress_populate_patreon_level_select', [$this, 'populate_patreon_level_select_from_ajax'], 10, 1);
@@ -1020,23 +1019,6 @@ class Patreon_Wordpress
         }
     }
 
-    public function check_for_update($plugin_check_data)
-    {
-        global $wp_version, $plugin_version, $plugin_base;
-
-        if (empty($plugin_check_data->checked)) {
-            return $plugin_check_data;
-        }
-
-        if (isset($plugin_check_data->response[PATREON_WORDPRESS_PLUGIN_SLUG])
-            and version_compare(PATREON_WORDPRESS_VERSION, $plugin_check_data->response[PATREON_WORDPRESS_PLUGIN_SLUG]->new_version, '<')
-        ) {
-            update_option('patreon-wordpress-update-available', 1);
-        }
-
-        return $plugin_check_data;
-    }
-
     public function dismiss_admin_notice()
     {
         if (!(is_admin() && current_user_can('manage_options'))) {
@@ -1046,10 +1028,6 @@ class Patreon_Wordpress
         // Mapping what comes from REQUEST to a given value avoids potential security problems and allows custom actions depending on notice
 
         $notice_id = isset($_REQUEST['notice_id']) ? sanitize_key(wp_unslash($_REQUEST['notice_id'])) : '';
-
-        if ('patreon-wordpress-update-available' == $notice_id) {
-            delete_option('patreon-wordpress-update-available');
-        }
 
         if ('patreon-addon-upsell-shown' == $notice_id) {
             if (!isset($_REQUEST['patreon_wordpress_nonce_patron_pro_addon_notice_shown']) or !wp_verify_nonce(sanitize_key($_REQUEST['patreon_wordpress_nonce_patron_pro_addon_notice_shown']), 'patreon_wordpress_nonce_patron_pro_addon_notice_shown')) {
