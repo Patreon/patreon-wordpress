@@ -1284,7 +1284,7 @@ class Patreon_Frontend
     public static function showPatreonLoginButton($args = [])
     {
         // Set default login image
-        $log_in_img = PATREON_PLUGIN_ASSETS.'/img/patreon login@1x.png';
+        $log_in_img = PATREON_PLUGIN_ASSETS.'/img/patreon-login-1x.png';
 
         $user = wp_get_current_user();
         $user_patreon_id = '';
@@ -1295,7 +1295,7 @@ class Patreon_Frontend
 
         if (is_user_logged_in() and '' == $user_patreon_id) {
             // Logged in user without a connected Patreon account. Show connect button
-            $log_in_img = PATREON_PLUGIN_ASSETS.'/img/patreon connect@1x.png';
+            $log_in_img = PATREON_PLUGIN_ASSETS.'/img/patreon-connect-1x.png';
         }
 
         // Override image if argument given
