@@ -695,7 +695,7 @@ RewriteRule ^".$upload_dir.'/(.*)$ index.php?patreon_action=serve_patron_only_im
         }
         // Get attachment from attachment url.
 
-        $attachment_id = Patreon_Wordpress::get_attachment_id_from_url($attachment_url);
+        $attachment_id = Patreon_Protect::get_attachment_id_from_url($attachment_url);
 
         // The above returns 0 if it cant find the attachment post id
 
