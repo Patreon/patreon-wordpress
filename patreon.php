@@ -7,6 +7,8 @@ Description: Patron-only content, directly on your website.
 Version: 1.10.0
 Author: Patreon <platform@patreon.com>
 Author URI: https://patreon.com
+License: GPLv2 or later
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
 */
 
 // If this file is called directly, abort.
