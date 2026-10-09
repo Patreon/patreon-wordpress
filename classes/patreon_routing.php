@@ -190,7 +190,7 @@ class Patreon_Routing
                     // If this is an image unlock request, override patreon level with image's:
 
                     if (isset($wp->query_vars['patreon-unlock-image']) and '' != $wp->query_vars['patreon-unlock-image']) {
-                        $patreon_level = get_post_meta($wp->query_vars['patreon-unlock-image'], 'patreon_level', true);
+                        $patreon_level = Patreon_Protect::getImageLevel($wp->query_vars['patreon-unlock-image']);
 
                         if (!$patreon_level or 0 == $patreon_level) {
                             $patreon_level = 0;

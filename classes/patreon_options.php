@@ -47,6 +47,7 @@ class Patreon_Options
         register_setting('patreon-options', 'patreon-enable-redirect-to-page-id', 'absint');
         register_setting('patreon-options', 'patreon-protect-default-image-patreon-level', 'sanitize_text_field');
         register_setting('patreon-options', 'patreon-enable-file-locking', 'sanitize_text_field');
+        register_setting('patreon-options', Patreon_Protect::INHERIT_POST_LEVEL_OPTION, 'sanitize_text_field');
         register_setting('patreon-options', 'patreon-enable-strict-oauth', 'sanitize_text_field');
         register_setting('patreon-options', 'patreon-lock-entire-site', [&$this, 'site_locking_value']);
         register_setting('patreon-options', 'patreon-custom-universal-banner', [&$this, 'sanitize_custom_universal_banner']);
@@ -296,6 +297,16 @@ class Patreon_Options
                                             </th>
                                             <td>
                                                 <input type="checkbox" name="patreon-enable-file-locking" value="1"<?php checked(get_option('patreon-enable-file-locking', false)); ?> />
+                                            </td>
+                                        </tr>
+                                        <tr valign="top">
+                                            <th scope="row">
+                                                <strong>Lock images in locked posts</strong>
+                                                <br>
+                                                <div class="patreon-options-info">If on, an image that has no pledge level of its own is locked at the level of the post that uses it as its featured image or that it is attached to. If several posts use the image, the highest level applies. Images with their own level are not affected. Requires image locking features to be on.</div>
+                                            </th>
+                                            <td>
+                                                <input type="checkbox" name="<?php echo esc_attr(Patreon_Protect::INHERIT_POST_LEVEL_OPTION); ?>" value="1"<?php checked(get_option(Patreon_Protect::INHERIT_POST_LEVEL_OPTION, false)); ?> />
                                             </td>
                                         </tr>
                                         <?php
