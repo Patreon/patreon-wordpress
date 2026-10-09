@@ -6,6 +6,13 @@ if (!defined('ABSPATH')) {
 
 class Patreon_Protect
 {
+    public const IMAGE_LEVEL_META_KEY = 'patreon-level';
+
+    // Images locked before 'patreon-level' became the key for images are stored under 'patreon_level'. Both keys are read, so no migration is needed. In the future this data could be migrated to 'patreon-level' and the fallback removed.
+    public const LEGACY_IMAGE_LEVEL_META_KEY = 'patreon_level';
+
+    public const INHERIT_POST_LEVEL_OPTION = 'patreon-protect-inherit-post-level-for-images';
+
     public function __construct()
     {
         // If image feature was not turned on before, or turned off, we skip activating image protection functions:
@@ -26,7 +33,7 @@ class Patreon_Protect
         $form_fields['patreon_level'] = [
             'label' => 'Minimum Patreon pledge amount​ &#36;',
             'input' => 'text',
-            'value' => get_post_meta($post->ID, 'patreon_level', true),
+            'value' => self::getOwnImageLevel($post->ID) ?? '',
             'helps' => '​​Anyone who isn\'t your patron pledging at or above the minimum will not be able to see this image.',
         ];
 
@@ -40,7 +47,7 @@ class Patreon_Protect
                 $attachment['patreon_level'] = 0;
             }
 
-            update_post_meta($post['ID'], 'patreon_level', $attachment['patreon_level']);
+            self::saveImageLevel($post['ID'], $attachment['patreon_level']);
         }
 
         // Flush this item's cached file:
@@ -213,12 +220,7 @@ class Patreon_Protect
 
         // Check if the image is protected:
 
-        $patreon_level = get_post_meta($attachment_id, 'patreon_level', true);
-
-        // If no specific level is found for this image, it is not set. Then set the level to 0.
-        if (!$patreon_level) {
-            $patreon_level = 0;
-        }
+        $patreon_level = self::getImageLevel($attachment_id);
 
         // If no level was set for image or it was 0, just serve the image.
         if (0 == $patreon_level) {
@@ -650,7 +652,7 @@ RewriteRule ^".$upload_dir.'/(.*)$ index.php?patreon_action=serve_patron_only_im
 
         $update_status = '';
 
-        if (update_post_meta($attachment_id, 'patreon_level', $patreon_level)) {
+        if (self::saveImageLevel($attachment_id, $patreon_level)) {
             $update_status = 'updated';
         }
 
@@ -715,7 +717,7 @@ RewriteRule ^".$upload_dir.'/(.*)$ index.php?patreon_action=serve_patron_only_im
             $message = 'Image locking is not enabled in <a href="'.admin_url('admin.php?page=patreon-plugin').'" target="_blank">settings</a>. Locking will not work';
         }
 
-        $patreon_level = get_post_meta($attachment_id, 'patreon_level', true);
+        $patreon_level = self::getOwnImageLevel($attachment_id) ?? '';
 
         $args = [
             'attachment_id' => $attachment_id,
@@ -864,6 +866,67 @@ RewriteRule ^".$upload_dir.'/(.*)$ index.php?patreon_action=serve_patron_only_im
 
     }
 
+    public static function getOwnImageLevel($attachment_id)
+    {
+        $levels = [];
+
+        foreach ([self::IMAGE_LEVEL_META_KEY, self::LEGACY_IMAGE_LEVEL_META_KEY] as $meta_key) {
+            if (metadata_exists('post', $attachment_id, $meta_key)) {
+                $levels[] = (float) get_post_meta($attachment_id, $meta_key, true);
+            }
+        }
+
+        return $levels ? max($levels) : null;
+    }
+
+    public static function getImageLevel($attachment_id)
+    {
+        $own_level = self::getOwnImageLevel($attachment_id);
+
+        if (null !== $own_level) {
+            return $own_level;
+        }
+
+        if (!get_option(self::INHERIT_POST_LEVEL_OPTION, false)) {
+            return 0.0;
+        }
+
+        return self::getInheritedImageLevel($attachment_id);
+    }
+
+    public static function getInheritedImageLevel($attachment_id)
+    {
+        $post_ids = get_posts([
+            'post_type' => 'any',
+            'post_status' => 'any',
+            'posts_per_page' => -1,
+            'fields' => 'ids',
+            'meta_key' => '_thumbnail_id',
+            'meta_value' => $attachment_id,
+        ]);
+
+        $parent_id = wp_get_post_parent_id($attachment_id);
+
+        if ($parent_id) {
+            $post_ids[] = $parent_id;
+        }
+
+        $levels = array_map(static fn ($post_id) => (float) get_post_meta($post_id, 'patreon-level', true), $post_ids);
+
+        return $levels ? max($levels) : 0.0;
+    }
+
+    public static function saveImageLevel($attachment_id, $patreon_level)
+    {
+        if ('' === $patreon_level) {
+            $patreon_level = 0;
+        }
+
+        delete_post_meta($attachment_id, self::LEGACY_IMAGE_LEVEL_META_KEY);
+
+        return (bool) update_post_meta($attachment_id, self::IMAGE_LEVEL_META_KEY, $patreon_level);
+    }
+
     public static function checkPatronPledgeForImage($attachment_id, $user = false)
     {
         // Checks a user's pledges against an image pledge level
@@ -880,9 +943,8 @@ RewriteRule ^".$upload_dir.'/(.*)$ index.php?patreon_action=serve_patron_only_im
 
         $patron_pledge = Patreon_Wordpress::getUserPatronage();
 
-        $patreon_level = get_post_meta($attachment_id, 'patreon_level', true);
+        $patreon_level = self::getImageLevel($attachment_id);
 
-        // If no specific level is found for this image, it is not set. Then set the level to 0.
         if (!$patreon_level) {
             return 0;
         }
