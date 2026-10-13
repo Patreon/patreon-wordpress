@@ -2438,6 +2438,8 @@ class Patreon_Wordpress
                 wp_die('Form security field expired - please refresh the page and try again');
             }
 
+            PatreonApiUtil::delete_check_campaign_name_cooldown();
+
             // Admin side, user is admin level. Perform action:
 
             // To disconnect the site from a particular creator account, we will delete all options related to creator account, but we will leave other plugin settings and post gating values untouched
@@ -2480,8 +2482,6 @@ class Patreon_Wordpress
                     delete_option($options_to_delete[$key]);
                 }
 
-                PatreonApiUtil::delete_check_campaign_name_cooldown();
-
                 update_option('patreon-installation-api-version', '2');
                 update_option('patreon-can-use-api-v2', true);
 
@@ -2511,8 +2511,6 @@ class Patreon_Wordpress
                     foreach ($options_to_delete as $key => $value) {
                         delete_option($options_to_delete[$key]);
                     }
-
-                    PatreonApiUtil::delete_check_campaign_name_cooldown();
 
                     update_option('patreon-show-site-disconnect-success-notice', true);
 
