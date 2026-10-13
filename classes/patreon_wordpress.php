@@ -84,7 +84,7 @@ class Patreon_Wordpress
         add_action('init', [$this, 'check_creator_token_expiration']);
         add_action('init', [$this, 'checkPatreonCampaignID']);
         add_action('init', [$this, 'checkPatreonCreatorURL']);
-        add_action('init', [$this, 'checkPatreonCampaignName']);
+        add_action('admin_init', [$this, 'checkPatreonCampaignName']);
         add_action('init', 'Patreon_Login::checkTokenExpiration');
         add_action('admin_enqueue_scripts', [$this, 'enqueueAdminScripts']);
         add_action('upgrader_process_complete', 'Patreon_Wordpress::AfterUpdateActions', 10, 2);
@@ -414,10 +414,15 @@ class Patreon_Wordpress
         // This function checks and saves campaign name and creator's name details. These are used in post locking interface
 
         if (!get_option('patreon-campaign-name', false) or '' == get_option('patreon-campaign-name', false)) {
+            if (PatreonApiUtil::is_app_creds_invalid() or PatreonApiUtil::get_check_campaign_name_cooldown()) {
+                return;
+            }
+
             // Making sure access credentials are there to avoid fruitlessly contacting the api:
 
             if (get_option('patreon-client-id', false) && get_option('patreon-client-secret', false) && get_option('patreon-creators-access-token', false)) {
                 // Credentials are in. Go.
+                PatreonApiUtil::set_check_campaign_name_cooldown();
                 $creator_info = self::getPatreonCreatorInfo();
 
                 if (isset($creator_info['data'][0]['attributes']['name'])) {
