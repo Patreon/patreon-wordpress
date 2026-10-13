@@ -66,6 +66,11 @@ class PatreonApiUtil
         set_transient(self::CHECK_CAMPAIGN_NAME_COOLDOWN_KEY, true, PATREON_CHECK_CAMPAIGN_NAME_COOLDOWN_S);
     }
 
+    public static function delete_check_campaign_name_cooldown()
+    {
+        delete_transient(self::CHECK_CAMPAIGN_NAME_COOLDOWN_KEY);
+    }
+
     private static function get_patreon_ua()
     {
         $campaign_id = get_option('patreon-campaign-id', '?');

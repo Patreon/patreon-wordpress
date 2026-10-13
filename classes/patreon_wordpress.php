@@ -1349,6 +1349,7 @@ class Patreon_Wordpress
         if ($new_value != $old_value) {
             // One of access credentials were updated. Set a flag to do an api connectivity check
             update_option('patreon-wordpress-do-api-connectivity-check', 1);
+            PatreonApiUtil::delete_check_campaign_name_cooldown();
         }
     }
 
@@ -1859,6 +1860,8 @@ class Patreon_Wordpress
                 foreach ($options_to_delete as $key => $value) {
                     delete_option($options_to_delete[$key]);
                 }
+
+                PatreonApiUtil::delete_check_campaign_name_cooldown();
 
                 update_option('patreon-installation-api-version', '2');
                 update_option('patreon-can-use-api-v2', true);
@@ -2477,6 +2480,8 @@ class Patreon_Wordpress
                     delete_option($options_to_delete[$key]);
                 }
 
+                PatreonApiUtil::delete_check_campaign_name_cooldown();
+
                 update_option('patreon-installation-api-version', '2');
                 update_option('patreon-can-use-api-v2', true);
 
@@ -2506,6 +2511,8 @@ class Patreon_Wordpress
                     foreach ($options_to_delete as $key => $value) {
                         delete_option($options_to_delete[$key]);
                     }
+
+                    PatreonApiUtil::delete_check_campaign_name_cooldown();
 
                     update_option('patreon-show-site-disconnect-success-notice', true);
 
