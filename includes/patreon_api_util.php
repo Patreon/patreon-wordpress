@@ -3,6 +3,7 @@
 class PatreonApiUtil
 {
     public const CHECK_API_CONNECTION_COOLDOWN_KEY = 'patreon-check-api-connection-cooldown';
+    public const CHECK_CAMPAIGN_NAME_COOLDOWN_KEY = 'patreon-check-campaign-name-cooldown';
     public const REFRESH_CREATOR_TOKEN_COOLDOWN_KEY = 'patreon-wordpress-app-creator-token-refresh-cooldown';
 
     public static function get_creator_access_token()
@@ -53,6 +54,21 @@ class PatreonApiUtil
     public static function set_check_creator_tiers_cooldown()
     {
         set_transient('patreon-check-creator-tiers-cooldown', true, PATREON_CHECK_CREATOR_TIERS_COOLDOWN_S);
+    }
+
+    public static function get_check_campaign_name_cooldown()
+    {
+        return get_transient(self::CHECK_CAMPAIGN_NAME_COOLDOWN_KEY);
+    }
+
+    public static function set_check_campaign_name_cooldown()
+    {
+        set_transient(self::CHECK_CAMPAIGN_NAME_COOLDOWN_KEY, true, PATREON_CHECK_CAMPAIGN_NAME_COOLDOWN_S);
+    }
+
+    public static function delete_check_campaign_name_cooldown()
+    {
+        delete_transient(self::CHECK_CAMPAIGN_NAME_COOLDOWN_KEY);
     }
 
     private static function get_patreon_ua()
