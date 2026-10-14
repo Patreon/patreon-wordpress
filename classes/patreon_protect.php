@@ -6,6 +6,7 @@ if (!defined('ABSPATH')) {
 
 class Patreon_Protect
 {
+    // Images locked with the lock UI use 'patreon_level'. Post sync tags attachments with 'patreon-level', the key posts use. A change to either can change an image's level, so both clear its cached placeholders.
     private const LEVEL_META_KEYS = ['patreon-level', 'patreon_level'];
 
     public function __construct()
