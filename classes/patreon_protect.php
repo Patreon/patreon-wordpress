@@ -6,6 +6,8 @@ if (!defined('ABSPATH')) {
 
 class Patreon_Protect
 {
+    private const LEVEL_META_KEYS = ['patreon-level', 'patreon_level'];
+
     public function __construct()
     {
         // If image feature was not turned on before, or turned off, we skip activating image protection functions:
@@ -19,6 +21,30 @@ class Patreon_Protect
         }
         // Only image-reader is left always on for backward compatibility in case a user already has images linked directly - it can be put into the conditional block above in later versions
         add_action('plugins_loaded', [$this, 'servePatronOnlyImage']);
+
+        foreach (['added_post_meta', 'updated_post_meta', 'deleted_post_meta'] as $meta_hook) {
+            add_action($meta_hook, [self::class, 'clearCachedPlaceholdersOnLevelChange'], 10, 3);
+        }
+        add_action('delete_attachment', [self::class, 'deleteCachedAttachmentPlaceholders']);
+    }
+
+    public static function clearCachedPlaceholdersOnLevelChange($meta_id, $object_id, $meta_key)
+    {
+        if (in_array($meta_key, self::LEVEL_META_KEYS, true) && 'attachment' === get_post_type($object_id)) {
+            self::deleteCachedAttachmentPlaceholders($object_id);
+        }
+    }
+
+    private static function sendLockedImageHeaders($mime_type)
+    {
+        header('Content-Type: '.$mime_type);
+
+        // Always send no cache headers since this is a gated image placeholder
+
+        header('Expires: '.gmdate('D, d M Y H:i:s').' GMT');
+        header('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT');
+        header('Cache-Control: no-store, no-cache, must-revalidate');
+        header('Cache-Control: post-check=0, pre-check=0', false);
     }
 
     public function GalleryItemSavePatreonEdit($form_fields, $post)
@@ -251,7 +277,9 @@ class Patreon_Protect
 
         $attachment_metadata = wp_get_attachment_metadata($attachment_id, true);
 
-        foreach ($attachment_metadata['sizes'] as $key => $value) {
+        $sizes = is_array($attachment_metadata) ? ($attachment_metadata['sizes'] ?? []) : [];
+
+        foreach ($sizes as $key => $value) {
             $cached_filename = $attachment_id.'-'.$key;
             if (file_exists(PATREON_PLUGIN_LOCKED_IMAGE_CACHE_DIR.'/'.$cached_filename)) {
                 wp_delete_file(PATREON_PLUGIN_LOCKED_IMAGE_CACHE_DIR.'/'.$cached_filename);
@@ -307,10 +335,10 @@ class Patreon_Protect
 
         // first, check if cached image exists:
 
-        if (file_exists(PATREON_PLUGIN_LOCKED_IMAGE_CACHE_DIR.'/'.$cached_filename) and isset($go)) {
+        if (file_exists(PATREON_PLUGIN_LOCKED_IMAGE_CACHE_DIR.'/'.$cached_filename)) {
             // Exists - serve the cached image:
 
-            header('Content-Type: '.$mime_type);
+            self::sendLockedImageHeaders('image/png');
             // Readfile to avoid higher memory usage. Can be modified to echo file_get_contents for small files in future
             echo file_get_contents(PATREON_PLUGIN_LOCKED_IMAGE_CACHE_DIR.'/'.$cached_filename); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Binary image data
             exit;
@@ -546,14 +574,7 @@ class Patreon_Protect
             imagettftext($image, $button_font_size, 0, $x_coord, $y_coord, $white, $font, $unlock_button_text);
         }
 
-        header('Content-Type: '.$force_mime_type);
-
-        // Always send no cache headers since this is a gated image placeholder
-
-        header('Expires: '.gmdate('D, d M Y H:i:s').' GMT');
-        header('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT');
-        header('Cache-Control: no-store, no-cache, must-revalidate');
-        header('Cache-Control: post-check=0, pre-check=0', false);
+        self::sendLockedImageHeaders($force_mime_type);
 
         if ('image/png' == $force_mime_type) {
             imagepng($image, PATREON_PLUGIN_LOCKED_IMAGE_CACHE_DIR.'/'.$cached_filename);
