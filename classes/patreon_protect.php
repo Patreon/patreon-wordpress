@@ -338,6 +338,7 @@ class Patreon_Protect
         if (file_exists(PATREON_PLUGIN_LOCKED_IMAGE_CACHE_DIR.'/'.$cached_filename)) {
             // Exists - serve the cached image:
 
+            // TODO: Serve locked and unlocked images from separate URLs, so the cached placeholder can be sent with cache headers and cached at the edge. Today both share one URL, so every response has to be no-store.
             self::sendLockedImageHeaders('image/png');
             // Readfile to avoid higher memory usage. Can be modified to echo file_get_contents for small files in future
             echo file_get_contents(PATREON_PLUGIN_LOCKED_IMAGE_CACHE_DIR.'/'.$cached_filename); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Binary image data
