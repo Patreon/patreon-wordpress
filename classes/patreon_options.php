@@ -23,7 +23,7 @@ class Patreon_Options
 
         add_submenu_page('', 'Patreon WordPress Admin Message', 'Admin message', 'manage_options', 'patreon-plugin-admin-message', [$this, 'patreon_plugin_admin_message_page']);
 
-        add_submenu_page('patreon-plugin', 'Patreon WordPress Post Sync', 'Post Sync', 'manage_options', 'patreon_wordpress_setup_wizard&setup_stage=post_sync_1', [$this, 'patreon_plugin_post_sync_page']);
+        add_submenu_page('patreon-plugin', 'Patreon WordPress Post Sync', 'Post Sync', 'manage_options', 'patreon-post-sync', [$this, 'patreon_plugin_post_sync_page']);
 
         add_submenu_page('patreon-plugin', 'Patreon WordPress Health Check', 'Health check', 'manage_options', 'patreon-plugin-health', [$this, 'patreon_plugin_health_check_page']);
     }
@@ -787,8 +787,7 @@ class Patreon_Options
 
     public function patreon_plugin_post_sync_page()
     {
-        // For now, dud to prevent any PHP notices when going to post sync wizard from admi menu. Can be expanded later.
-        return;
+        Patreon_Wordpress::render_setup_wizard('post_sync_1', 'patreon-post-sync');
     }
 
     public function patreon_plugin_health_check_page()
