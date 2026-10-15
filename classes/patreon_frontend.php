@@ -1284,8 +1284,7 @@ class Patreon_Frontend
 
     public static function showPatreonLoginButton($args = [])
     {
-        // Set default login image
-        $log_in_img = PATREON_PLUGIN_ASSETS.'/img/patreon-login-1x.png';
+        $label = PATREON_TEXT_LOG_IN_WITH_PATREON;
 
         $user = wp_get_current_user();
         $user_patreon_id = '';
@@ -1296,12 +1295,14 @@ class Patreon_Frontend
 
         if (is_user_logged_in() and '' == $user_patreon_id) {
             // Logged in user without a connected Patreon account. Show connect button
-            $log_in_img = PATREON_PLUGIN_ASSETS.'/img/patreon-connect-1x.png';
+            $label = PATREON_TEXT_CONNECT;
         }
+
+        $button_markup = self::makeButtonMarkup($label, '');
 
         // Override image if argument given
         if (isset($args['img'])) {
-            $log_in_img = $args['img'];
+            $button_markup = '<img src="'.esc_url($args['img']).'" width="272" height="42" alt="'.esc_attr($label).'" />';
         }
 
         $client_id = get_option('patreon-client-id', false);
@@ -1314,14 +1315,14 @@ class Patreon_Frontend
         $button .= '
         <style type="text/css">
             .ptrn-button{display:block !important;;margin-top:20px !important;margin-bottom:20px !important;}
-            .ptrn-button img {width: 272px; height:42px;}
+            .ptrn-button > img {width: 272px; height:42px;}
             .patreon-msg {-webkit-border-radius: 6px;-moz-border-radius: 6px;-ms-border-radius: 6px;-o-border-radius: 6px;border-radius: 6px;padding:8px;margin-bottom:20px!important;display:block;border:1px solid #E6461A;background-color:#484848;color:#ffffff;}
         </style>';
 
         if (isset($_REQUEST['patreon-msg']) && 'login_with_patreon' == $_REQUEST['patreon-msg']) {
             $button .= '<p class="patreon-msg">You can now login with your WordPress username/password.</p>';
         } else {
-            $button .= apply_filters('ptrn/login_button', '<a href="'.esc_url(self::patreonMakeCacheableLoginLink()).'" class="ptrn-button"><img src="'.esc_url($log_in_img).'" width="272" height="42" alt="Login with Patreon" /></a>');
+            $button .= apply_filters('ptrn/login_button', '<a href="'.esc_url(self::patreonMakeCacheableLoginLink()).'" class="ptrn-button">'.$button_markup.'</a>');
         }
 
         return $button;

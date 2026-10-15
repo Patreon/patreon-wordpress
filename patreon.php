@@ -37,6 +37,7 @@ define('PATREON_PLUGIN_ASSETS', plugin_dir_url(__FILE__).'assets');
 define('PATREON_PLUGIN_ASSETS_DIR', plugin_dir_path(__FILE__).'assets');
 define('PATREON_PLUGIN_LOCKED_IMAGE_CACHE_DIR', $patreon_locked_image_cache_dir);
 define('PATREON_TEXT_CONNECT', 'Connect with Patreon');
+define('PATREON_TEXT_LOG_IN_WITH_PATREON', 'Log in with Patreon');
 define('PATREON_TEXT_REFRESH', 'Refresh');
 define('PATREON_TEXT_NOT_PATRON', 'Not a Patron?');
 define('PATREON_TEXT_ALREADY_PATRON', 'Already a Patron?');
