@@ -292,7 +292,7 @@ class Patreon_Options
                                             <th scope="row">
                                                 <strong>Enable image locking features</strong>
                                                 <br>
-                                                <div class="patreon-options-info">If on, you will be able to lock your images and provide patron only images anywhere in your posts like webcomics or visual content. This may use noticeable server resources at your web host. If you aren't using image locking or having complications due to your web host infrastructure, you turn this feature off. Whenever you turn this feature on or off, you should visit 'Permalinks' settings in your WordPress site and save your permalinks just once by clicking 'Save'. Otherwise your images may appear broken.</div>
+                                                <div class="patreon-options-info">Lock your images so that only patrons can see them. Set a minimum pledge on an image, or leave it empty and the image uses the level of the post it belongs to. When this is on, image requests are served through WordPress, which may use noticeable server resources on your host. Turn it off if you don't use image locking or if it causes problems with your host. After turning it on or off, open Settings &gt; Permalinks and click Save once, otherwise your images may appear broken.</div>
                                             </th>
                                             <td>
                                                 <input type="checkbox" name="patreon-enable-file-locking" value="1"<?php checked(get_option('patreon-enable-file-locking', false)); ?> />

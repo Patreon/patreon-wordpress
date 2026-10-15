@@ -620,7 +620,7 @@ class Patreon_Compatibility
 
         // Get Patreon level if there is:
 
-        $patreon_level = get_post_meta($attachment_id, 'patreon_level', true);
+        $patreon_level = Patreon_Protect::getImageLevel($attachment_id);
 
         if ($patreon_level > 0) {
             return true;
