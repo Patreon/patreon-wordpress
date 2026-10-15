@@ -290,6 +290,23 @@ class Patreon_Protect
         wp_delete_file(PATREON_PLUGIN_LOCKED_IMAGE_CACHE_DIR.'/'.$attachment_id);
     }
 
+    private static function drawFilledRoundedRectangle($image, $x1, $y1, $x2, $y2, $radius, $color)
+    {
+        $x1 = (int) round($x1);
+        $y1 = (int) round($y1);
+        $x2 = (int) round($x2);
+        $y2 = (int) round($y2);
+        $radius = (int) round($radius);
+        $diameter = $radius * 2;
+
+        imagefilledrectangle($image, $x1 + $radius, $y1, $x2 - $radius, $y2, $color);
+        imagefilledrectangle($image, $x1, $y1 + $radius, $x2, $y2 - $radius, $color);
+        imagefilledellipse($image, $x1 + $radius, $y1 + $radius, $diameter, $diameter, $color);
+        imagefilledellipse($image, $x2 - $radius, $y1 + $radius, $diameter, $diameter, $color);
+        imagefilledellipse($image, $x1 + $radius, $y2 - $radius, $diameter, $diameter, $color);
+        imagefilledellipse($image, $x2 - $radius, $y2 - $radius, $diameter, $diameter, $color);
+    }
+
     public static function generateBlockedImagePlaceholder($patreon_level, $attachment_id, $image, $refresh_cache = false)
     {
         // Check if GDlib is installed
@@ -554,11 +571,7 @@ class Patreon_Protect
                 $y2_coord = $y1_coord + $rectangle_height;
             }
 
-            $thickness = apply_filters('ptrn/locked_image_interface_button_border', 3, $patreon_level, $attachment_id, $image, $width, $height);
-
-            imagesetthickness($image, $thickness);
-
-            imagerectangle($image, $x1_coord, $y1_coord, $x2_coord, $y2_coord, $white);
+            self::drawFilledRoundedRectangle($image, $x1_coord, $y1_coord, $x2_coord, $y2_coord, $rectangle_height / 4, $white);
 
             $button_font_size = apply_filters('ptrn/locked_image_interface_unlock_button_font_size', 9, $patreon_level, $attachment_id, $image, $width, $height);
 
@@ -571,7 +584,7 @@ class Patreon_Protect
 
             $y_coord = $y1_coord + (($rectangle_height / 2) - ($text_height / 2));
 
-            imagettftext($image, $button_font_size, 0, $x_coord, $y_coord, $white, $font, $unlock_button_text);
+            imagettftext($image, $button_font_size, 0, $x_coord, $y_coord, $black, $font, $unlock_button_text);
         }
 
         self::sendLockedImageHeaders($force_mime_type);
