@@ -4,7 +4,7 @@ Tags: patreon, membership, members
 Requires at least: 4.9.6
 Requires PHP: 7.4
 Tested up to: 7.1
-Stable tag: 1.12.0
+Stable tag: 1.13.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -78,6 +78,11 @@ To make a locked post public again, just choose "Everyone" from the select box a
 It is  difficult to protect videos due the intensive bandwidth requirements of hosting video  and having to rely on third parties such as Youtube or Vimeo. Youtube allows you to set videos to ‘private’ but Vimeo offers extra controls by only allowing videos to be played on specific domains. Visit this guide to [protecting your video content with Vimeo](https://help.vimeo.com/hc/en-us/articles/224817847-Privacy-settings-overview).
 
 == Upgrade Notice ==
+
+= 1.13.0 =
+
+* Changed: With image locking enabled, an image with no Patreon level of its own now uses the lowest level of the published posts that use it as featured image, or of the published post it is attached to, and is blurred for visitors below that level. Set an image's level to `0` to keep it public and unblurred on locked posts
+* Fixed: Locked image placeholders are now served from cache
 
 = 1.12.0 =
 
@@ -612,12 +617,14 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
+= 1.13.0 =
+
+* Changed: With image locking enabled, an image with no Patreon level of its own now uses the lowest level of the published posts that use it as featured image, or of the published post it is attached to, and is blurred for visitors below that level. Set an image's level to `0` to keep it public and unblurred on locked posts
+* Fixed: Locked image placeholders are now served from cache
+
 = 1.12.0 =
 
 * Fixed: The campaign name is no longer fetched from Patreon on every page load. It is now fetched on admin page loads only, skipped when the connection with Patreon's API is broken, and retried at most every 12 hours. This prevents repeated `HTTP 401` responses from `/oauth2/v2/campaigns`
 * Fixed: Fatal error when locking an image from the classic editor
 
-= 1.11.0 =
-
-* Security fixes for admin actions, settings, and database queries.
-* WordPress compatibility fixes. Requires WordPress 4.9.6 or later. Tested up to WordPress 7.1.
+To see the full changelog, visit [CHANGELOG.md on GitHub](https://github.com/Patreon/patreon-wordpress/blob/master/CHANGELOG.md).
