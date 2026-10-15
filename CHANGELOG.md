@@ -1,3 +1,8 @@
+= 1.13.0 =
+
+* Changed: With image locking enabled, an image with no Patreon level of its own now uses the lowest level of the published posts that use it as featured image, or of the published post it is attached to. Set an image's level to `0` to keep it public
+* Fixed: Locked image placeholders are now served from cache, and the cache is cleared when an image's level changes or the image is deleted
+
 = 1.12.0 =
 
 * Fixed: The campaign name is no longer fetched from Patreon on every page load. It is now fetched on admin page loads only, skipped when the connection with Patreon's API is broken, and retried at most every 12 hours. This prevents repeated `HTTP 401` responses from `/oauth2/v2/campaigns`
