@@ -1,7 +1,7 @@
 = 1.13.0 =
 
-* Changed: With image locking enabled, an image with no Patreon level of its own now uses the lowest level of the published posts that use it as featured image, or of the published post it is attached to. Set an image's level to `0` to keep it public
-* Fixed: Locked image placeholders are now served from cache, and the cache is cleared when an image's level changes or the image is deleted
+* Changed: With image locking enabled, an image with no Patreon level of its own now uses the lowest level of the published posts that use it as featured image, or of the published post it is attached to, and is blurred for visitors below that level. Set an image's level to `0` to keep it public and unblurred
+* Fixed: Locked image placeholders are now served from cache
 
 = 1.12.0 =
 
