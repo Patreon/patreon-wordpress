@@ -54,6 +54,11 @@
 	padding-left: 3px;
 }
 
+.compat-item .compat-field-patreon_level .help {
+	color: #646970;
+	font-size: 12px;
+}
+
 .patreon_image_locking_interface_heading {
 	font-size: 150%;
 	font-weight: bold;
