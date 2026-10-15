@@ -626,3 +626,5 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 * Fixed: The campaign name is no longer fetched from Patreon on every page load. It is now fetched on admin page loads only, skipped when the connection with Patreon's API is broken, and retried at most every 12 hours. This prevents repeated `HTTP 401` responses from `/oauth2/v2/campaigns`
 * Fixed: Fatal error when locking an image from the classic editor
+
+To see the full changelog, visit [CHANGELOG.md on GitHub](https://github.com/Patreon/patreon-wordpress/blob/master/CHANGELOG.md).
