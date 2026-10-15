@@ -59,6 +59,7 @@ class Patreon_Options
         register_setting('patreon-options', 'patreon-update-posts', 'sanitize_text_field');
         register_setting('patreon-options', 'patreon-post-author-for-synced-posts', 'absint');
         register_setting('patreon-options', 'patreon-hide-login-button', 'sanitize_text_field');
+        register_setting('patreon-options', 'patreon-button-style', [&$this, 'sanitize_button_style']);
         register_setting('patreon-options', 'patreon-set-featured-image', 'sanitize_text_field');
         register_setting('patreon-options', 'patreon-auto-publish-public-posts', 'sanitize_text_field');
         register_setting('patreon-options', 'patreon-auto-publish-patron-only-posts', 'sanitize_text_field');
@@ -354,6 +355,18 @@ class Patreon_Options
                                             </th>
                                             <td>
                                                 <input type="checkbox" name="patreon-hide-login-button" value="1"<?php checked(get_option('patreon-hide-login-button', false)); ?> />
+                                            </td>
+                                        </tr>
+                                        <tr valign="top">
+                                            <th scope="row">
+                                                <strong>Patreon button style</strong>
+                                                <div class="patreon-options-info">Style of the unlock and login buttons. Use light on sites with a dark background.</div>
+                                            </th>
+                                            <td>
+                                                <select name="patreon-button-style">
+                                                    <option value="dark"<?php selected(Patreon_Frontend::getButtonStyle(), 'dark'); ?>>Dark</option>
+                                                    <option value="light"<?php selected(Patreon_Frontend::getButtonStyle(), 'light'); ?>>Light</option>
+                                                </select>
                                             </td>
                                         </tr>
 
@@ -928,6 +941,11 @@ class Patreon_Options
         }
         ?></div><?php
 
+    }
+
+    public function sanitize_button_style($input)
+    {
+        return 'light' === $input ? 'light' : 'dark';
     }
 
     public function sanitize_currency_sign($input)

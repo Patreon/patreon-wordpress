@@ -15,7 +15,6 @@ class Patreon_Frontend
     {
         add_action('login_enqueue_scripts', [$this, 'patreonEnqueueCss'], 10);
         add_action('wp_enqueue_scripts', [$this, 'patreonEnqueueCss']);
-        add_action('wp_head', [$this, 'patreonPrintCss']);
         add_action('wp_enqueue_scripts', [$this, 'patreonEnqueueJs']);
         add_action('admin_enqueue_scripts', [$this, 'patreonEnqueueAdminCss']);
         add_action('login_form', [$this, 'showPatreonMessages']);
@@ -81,19 +80,6 @@ class Patreon_Frontend
     public function patreonEnqueueCss()
     {
         wp_enqueue_style('patreon-wordpress-css', PATREON_PLUGIN_ASSETS.'/css/app.css', [], PATREON_WORDPRESS_VERSION);
-    }
-
-    public function patreonPrintCss()
-    {
-        // Why we print out css direclty in header is that we want to account for any potential WP content directory location than default
-        echo '<style>';
-        echo "@font-face {
-            font-family: 'Libre Franklin Extra Bold';
-            src: url('".esc_url(PATREON_PLUGIN_ASSETS.'/fonts/librefranklin-extrabold-webfont.woff2')."') format('woff2'),
-                 url('".esc_url(PATREON_PLUGIN_ASSETS.'/fonts/librefranklin-extrabold-webfont.woff')."') format('woff');
-            font-weight: bold;
-            }";
-        echo '</style>';
     }
 
     public static function displayPatreonCampaignBanner($patreon_level = false, $args = false)
@@ -670,9 +656,22 @@ class Patreon_Frontend
         return $flow_link;
     }
 
+    public static function getButtonStyle()
+    {
+        return 'light' === get_option('patreon-button-style', 'dark') ? 'light' : 'dark';
+    }
+
+    public static function makeButtonMarkup($label, $logo_alt)
+    {
+        $style = self::getButtonStyle();
+        $logo = 'light' === $style ? 'patreon-mark-black.svg' : 'patreon-mark-white.svg';
+
+        return '<div class="patreon-responsive-button-wrapper patreon-button-'.$style.'"><div class="patreon-responsive-button"><img class="patreon_logo" src="'.PATREON_PLUGIN_ASSETS.'/img/'.$logo.'" alt="'.$logo_alt.'" /> '.$label.'</div></div>';
+    }
+
     public static function patreonMakeUniversalButtonImage($label)
     {
-        return '<div class="patreon-responsive-button-wrapper"><div class="patreon-responsive-button"><img class="patreon_logo" src="'.PATREON_PLUGIN_ASSETS.'/img/patreon-logomark-on-coral.svg" alt="'.$label.'" /> '.$label.'</div></div>';
+        return self::makeButtonMarkup($label, $label);
     }
 
     public static function MakeUniversalFlowLink($pledge_level, $state = false, $client_id = false, $post = false, $args = false)
@@ -876,7 +875,7 @@ class Patreon_Frontend
 
         $href = self::patreonMakeCacheableLoginLink();
 
-        return apply_filters('ptrn/login_button', '<a href="'.$href.'" class="ptrn-login"><div class="patreon-responsive-button-wrapper"><div class="patreon-responsive-button"><img class="patreon_logo" src="'.PATREON_PLUGIN_ASSETS.'/img/patreon-logomark-on-coral.svg" alt=""> '.$login_label.'</div></div></a>', $href);
+        return apply_filters('ptrn/login_button', '<a href="'.$href.'" class="ptrn-login">'.self::makeButtonMarkup($login_label, '').'</a>', $href);
     }
 
     public static function lock_this_post($post = false)
