@@ -2908,15 +2908,10 @@ class Patreon_Wordpress
 
     public function get_file_id_from_media_library($filename)
     {
-        global $wpdb;
+        $attachment = get_page_by_path($filename, OBJECT, 'attachment');
 
-        $attachment_id = $wpdb->get_var($wpdb->prepare(
-            "SELECT ID FROM $wpdb->posts WHERE post_type = 'attachment' AND post_name = %s",
-            $filename
-        ));
-
-        if (null !== $attachment_id) {
-            return $attachment_id;
+        if (null !== $attachment) {
+            return $attachment->ID;
         }
 
         return false;
