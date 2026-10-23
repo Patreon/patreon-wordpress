@@ -1804,7 +1804,7 @@ class Patreon_Wordpress
                 // Toggle redirect flag off. If the user skips the wizard we will just show a notice in admin and not force subsequent redirections
                 update_option('patreon-redirect_to_setup_wizard', false);
 
-                wp_redirect(admin_url('admin.php?page=patreon_wordpress_setup_wizard&setup_stage=0'));
+                wp_safe_redirect(admin_url('admin.php?page=patreon_wordpress_setup_wizard&setup_stage=0'));
                 exit;
             }
         }
@@ -2485,7 +2485,7 @@ class Patreon_Wordpress
                 update_option('patreon-installation-api-version', '2');
                 update_option('patreon-can-use-api-v2', true);
 
-                wp_redirect(admin_url('admin.php?page=patreon_wordpress_setup_wizard&setup_stage=reconnect_0'));
+                wp_safe_redirect(admin_url('admin.php?page=patreon_wordpress_setup_wizard&setup_stage=reconnect_0'));
                 exit;
             }
 
@@ -2514,7 +2514,7 @@ class Patreon_Wordpress
 
                     update_option('patreon-show-site-disconnect-success-notice', true);
 
-                    wp_redirect(admin_url('admin.php?page=patreon-plugin'));
+                    wp_safe_redirect(admin_url('admin.php?page=patreon-plugin'));
                     exit;
                 }
 
@@ -2522,7 +2522,7 @@ class Patreon_Wordpress
 
                 // We redirect to error page.
 
-                wp_redirect(admin_url('admin.php?page=patreon-plugin-admin-message&patreon_admin_message_title=client_delete_error_title&patreon_admin_message_content=client_delete_error_content'));
+                wp_safe_redirect(admin_url('admin.php?page=patreon-plugin-admin-message&patreon_admin_message_title=client_delete_error_title&patreon_admin_message_content=client_delete_error_content'));
                 exit;
             }
         }
@@ -2531,7 +2531,7 @@ class Patreon_Wordpress
             // We dont need to do this anymore. So for the time being, just redirect to the connection wizard for compatibility concerns. The entire block can be removed after a few versions
 
             // Redirect to connect wizard
-            wp_redirect(admin_url('admin.php?page=patreon_wordpress_setup_wizard&setup_stage=reconnect_0'));
+            wp_safe_redirect(admin_url('admin.php?page=patreon_wordpress_setup_wizard&setup_stage=reconnect_0'));
             exit;
 
             if (!isset($_REQUEST['patreon_wordpress_reconnect_to_patreon_nonce']) or !wp_verify_nonce(sanitize_key($_REQUEST['patreon_wordpress_reconnect_to_patreon_nonce']))) {
@@ -2583,7 +2583,7 @@ class Patreon_Wordpress
                 update_option('patreon-installation-api-version', '2');
                 update_option('patreon-can-use-api-v2', true);
 
-                wp_redirect(admin_url('admin.php?page=patreon_wordpress_setup_wizard&setup_stage=reconnect_0'));
+                wp_safe_redirect(admin_url('admin.php?page=patreon_wordpress_setup_wizard&setup_stage=reconnect_0'));
                 exit;
             }
             // Exceptions EOF
@@ -2610,7 +2610,7 @@ class Patreon_Wordpress
                     }
 
                     // Redirect to connect wizard
-                    wp_redirect(admin_url('admin.php?page=patreon_wordpress_setup_wizard&setup_stage=reconnect_0'));
+                    wp_safe_redirect(admin_url('admin.php?page=patreon_wordpress_setup_wizard&setup_stage=reconnect_0'));
                     exit;
                 }
 
@@ -2618,7 +2618,7 @@ class Patreon_Wordpress
 
                 // We redirect to error page.
 
-                wp_redirect(admin_url('admin.php?page=patreon-plugin-admin-message&patreon_admin_message_title=client_reconnect_delete_error_title&patreon_admin_message_content=client_reconnect_delete_error_content'));
+                wp_safe_redirect(admin_url('admin.php?page=patreon-plugin-admin-message&patreon_admin_message_title=client_reconnect_delete_error_title&patreon_admin_message_content=client_reconnect_delete_error_content'));
                 exit;
             }
         }
