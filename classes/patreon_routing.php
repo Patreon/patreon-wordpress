@@ -13,6 +13,13 @@ class Patreon_Routing
         add_filter('query_vars', [$this, 'query_vars']);
         add_action('parse_request', [$this, 'parse_request']);
         add_action('init', [$this, 'force_rewrite_rules']);
+        add_filter('allowed_redirect_hosts', [$this, 'allow_patreon_redirect_hosts']);
+    }
+
+    public function allow_patreon_redirect_hosts($hosts)
+    {
+        // Lets wp_safe_redirect() send users to Patreon's OAuth pages
+        return array_merge($hosts, [PATREON_HOST, 'www.'.PATREON_HOST]);
     }
 
     public function force_rewrite_rules()
@@ -91,7 +98,7 @@ class Patreon_Routing
 
                 $login_url = Patreon_Frontend::patreonMakeLoginLink(false, $state);
 
-                wp_redirect($login_url);
+                wp_safe_redirect($login_url);
                 exit;
             }
 
@@ -113,7 +120,7 @@ class Patreon_Routing
 
                         $final_redirect = add_query_arg('patreon_message', 'patreon_cant_login_api_error_credentials', $final_redirect);
 
-                        wp_redirect($final_redirect);
+                        wp_safe_redirect($final_redirect);
                         exit;
                     }
 
@@ -130,7 +137,7 @@ class Patreon_Routing
 
                     $flow_link = Patreon_Frontend::MakeUniversalFlowLink($send_pledge_level, $state, $client_id, $post, ['link_interface_item' => $link_interface_item]);
 
-                    wp_redirect($flow_link);
+                    wp_safe_redirect($flow_link);
                     exit;
                 }
             }
@@ -158,7 +165,7 @@ class Patreon_Routing
                             // No post, no point in being here.
 
                             $final_redirect = add_query_arg('patreon_message', 'patreon_no_post_id_to_unlock_post', $final_redirect);
-                            wp_redirect(home_url());
+                            wp_safe_redirect(home_url());
                             exit;
                         }
                     }
@@ -206,7 +213,7 @@ class Patreon_Routing
 
                         $final_redirect = add_query_arg('patreon_message', 'patreon_cant_login_api_error_credentials', $final_redirect);
 
-                        wp_redirect($final_redirect);
+                        wp_safe_redirect($final_redirect);
                         exit;
                     }
 
@@ -229,14 +236,14 @@ class Patreon_Routing
 
                     $flow_link = Patreon_Frontend::MakeUniversalFlowLink($send_pledge_level, $state, $client_id, $post, ['link_interface_item' => $link_interface_item]);
 
-                    wp_redirect($flow_link);
+                    wp_safe_redirect($flow_link);
                     exit;
                 }
             }
 
             // Catch all
             $redirect = add_query_arg('patreon_message', 'no_patreon_action_provided_for_flow', wp_login_url());
-            wp_redirect($redirect);
+            wp_safe_redirect($redirect);
             exit;
         }
 
@@ -503,7 +510,7 @@ class Patreon_Routing
                         ) {
                             // One or more of the app details is kaput. Redirect with an error message.
 
-                            wp_redirect(admin_url('admin.php?page=patreon_wordpress_setup_wizard&setup_stage='.$stage_prefix.'0&patreon_message=error_missing_credentials'));
+                            wp_safe_redirect(admin_url('admin.php?page=patreon_wordpress_setup_wizard&setup_stage='.$stage_prefix.'0&patreon_message=error_missing_credentials'));
                             exit;
                         }
 
@@ -543,7 +550,7 @@ class Patreon_Routing
                                 $setup_final_redirect = apply_filters('ptrn/setup_wizard_post_sync_redirect', admin_url('admin.php?page=patreon_wordpress_setup_wizard&setup_stage=post_sync_0'));
                             }
 
-                            wp_redirect($setup_final_redirect);
+                            wp_safe_redirect($setup_final_redirect);
                             exit;
                         }
                     } elseif (isset($client_result['errors'])) {
@@ -552,12 +559,12 @@ class Patreon_Routing
 
                     // If we are here, something else is wrong. Come out with an error
 
-                    wp_redirect(admin_url('admin.php?page=patreon_wordpress_setup_wizard&setup_stage='.$stage_prefix.'0&patreon_message=failure_obtaining_credentials'));
+                    wp_safe_redirect(admin_url('admin.php?page=patreon_wordpress_setup_wizard&setup_stage='.$stage_prefix.'0&patreon_message=failure_obtaining_credentials'));
                     exit;
                 } else {
                     // No auth. Error handling here.
 
-                    wp_redirect(admin_url('admin.php?page=patreon_wordpress_setup_wizard&setup_stage='.$stage_prefix.'0&patreon_message=no_auth_for_client_creation'));
+                    wp_safe_redirect(admin_url('admin.php?page=patreon_wordpress_setup_wizard&setup_stage='.$stage_prefix.'0&patreon_message=no_auth_for_client_creation'));
                     exit;
                 }
             }
@@ -567,7 +574,7 @@ class Patreon_Routing
             if (false == get_option('patreon-client-id', false) || false == get_option('patreon-client-secret', false)) {
                 /* redirect to homepage because of oauth client_id or secure_key error */
                 $redirect = add_query_arg('patreon_message', 'patreon_api_credentials_missing', $redirect);
-                wp_redirect($redirect);
+                wp_safe_redirect($redirect);
                 exit;
             } else {
                 $oauth_client = new Patreon_Oauth();
@@ -585,7 +592,7 @@ class Patreon_Routing
                     $redirect = add_query_arg('patreon_error', $tokens['error'], $redirect);
                 }
 
-                wp_redirect($redirect);
+                wp_safe_redirect($redirect);
                 exit;
             } else {
                 $api_client = new Patreon_API($tokens['access_token']);
@@ -599,7 +606,7 @@ class Patreon_Routing
 
                     $redirect = add_query_arg('patreon_message', 'patreon_couldnt_acquire_user_details', $redirect);
 
-                    wp_redirect($redirect);
+                    wp_safe_redirect($redirect);
                     exit;
                 }
 
@@ -612,12 +619,12 @@ class Patreon_Routing
                 // shouldn't get here
                 $redirect = add_query_arg('patreon_message', 'patreon_weird_redirection_at_login', $redirect);
 
-                wp_redirect($redirect);
+                wp_safe_redirect($redirect);
                 exit;
             }
         } else {
             $redirect = add_query_arg('patreon_message', 'no_code_receved_from_patreon', wp_login_url());
-            wp_redirect($redirect);
+            wp_safe_redirect($redirect);
             exit;
         }
     }

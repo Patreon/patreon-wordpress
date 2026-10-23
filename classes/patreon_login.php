@@ -57,12 +57,12 @@ class Patreon_Login
 
         if (0 == $user->ID) {
             $redirect = add_query_arg('patreon_message', 'patreon_cant_login_strict_oauth', $redirect);
-            wp_redirect($redirect);
+            wp_safe_redirect($redirect);
             exit;
         } else {
             /* update user meta data with patreon data */
             self::updateExistingUser($user->ID, $user_response, $tokens);
-            wp_redirect($redirect);
+            wp_safe_redirect($redirect);
             exit;
         }
     }
@@ -135,7 +135,7 @@ class Patreon_Login
             // Save this time when patron returned from a Patreon flow to use for deciding when to call the api in unlock actions
             update_user_meta($user->ID, 'patreon_user_last_returned_from_any_flow', time());
 
-            wp_redirect($redirect);
+            wp_safe_redirect($redirect);
             exit;
         }
 
@@ -181,7 +181,7 @@ class Patreon_Login
             if ($login_with_patreon) {
                 if (false == $admins_editors_login_with_patreon && array_key_exists($user->user_login, $danger_user_list)) {
                     /* dont log admin / editor in */
-                    wp_redirect(wp_login_url().'?patreon_message=admin_login_with_patreon_disabled', '301');
+                    wp_safe_redirect(wp_login_url().'?patreon_message=admin_login_with_patreon_disabled', '301');
                     exit;
                 } else {
                     /* log user into existing wordpress account with matching username */
@@ -210,11 +210,11 @@ class Patreon_Login
                     // Save this time when patron returned from a Patreon flow to use for deciding when to call the api in unlock actions
                     update_user_meta($user->ID, 'patreon_user_last_returned_from_any_flow', time());
 
-                    wp_redirect($redirect);
+                    wp_safe_redirect($redirect);
                     exit;
                 }
             } else {
-                wp_redirect(wp_login_url().'?patreon_message=login_with_patreon_disabled', '301');
+                wp_safe_redirect(wp_login_url().'?patreon_message=login_with_patreon_disabled', '301');
                 exit;
             }
         }
@@ -235,7 +235,7 @@ class Patreon_Login
 
             // Give a message to the user to log in with the WP account and then log in with Patreon
 
-            wp_redirect(wp_login_url().'?patreon_message=email_exists_login_with_wp_first', '301');
+            wp_safe_redirect(wp_login_url().'?patreon_message=email_exists_login_with_wp_first', '301');
             exit;
         }
 
@@ -317,13 +317,13 @@ class Patreon_Login
                 // Save this time when patron returned from a Patreon flow to use for deciding when to call the api in unlock actions
                 update_user_meta($user->ID, 'patreon_user_last_returned_from_any_flow', time());
 
-                wp_redirect($redirect);
+                wp_safe_redirect($redirect);
                 exit;
             } else {
                 /* wordpress account creation failed */
 
                 $redirect = add_query_arg('patreon_message', 'patreon_could_not_create_wp_account', $redirect);
-                wp_redirect($redirect);
+                wp_safe_redirect($redirect);
                 exit;
             }
         } else {
@@ -351,7 +351,7 @@ class Patreon_Login
             // Save this time when patron returned from a Patreon flow to use for deciding when to call the api in unlock actions
             update_user_meta($user->ID, 'patreon_user_last_returned_from_any_flow', time());
 
-            wp_redirect($redirect);
+            wp_safe_redirect($redirect);
             exit;
         }
     }
