@@ -227,7 +227,6 @@ class Patreon_Content_Sync
         // Parse and handle the images inside the post:
 
         global $Patreon_Wordpress;
-        global $wpdb;
 
         $images = $Patreon_Wordpress->get_images_info_from_content($post['post_content']);
 
@@ -267,9 +266,9 @@ class Patreon_Content_Sync
 
         if ($images) {
             foreach ($images as $key => $value) {
-                $inserted_attachment = $wpdb->get_results($wpdb->prepare('SELECT ID FROM '.$wpdb->posts.' WHERE post_name = %s', $images[$key]['name']));
+                $inserted_attachment = get_page_by_path($images[$key]['name'], OBJECT, 'attachment');
 
-                $inserted_attachment_id = $inserted_attachment[0]->ID;
+                $inserted_attachment_id = $inserted_attachment ? $inserted_attachment->ID : 0;
 
                 // Set Patreon post as parent of this attachment
 
@@ -334,7 +333,6 @@ class Patreon_Content_Sync
         // Parse and handle the images inside the post:
 
         global $Patreon_Wordpress;
-        global $wpdb;
 
         $images = $Patreon_Wordpress->get_images_info_from_content($post['post_content']);
 
@@ -374,9 +372,9 @@ class Patreon_Content_Sync
 
         if ($images) {
             foreach ($images as $key => $value) {
-                $inserted_attachment = $wpdb->get_results($wpdb->prepare('SELECT ID FROM '.$wpdb->posts.' WHERE post_name = %s', $images[$key]['name']));
+                $inserted_attachment = get_page_by_path($images[$key]['name'], OBJECT, 'attachment');
 
-                $inserted_attachment_id = $inserted_attachment[0]->ID;
+                $inserted_attachment_id = $inserted_attachment ? $inserted_attachment->ID : 0;
 
                 // Set Patreon post as parent of this attachment
 

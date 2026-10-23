@@ -99,7 +99,6 @@ class Patreon_Protect
 
     public static function getAttachmentIDfromThumbnailURL($attachment_url = '')
     {
-        global $wpdb;
         $attachment_id = false;
 
         if ('' == $attachment_url) {
@@ -122,7 +121,7 @@ class Patreon_Protect
             $attachment_id = get_transient($cache_key);
 
             if (false == $attachment_id or '' == $attachment_id) {
-                $attachment_id = $wpdb->get_var($wpdb->prepare("SELECT wposts.ID FROM $wpdb->posts wposts, $wpdb->postmeta wpostmeta WHERE wposts.ID = wpostmeta.post_id AND wpostmeta.meta_key = '_wp_attached_file' AND wpostmeta.meta_value = %s AND wposts.post_type = 'attachment'", $search_attachment_url));
+                $attachment_id = attachment_url_to_postid($upload_dir_paths['baseurl'].'/'.$search_attachment_url);
                 set_transient($cache_key, $attachment_id, 60);
             }
 
@@ -132,7 +131,7 @@ class Patreon_Protect
                 $search_attachment_url = preg_replace('/-\d+x\d+(?=\.(jpg|jpeg|png|gif)$)/i', '', $protocol_snipped_attachment_url);
                 $search_attachment_url = str_replace($protocol_snipped_baseurl.'/', '', $search_attachment_url);
 
-                $attachment_id = $wpdb->get_var($wpdb->prepare("SELECT wposts.ID FROM $wpdb->posts wposts, $wpdb->postmeta wpostmeta WHERE wposts.ID = wpostmeta.post_id AND wpostmeta.meta_key = '_wp_attached_file' AND wpostmeta.meta_value = %s AND wposts.post_type = 'attachment'", $search_attachment_url));
+                $attachment_id = attachment_url_to_postid($upload_dir_paths['baseurl'].'/'.$search_attachment_url);
                 set_transient($cache_key, $attachment_id, 60);
             }
 
