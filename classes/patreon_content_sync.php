@@ -266,9 +266,11 @@ class Patreon_Content_Sync
 
         if ($images) {
             foreach ($images as $key => $value) {
-                $inserted_attachment = get_page_by_path($images[$key]['name'], OBJECT, 'attachment');
+                $inserted_attachment_id = $Patreon_Wordpress->get_file_id_from_media_library($images[$key]['name']);
 
-                $inserted_attachment_id = $inserted_attachment ? $inserted_attachment->ID : 0;
+                if (!$inserted_attachment_id) {
+                    continue;
+                }
 
                 // Set Patreon post as parent of this attachment
 
@@ -372,9 +374,11 @@ class Patreon_Content_Sync
 
         if ($images) {
             foreach ($images as $key => $value) {
-                $inserted_attachment = get_page_by_path($images[$key]['name'], OBJECT, 'attachment');
+                $inserted_attachment_id = $Patreon_Wordpress->get_file_id_from_media_library($images[$key]['name']);
 
-                $inserted_attachment_id = $inserted_attachment ? $inserted_attachment->ID : 0;
+                if (!$inserted_attachment_id) {
+                    continue;
+                }
 
                 // Set Patreon post as parent of this attachment
 

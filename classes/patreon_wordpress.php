@@ -2908,10 +2908,19 @@ class Patreon_Wordpress
 
     public function get_file_id_from_media_library($filename)
     {
-        $attachment = get_page_by_path($filename, OBJECT, 'attachment');
+        // Not get_page_by_path(), which skips attachments that have a parent post
+        $attachment_ids = get_posts([
+            'post_type' => 'attachment',
+            'name' => $filename,
+            'post_status' => 'any',
+            'posts_per_page' => 1,
+            'orderby' => 'ID',
+            'order' => 'ASC',
+            'fields' => 'ids',
+        ]);
 
-        if (null !== $attachment) {
-            return $attachment->ID;
+        if ($attachment_ids) {
+            return $attachment_ids[0];
         }
 
         return false;
