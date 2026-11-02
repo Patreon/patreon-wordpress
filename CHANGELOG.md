@@ -1,3 +1,7 @@
+= 1.13.1 =
+
+* Miscellaneous WordPress Plugin Check warning fixes.
+
 = 1.13.0 =
 
 * Changed: With image locking enabled, an image with no Patreon level of its own now uses the lowest level of the published posts that use it as featured image, or of the published post it is attached to, and is blurred for visitors below that level. Set an image's level to `0` to keep it public and unblurred on locked posts
