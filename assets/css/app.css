@@ -29,7 +29,7 @@
 	width: 100%;
 	font-size: 100%;
 	margin: 10px 0px 10px 0px;
-	clear: both; 
+	clear: both;
 	padding-bottom: 20px;
 	margin-bottom: 20px;
 	border-bottom: 1px solid #f0f0f0;
@@ -54,45 +54,65 @@
 }
 
 .patreon-responsive-button-wrapper {
-	display: inline-table !important; /* some themes override this. hence important */
-	width: 240px !important; /* some themes override this. hence important */
-	height: 50px !important; /* some themes override this. hence important */
+	display: inline-flex !important; /* some themes override this. hence important */
+	align-items: center;
+	justify-content: center;
+	box-sizing: border-box;
+	min-width: 240px !important; /* some themes override this. hence important */
+	height: 44px !important; /* some themes override this. hence important */
+	padding: 0 16px;
+	border-radius: 8px;
 	vertical-align: middle;
 	text-align: center;
-	background-color: #F96854 !important;
+	background-color: #000000 !important;
+	transition: background-color 0.15s ease;
 }
-.patreon-responsive-button-wrapper:hover{
-	background-color: #FA7664 !important;
+.patreon-responsive-button-wrapper:hover {
+	background-color: #262626 !important;
+}
+.patreon-responsive-button-wrapper:active {
+	background-color: #3d3d3d !important;
+}
+.patreon-responsive-button-wrapper.patreon-button-light {
+	background-color: #ffffff !important;
+}
+.patreon-responsive-button-wrapper.patreon-button-light:hover {
+	background-color: #f2f2f2 !important;
+}
+.patreon-responsive-button-wrapper.patreon-button-light:active {
+	background-color: #dedede !important;
 }
 .patreon-responsive-button {
-	display: table-cell !important; /* some themes override this. hence important */
-	vertical-align: middle;
-	text-align: center;
+	display: inline-flex !important; /* some themes override this. hence important */
+	align-items: center;
+	justify-content: center;
 	padding: 0px;
 	height: auto;
 	text-wrap: nowrap;
-	/* below code taken from earlier button */
 	border: 0;
 	box-shadow: none !important;
-	color: #fff !important;
+	color: #ffffff !important;
 	cursor: pointer;
-	font-size: 14px;
-	font-weight: 800;
+	font-size: 15px;
+	font-weight: 600;
+	line-height: 1;
 	text-shadow: none;
 	text-decoration: none !important;
 	text-align: center;
-	text-transform: uppercase;
-	font-family: 'Libre Franklin Extra Bold',Helvetica, Arial;
+	text-transform: none;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+.patreon-button-light .patreon-responsive-button {
+	color: #000000 !important;
 }
 
 .patreon-responsive-button img {
-	display:inline-block !important; /* some themes override this. hence important */
-	/* below code taken from earlier button */	
+	display: inline-block !important; /* some themes override this. hence important */
 	/* Themes override the below - therefore !important */
-	width: 20px !important;
-	color: #fff !important;
+	width: 16px !important;
+	height: auto !important;
 	vertical-align: middle;
-	margin-right: 10px;
+	margin: 0 8px 0 0 !important;
 	box-shadow: none !important;
 }
 
@@ -114,7 +134,7 @@
 	display: inline-block;
 	width: 100%;
 	margin-bottom: 20px;
-	font-size: 100%; 
+	font-size: 100%;
 }
 
 .patreon-text-under-button {
@@ -128,7 +148,7 @@
 .patreon-valid-patron-message {
 	display: block;
 	width: 100%;
-	clear: both; 
+	clear: both;
 	padding-bottom: 25px;
 	padding-top: 25px;
 	margin-top: 25px;
