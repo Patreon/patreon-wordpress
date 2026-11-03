@@ -216,13 +216,13 @@ class Patreon_Protect
 
         $attachment_id = Patreon_Protect::get_attachment_id_from_url($image);
 
-        // The above returns 0 if it cant find the attachment post id
+        // The above returns 0 if it can't find the attachment post id
 
         if (0 == $attachment_id) {
             // Couldnt determine attachment post id. Try to get id from thumbnail
             $attachment_id = Patreon_Protect::getAttachmentIDfromThumbnailURL($image);
 
-            // No go. Image cant be found in media library. bail out.
+            // No go. Image can't be found in media library. bail out.
             if (0 == $attachment_id or !$attachment_id) {
                 wp_die('Image not found in media library');
             }
@@ -717,7 +717,7 @@ RewriteRule ^".$upload_dir.'/(.*)$ index.php?patreon_action=serve_patron_only_im
 
         $attachment_id = Patreon_Protect::get_attachment_id_from_url($attachment_url);
 
-        // The above returns 0 if it cant find the attachment post id
+        // The above returns 0 if it can't find the attachment post id
 
         if (0 == $attachment_id) {
             // Couldnt determine attachment post id. Try to get id from thumbnail
@@ -820,7 +820,7 @@ RewriteRule ^".$upload_dir.'/(.*)$ index.php?patreon_action=serve_patron_only_im
         foreach ($images as $key => $value) {
             $attachment_id = Patreon_Protect::get_attachment_id_from_url($images[$key]);
 
-            // The above returns 0 if it cant find the attachment post id
+            // The above returns 0 if it can't find the attachment post id
 
             if (0 == $attachment_id) {
                 // Couldnt determine attachment post id. Try to get id from thumbnail

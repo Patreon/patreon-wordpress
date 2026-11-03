@@ -49,7 +49,7 @@ class Patreon_OAuth
 
         if ($disable_app_on_auth_err) {
             // Debugging high number of 401s to the token API. Try to indicate
-            // whether the refresh event is for a creator token or not. Use the
+            // whether the refresh event is for a creator token or not. The
             // $disable_app_on_auth_err is usually set to true when working with
             // creator access token.
             $api_endpoint = $api_endpoint.'?is_creator_access=true';

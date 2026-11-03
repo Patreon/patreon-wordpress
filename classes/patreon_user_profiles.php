@@ -75,7 +75,7 @@ class Patreon_User_Profiles
                 $linked_patreon_account = get_user_meta($user_id, 'patreon_user_id', true);
 
             if ('' == $linked_patreon_account and (isset($user_id) and (get_current_user_id() == $user_id))) {
-                // Only show this if the current user is the owner of the profile - an admin cant link a user's Patreon account for that user
+                // Only show this if the current user is the owner of the profile - an admin can't link a user's Patreon account for that user
 
                 $user = wp_get_current_user();
 

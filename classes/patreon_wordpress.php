@@ -207,7 +207,7 @@ class Patreon_Wordpress
                 }
             }
 
-            // For whatsoever reason the returns are not valid and we cant refresh the user
+            // For whatsoever reason the returns are not valid and we can't refresh the user
             // Check if a saved return exists for this user
 
             $user_response = get_user_meta($user->ID, 'patreon_latest_patron_info', true);
