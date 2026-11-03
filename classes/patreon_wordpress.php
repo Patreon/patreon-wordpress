@@ -1587,11 +1587,16 @@ class Patreon_Wordpress
             $post_level = 0;
         }
 
-        // Check if post was set for active patrons only
-        $patreon_active_patrons_only = get_post_meta($post->ID, 'patreon-active-patrons-only', true);
+        $patreon_active_patrons_only = '';
+        $post_total_patronage_level = '';
 
-        // Check if specific total patronage is given for this post:
-        $post_total_patronage_level = get_post_meta($post->ID, 'patreon-total-patronage-level', true);
+        if (isset($post->ID)) {
+            // Check if post was set for active patrons only
+            $patreon_active_patrons_only = get_post_meta($post->ID, 'patreon-active-patrons-only', true);
+
+            // Check if specific total patronage is given for this post:
+            $post_total_patronage_level = get_post_meta($post->ID, 'patreon-total-patronage-level', true);
+        }
 
         $post_locked_with = [
             'site_patreon_level' => $patreon_level,
